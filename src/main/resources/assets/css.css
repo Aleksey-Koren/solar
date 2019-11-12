@@ -1,0 +1,156 @@
+.hidden {
+    display: none !important;
+}
+.flex-row {
+    display: flex;
+    flex-direction: row;
+}
+canvas {
+    display: block;
+}
+body, html, * {
+    box-sizing: border-box
+}
+body, html {
+    background: #2b2b2b;
+    color: #4fb169;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+a {
+    color: #ffc562;
+    text-decoration: none;
+}
+td, th {
+    padding: 10px 5px;
+}
+.grid td, .grid th {
+    border-left: 1px solid;
+}
+.grid td:first-child, .grid th:first-child {
+    border-left: none;
+}
+.grid tr td {
+    border-top: 1px solid;
+}
+
+table {
+    border-collapse: collapse;
+    margin-bottom: 15px;
+}
+input, select, textarea {
+    padding: 4px;
+    border-radius: 2px;
+    border: none;
+}
+.head-menu {
+    border-bottom: 1px solid #555555;
+    padding: 20px 0;
+    text-align: center;
+    background-color: #2b2b2b;
+    z-index: 20;
+    position: relative;
+
+}
+.head-menu.head-menu-top {
+     z-index: 30;
+}
+
+.head-menu > * {
+    margin: 0 10px;
+}
+
+.planets-form tr:first-child td{
+    border-top: none;
+}
+.planets-form {
+    margin-right: 20px;
+}
+.head-menu-item {
+    position: relative;
+}
+.head-menu-item > span {
+    position: absolute;
+    width: 220px;
+    top: 26px;
+    left: 50%;
+    margin-left: -110px;
+    background: #2b2b2b;
+    border: 1px solid #555555;
+    z-index: 30;
+}
+.head-menu-item > span > * {
+    display: block;
+    padding: 5px 0;
+}
+.pagination-page {
+    max-width: 40px;
+}
+.notification-container {
+    position: fixed;
+    top: 80px;
+    right: 10px;
+    z-index: 100000;
+}
+.notification-close {
+    position: absolute;
+    top: 3px;
+    right: 6px;
+    font-weight: bold;
+    font-family: Arial;
+    font-size: 14px;
+}
+.notification {
+    padding: 20px 10px 10px;
+    border: 1px solid;
+    background: #2b2b2b;
+}
+.notification-info {
+    border: 1px solid #ffc562;
+}
+.notification-error .notification-close {
+    color: #f34848;
+}
+.notification-error {
+    border: 1px solid #f34848;
+    color:  #ffc562;
+}
+.solar-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 10;
+}
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #3a3a3a;
+    z-index: 1000;
+}
+
+.modal, .small-modal {
+    background: #2b2b2b;
+    border: 1px solid  #ffc562;
+    padding: 15px;
+}
+.small-modal {
+    width: 460px;
+    left: 50%;
+    position: relative;
+    margin-left: -230px;
+    top: 100px;
+}
+
+tr, td, th {
+    vertical-align: top;
+}
+.inventory-item-form textarea {
+    min-width: 300px;
+}
+.items-f-left > * {
+    float: left;
+}
