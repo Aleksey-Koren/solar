@@ -1,18 +1,20 @@
 function Menu(context) {
     this.context = context;
     this.container = Dom.el('div', 'head-menu head-menu-top');
+    var logout = this.createItem("logoutManagement", "Logout", function(){return new LogoutManagement(context)});
+    logout.style.cssFloat = 'right';
     Dom.append(this.container, [
         this.createItem('solarWrapper', 'Star Map', function(){return new SolarWrapper(context)}),
         this.createItem('dashboard', 'Dashboard', function(){return new DashboardManagement(context)}),
         this.createDropdown("Config", [
             this.createItem('planetsManagement', 'Planets Management', function(){return new PlanetsManagement(context)}),
             this.createItem('productsManagement', 'Products Management', function(){return new ProductsManagement()}),
-            this.createItem('stationsManagement', 'Stations Management', function(){return new StationsManagement()}),
+            this.createItem('stationsManagement', 'Stations Management', function(){return new StationsManagement(context)}),
             this.createItem('inventoryManagement', 'Inventory Management', function(){return new InventoryManagement(context)}),
             this.createItem('permissionsManagement', 'Permissions Management', function(){return new PermissionsManagement(context)}),
             this.createItem('usersManagement', 'Users Management', function(){return new UserManagement(context)})
         ]),
-        this.createItem("logoutManagement", "Logout", function(){return new LogoutManagement(context)})
+        logout
     ])
 }
 

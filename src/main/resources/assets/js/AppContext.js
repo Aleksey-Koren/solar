@@ -4,6 +4,7 @@ function AppContext() {
         planets: new PlanetsStore(),
         inventory: new InventoryStore(),
         permissions: new PermissionsStore(),
+        station: new StationStore(),
     };
     this.app = {
         instance: null,

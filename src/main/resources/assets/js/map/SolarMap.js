@@ -332,6 +332,7 @@ SolarMap.prototype.calculateZoom = function () {
     zoomInfo.step++;
     if (this.kkmPerPixel > 51918 && zoomInfo.zoom > 1) {
         this.zoomStack.shift();
+        this.calculateZoom();
         return;
     }
 

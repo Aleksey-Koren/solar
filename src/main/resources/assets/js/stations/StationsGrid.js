@@ -1,5 +1,6 @@
-function StationsGrid() {
+function StationsGrid(context) {
 
+    this.context = context;
     var me = this;
     this.grid = new Grid({
         columns: [
@@ -60,7 +61,7 @@ StationsGrid.prototype.showForm = function (id) {
     var me = this;
     var form = new StationsCreationForm(id, function () {
         me.showGrid()
-    });
+    }, this.context);
     this.container.appendChild(form.container);
 };
 

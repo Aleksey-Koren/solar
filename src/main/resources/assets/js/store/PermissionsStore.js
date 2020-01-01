@@ -22,5 +22,4 @@ PermissionsStore.prototype.update = function() {
             permissionTypes: me.permissionTypes
         });
     });
-
 };

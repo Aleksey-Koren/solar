@@ -1,9 +1,9 @@
-function StationsCreationForm(id, onClose) {
+function StationsCreationForm(id, onClose, context) {
     var w = wrapTableInput;
 
     var me = this;
     this.planets = Dom.el('select', {name: 'planetId'});
-
+    this.hullSelect = Dom.el('select', {name: 'hullId'});
 
     this.id = id;
     this.onClose = onClose;
@@ -26,6 +26,7 @@ function StationsCreationForm(id, onClose) {
                 Dom.el('option', {value: 'V'}, 'Void')
             ])),
             w('type', Dom.el('select', {name: 'type'}, [
+                Dom.el('option', {value: ''}, ''),
                 Dom.el('option', {value: 'static'}, 'Static'),
                 Dom.el('option', {value: 'mining'}, 'Mining'),
                 Dom.el('option', {value: 'military'}, 'Military'),
@@ -33,6 +34,7 @@ function StationsCreationForm(id, onClose) {
                 Dom.el('option', {value: 'production'}, 'Production'),
                 Dom.el('option', {value: 'asylum'}, 'Asylum')
             ])),
+            w('Hull', this.hullSelect),
             w('population'),
             w('planet', Dom.el('div', {}, [
                 this.planets,
@@ -61,11 +63,18 @@ function StationsCreationForm(id, onClose) {
 
     this.container = Dom.el('div', {});
 
-    this.loadDropdown().then(function () {
-        if (id) {
-            me.load(id);
+    this.context = context;
+    var store = context.stores.inventory;
+    store.listen(this);
+
+    this.loadPlanetsDropdown().then(function () {
+        if(store.isItemsLoaded && store.isTypesLoaded) {
+            me.makeHullDropdown()
+        } else {
+            context.stores.inventory.update('all');
         }
     });
+
     this.productionGrid = new ProductionGrid();
 
     Dom.append(this.container, [
@@ -75,11 +84,41 @@ function StationsCreationForm(id, onClose) {
             this.productionGrid
         ])
     ]);
-
-
 }
 
-StationsCreationForm.prototype.loadDropdown = function () {
+StationsCreationForm.prototype.onStoreChange = function () {
+    var store = this.context.stores.inventory;
+    if(store.isItemsLoaded && store.isTypesLoaded) {
+        this.makeHullDropdown();
+    }
+};
+
+StationsCreationForm.prototype.makeHullDropdown = function () {
+    this.hullSelect.innerHTML = '';
+    var options = [Dom.el('option', {value: ''}, ' ')];
+    var store = this.context.stores.inventory;
+    var hullId = -1;
+    for(var i = 0; i < store.inventoryTypes.length; i++) {
+        if(store.inventoryTypes[i].title === 'hull') {
+            hullId = store.inventoryTypes[i].id;
+            break;
+        }
+    }
+    if(hullId === -1) {
+        return;
+    }
+    store.inventoryItems.filter(function(item){
+        return item.inventoryType === hullId;
+    }).forEach(function(item) {
+        options.push(Dom.el('option', {value: item.id}, item.title));
+    });
+    Dom.append(this.hullSelect, options);
+    if(this.id) {
+        this.load();
+    }
+};
+
+StationsCreationForm.prototype.loadPlanetsDropdown = function () {
     var me = this;
     return Rest.doGet('/api/planet/utils/dropdown').then(function (options) {
         var value = me.planets.value;

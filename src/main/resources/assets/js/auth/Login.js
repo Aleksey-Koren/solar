@@ -3,6 +3,7 @@ function Login(context, openRegister, changeStorage) {
     var me = this;
     this.context = context;
     this.errors = Dom.el('div');
+    this.blockedInterval = null;
     var rememberAttr = {
         type: 'checkbox', onchange: function (e) {
             if (e.target.checked) {
@@ -35,7 +36,20 @@ function Login(context, openRegister, changeStorage) {
     ]));
 }
 
+Login.prototype.toTimer = function (time) {
+    var seconds = parseInt(time / 1000);
+    var minutes = parseInt(seconds / 60);
+    var renderSeconds = (seconds - minutes * 60);
+    if(renderSeconds < 10) {
+        renderSeconds = "0" + renderSeconds;
+    }
+    return minutes + ":" + renderSeconds;
+};
+
 Login.prototype.onSubmit = function () {
+    if(this.blockedInterval) {
+        clearInterval(this.blockedInterval);
+    }
     var data = Dom.fromForm(this.container);
     if (!data.login || data.login.length < 3) {
         this.errors.innerHTML = 'Login too short';
@@ -56,7 +70,18 @@ Login.prototype.onSubmit = function () {
                 return new DashboardManagement(me.context);
             });
         } else {
-            me.errors.innerHTML = "Invalid credentials";
+            if(response.blocked) {
+                me.blockedInterval = setInterval(function(){
+                    me.errors.innerHTML = 'Account will be unlocked after ' + me.toTimer(response.blocked -= 1000);
+                    if(response.blocked <= 0) {
+                        clearInterval(me.blockedInterval);
+                        me.errors.innerHTML = '';
+                    }
+                }, 1000);
+
+            } else {
+                me.errors.innerHTML = "Invalid credentials";
+            }
         }
     }).catch(function () {
         me.errors.innerHTML = "Could not login, server error";

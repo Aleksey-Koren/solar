@@ -1,5 +1,5 @@
-function StationsManagement() {
-    this.grid = new StationsGrid();
+function StationsManagement(context) {
+    this.grid = new StationsGrid(context);
     this.container = Dom.el('div', {}, [this.grid.container])
 }
 

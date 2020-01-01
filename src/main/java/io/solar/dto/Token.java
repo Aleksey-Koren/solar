@@ -7,4 +7,5 @@ import lombok.Setter;
 @Setter
 public class Token {
     private String data;
+    private Boolean onHack;
 }

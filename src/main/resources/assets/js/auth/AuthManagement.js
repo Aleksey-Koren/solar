@@ -9,11 +9,14 @@ function AuthManagement(context) {
     if(token) {
         this.authorise(token);
     } else {
-        Dom.append(this.content, this.app.container);
-        Dom.removeClass(this.container, 'hidden')
+        this.showLogin();
     }
 }
 
+AuthManagement.prototype.showLogin = function() {
+    Dom.append(this.content, this.app.container);
+    Dom.removeClass(this.container, 'hidden')
+};
 AuthManagement.prototype.createLogin = function() {
     var me = this;
     return new Login(this.context, function(){
@@ -44,11 +47,11 @@ AuthManagement.prototype.authorise = function(token) {
                 return new DashboardManagement(me.context);
             });
         } else {
-            Dom.removeClass(me.container, 'hidden')
+            me.showLogin();
         }
     }).catch(function(){
         console.error("could not authorise");
-        Dom.append(me.content, me.app.container);
+        me.showLogin();
     })
 };
 

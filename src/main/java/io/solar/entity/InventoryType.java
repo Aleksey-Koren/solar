@@ -5,6 +5,9 @@ import lombok.Setter;
 
 import java.util.List;
 
+/**
+ * hull, armor, shield generator
+ */
 @Getter
 @Setter
 public class InventoryType {

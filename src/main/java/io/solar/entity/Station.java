@@ -20,6 +20,10 @@ public class Station {
     private Float aphelion;
     private Float orbitalPeriod;
     private Float angle;
+    private Long hullId;
+    private Long userId;
+
     private List<Production> production;
     private List<Goods> goods;
+    private List<Inventory> inventory;
 }

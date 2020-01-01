@@ -5,6 +5,10 @@ import lombok.Setter;
 
 import java.util.List;
 
+/**
+ * Description for inventory item
+ * NOT A INSTANCE
+ */
 @Getter
 @Setter
 public class InventoryItem {

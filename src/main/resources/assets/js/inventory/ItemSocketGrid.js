@@ -3,9 +3,15 @@ function ItemSocketGrid(context) {
     this.context = context;
 
     this.dropdown = Dom.el('select', {onchange: function(e){
-        me.addSocket(e.target.value);
+        var count = parseInt(me.amount.value);
+        count = isNaN(count) ? 1 : count;
+        while(count > 0) {
+            me.addSocket(e.target.value);
+            count--;
+        }
         me.dropdown.value = '';
     }});
+    this.amount = Dom.el('input', {value: 1});
     this.grid = new Grid({
         data: [],
         columns: [
@@ -34,6 +40,8 @@ function ItemSocketGrid(context) {
     this.container = Dom.el('div', {}, [
         Dom.el('div', {}, "Sockets"),
         this.dropdown,
+        ' ',
+        this.amount,
         this.grid.container
     ]);
     var store = this.context.stores.inventory;

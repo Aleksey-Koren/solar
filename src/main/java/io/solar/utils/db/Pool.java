@@ -1,8 +1,6 @@
 package io.solar.utils.db;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,8 +26,35 @@ public class Pool {
             pool.add(new ConnectionInUse(createConnection()));
             size--;
         }
+        keepConnectionsAlive();
     }
 
+    private void keepConnectionsAlive() {
+        (new Thread(() -> {
+            while(true) {
+                try {
+                    Thread.sleep(1000 * 60 * 60);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                synchronized (pool) {
+                    Thread current = Thread.currentThread();
+                    for (ConnectionInUse con : instance.pool) {
+                        Connection connection = con.use(current);
+                        if (connection != null) {
+                            try {
+                                PreparedStatement statement = connection.prepareStatement("select 1");
+                                statement.execute();
+                            } catch (SQLException e) {
+                                e.printStackTrace();
+                            }
+                            con.release(current);
+                        }
+                    }
+                }
+            }
+        })).start();
+    }
 
     public static Connection getConnection() {
         Thread current = Thread.currentThread();

@@ -20,6 +20,7 @@ public class StationMapper implements DbMapper<Station> {
         station.setAphelion(resultSet.getFloat("aphelion"));
         station.setAngle(resultSet.getFloat("angle"));
         station.setOrbitalPeriod(resultSet.getFloat("orbital_period"));
+        station.setHullId(resultSet.getLong("hull_id"));
 
         return station;
     }

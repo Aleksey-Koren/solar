@@ -5,8 +5,11 @@ function InventoryStore() {
     this.inventoryModifications = [];
     this.dropdown = [];
     this.name = "inventory";
+    /*shield, hull, laser*/
     this.isTypesLoaded = false;
+    /*shild mk1, shield mk2, neutron blaster, aluminium armor*/
     this.isItemsLoaded = false;
+    /*+50% damage to shields*/
     this.isModificationsLoaded = false;
 }
 InventoryStore.prototype = Object.create(AbstractStore.prototype);
@@ -59,7 +62,7 @@ InventoryStore.prototype.update = function(type) {
         }));
     }
 
-    Promise.all(promises).then(function(){
+    return Promise.all(promises).then(function(){
         me.notify({
             inventoryModifications: me.inventoryModifications,
             inventoryItems: me.inventoryItems,

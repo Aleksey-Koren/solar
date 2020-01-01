@@ -61,6 +61,7 @@ ProductionGrid.prototype.loadDropdown = function () {
     var me = this;
     return Rest.doGet('/api/product/utils/dropdown').then(function(options){
         me.product.innerHTML = '';
+        me.product.appendChild(Dom.el('option', {value: ''}, ' '));
         Dom.append(me.product, options.map(function(opt){
             return Dom.el('option', {value: opt.value}, opt.label);
         }));
