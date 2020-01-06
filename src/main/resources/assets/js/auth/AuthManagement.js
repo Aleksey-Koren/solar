@@ -49,8 +49,8 @@ AuthManagement.prototype.authorise = function(token) {
         } else {
             me.showLogin();
         }
-    }).catch(function(){
-        console.error("could not authorise");
+    }).catch(function(e){
+        console.error("could not authorise", e);
         me.showLogin();
     })
 };

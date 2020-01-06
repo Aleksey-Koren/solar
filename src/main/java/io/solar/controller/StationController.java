@@ -1,13 +1,10 @@
 package io.solar.controller;
 
 import io.solar.dto.Marketplace;
-import io.solar.entity.Planet;
-import io.solar.entity.Production;
-import io.solar.entity.Station;
-import io.solar.entity.User;
+import io.solar.entity.*;
+import io.solar.mapper.PopulationMapper;
 import io.solar.mapper.ProductionMapper;
-import io.solar.mapper.StationMapper;
-import io.solar.mapper.TotalMapper;
+import io.solar.service.StarShipService;
 import io.solar.utils.Option;
 import io.solar.utils.Page;
 import io.solar.utils.StationRestUtils;
@@ -18,6 +15,7 @@ import io.solar.utils.server.Pageable;
 import io.solar.utils.server.controller.PathVariable;
 import io.solar.utils.server.controller.RequestBody;
 import io.solar.utils.server.controller.RequestMapping;
+import io.solar.utils.server.controller.Scheduled;
 import lombok.extern.slf4j.Slf4j;
 
 import java.sql.SQLException;
@@ -29,14 +27,16 @@ import java.util.stream.Collectors;
 public class StationController {
 
     private final StationRestUtils stationRestUtils;
+    private final StarShipService starShipService;
 
-    public StationController(PlanetController planetsController) {
+    public StationController(PlanetController planetsController, StarShipService starShipService) {
         this.stationRestUtils = new StationRestUtils(planetsController);
+        this.starShipService = starShipService;
     }
 
     @RequestMapping(method = "post")
     public Station save(@RequestBody Station station, @AuthData User user, Transaction transaction) {
-        if (!AuthController.userCan(user, "edit-station")) {
+        if (!AuthController.userCan(user, "edit-station", transaction)) {
             throw new RuntimeException("no privileges");
         }
         return stationRestUtils.save(station, transaction);
@@ -64,7 +64,7 @@ public class StationController {
 
     @RequestMapping(value = "{id}", method = "delete")
     public void delete(@PathVariable("id") Long id, @AuthData User user, Transaction transaction) {
-        if (!AuthController.userCan(user, "edit-station")) {
+        if (!AuthController.userCan(user, "edit-station", transaction)) {
             throw new RuntimeException("no privileges");
         }
         stationRestUtils.delete(id, transaction);
@@ -72,7 +72,58 @@ public class StationController {
 
     @RequestMapping("user/marketplace")
     public Marketplace getMarketplace(@AuthData User user, Transaction transaction) {
+        Long planetId = definePlanetId(user, transaction);
+        Query query = transaction.query("select * from ");
         return new Marketplace(null, null, null);
+    }
+
+    @Scheduled(interval = 1000/* * 60 * 60*/)
+    public void stationUpdate() {
+        if(true) {
+            return;
+        }
+        Transaction transaction = null;
+        try {
+            transaction = Transaction.begin();
+            Query query = transaction.query("select distinct id, population from objects where type != 'ship'");
+            List<StarShip> stations = query.executeQuery(new PopulationMapper());
+            Query productionQuery = transaction.query("select * from productions where station = :station");
+            Query bulkQuery = transaction.query("select * from productions where station = :station");
+            for(StarShip station : stations) {
+                productionQuery.setLong("station", station.getId());
+                List<Production> productions = productionQuery.executeQuery(new ProductionMapper());
+
+                /*List<Long> bulk =
+                System.out.println(productions);*/
+            }
+        } catch (Exception e) {
+            if(transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        }
+
+        System.out.println("station update loop");
+    }
+
+    private Long definePlanetId(User user, StarShip starShip) {
+        Long planetId = user.getPlanet();
+        if(planetId != null) {
+            return planetId;
+        }
+        if(starShip != null) {
+            return starShip.getPlanet();
+        } else {
+            return 4L;//earth id
+        }
+    }
+    private Long definePlanetId(User user, Transaction transaction) {
+        Long planetId = user.getPlanet();
+        if(planetId != null) {
+            return planetId;
+        }
+        Optional<StarShip> starShip = starShipService.getActiveShip(user, transaction);
+        return definePlanetId(user, starShip.get());
     }
 
 

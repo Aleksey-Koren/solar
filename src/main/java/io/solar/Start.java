@@ -4,6 +4,7 @@ import io.solar.controller.*;
 import io.solar.controller.inventory.InventoryItemsController;
 import io.solar.controller.inventory.InventoryModificationsController;
 import io.solar.controller.inventory.InventoryTypeController;
+import io.solar.service.StarShipService;
 import io.solar.utils.ApplicationContext;
 import io.solar.utils.Server;
 import io.solar.utils.context.ApiBridge;
@@ -22,6 +23,7 @@ public class Start {
 
         ApplicationContext context = new ApplicationContext();
         context.put(ApiBridge.class, new ApiBridge(context));
+        context.put(StarShipService.class);
         context.put(PlanetController.class);
         context.put(ProductController.class);
         context.put(StationController.class);

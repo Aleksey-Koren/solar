@@ -9,7 +9,7 @@ import io.solar.mapper.PermissionTypeMappe;
 import io.solar.utils.context.AuthData;
 import io.solar.utils.db.Query;
 import io.solar.utils.db.Transaction;
-import io.solar.utils.server.controller.Controller;
+import io.solar.utils.server.beans.Controller;
 import io.solar.utils.server.controller.PathVariable;
 import io.solar.utils.server.controller.RequestBody;
 import io.solar.utils.server.controller.RequestMapping;
@@ -22,7 +22,7 @@ public class PermissionsController {
 
     @RequestMapping(method = "post")
     public PermissionType save(@RequestBody PermissionType permissionType, @AuthData User user, Transaction transaction) {
-        if(!AuthController.userCan(user, "edit-permission")) {
+        if(!AuthController.userCan(user, "edit-permission", transaction)) {
             throw new RuntimeException("no permissions");
         }
         if (permissionType == null || permissionType.getTitle() == null || "".equals(permissionType.getTitle())) {
@@ -66,7 +66,7 @@ public class PermissionsController {
 
     @RequestMapping(value = "elevate", method = "post")
     public Permission elevate(@RequestBody Permission permission, @AuthData User user, Transaction transaction) {
-        if(!AuthController.userCan(user, "assign-permission")) {
+        if(!AuthController.userCan(user, "assign-permission", transaction)) {
             throw new RuntimeException("no permissions");
         }
         if (permission == null || permission.getPermissionTypeId() == null && permission.getUserId() == null) {
@@ -107,7 +107,7 @@ public class PermissionsController {
 
     @RequestMapping("user/{userId}")
     public List<Permission> userPermissions(@PathVariable("userId") Long userId, @AuthData User user, Transaction transaction) {
-        if(!(userId.equals(user.getId()) || AuthController.userCan(user, "see-permissions"))) {
+        if(!(userId.equals(user.getId()) || AuthController.userCan(user, "see-permissions", transaction))) {
             throw new RuntimeException("no access");
         }
         Query query = transaction.query("select permission.id, permission.user_id, permission.permission_type, permission_type.title" +

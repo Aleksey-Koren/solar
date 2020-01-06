@@ -23,6 +23,29 @@ function ItemSocketGrid(context) {
                 }
             },
             {
+                name: 'sort',
+                title: ' ',
+                render: function(row) {
+                    var up = Dom.el('a', {href: '#', onclick: function(){
+                            me.move(row, true);
+                        }}, 'UP');
+                    var down = Dom.el('a', {href: '#', onclick: function(){
+                            me.move(row, false);
+                        }}, 'DOWN');
+                    var content =  [];
+                    if(me.grid.data[0] === row) {
+                        content.push(down);
+                    } else if(me.grid.data[me.grid.data.length - 1] === row) {
+                        content.push(up);
+                    } else {
+                        content.push(up);
+                        content.push(" ");
+                        content.push(down);
+                    }
+                    return Dom.el('div', {}, content);
+                }
+            },
+            {
                 name: 'delete',
                 title: 'Delete',
                 render: function(row){
@@ -53,6 +76,23 @@ function ItemSocketGrid(context) {
     }
 }
 
+ItemSocketGrid.prototype.move = function(row, up) {
+    var position = this.grid.data.indexOf(row);
+    if(up) {
+        if(position === 0) {
+            return;
+        }
+        this.grid.data[position] = this.grid.data[position - 1];
+        this.grid.data[position - 1] = row;
+    } else {
+        if(position === this.grid.data.length - 1) {
+            return;
+        }
+        this.grid.data[position] = this.grid.data[position + 1];
+        this.grid.data[position + 1] = row;
+    }
+    this.grid.render();
+};
 ItemSocketGrid.prototype.addSocket = function(id) {
     id = parseInt(id);
     if(id && !isNaN(id)) {

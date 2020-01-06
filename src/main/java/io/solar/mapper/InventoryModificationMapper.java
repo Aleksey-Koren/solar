@@ -12,6 +12,7 @@ public class InventoryModificationMapper implements DbMapper<InventoryModificati
         out.setId(resultSet.getLong("id"));
         out.setTitle(resultSet.getString("title"));
         out.setData(resultSet.getString("data"));
+        out.setDescription(resultSet.getString("description"));
 
         return out;
     }

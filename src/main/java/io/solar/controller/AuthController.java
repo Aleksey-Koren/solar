@@ -16,7 +16,7 @@ import io.solar.utils.BlockedToken;
 import io.solar.utils.context.AuthInterface;
 import io.solar.utils.db.Query;
 import io.solar.utils.db.Transaction;
-import io.solar.utils.server.controller.Controller;
+import io.solar.utils.server.beans.Controller;
 import io.solar.utils.server.controller.RequestBody;
 import io.solar.utils.server.controller.RequestMapping;
 
@@ -38,7 +38,6 @@ public class AuthController implements AuthInterface<User> {
         Query query = transaction.query("select * from users where login = :login ");
         query.setString("login", user.getLogin());
         List<User> users = query.executeQuery(new UserMapper());
-        transaction.commit();
 
         if (users.size() > 0) {
             String pass = hash(user.getPassword());
@@ -49,9 +48,9 @@ public class AuthController implements AuthInterface<User> {
                 }
 
                 if (pass.equals(userFromList.getPassword())) {
-                    query = transaction.query("update users set hack_attempts = null, hack_block = '2010-01-01' where id = :id");
+                    query = transaction.query("update users set hack_attempts = 0, hack_block = '2010-01-01 00:00:00' where id = :id");
                     query.setLong("id", userFromList.getId());
-                    query.execute();
+                    query.executeUpdate();
                     return createToken(userFromList);
                 } else {
                     query = transaction.query("update users set" +
@@ -59,7 +58,7 @@ public class AuthController implements AuthInterface<User> {
                             " hack_block = if(hack_attempts < 4, '2010-01-01', " + DateTimeFormatter.ofPattern("yyyyMMddHHmmss")
                             .withZone(ZoneId.of("UTC")).format(now) + " + 500) where id = :id");
                     query.setLong("id", userFromList.getId());
-                    query.execute();
+                    query.executeUpdate();
                 }
             }
 
@@ -114,12 +113,11 @@ public class AuthController implements AuthInterface<User> {
         query.setString("login", user.getLogin());
         query.setString("password", hash(user.getPassword()));
         query.setString("title", user.getTitle() == null ? user.getLogin() : user.getTitle());
-        query.execute();
+        query.executeUpdate();
         Long id = query.getLastGeneratedKey(Long.class);
         user.setId(id);
 
         Token token = createToken(user);
-        transaction.commit();
         return new Register(true, token.getData(), "");
     }
 
@@ -147,6 +145,7 @@ public class AuthController implements AuthInterface<User> {
     @Override
     public Optional<User> verify(String token) {
         try {
+            Transaction transaction = Transaction.begin();
             String secret = System.getenv("solar_token_secret");
             if (secret == null || "".equals(secret)) {
                 throw new RuntimeException("solar_token_secret system env was not defined");
@@ -159,7 +158,7 @@ public class AuthController implements AuthInterface<User> {
             Claim claim = jwt.getClaim("user_id");
             Long userId = claim.as(Long.class);
 
-            return Optional.ofNullable(getUser(userId));
+            return Optional.ofNullable(getUser(userId, transaction));
         } catch (JWTVerificationException exception){
             return Optional.empty();
             //Invalid signature/claims
@@ -169,48 +168,27 @@ public class AuthController implements AuthInterface<User> {
         }
     }
 
-    private User getUser(Long id) {
-        Transaction transaction = null;
-        try {
-            transaction = Transaction.begin();
-            Query query = transaction.query("select * from users where id = :id");
-            query.setLong("id", id);
-            transaction.commit();
-            List<User> users = query.executeQuery(new UserMapper());
-            if (users.size() == 1) {
-                return users.get(0);
-            } else {
-                return null;
-            }
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            throw new RuntimeException(e);
+    private User getUser(Long id, Transaction transaction) {
+        Query query = transaction.query("select * from users where id = :id");
+        query.setLong("id", id);
+        List<User> users = query.executeQuery(new UserMapper());
+        if (users.size() == 1) {
+            return users.get(0);
+        } else {
+            return null;
         }
     }
 
-    public static boolean userCan(User user, String permission) {
+    public static boolean userCan(User user, String permission, Transaction transaction) {
         Map<String, Permission> permissions = user.getPermissions();
         if (permissions == null) {
-            Transaction transaction = null;
-            try {
-                transaction = Transaction.begin();
-                Query query = transaction.query("select permission.id, permission.user_id, permission.permission_type, permission_type.title" +
-                        " from permission" +
-                        " inner join permission_type on permission.permission_type = permission_type.id" +
-                        " where user_id = :userId");
-                query.setLong("userId", user.getId());
-                user.setPermissions(query.executeQuery(new PermissionMapper()).stream().collect(Collectors.toMap(Permission::getTitle, p -> p)));
-                permissions = user.getPermissions();
-                transaction.commit();
-            } catch (Exception e) {
-                if (transaction != null) {
-                    transaction.rollback();
-                }
-                e.printStackTrace();
-                return false;
-            }
+            Query query = transaction.query("select permission.id, permission.user_id, permission.permission_type, permission_type.title" +
+                    " from permission" +
+                    " inner join permission_type on permission.permission_type = permission_type.id" +
+                    " where user_id = :userId");
+            query.setLong("userId", user.getId());
+            user.setPermissions(query.executeQuery(new PermissionMapper()).stream().collect(Collectors.toMap(Permission::getTitle, p -> p)));
+            permissions = user.getPermissions();
         }
         return permissions.containsKey(permission);
     }

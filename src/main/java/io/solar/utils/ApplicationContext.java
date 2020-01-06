@@ -1,14 +1,19 @@
 package io.solar.utils;
 
-import io.solar.controller.AuthController;
 import io.solar.utils.context.ApiBridge;
-import io.solar.utils.context.AuthInterface;
 import io.solar.utils.context.BeanCreator;
-import io.solar.utils.server.controller.Controller;
+import io.solar.utils.server.beans.Controller;
 import io.solar.utils.server.controller.RequestMapping;
+import io.solar.utils.server.beans.Service;
+import io.solar.utils.server.controller.Scheduled;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class ApplicationContext {
     private final Map<Class, Object> context;
@@ -47,6 +52,23 @@ public class ApplicationContext {
         if(requestMapping != null || controller != null) {
             ApiBridge bridge = get(ApiBridge.class);
             bridge.mapController(instance, requestMapping);
+        }
+        Method[] methods = clazz.getDeclaredMethods();
+        for(Method method : methods) {
+            Scheduled scheduled = method.getDeclaredAnnotation(Scheduled.class);
+            if(scheduled != null) {
+                Timer timer = new Timer(true);
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        try {
+                            method.invoke(instance);
+                        } catch (IllegalAccessException | InvocationTargetException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, 0, scheduled.interval());
+            }
         }
     }
 

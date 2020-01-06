@@ -21,7 +21,7 @@ StationStore.prototype.clean = function() {
 
 StationStore.prototype.update = function() {
     var me = this;
-    Rest.doGet('/api/station/user/marketplace').then(function (value) {
+    return Rest.doGet('/api/station/user/marketplace').then(function (value) {
         me.isLoaded = true;
         me.ships = value.ships;
         me.inventory = value.inventory;

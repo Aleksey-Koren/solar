@@ -5,7 +5,9 @@ function App(container) {
     this.context.menu = this.menu;
 
     var me = this;
-    this.menu.runApp('authManagement', function(){return new AuthManagement(me.context)})
+    this.menu.runApp('authManagement', function(){
+        return new AuthManagement(me.context)
+    });
 
 
 

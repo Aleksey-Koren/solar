@@ -1,5 +1,5 @@
 function InventoryShop(context) {
-    AbstractShop.call(this, [context]);
+    AbstractShop.call(this, context);
 }
 InventoryShop.prototype = Object.create(AbstractShop.prototype);
 InventoryShop.prototype.constructor = InventoryShop;

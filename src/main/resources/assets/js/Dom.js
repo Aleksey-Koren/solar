@@ -119,6 +119,13 @@ function iterateListeners(el, listeners, clb) {
         }
     }
 }
+
+Dom.clear = function(el){
+    while (el.firstChild) {
+        el.removeChild(el.firstChild);
+    }
+};
+
 Dom.addListeners = function(el, listeners) {
     if(!listeners) {
         listeners = el;

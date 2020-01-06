@@ -25,15 +25,6 @@ function StationsCreationForm(id, onClose, context) {
                 Dom.el('option', {value: 'JM'}, 'Jupiter Mechanics'),
                 Dom.el('option', {value: 'V'}, 'Void')
             ])),
-            w('type', Dom.el('select', {name: 'type'}, [
-                Dom.el('option', {value: ''}, ''),
-                Dom.el('option', {value: 'static'}, 'Static'),
-                Dom.el('option', {value: 'mining'}, 'Mining'),
-                Dom.el('option', {value: 'military'}, 'Military'),
-                Dom.el('option', {value: 'science'}, 'Science'),
-                Dom.el('option', {value: 'production'}, 'Production'),
-                Dom.el('option', {value: 'asylum'}, 'Asylum')
-            ])),
             w('Hull', this.hullSelect),
             w('population'),
             w('planet', Dom.el('div', {}, [
@@ -110,7 +101,7 @@ StationsCreationForm.prototype.makeHullDropdown = function () {
     store.inventoryItems.filter(function(item){
         return item.inventoryType === hullId;
     }).forEach(function(item) {
-        options.push(Dom.el('option', {value: item.id}, item.title));
+        options.push(Dom.el('option', {value: item.id}, item.title + (item.type ? " (" + item.type + ")" : "")));
     });
     Dom.append(this.hullSelect, options);
     if(this.id) {

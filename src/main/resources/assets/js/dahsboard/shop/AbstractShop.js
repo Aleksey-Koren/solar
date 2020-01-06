@@ -12,6 +12,9 @@ function AbstractShop(context) {
 
 AbstractShop.prototype.renderItems = function() {
     this.table.innerHTML = '';
+    if(!this.items) {
+        return;
+    }
     var colIdx = 0;
     var row = null;
     for(var i = 0; i < this.items.length; i++) {
@@ -24,7 +27,7 @@ AbstractShop.prototype.renderItems = function() {
 };
 
 AbstractShop.prototype.loadData = function() {
-    this.context.stores.station.update();
+    return this.context.stores.station.update();
 };
 
 AbstractShop.prototype.dataLoaded = function() {

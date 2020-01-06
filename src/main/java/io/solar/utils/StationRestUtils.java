@@ -29,13 +29,13 @@ public class StationRestUtils {
 
         Query save = null;
         if (station.getId() != null) {
-            Query query = transaction.query("select * from user_ship where id = :id");
+            Query query = transaction.query("select * from objects where id = :id");
             query.setLong("id", station.getId());
             List<Station> existing = query.executeQuery(new StationMapper());
 
             if (existing.size() == 1) {
-                save = transaction.query("UPDATE user_ship set planet=:planet,population=:population,fraction=:fraction," +
-                        "type=:type,title=:title, x = :x, y = :y, aphelion = :aphelion," +
+                save = transaction.query("UPDATE objects set planet=:planet,population=:population,fraction=:fraction," +
+                        "title=:title, x = :x, y = :y, aphelion = :aphelion," +
                         " orbital_period = :orbital_period, angle=:angle, user_id = :user_id, hull_id = :hull_id" +
                         " where id=:id");
                 save.setLong("id", station.getId());
@@ -43,9 +43,9 @@ public class StationRestUtils {
                 log.error("can't find planet with id: " + station.getId());
             }
         } else {
-            save = transaction.query("insert into user_ship (planet,population,fraction,type,title," +
+            save = transaction.query("insert into objects (planet,population,fraction,title," +
                     "x,y,aphelion,orbital_period, angle, user_id, hull_id) " +
-                    " values (:planet, :population, :fraction, :type, :title," +
+                    " values (:planet, :population, :fraction, :title," +
                     " :x, :y, :aphelion, :orbital_period, :angle, :user_id, :hull_id)");
         }
 
@@ -53,7 +53,6 @@ public class StationRestUtils {
             save.setLong("planet", station.getPlanetId());
             save.setLong("population", station.getPopulation());
             save.setString("fraction", station.getFraction());
-            save.setString("type", station.getType());
             save.setString("title", station.getTitle());
             save.setFloat("x", station.getPlanetId() == null ? station.getX() : null);
             save.setFloat("y", station.getPlanetId() == null ? station.getY() : null);
@@ -132,25 +131,25 @@ public class StationRestUtils {
                 delProduction.setLong("station", station.getId());
             }
         }
-        transaction.commit();
         return station;
     }
 
     public Station get(Long id, Transaction transaction) {
-        Query query = transaction.query("select * from user_ship where id = :id");
+        Query query = transaction.query("select objects.*, otd.sub_type as type from objects" +
+                " inner join object_type_description otd on objects.hull_id = otd.id " +
+                "where objects.id = :id and otd.type = 'station'");
         query.setLong("id", id);
         List<Station> existing = query.executeQuery(new StationMapper());
-        appendPlanets(existing);
-        appendProductions(existing);
-        transaction.commit();
+        appendPlanets(existing, transaction);
+        appendProductions(existing, transaction);
         return existing.size() == 1 ? existing.get(0) : null;
     }
 
-    private void appendPlanets(List<Station> existing) {
+    private void appendPlanets(List<Station> existing, Transaction transaction) {
         if (existing != null && !existing.isEmpty()) {
             Map<Long, Planet> planets = planetController.getByIds(existing.stream()
                     .map(Station::getPlanetId)
-                    .collect(Collectors.toList())
+                    .collect(Collectors.toList()), transaction
             ).stream().collect(
                     Collectors.toMap(Planet::getId, v -> v)
             );
@@ -158,60 +157,51 @@ public class StationRestUtils {
         }
     }
 
-    private void appendProductions(List<Station> existing) {
+    private void appendProductions(List<Station> existing, Transaction transaction) {
         if (existing != null && !existing.isEmpty()) {
-            Transaction transaction = null;
-            try {
-                transaction = Transaction.begin();
-
-                Query query = transaction.query("select * from productions where station in (" + existing.stream().map(v -> "?").collect(Collectors.joining(",")) + ")");
-                for (int i = 0; i < existing.size(); i++) {
-                    Station station = existing.get(i);
-                    query.setLong(i + 1, station.getId());
-                }
-
-                List<Production> productions = query.executeQuery(new ProductionMapper());
-                Map<Long, List<Production>> map = new HashMap<>();
-                for (Production p : productions) {
-                    List<Production> mapped = map.computeIfAbsent(p.getStation(), k -> new ArrayList<>());
-                    mapped.add(p);
-                }
-                existing.forEach(v -> v.setProduction(map.get(v.getId())));
-                transaction.commit();
-            } catch (Exception e) {
-                if (transaction != null) {
-                    transaction.rollback();
-                }
-                e.printStackTrace();
+            Query query = transaction.query("select * from productions where station in (" + existing.stream().map(v -> "?").collect(Collectors.joining(",")) + ")");
+            for (int i = 0; i < existing.size(); i++) {
+                Station station = existing.get(i);
+                query.setLong(i + 1, station.getId());
             }
+
+            List<Production> productions = query.executeQuery(new ProductionMapper());
+            Map<Long, List<Production>> map = new HashMap<>();
+            for (Production p : productions) {
+                List<Production> mapped = map.computeIfAbsent(p.getStation(), k -> new ArrayList<>());
+                mapped.add(p);
+            }
+            existing.forEach(v -> v.setProduction(map.get(v.getId())));
         }
     }
 
     public Page<Station> getAll(Pageable pageable, Transaction transaction) {
-        Query countQ = transaction.query("select count(1) from user_ship");
+        Query countQ = transaction.query("select count(1) from objects " +
+                " inner join object_type_description on objects.hull_id = object_type_description.id" +
+                " where object_type_description.type = 'station'");
         Long count = countQ.executeQuery(new TotalMapper()).get(0);
         if (count == 0) {
             return Page.empty();
         }
 
-        Query query = transaction.query("select * from user_ship limit :skip, :pageSize");
+        Query query = transaction.query("select * from objects " +
+                "inner join object_type_description on objects.hull_id = object_type_description.id" +
+                " where object_type_description.type = 'station'" +
+                " limit :skip, :pageSize");
 
         query.setInt("skip", pageable.getPage() * pageable.getPageSize());
         query.setInt("pageSize", pageable.getPageSize());
         List<Station> existing = query.executeQuery(new StationMapper());
 
-        appendPlanets(existing);
-        appendProductions(existing);
+        appendPlanets(existing, transaction);
+        appendProductions(existing, transaction);
 
-
-        transaction.commit();
         return new Page<>(existing, count);
     }
 
     public void delete(Long id, Transaction transaction) {
-        Query query = transaction.query("delete from user_ship where id = :id");
+        Query query = transaction.query("delete from objects where id = :id");
         query.setLong("id", id);
         query.execute();
-        transaction.commit();
     }
 }

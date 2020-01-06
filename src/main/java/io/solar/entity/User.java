@@ -17,8 +17,8 @@ public class User {
     private String title;
     private String login;
     private String password;
-    private Long activeShip;
     private Long money;
+    private Long planet;
     private Instant hackBlock;
     private Integer hackAttempts;
 
@@ -29,8 +29,8 @@ public class User {
 
     Map<String, Permission> permissions;
 
-    public boolean can(String permission) {
-        return AuthController.userCan(this, permission);
+    public boolean can(String permission, Transaction transaction) {
+        return AuthController.userCan(this, permission, transaction);
     }
 
     @JsonIgnore

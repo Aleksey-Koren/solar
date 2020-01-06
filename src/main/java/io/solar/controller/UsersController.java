@@ -7,7 +7,7 @@ import io.solar.utils.context.AuthData;
 import io.solar.utils.db.Query;
 import io.solar.utils.db.Transaction;
 import io.solar.utils.server.Pageable;
-import io.solar.utils.server.controller.Controller;
+import io.solar.utils.server.beans.Controller;
 import io.solar.utils.server.controller.RequestBody;
 import io.solar.utils.server.controller.RequestMapping;
 
@@ -28,7 +28,7 @@ public class UsersController {
 
     @RequestMapping(method = "post")
     public User updateUser(@AuthData User user, @RequestBody User payload, Transaction transaction) {
-        if(!((user.getId() != null && user.getId().equals(payload.getId())) || AuthController.userCan(user, "edit-user"))) {
+        if(!((user.getId() != null && user.getId().equals(payload.getId())) || AuthController.userCan(user, "edit-user", transaction))) {
             throw new RuntimeException("no permissions");
         }
         if(payload.getId() == null) {

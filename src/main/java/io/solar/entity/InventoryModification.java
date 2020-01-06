@@ -15,4 +15,5 @@ public class InventoryModification {
     private Long id;
     private String title;
     private String data;
+    private String description;
 }

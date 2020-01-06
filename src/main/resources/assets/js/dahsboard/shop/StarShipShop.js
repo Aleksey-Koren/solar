@@ -1,5 +1,5 @@
 function StarShipShop(context) {
-    AbstractShop.call(this, [context]);
+    AbstractShop.call(this, context);
 }
 StarShipShop.prototype = Object.create(AbstractShop.prototype);
 StarShipShop.prototype.constructor = StarShipShop;

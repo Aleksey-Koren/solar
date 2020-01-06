@@ -30,6 +30,16 @@ function InventoryModificationsGrid(context) {
                 }
             },
             {
+                name: 'description',
+                title: 'Description',
+                render: function(row){
+                    return Dom.el('textarea', {value: row.description, onchange: function(e){
+                            row.description = e.target.value;
+                            me.update(row);
+                        }})
+                }
+            },
+            {
                 name: 'delete',
                 title: 'Delete',
                 render: function(row) {

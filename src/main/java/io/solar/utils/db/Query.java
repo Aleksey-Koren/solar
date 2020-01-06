@@ -306,11 +306,14 @@ public class Query {
      * or an SQL statement that returns nothing, such as a DDL statement.
      *
      * @return number of rows affected
-     * @throws SQLException if an error occurred
      * @see PreparedStatement#executeUpdate()
      */
-    public int executeUpdate() throws SQLException {
-        return statement.executeUpdate();
+    public int executeUpdate() {
+        try {
+            return statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 

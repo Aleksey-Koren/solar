@@ -53,8 +53,8 @@ function SolarMap(context) {
         me.my = e.clientY;
         var hover = [];
         for(var i = 0; i < me.objects.length; i++) {
-            var obj = me.objects[i];
-            if(obj.x - obj.r <= e.clientX && obj.x + obj.r >= e.clientX && obj.y - obj.r <= e.clientY && obj.y + obj.r >= e.clientY) {
+            var obj = me.overObject(me.objects[i], e)
+            if(obj) {
                 hover.push(obj);
             }
         }
@@ -95,6 +95,16 @@ function SolarMap(context) {
             me.changeZoom(1 / change, x, y);
         }
     });
+    me.objectWindow = null;
+    this.canvas.addEventListener('click', function(e){
+        var obj = me.overObject(me.selectedObject, e);
+        if(obj) {
+            if(!me.objectWindow) {
+                me.objectWindow = new PlanetWindow(me.context);
+            }
+            me.objectWindow.show(obj.obj);
+        }
+    });
 }
 
 SolarMap.MAX_RADIUS_KKM = 15000000;
@@ -104,6 +114,21 @@ SolarMap.PRIORITES = {
     'sun': 3,
     'station': 4,
     'ship': 5
+};
+
+SolarMap.prototype.overObject = function (obj, e) {
+    if(!obj) {
+        return null;
+    }
+    if(obj.type === 'moon' || obj.type === 'planet' || obj.type === 'sun') {
+        var length = Math.sqrt(Math.pow(obj.x - e.clientX, 2) + Math.pow(obj.y - e.clientY, 2));
+        if(length <= obj.r) {
+            return obj;
+        }
+    } else if(obj.x - obj.r <= e.clientX && obj.x + obj.r >= e.clientX && obj.y - obj.r <= e.clientY && obj.y + obj.r >= e.clientY) {
+        return obj;
+    }
+    return null;
 };
 
 SolarMap.prototype.getAbsPoint = function (x, y) {
@@ -153,9 +178,6 @@ SolarMap.prototype.render = function (planets) {
     var zero = {x: 0, y: 0};
     if (planets.length) {
         me.drawPlanet(ctx, planets[0], absWindow, zero);
-    }
-    if(this.selectedObject) {
-
     }
     ctx.restore();
     this.objects.sort(function (o1, o2) {
@@ -369,10 +391,11 @@ SolarMap.prototype.calculateZoom = function () {
 
 SolarMap.prototype.resize = function () {
     var screenSize = this.screenSize();
+    var dpi = window.devicePixelRatio;
     this.window.width = screenSize.w;
     this.window.height = screenSize.h;
-    this.canvas.setAttribute('width', screenSize.w + '');
-    this.canvas.setAttribute('height', screenSize.h + '');
-    this.canvas.style.width = screenSize.w + 'px';
-    this.canvas.style.height = screenSize.h + 'px';
+    this.canvas.setAttribute('width', (screenSize.w  * dpi) + '');
+    this.canvas.setAttribute('height', (screenSize.h  * dpi) + '');
+    //this.canvas.style.width = screenSize.w + 'px';
+    //this.canvas.style.height = screenSize.h + 'px';
 };
