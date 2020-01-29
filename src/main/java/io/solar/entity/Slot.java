@@ -1,5 +1,6 @@
 package io.solar.entity;
 
+import io.solar.entity.inventory.InventoryType;
 import lombok.Getter;
 import lombok.Setter;
 

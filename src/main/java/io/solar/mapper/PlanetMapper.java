@@ -10,16 +10,16 @@ public class PlanetMapper implements DbMapper<Planet> {
     public Planet map(SafeResultSet resultSet) {
         Planet out = new Planet();
 
-        out.setId(resultSet.getLong("id"));
-        out.setAldebo(resultSet.getFloat("aldebo"));
-        out.setAphelion(resultSet.getLong("aphelion"));
+        out.setId(resultSet.fetchLong("id"));
+        out.setAldebo(resultSet.fetchFloat("aldebo"));
+        out.setAphelion(resultSet.fetchLong("aphelion"));
         out.setAxialTilt(resultSet.getString("axial_tilt"));
         out.setEccentricity(resultSet.getString("eccentricity"));
         out.setEscapeVelocity(resultSet.getString("escape_velocity"));
         out.setInclination(resultSet.getString("inclination"));
         out.setMass(resultSet.getString("mass"));
-        out.setMeanAnomaly(resultSet.getFloat("mean_anomaly"));
-        out.setAngle(resultSet.getFloat("angle"));
+        out.setMeanAnomaly(resultSet.fetchFloat("mean_anomaly"));
+        out.setAngle(resultSet.fetchFloat("angle"));
         out.setMeanOrbitRadius(resultSet.getString("mean_orbit_radius"));
         out.setMeanRadius(resultSet.getString("mean_radius"));
         out.setTitle(resultSet.getString("title"));
@@ -30,7 +30,7 @@ public class PlanetMapper implements DbMapper<Planet> {
         out.setSurfaceGravity(resultSet.getString("surface_gravity"));
         out.setSurfacePressure(resultSet.getString("surface_pressure"));
         out.setVolume(resultSet.getString("volume"));
-        out.setParent(resultSet.getLong("parent"));
+        out.setParent(resultSet.fetchLong("parent"));
 
         return out;
     }

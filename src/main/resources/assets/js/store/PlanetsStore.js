@@ -1,11 +1,15 @@
 function PlanetsStore() {
     AbstractStore.call(this);
     this.planets = [];
+    this.map = {};
     this.dropdown = [];
     this.name = "planets"
 }
 PlanetsStore.prototype = Object.create(AbstractStore.prototype);
 
+PlanetsStore.prototype.find = function(id) {
+    return this.map[id] || null
+};
 PlanetsStore.prototype.update = function() {
     var me = this;
     Rest.doGet('/api/planet').then(function (value) {
@@ -28,8 +32,10 @@ PlanetsStore.prototype.update = function() {
                 parent.moons.push(child);
             }
         }
+        me.map = map;
         me.notify({
             list: me.planets,
+            map: map,
             dropdown: me.dropdown
         })
     });

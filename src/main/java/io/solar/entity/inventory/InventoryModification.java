@@ -1,4 +1,4 @@
-package io.solar.entity;
+package io.solar.entity.inventory;
 
 import lombok.Getter;
 import lombok.Setter;

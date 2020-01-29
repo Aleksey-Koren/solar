@@ -9,10 +9,10 @@ public class ProductionMapper implements DbMapper<Production> {
     @Override
     public Production map(SafeResultSet resultSet) {
         Production production = new Production();
-        production.setId(resultSet.getLong("id"));
-        production.setPower(resultSet.getFloat("power"));
-        production.setProduct(resultSet.getLong("product"));
-        production.setStation(resultSet.getLong("station"));
+        production.setId(resultSet.fetchLong("id"));
+        production.setPower(resultSet.fetchFloat("power"));
+        production.setProduct(resultSet.fetchLong("product"));
+        production.setStation(resultSet.fetchLong("station"));
         return production;
     }
 }

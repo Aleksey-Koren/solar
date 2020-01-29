@@ -21,8 +21,8 @@ Dom.el = function (type, attr, content) {
             attr.autocomplete = 'off';
         }
     }
-    Dom.update(o, attr);
     Dom.append(o, content);
+    Dom.update(o, attr);
     return o;
 };
 Dom.addClass = function (el, clazz) {
@@ -211,16 +211,26 @@ Dom.form = function(form, object) {
     var elements = form.querySelectorAll('input, textarea, select');
     var map = {};
     for(var i = 0; i < elements.length; i++) {
-        var name = elements[i].name;
+        var el = elements[i];
+        var name = el.name;
         if(!name)continue;
-        if(map[name])throw new Error("Two controls with same same");
-        map[name] = elements[i];
-        elements[i].value = '';
+        if(map[name])throw new Error("Two controls with same name");
+        map[name] = el;
+        el.value = '';
     }
     for(var k in object) {
         if(object.hasOwnProperty(k)) {
             if(map[k]) {
-                map[k].value = object[k] || object[k] === 0 ? object[k] + '' : '';
+                var value = object[k] || object[k] === 0 ? object[k] + '' : '';
+                if(typeof map[k].updateComponent === 'function') {
+                    map[k].updateComponent(value)
+                } else {
+                    if(map[k].type === 'checkbox') {
+                        map[k].checked = !!value;
+                    } else {
+                        map[k].value = value;
+                    }
+                }
             }
         }
     }
@@ -232,7 +242,11 @@ Dom.fromForm = function (form, obj) {
     for(var i = 0; i < elements.length; i++) {
         var el = elements[i];
         if(el.name) {
-            out[el.name] = el.value;
+            if(el.type === 'checkbox') {
+                out[el.name] = !!el.checked;
+            } else {
+                out[el.name] = el.value;
+            }
         }
     }
     return out;
@@ -242,7 +256,11 @@ Dom.clearForm = function (form) {
     for(var i = 0; i < elements.length; i++) {
         var el = elements[i];
         if(el.name) {
-            el.value = '';
+            if(el.type === 'checkbox') {
+                el.checked = false;
+            } else {
+                el.value = '';
+            }
         }
     }
 };

@@ -16,14 +16,14 @@ function UserGrid(openForm) {
             me.onPaginationChange();
         }
     });
-    this.onPaginationChange(this.grid.pageInfo);
+    this.onPaginationChange();
     this.container = this.grid.container;
 }
 
-UserGrid.prototype.onPaginationChange = function(pagination) {
+UserGrid.prototype.onPaginationChange = function() {
     var me = this;
-    Rest.doGet('/api/users/?' + this.grid.queryString()).then(function(response){
-        me.grid.data = response;
+    Rest.doGet('/api/users/?' + this.grid.queryString()).then(function(page){
+        me.grid.setPage(page);
         me.grid.render();
     }).catch(function(){
         Notification.error("Could not load user list, server error");

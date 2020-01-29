@@ -6,3 +6,6 @@ function StationsManagement(context) {
 StationsManagement.prototype.render = function() {
     this.grid.mount();
 };
+StationsManagement.prototype.unmount = function() {
+    this.grid.unmount();
+};

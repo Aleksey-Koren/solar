@@ -24,6 +24,7 @@ a {
 }
 td, th {
     padding: 10px 5px;
+    border-color: #4fb169 !important;
 }
 .grid td, .grid th {
     border-left: 1px solid;
@@ -132,17 +133,27 @@ input, select, textarea {
     z-index: 1000;
 }
 
-.modal, .small-modal {
+.modal, .small-modal, .large-modal  {
     background: #2b2b2b;
     border: 1px solid  #ffc562;
     padding: 15px;
+    left: 50%;
+    position: relative;
+    top: 100px;
+    max-height: calc(80% - 100px);
+    overflow: auto;
 }
 .small-modal {
     width: 460px;
-    left: 50%;
-    position: relative;
     margin-left: -230px;
-    top: 100px;
+}
+.modal {
+    width: 666px;
+    margin-left: -333px;
+}
+.large-modal {
+    width: 900px;
+    margin-left: -450px;
 }
 
 tr, td, th {
@@ -163,4 +174,43 @@ tr, td, th {
     right: 10px;
     top: 70px;
     z-index: 100;
+}
+.popup-panel {
+    float: right;
+}
+.object-selection-grid tr:hover {
+    color: #ffc562;
+    cursor: pointer;
+}
+.popup-close {
+    width: 10px;
+    height: 10px;
+    background-color: #f34848;
+    border: 1px solid #e04343;
+    border-radius: 50%;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    cursor: pointer;
+}
+
+.objects-form {
+    display: flex;
+    flex-direction: row;
+}
+
+.socket-item {
+    height: 100px;
+    border: 1px solid #4fb169;
+}
+.popup-title {
+    margin: 0 0 10px;
+}
+
+.delete-link:hover {
+    color: #f34848;
+}
+a.disabled {
+    color: #F5F5F5;
+    cursor: not-allowed;
 }

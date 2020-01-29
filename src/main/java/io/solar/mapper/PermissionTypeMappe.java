@@ -8,7 +8,7 @@ public class PermissionTypeMappe implements DbMapper<PermissionType> {
     @Override
     public PermissionType map(SafeResultSet resultSet) {
         PermissionType out = new PermissionType();
-        out.setId(resultSet.getLong("id"));
+        out.setId(resultSet.fetchLong("id"));
         out.setTitle(resultSet.getString("title"));
         return out;
     }

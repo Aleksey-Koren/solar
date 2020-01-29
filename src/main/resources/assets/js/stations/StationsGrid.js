@@ -1,6 +1,7 @@
 function StationsGrid(context) {
 
     this.context = context;
+    var pStore = context.stores.planets;
     var me = this;
     this.grid = new Grid({
         columns: [
@@ -15,7 +16,12 @@ function StationsGrid(context) {
                 }
             },
             {name: 'planet', title: 'Planet', render: function(row){
-                return row.planet ? row.planet.title : " - ";
+                if(!pStore.isLoaded) {
+                    return null;
+                } else {
+                    var planet = pStore.map[row.planet];
+                    return planet ? planet.title : null;
+                }
             }},
             {name: 'population', title: 'Population'},
             {name: 'fraction', title: 'Fraction'},
@@ -50,8 +56,20 @@ function StationsGrid(context) {
     Dom.append(this.container, [
         this.gridC
     ]);
+
+    this.planetsStore = pStore;
+    pStore.listen(this);
+    if(!pStore.isLoaded) {
+        pStore.update();
+    }
 }
 
+StationsGrid.prototype.unmount = function () {
+    this.planetsStore.remove(this);
+};
+StationsGrid.prototype.onStoreChange = function () {
+    this.grid.render();
+};
 StationsGrid.prototype.mount = function () {
     this.load();
 };

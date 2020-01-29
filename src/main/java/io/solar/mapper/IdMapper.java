@@ -6,6 +6,6 @@ import io.solar.utils.db.SafeResultSet;
 public class IdMapper implements DbMapper<Long> {
     @Override
     public Long map(SafeResultSet resultSet) {
-        return resultSet.getLong(1);
+        return resultSet.fetchLong(1);
     }
 }

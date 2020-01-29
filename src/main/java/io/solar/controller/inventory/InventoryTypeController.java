@@ -1,7 +1,7 @@
 package io.solar.controller.inventory;
 
 import io.solar.controller.AuthController;
-import io.solar.entity.InventoryType;
+import io.solar.entity.inventory.InventoryType;
 import io.solar.entity.User;
 import io.solar.mapper.InventoryTypeMapper;
 import io.solar.utils.context.AuthData;
@@ -56,10 +56,27 @@ public class InventoryTypeController {
         if (!AuthController.userCan(user, "edit-inventory-type", transaction)) {
             throw new RuntimeException("no privileges");
         }
+        Query deleteObjects = transaction.query("delete from objects where hull_id in (" +
+                "select id from object_type_description where object_type_description.inventory_type = :id)");
+        deleteObjects.setLong("id", id);
+        deleteObjects.execute();
 
-        Query query = transaction.query("delete from object_type where id = :id");
-        query.setLong("id", id);
-        query.execute();
+        Query deleteObjectModifications = transaction.query("delete from object_modification" +
+                " where item_id in (select id from object_type_description where inventory_type = :id)");
+        deleteObjectModifications.setLong("id", id);
+        deleteObjectModifications.execute();
+
+        Query deleteObjectsDescriptions = transaction.query("delete from object_type_description where inventory_type = :id");
+        deleteObjectsDescriptions.setLong("id", id);
+        deleteObjectsDescriptions.execute();
+
+        Query deleteSockets = transaction.query("delete from object_type_socket where item_type_id = :id");
+        deleteSockets.setLong("id", id);
+        deleteSockets.execute();
+
+        Query deleteObjectType = transaction.query("delete from object_type where id = :id");
+        deleteObjectType.setLong("id", id);
+        deleteObjectType.execute();
     }
 
 

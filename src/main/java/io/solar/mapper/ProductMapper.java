@@ -10,12 +10,12 @@ public class ProductMapper implements DbMapper<Product> {
     public Product map(SafeResultSet resultSet) {
         Product out = new Product();
 
-        out.setId(resultSet.getLong("id"));
+        out.setId(resultSet.fetchLong("id"));
         out.setTitle(resultSet.getString("title"));
         out.setImage(resultSet.getString("image"));
-        out.setBulk(resultSet.getFloat("bulk"));
-        out.setMass(resultSet.getFloat("mass"));
-        out.setPrice(resultSet.getFloat("price"));
+        out.setBulk(resultSet.fetchFloat("bulk"));
+        out.setMass(resultSet.fetchFloat("mass"));
+        out.setPrice(resultSet.fetchFloat("price"));
 
         return out;
     }

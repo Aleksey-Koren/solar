@@ -6,6 +6,7 @@ function AppContext() {
         permissions: new PermissionsStore(),
         station: new StationStore(),
     };
+    this.escListener = new EscListener();
     this.app = {
         instance: null,
         name: null

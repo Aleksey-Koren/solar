@@ -180,6 +180,9 @@ public class AuthController implements AuthInterface<User> {
     }
 
     public static boolean userCan(User user, String permission, Transaction transaction) {
+        if(user == null) {
+            return false;
+        }
         Map<String, Permission> permissions = user.getPermissions();
         if (permissions == null) {
             Query query = transaction.query("select permission.id, permission.user_id, permission.permission_type, permission_type.title" +

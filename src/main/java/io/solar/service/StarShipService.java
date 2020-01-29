@@ -1,6 +1,6 @@
 package io.solar.service;
 
-import io.solar.entity.StarShip;
+import io.solar.entity.objects.StarShip;
 import io.solar.entity.User;
 import io.solar.mapper.StarShipMapper;
 import io.solar.utils.db.Query;
@@ -25,11 +25,14 @@ public class StarShipService {
                 " objects.aphelion user_ship_aphelion," +
                 " objects.orbital_period user_ship_orbital_period," +
                 " objects.angle user_ship_angle," +
+                " objects.hull_id hull_id," +
                 " objects.user_id user_ship_user_id," +
                 " objects.active user_ship_active," +
                 " objects.durability user_ship_durability," +
+                " objects.attached_to_ship user_ship_attached_to_ship," +
+                " objects.attached_to_socket user_ship_attached_to_socket," +
+                " objects.status user_ship_status," +
                 " object_type_description.sub_type hull_type," +
-                " object_type_description.id hull_id," +
                 " object_type_description.title hull_title," +
                 " object_type_description.power_degradation hull_power_degradation," +
                 " object_type_description.energy_consumption hull_energy_consumption," +

@@ -29,13 +29,16 @@ InventoryStore.prototype.drop = function(row) {
         inventoryTypes: this.inventoryTypes
     });
 };
-InventoryStore.prototype.update = function(type) {
+InventoryStore.prototype.update = function(type, params) {
+    if(typeof type === 'string') {
+        type = [type];
+    }
     var me = this;
     var promises = [];
     if(!type) {
-        type = 'all';
+        type = ['all'];
     }
-    if(type === 'type' || type === 'all') {
+    if(type.indexOf('type') > -1 || type.indexOf('all') > -1) {
         promises.push(Rest.doGet('/api/inventory-type').then(function (value) {
             me.isTypesLoaded = true;
             me.inventoryTypes = value;
@@ -47,14 +50,14 @@ InventoryStore.prototype.update = function(type) {
             return value;
         }));
     }
-    if(type === 'item' || type === 'all') {
+    if(type.indexOf('item') > -1 || type.indexOf('all') > -1) {
         promises.push(Rest.doGet('/api/inventory-item').then(function(value){
             me.isItemsLoaded = true;
             me.inventoryItems = value;
             return value;
         }));
     }
-    if(type === 'modification' || type === 'all') {
+    if(type.indexOf('modification') > -1 || type.indexOf('all') > -1) {
         promises.push(Rest.doGet('/api/inventory-modification').then(function(value){
             me.isModificationsLoaded = true;
             me.inventoryModifications = value;
@@ -69,5 +72,6 @@ InventoryStore.prototype.update = function(type) {
             dropdown: me.dropdown,
             inventoryTypes: me.inventoryTypes
         });
+        return true;
     })
 };

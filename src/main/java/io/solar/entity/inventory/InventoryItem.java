@@ -1,4 +1,4 @@
-package io.solar.entity;
+package io.solar.entity.inventory;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -27,5 +27,5 @@ public class InventoryItem {
     private Long price;
 
     List<InventoryModification> modifications;
-    List<InventoryType> sockets;
+    List<InventorySocket> sockets;
 }

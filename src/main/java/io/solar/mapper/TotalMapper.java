@@ -8,6 +8,6 @@ public class TotalMapper implements DbMapper<Long> {
 
     @Override
     public Long map(SafeResultSet resultSet) {
-        return resultSet.getLong(1);
+        return resultSet.fetchLong(1);
     }
 }

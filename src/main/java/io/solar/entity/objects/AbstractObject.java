@@ -1,5 +1,6 @@
-package io.solar.entity;
+package io.solar.entity.objects;
 
+import io.solar.entity.inventory.InventorySocket;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -7,7 +8,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class StarShip {
+public abstract class AbstractObject {
 
     private Long id;
     private Long planet;
@@ -19,16 +20,14 @@ public class StarShip {
     private Float aphelion;
     private Float orbitalPeriod;
     private Float angle;
-    private Long durability;
     private Long hullId;
-    private String type;
     private Long userId;
     private Boolean active;
-    private String hullTitle;
-    private Float powerDegradation;
-    private Float energyConsumption;
-    private Long maxDurability;
-    private String hullDescription;
+    private Long durability;
+    private Long attachedToShip;
+    private Long attachedToSocket;
+    private ObjectStatus status;
 
-    private List<Inventory> inventory;
+    private List<InventorySocket> socketList;
+    private List<ObjectItem> attachedObjects;
 }

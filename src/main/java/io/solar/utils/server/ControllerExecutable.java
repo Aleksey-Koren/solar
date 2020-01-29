@@ -9,6 +9,7 @@ import io.solar.utils.context.AuthInterface;
 import io.solar.utils.db.Transaction;
 import io.solar.utils.server.controller.PathVariable;
 import io.solar.utils.server.controller.RequestBody;
+import io.solar.utils.server.params.*;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -18,7 +19,6 @@ import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
-@Slf4j
 public class ControllerExecutable {
     private final String[] pathParts;
     private final String httpMethod;
@@ -55,104 +55,37 @@ public class ControllerExecutable {
             for(int i = 0; i < params.length; i++) {
                 Parameter param = params[i];
 
-                if(param.getType().equals(Transaction.class)) {
+                if(TransactionParamUtils.process(args, param, i, transaction)) {
                     if(transaction == null) {
-                        transaction = Transaction.begin();
+                        transaction = (Transaction) args[i];
                     }
-                    args[i] = transaction;
                     continue;
                 }
 
+                if(AuthParamUtils.process(args, param, i, exchange, context)) {
+                    continue;
+                }
 
-                AuthData authData = param.getAnnotation(AuthData.class);
-                if(authData != null) {
-                    List<String> tokenList = exchange.getRequestHeaders().get("auth_token");
-                    if(tokenList == null || tokenList.isEmpty()) {
-                        args[i] = null;
+                if(RequestBodyParamUtils.process(args, param, i, exchange, context)) {
+                    continue;
+                }
+                try {
+                    if (RequestPathParamUtils.process(args, param, i, pathParts, path)) {
                         continue;
                     }
-                    String token = tokenList.get(0);
-                    AuthInterface auth = context.safeGet(AuthInterface.class);
-                    Optional optional = auth.verify(token);
-                    if(optional.isEmpty()) {
-                        args[i] = null;
-                    } else {
-                        args[i] = optional.get();
+                    if(GetParamsParamUtils.process(args, param, i, exchange)) {
+                        continue;
                     }
-                    continue;
-                }
-                RequestBody body = param.getAnnotation(RequestBody.class);
-                if(body != null) {
-                    try {
-                        String json = new String(exchange.getRequestBody().readAllBytes());
-                        ObjectMapperFactory factory = context.get(ObjectMapperFactory.class);
-                        if(factory == null) {
-                           log.error("ObjectMapperFactory was not properly configured");
-                        }
-                        args[i] = factory.create().readValue(json, param.getType());
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    continue;
-                }
-                PathVariable pathVariable = param.getAnnotation(PathVariable.class);
-                if(pathVariable != null) {
-                    String varName = "{" + pathVariable.value() + "}";
-                    int index = -1;
-                    for(int j = 0; j < pathParts.length; j++) {
-                        String pathPart = pathParts[j];
-                        if(pathPart.equals(varName)) {
-                            index = j;
-                            break;
-                        }
-                    }
-                    if(index == -1) {
-                        args[i] = null;
-                    } else {
-                        String source = path[index];
-                        if (param.getType().equals(String.class)) {
-                            args[i] = source;
-                        } else if(param.getType().equals(Integer.class)) {
-                            try {
-                                args[i] = Integer.parseInt(source);
-                            } catch (Exception e) {
-                                return new ApiResponse("Bad request", 400);
-                            }
-                        } else if(param.getType().equals(Long.class)) {
-                            try {
-                                args[i] = Long.parseLong(source);
-                            } catch (Exception e) {
-                                return new ApiResponse("Bad request", 400);
-                            }
-                        }
-                    }
+                } catch (Exception e) {
+                    return new ApiResponse(e.getMessage(), 400);
                 }
 
-                if(param.getType().equals(Pageable.class)) {
-                    String pageS = UrlUtils.getQuery(exchange, "page");
-                    String sizeS = UrlUtils.getQuery(exchange, "size");
-                    int page;
-                    try {
-                        if(null != pageS && !"".equals(pageS)) {
-                            page = Integer.parseInt(pageS);
-                        } else {
-                            page = 0;
-                        }
-                    } catch (Exception e) {
-                        page = 0;
-                    }
-                    int size;
-                    try {
-                        if(null != sizeS && !"".equals(sizeS)) {
-                            size = Integer.parseInt(sizeS);
-                        } else {
-                            size = 20;
-                        }
-                    } catch (Exception e) {
-                        size = 20;
-                    }
-                    args[i] = new Pageable(page, size);
+
+                if(PageableParamUtils.process(args, param, i, exchange)) {
+                    continue;
                 }
+
+
             }
             if(method.getReturnType().equals(void.class)) {
                 method.invoke(controller, args);

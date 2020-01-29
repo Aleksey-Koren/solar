@@ -5,6 +5,7 @@
  */
 function Grid(params) {
     this.data = params.data || [];
+    this.onRowClick = params.onRowClick;
     this.columns = params.columns;
     this.pageInfo = {page: 1, size: 10, total: 0};
     this.table = Dom.el('table', 'grid');
@@ -13,29 +14,34 @@ function Grid(params) {
         params.controls || null,
         this.table,
         this.pagination.container
-    ].filter(function(v){return v}));
+    ].filter(function (v) {
+        return v
+    }));
     this.render();
 }
 
-Grid.prototype.setPage = function(page) {
+Grid.prototype.setPage = function (page) {
     this.data = page.content;
     this.pageInfo.total = page.totalElements;
     this.pagination.update(this.data);
 };
-Grid.prototype.queryString = function() {
+Grid.prototype.queryString = function () {
     return "page=" + encodeURIComponent(this.pageInfo.page - 1) + "&size=" + encodeURIComponent(this.pageInfo.size);
 };
 
-Grid.prototype.render = function() {
+Grid.prototype.render = function (data) {
+    if (data) {
+        this.data = data;
+    }
     var header = this.renderHeader();
     var body = this.renderBody();
-    this.table.innerHTML = '';
+    Dom.clear(this.table);
     Dom.append(this.table, [header, body]);
 };
 
-Grid.prototype.renderHeader = function() {
+Grid.prototype.renderHeader = function () {
     var out = Dom.el('tr');
-    this.columns.forEach(function(col) {
+    this.columns.forEach(function (col) {
         var header = col.headerRender ? col.headerRender() : (col.title || "");
         Dom.append(out, Dom.el('th', {}, header));
     });
@@ -43,25 +49,34 @@ Grid.prototype.renderHeader = function() {
 };
 
 
-Grid.prototype.hidePagination = function() {
+Grid.prototype.hidePagination = function () {
     this.pagination.hide();
 };
 
-Grid.prototype.renderBody = function() {
+Grid.prototype.renderBody = function () {
     var me = this;
     var out = [];
-    var i = 0;
-    this.data.forEach(function(row) {
-       out.push(Dom.el('tr', {class: i%2 ? 'even' : 'odd'}, me.columns.map(function (column) {
-           var content;
-           if(column.render) {
-               content = column.render(row);
-           } else {
-               content = row[column.name];
-           }
-           return Dom.el('td', {}, content === undefined ? "" : content);
-       })));
+    this.data.forEach(function (row, i) {
+        var params = {class: i % 2 ? 'even' : 'odd'};
+        if(me.onRowClick) {
+            params.click = function() {
+                me.onRowClick(row);
+            }
+        }
+        var cache = {};
+        out.push(Dom.el('tr', params, me.columns.map(function (column) {
+            var content;
+            if (column.render) {
+                content = column.render(row, cache);
+            } else {
+                content = row[column.name];
+            }
+            return Dom.el('td', {}, content === undefined ? "" : content);
+        })));
     });
+    if(this.data.length === 0) {
+        out.push(Dom.el('tr', {colspan: me.columns.length}, "No Content"));
+    }
     return Dom.el('tbody', {}, out);
 };
 
@@ -72,17 +87,21 @@ function GridPagination(pagination, onChange, data) {
     this.page = Dom.el('input', {
         value: pagination.page,
         class: 'pagination-page',
-        onchange: function () {
-            pagination.page = me.page.value;
-            onChange(pagination);
+        onkeyup: function () {
+            if(me.page.value) {
+                pagination.page = me.page.value;
+                onChange(pagination);
+            }
         }
     });
-    this.total = Dom.el('span',{}, this.prepareTotal(data));
-    this.pageSize = Dom.el('select', {onchange: function(){
-        pagination.page = 1;
-        pagination.size = parseInt(me.pageSize.value);
-        onChange(pagination)
-    }}, [
+    this.total = Dom.el('span', {}, this.prepareTotal(data));
+    this.pageSize = Dom.el('select', {
+        onchange: function () {
+            pagination.page = 1;
+            pagination.size = parseInt(me.pageSize.value);
+            onChange(pagination)
+        }
+    }, [
         Dom.el('option', {value: 10}, 10),
         Dom.el('option', {value: 20}, 20),
         Dom.el('option', {value: 50}, 50),
@@ -102,20 +121,77 @@ function GridPagination(pagination, onChange, data) {
     ]);
 }
 
-GridPagination.prototype.prepareTotal = function(data) {
+GridPagination.prototype.prepareTotal = function (data) {
     var page = (this.pagination.page || 1) - 1;
     var total = this.pagination.total;
-    if(total === 0) {
+    if (total === 0) {
         return "";
     }
-    return ["Shown ", page * (this.pagination.size) + 1, " - ", page * this.pagination.size + data.length, "from",  total + ""].join(' ');
+    return ["Shown ", page * (this.pagination.size) + 1, " - ", page * this.pagination.size + data.length, "from", total + ""].join(' ');
 
 };
-GridPagination.prototype.update = function(data) {
+GridPagination.prototype.update = function (data) {
     this.total.innerHTML = this.prepareTotal(data);
     this.page.value = this.pagination.page || 1;
     this.pageSize.value = this.pagination.size;
 };
-GridPagination.prototype.hide = function() {
+GridPagination.prototype.hide = function () {
     Dom.addClass(this.container, "hidden");
+};
+
+
+/**
+ *
+ * @param params {{
+ *     context: object,
+ *     content: object,
+ *     title: object,
+ *     noControls?: boolean
+ * }}
+ * @constructor
+ */
+function Popup(params) {
+    this.context = params.context;
+    this.content = Dom.el('div', {}, params.content ? params.content : undefined);
+    var me = this;
+    if(params.title) {
+        this.title = Dom.el('h3', {class: "popup-title"}, params.title);
+    } else {
+        this.title = null;
+    }
+    this.window = Dom.el('div', {class: "modal"}, [
+        this.title,
+        this.content,
+        params.noControls ? null : Dom.el('div', {}, [Dom.el('div', {
+            class: 'popup-close',
+            onclick: function () {
+                me.hide();
+            }
+        })])
+    ]);
+    this.container = Dom.el(
+        'div',
+        {class: "overlay"},
+        this.window
+    );
+    this.hideWrapper = null;
+}
+Popup.prototype.setContent = function (content) {
+    Dom.append(this.content, content)
+};
+Popup.prototype.show = function () {
+    if(this.context && this.context.escListener) {
+        var me = this;
+        this.hideWrapper = function(){
+            me.hide();
+        };
+        this.context.escListener.add(this.hideWrapper)
+    }
+    document.body.appendChild(this.container);
+};
+Popup.prototype.hide = function () {
+    if(this.context && this.context.escListener) {
+        this.context.escListener.remove(this.hideWrapper);
+    }
+    this.container.parentElement && this.container.parentElement.removeChild(this.container);
 };

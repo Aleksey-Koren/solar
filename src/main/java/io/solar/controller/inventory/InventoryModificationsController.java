@@ -1,7 +1,7 @@
 package io.solar.controller.inventory;
 
 import io.solar.controller.AuthController;
-import io.solar.entity.InventoryModification;
+import io.solar.entity.inventory.InventoryModification;
 import io.solar.entity.User;
 import io.solar.mapper.InventoryModificationMapper;
 import io.solar.utils.context.AuthData;

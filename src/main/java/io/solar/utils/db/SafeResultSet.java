@@ -118,6 +118,23 @@ public class SafeResultSet implements ResultSet {
         }
     }
 
+    public Float fetchFloat(int i) {
+        try {
+            return resultSet.getObject(i, Float.class);
+        } catch  (SQLException e) {
+            log(e);
+            return null;
+        }
+    }
+    public Float fetchFloat(String i) {
+        try {
+            return resultSet.getObject(i, Float.class);
+        } catch  (SQLException e) {
+            log(e);
+            return null;
+        }
+    }
+
     @Override
     public double getDouble(int i) {
         try {
@@ -265,6 +282,24 @@ public class SafeResultSet implements ResultSet {
         } catch  (SQLException e) {
             log(e);
             return 0;
+        }
+    }
+
+    public Long fetchLong(String s) {
+        try {
+            return resultSet.getObject(s, Long.class);
+        } catch  (SQLException e) {
+            log(e);
+            return null;
+        }
+    }
+
+    public Long fetchLong(int s) {
+        try {
+            return resultSet.getObject(s, Long.class);
+        } catch  (SQLException e) {
+            log(e);
+            return null;
         }
     }
 

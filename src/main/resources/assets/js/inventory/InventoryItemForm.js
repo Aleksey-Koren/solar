@@ -77,7 +77,7 @@ InventoryItemForm.prototype.updateSelect = function () {
 };
 
 InventoryItemForm.prototype.save = function() {
-    var item = Dom.fromForm(this.container);
+    var item = Dom.fromForm(this.form);
     item.modifications = this.modificationsGrid.grid.data;
     item.sockets = this.socketsGrid.grid.data;
     var me = this;

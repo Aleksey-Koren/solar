@@ -2,8 +2,11 @@ package io.solar.controller;
 
 import io.solar.dto.Marketplace;
 import io.solar.entity.*;
+import io.solar.entity.objects.StarShip;
+import io.solar.entity.objects.Station;
 import io.solar.mapper.PopulationMapper;
 import io.solar.mapper.ProductionMapper;
+import io.solar.service.ObjectService;
 import io.solar.service.StarShipService;
 import io.solar.utils.Option;
 import io.solar.utils.Page;
@@ -18,7 +21,6 @@ import io.solar.utils.server.controller.RequestMapping;
 import io.solar.utils.server.controller.Scheduled;
 import lombok.extern.slf4j.Slf4j;
 
-import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -29,8 +31,8 @@ public class StationController {
     private final StationRestUtils stationRestUtils;
     private final StarShipService starShipService;
 
-    public StationController(PlanetController planetsController, StarShipService starShipService) {
-        this.stationRestUtils = new StationRestUtils(planetsController);
+    public StationController(PlanetController planetsController, ObjectService objectService, StarShipService starShipService) {
+        this.stationRestUtils = new StationRestUtils(planetsController, objectService);
         this.starShipService = starShipService;
     }
 
@@ -85,10 +87,17 @@ public class StationController {
         Transaction transaction = null;
         try {
             transaction = Transaction.begin();
-            Query query = transaction.query("select distinct id, population from objects where type != 'ship'");
+            Query query = transaction.query("select distinct objects.id, objects.population" +
+                    " from objects" +
+                    " inner join object_type_description on objects.hull_id = object_type_description.id" +
+                    " where object_type_description.type = 'station'");
+
             List<StarShip> stations = query.executeQuery(new PopulationMapper());
             Query productionQuery = transaction.query("select * from productions where station = :station");
-            Query bulkQuery = transaction.query("select * from productions where station = :station");
+            Query bulkQuery = transaction.query("select * from objects" +
+                    " inner join object_type_description on objects.hull_id = object_type_description.id" +
+                    " inner join object_type on object_type_description.inventory_type = object_type.id " +
+                    " where hull_id = :station");
             for(StarShip station : stations) {
                 productionQuery.setLong("station", station.getId());
                 List<Production> productions = productionQuery.executeQuery(new ProductionMapper());

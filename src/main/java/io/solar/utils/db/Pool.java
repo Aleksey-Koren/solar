@@ -10,6 +10,9 @@ public class Pool {
     private final String password;
 
     private final List<ConnectionInUse> pool;
+    private final List<Thread> await;
+
+    private static final long TWO_MIN = 2 * 60 * 1000;
 
     private static Pool instance;
 
@@ -17,11 +20,12 @@ public class Pool {
         instance = new Pool(url, username, password, size);
     }
 
-    public Pool(String url, String username,String  password, int size) {
+    private Pool(String url, String username,String  password, int size) {
         this.url = url;
         this.username = username;
         this.password = password;
         pool = new ArrayList<>(size);
+        await = new ArrayList<>();
         while(size > 0) {
             pool.add(new ConnectionInUse(createConnection()));
             size--;
@@ -37,7 +41,7 @@ public class Pool {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                synchronized (pool) {
+                synchronized (instance) {
                     Thread current = Thread.currentThread();
                     for (ConnectionInUse con : instance.pool) {
                         Connection connection = con.use(current);
@@ -58,27 +62,32 @@ public class Pool {
 
     public static Connection getConnection() {
         Thread current = Thread.currentThread();
-        synchronized (instance.pool) {
+        synchronized (instance) {
             for (ConnectionInUse con : instance.pool) {
                 Connection connection = con.use(current);
                 if(connection != null) {
                     return connection;
                 }
             }
+            instance.await.add(Thread.currentThread());
         }
         try {
-            Thread.sleep(5);
+            Thread.sleep(TWO_MIN);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            return getConnection();
         }
-        return getConnection();
+        throw new RuntimeException("can't get connection");
     }
 
     public static void release() {
         Thread current = Thread.currentThread();
-        synchronized (instance.pool) {
+        synchronized (instance) {
             for (ConnectionInUse con : instance.pool) {
                 if(con.release(current)) {
+                    if(instance.await.size() > 0) {
+                        Thread sleeping = instance.await.remove(0);
+                        sleeping.interrupt();
+                    }
                     break;
                 }
             }

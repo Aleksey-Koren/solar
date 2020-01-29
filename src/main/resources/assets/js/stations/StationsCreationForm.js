@@ -2,7 +2,7 @@ function StationsCreationForm(id, onClose, context) {
     var w = wrapTableInput;
 
     var me = this;
-    this.planets = Dom.el('select', {name: 'planetId'});
+    this.planets = Dom.el('select', {name: 'planet'});
     this.hullSelect = Dom.el('select', {name: 'hullId'});
 
     this.id = id;

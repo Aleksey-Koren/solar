@@ -1,14 +1,16 @@
 package io.solar.controller.inventory;
 
 import io.solar.controller.AuthController;
-import io.solar.entity.InventoryItem;
-import io.solar.entity.InventoryModification;
-import io.solar.entity.InventoryType;
+import io.solar.entity.inventory.InventoryItem;
+import io.solar.entity.inventory.InventoryModification;
+import io.solar.entity.inventory.InventorySocket;
+import io.solar.entity.inventory.InventoryType;
 import io.solar.entity.User;
 import io.solar.entity.util.ManyToMany;
 import io.solar.mapper.InventoryItemMapper;
 import io.solar.mapper.InventoryModificationMapper;
 import io.solar.mapper.InventoryTypeMapper;
+import io.solar.mapper.SocketMapper;
 import io.solar.utils.context.AuthData;
 import io.solar.utils.db.Query;
 import io.solar.utils.db.SafeResultSet;
@@ -17,6 +19,7 @@ import io.solar.utils.server.beans.Controller;
 import io.solar.utils.server.controller.PathVariable;
 import io.solar.utils.server.controller.RequestBody;
 import io.solar.utils.server.controller.RequestMapping;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,7 +29,10 @@ import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping(value = "inventory-item")
+@Slf4j
 public class InventoryItemsController {
+
+
 
     @RequestMapping(method = "post")
     public InventoryItem save(@RequestBody InventoryItem inventoryItem, @AuthData User user, Transaction transaction) {
@@ -85,6 +91,24 @@ public class InventoryItemsController {
         if (!AuthController.userCan(user, "edit-inventory", transaction)) {
             throw new RuntimeException("no privileges");
         }
+
+        Query modification = transaction.query("delete from object_modification where item_id = :id");
+        modification.setLong("id", id);
+        modification.execute();
+
+        Query deleteSockets = transaction.query("delete from object_type_socket where item_id = :id");
+        deleteSockets.setLong("id", id);
+        deleteSockets.execute();
+
+        Query productions = transaction.query("delete from productions where station in (" +
+                "select id from objects where hull_id = :id)");
+        productions.setLong("id", id);
+        productions.execute();
+
+        Query objects = transaction.query("delete from objects where hull_id = :id");
+        objects.setLong("id", id);
+        objects.execute();
+
         Query query = transaction.query("delete from object_type_description where id = :id");
         query.setLong("id", id);
         query.execute();
@@ -103,11 +127,10 @@ public class InventoryItemsController {
             query.setLong("id", itemId);
             out.setModifications(query.executeQuery(new InventoryModificationMapper()));
 
-            query = transaction.query("select object_type.* from object_type_socket" +
-                    " left join object_type on object_type.id = object_type_socket.item_type_id" +
+            query = transaction.query("select object_type_socket.* from object_type_socket" +
                     " where object_type_socket.item_id = :id order by object_type_socket.sort_order");
             query.setLong("id", itemId);
-            out.setSockets(query.executeQuery(new InventoryTypeMapper()));
+            out.setSockets(query.executeQuery(new SocketMapper()));
             return out;
         } else {
             return null;
@@ -128,9 +151,9 @@ public class InventoryItemsController {
         Query query = transaction.query("select * from object_modification where item_id = :itemId");
         query.setLong("itemId", inventoryItem.getId());
         Map<Long, ManyToMany> join = query.executeQuery(resultSet -> new ManyToMany(
-                resultSet.getLong("id"),
-                resultSet.getLong("item_id"),
-                resultSet.getLong("modification_id")
+                resultSet.fetchLong("id"),
+                resultSet.fetchLong("item_id"),
+                resultSet.fetchLong("modification_id")
         )).stream().collect(Collectors.toMap(ManyToMany::getRight, m -> m));
 
         List<InventoryModification> toAdd = new ArrayList<>();
@@ -163,100 +186,78 @@ public class InventoryItemsController {
     }
 
     private void saveSockets(InventoryItem inventoryItem, Transaction transaction) {
-        List<InventoryType> sockets = inventoryItem.getSockets();
+        List<InventorySocket> sockets = inventoryItem.getSockets();
         if (sockets == null || sockets.isEmpty()) {
             Query del = transaction.query("delete from object_type_socket where item_id = :itemId");
             del.setLong("itemId", inventoryItem.getId());
             del.execute();
             return;
         }
-        Map<Long, List<InventoryType>> thisMap = new HashMap<>();
-        for (InventoryType type : sockets) {
-            List<InventoryType> list = thisMap.computeIfAbsent(type.getId(), k -> new ArrayList<>());
-            list.add(type);
-        }
+
 
         Query query = transaction.query("select * from object_type_socket where item_id = :itemId");
         query.setLong("itemId", inventoryItem.getId());
-        List<ManyToMany> existingLinks = query.executeQuery((SafeResultSet rs) -> new ManyToMany(
-                rs.getLong("id"),
-                rs.getLong("item_id"),
-                rs.getLong("item_type_id"),
-                rs.getInt("sort_order")
-        ));
-        Map<Long, List<ManyToMany>> existingMap = new HashMap<>();
-        for (ManyToMany join : existingLinks) {
-            List<ManyToMany> list = existingMap.computeIfAbsent(join.getRight(), k -> new ArrayList<>());
-            list.add(join);
+        Map<Long, InventorySocket> existing = query.executeQuery(new SocketMapper())
+                .stream()
+                .collect(Collectors.toMap(InventorySocket::getId, v -> v));
+
+        boolean updateRequired = false;
+        Query update = transaction.query("update object_type_socket " +
+                "set item_type_id = :itemTypeId, alias = :alias " +
+                "where item_id = :itemId and id = :id");
+        for(InventorySocket socket : sockets) {
+            if(socket.getId() != null) {
+                updateRequired = true;
+                update.setLong("id", socket.getId());
+                update.setLong("itemId", inventoryItem.getId());
+                update.setLong("itemTypeId", socket.getItemTypeId());
+                update.setString("alias", socket.getAlias());
+                update.addBatch();
+            }
+        }
+        if(updateRequired) {
+            update.executeBatch();
         }
 
+        Query insert = transaction.query("insert into object_type_socket (item_id, item_type_id, alias)" +
+                " value (:itemId, :itemTypeId, :alias)");
+        boolean insertRequired = false;
+        for(InventorySocket socket : sockets) {
+            if(socket.getId() == null) {
+                insertRequired = true;
+                insert.setLong("itemId", inventoryItem.getId());
+                insert.setLong("itemTypeId", socket.getItemTypeId());
+                insert.setString("alias", socket.getAlias());
+                insert.executeUpdate();
+                socket.setId(insert.getLastGeneratedKey(Long.class));
+            }
+        }
+        if(insertRequired) {
+            insert.executeBatch();
+        }
+
+        Map<Long, InventorySocket> current = sockets.stream()
+                .collect(Collectors.toMap(InventorySocket::getId, v -> v));
         Query delete = transaction.query("delete from object_type_socket where id = :id");
-        Query insert = transaction.query("insert into object_type_socket (item_id, item_type_id)" +
-                " value (:itemId, :itemTypeId)");
-
-        for (Map.Entry<Long, List<InventoryType>> entry : thisMap.entrySet()) {
-            List<ManyToMany> existing = existingMap.get(entry.getKey());
-            if (existing == null) {
-                existing = new ArrayList<>();
-            }
-            List<InventoryType> thisType = entry.getValue();
-            int delta = existing.size() - thisType.size();
-            if (delta > 0) {
-                Long id = existing.get(existing.size() - 1).getId();
-                while (delta > 0) {
-                    delete.setLong("id", id);
-                    delete.addBatch();
-                    delta--;
-                }
-            } else if (delta < 0) {
-                while (delta < 0) {
-                    insert.setLong("itemId", inventoryItem.getId());
-                    insert.setLong("itemTypeId", entry.getKey());
-                    insert.addBatch();
-                    delta++;
-                }
+        boolean deleteRequired = false;
+        for(Map.Entry<Long, InventorySocket> socket : existing.entrySet()) {
+            if(!current.containsKey(socket.getKey())) {
+                deleteRequired = true;
+                delete.setLong("id", socket.getKey());
+                delete.addBatch();
             }
         }
-        for (Map.Entry<Long, List<ManyToMany>> entry : existingMap.entrySet()) {
-            Long itemId = entry.getKey();
-            if (!thisMap.containsKey(itemId)) {
-                List<ManyToMany> joins = entry.getValue();
-                for (ManyToMany join : joins) {
-                    delete.setLong("id", join.getId());
-                    delete.addBatch();
-                }
-            }
-        }
-        delete.executeBatch();
-        insert.executeBatch();
-
-
-        List<InventoryType> incomingOrder = new ArrayList<>(inventoryItem.getSockets());
-        Query select = transaction.query("select id, item_id, item_type_id from object_type_socket where item_id = :item_id");
-        select.setLong("item_id", inventoryItem.getId());
-        List<ManyToMany> dbOrderList = query.executeQuery(rs ->
-                new ManyToMany(rs.getLong("id"), rs.getLong("item_id"), rs.getLong("item_type_id"))
-        );
-        Map<Long, List<ManyToMany>> dbOrderMap = new HashMap<>();
-        for(ManyToMany item : dbOrderList) {
-            List<ManyToMany> list = dbOrderMap.computeIfAbsent(item.getRight(), v -> new ArrayList<>());
-            list.add(item);
+        if(deleteRequired) {
+            delete.executeBatch();
         }
 
-        Query update = transaction.query("update object_type_socket set sort_order = :sort_order where id = :id");
-        for(int i = 0; i < incomingOrder.size(); i++) {
-            List<ManyToMany> list = dbOrderMap.get(incomingOrder.get(i).getId());
-            for(ManyToMany m : list) {
-                if(m.getSort() == null) {
-                    m.setSort(i);
-                    update.setInt("sort_order", i + 1);
-                    update.setLong("id", m.getId());
-                    update.addBatch();
-                    break;
-                }
-            }
+        Query updateOrder = transaction.query("update object_type_socket set sort_order = :sortOrder where id = :id");
+        for(int i = 0; i < sockets.size(); i++) {
+            InventorySocket socket = sockets.get(i);
+            updateOrder.setInt("sortOrder", i + 1);
+            updateOrder.setLong("id", socket.getId());
+            updateOrder.executeUpdate();
         }
-        update.executeBatch();
     }
 
 }

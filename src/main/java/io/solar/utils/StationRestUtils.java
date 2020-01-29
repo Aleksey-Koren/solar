@@ -3,10 +3,11 @@ package io.solar.utils;
 import io.solar.controller.PlanetController;
 import io.solar.entity.Planet;
 import io.solar.entity.Production;
-import io.solar.entity.Station;
+import io.solar.entity.objects.Station;
 import io.solar.mapper.ProductionMapper;
 import io.solar.mapper.StationMapper;
 import io.solar.mapper.TotalMapper;
+import io.solar.service.ObjectService;
 import io.solar.utils.db.Query;
 import io.solar.utils.db.Transaction;
 import io.solar.utils.server.Pageable;
@@ -19,56 +20,17 @@ import java.util.stream.Collectors;
 public class StationRestUtils {
 
     private final PlanetController planetController;
+    private final ObjectService objectService;
 
-    public StationRestUtils(PlanetController planetController) {
+    public StationRestUtils(PlanetController planetController, ObjectService objectService) {
         this.planetController = planetController;
+        this.objectService = objectService;
     }
 
     public Station save(Station station, Transaction transaction) {
         boolean isNew = station.getId() == null;
 
-        Query save = null;
-        if (station.getId() != null) {
-            Query query = transaction.query("select * from objects where id = :id");
-            query.setLong("id", station.getId());
-            List<Station> existing = query.executeQuery(new StationMapper());
-
-            if (existing.size() == 1) {
-                save = transaction.query("UPDATE objects set planet=:planet,population=:population,fraction=:fraction," +
-                        "title=:title, x = :x, y = :y, aphelion = :aphelion," +
-                        " orbital_period = :orbital_period, angle=:angle, user_id = :user_id, hull_id = :hull_id" +
-                        " where id=:id");
-                save.setLong("id", station.getId());
-            } else {
-                log.error("can't find planet with id: " + station.getId());
-            }
-        } else {
-            save = transaction.query("insert into objects (planet,population,fraction,title," +
-                    "x,y,aphelion,orbital_period, angle, user_id, hull_id) " +
-                    " values (:planet, :population, :fraction, :title," +
-                    " :x, :y, :aphelion, :orbital_period, :angle, :user_id, :hull_id)");
-        }
-
-        if (save != null) {
-            save.setLong("planet", station.getPlanetId());
-            save.setLong("population", station.getPopulation());
-            save.setString("fraction", station.getFraction());
-            save.setString("title", station.getTitle());
-            save.setFloat("x", station.getPlanetId() == null ? station.getX() : null);
-            save.setFloat("y", station.getPlanetId() == null ? station.getY() : null);
-            save.setFloat("aphelion", station.getPlanetId() != null ? station.getAphelion() : null);
-            save.setFloat("angle", station.getPlanetId() != null ? station.getAngle() : null);
-            save.setFloat("orbital_period", station.getPlanetId() != null ? station.getOrbitalPeriod() : null);
-            save.setLong("user_id", station.getUserId());
-            save.setLong("hull_id", station.getHullId());
-
-            save.execute();
-            if (station.getId() == null) {
-                station.setId(save.getLastGeneratedKey(Long.class));
-            }
-        } else {
-            throw new RuntimeException("Can't save or update product");
-        }
+        objectService.save(station, transaction);
 
         List<Production> production = station.getProduction();
         if (production != null && production.size() > 0) {
@@ -140,21 +102,8 @@ public class StationRestUtils {
                 "where objects.id = :id and otd.type = 'station'");
         query.setLong("id", id);
         List<Station> existing = query.executeQuery(new StationMapper());
-        appendPlanets(existing, transaction);
         appendProductions(existing, transaction);
         return existing.size() == 1 ? existing.get(0) : null;
-    }
-
-    private void appendPlanets(List<Station> existing, Transaction transaction) {
-        if (existing != null && !existing.isEmpty()) {
-            Map<Long, Planet> planets = planetController.getByIds(existing.stream()
-                    .map(Station::getPlanetId)
-                    .collect(Collectors.toList()), transaction
-            ).stream().collect(
-                    Collectors.toMap(Planet::getId, v -> v)
-            );
-            existing.forEach(v -> v.setPlanet(planets.get(v.getPlanetId())));
-        }
     }
 
     private void appendProductions(List<Station> existing, Transaction transaction) {
@@ -193,7 +142,6 @@ public class StationRestUtils {
         query.setInt("pageSize", pageable.getPageSize());
         List<Station> existing = query.executeQuery(new StationMapper());
 
-        appendPlanets(existing, transaction);
         appendProductions(existing, transaction);
 
         return new Page<>(existing, count);

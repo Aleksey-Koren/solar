@@ -77,9 +77,8 @@ function InventoryItemGrid(context) {
     this.showGrid();
     this.grid.hidePagination();
     var store = this.context.stores.inventory;
-    store.listen(function () {
-        me.drawStore();
-    });
+    store.listen(this);
+
     if (!store.isItemsLoaded || !store.isTypesLoaded) {
         store.update();
     } else {
@@ -87,6 +86,13 @@ function InventoryItemGrid(context) {
     }
 }
 
+InventoryItemGrid.prototype.onStoreChange = function() {
+    this.drawStore();
+};
+
+InventoryItemGrid.prototype.unmount = function() {
+    this.context.stores.inventory.remove(this);
+};
 
 InventoryItemGrid.prototype.drawStore = function () {
     var store = this.context.stores.inventory;
