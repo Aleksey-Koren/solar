@@ -20,10 +20,12 @@ import io.solar.utils.server.controller.RequestBody;
 import io.solar.utils.server.controller.RequestMapping;
 import io.solar.utils.server.controller.Scheduled;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Component
 @RequestMapping(value = "station")
 @Slf4j
 public class StationController {

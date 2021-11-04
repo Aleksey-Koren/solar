@@ -14,9 +14,11 @@ import io.solar.utils.server.controller.PathVariable;
 import io.solar.utils.server.controller.RequestBody;
 import io.solar.utils.server.controller.RequestMapping;
 import io.solar.utils.server.controller.RequestParam;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Component
 @Controller
 @RequestMapping("users")
 public class UsersController {

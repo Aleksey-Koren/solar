@@ -19,6 +19,7 @@ import io.solar.utils.db.Transaction;
 import io.solar.utils.server.beans.Controller;
 import io.solar.utils.server.controller.RequestBody;
 import io.solar.utils.server.controller.RequestMapping;
+import org.springframework.stereotype.Component;
 
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
@@ -29,6 +30,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Component
 @Controller
 public class AuthController implements AuthInterface<User> {
 

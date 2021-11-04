@@ -15,11 +15,13 @@ import io.solar.utils.server.controller.PathVariable;
 import io.solar.utils.server.controller.RequestBody;
 import io.solar.utils.server.controller.RequestMapping;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 import java.sql.SQLException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Component
 @RequestMapping(value = "product")
 @Slf4j
 public class ProductController {

@@ -12,21 +12,32 @@ import io.solar.utils.db.Pool;
 import io.solar.utils.db.Query;
 import io.solar.utils.db.Transaction;
 import io.solar.utils.server.ObjectMapperFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+
 public class Start {
+
     public static void main(String[] args) throws IOException {
+
         Pool.init(
                 "jdbc:mysql://localhost/solar?useSSL=false&serverTimezone=UTC",
                 System.getenv("solar_db_user"),
                 System.getenv("solar_db_pass"),
                 8
         );
+
+
 
         ApplicationContext context = new ApplicationContext();
         context.put(ApiBridge.class, new ApiBridge(context));
@@ -48,5 +59,4 @@ public class Start {
         Server s = new Server("assets", "api");
         s.start(context);
     }
-
 }

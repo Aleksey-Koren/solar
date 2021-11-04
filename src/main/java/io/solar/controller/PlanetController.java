@@ -11,10 +11,12 @@ import io.solar.utils.server.controller.PathVariable;
 import io.solar.utils.server.controller.RequestBody;
 import io.solar.utils.server.controller.RequestMapping;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Component
 @RequestMapping(value = "planet")
 @Slf4j
 public class PlanetController {

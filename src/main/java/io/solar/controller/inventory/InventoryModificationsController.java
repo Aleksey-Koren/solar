@@ -11,9 +11,11 @@ import io.solar.utils.server.beans.Controller;
 import io.solar.utils.server.controller.PathVariable;
 import io.solar.utils.server.controller.RequestBody;
 import io.solar.utils.server.controller.RequestMapping;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Component
 @Controller
 @RequestMapping(value = "inventory-modification")
 public class InventoryModificationsController {

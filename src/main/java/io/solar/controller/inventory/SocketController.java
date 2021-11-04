@@ -8,10 +8,12 @@ import io.solar.utils.server.beans.Controller;
 import io.solar.utils.server.controller.PathVariable;
 import io.solar.utils.server.controller.RequestMapping;
 import io.solar.utils.server.controller.RequestParam;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
 @Controller
 @RequestMapping("sockets")
 public class SocketController {

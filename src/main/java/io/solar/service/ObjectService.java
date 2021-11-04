@@ -8,9 +8,11 @@ import io.solar.utils.db.Query;
 import io.solar.utils.db.Transaction;
 import io.solar.utils.server.beans.Service;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Component
 @Service
 @Slf4j
 public class ObjectService {

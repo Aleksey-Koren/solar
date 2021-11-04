@@ -6,10 +6,12 @@ import io.solar.mapper.StarShipMapper;
 import io.solar.utils.db.Query;
 import io.solar.utils.db.Transaction;
 import io.solar.utils.server.beans.Service;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
 
+@Component
 @Service
 public class StarShipService {
 

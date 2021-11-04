@@ -6,6 +6,7 @@ import io.solar.utils.server.beans.Controller;
 import io.solar.utils.server.controller.RequestMapping;
 import io.solar.utils.server.beans.Service;
 import io.solar.utils.server.controller.Scheduled;
+import org.springframework.stereotype.Component;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -15,6 +16,7 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+@Component
 public class ApplicationContext {
     private final Map<Class, Object> context;
 
