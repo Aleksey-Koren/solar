@@ -5,6 +5,8 @@ import io.solar.utils.ApplicationContext;
 import io.solar.utils.server.ApiResponse;
 import io.solar.utils.server.ControllerExecutable;
 import io.solar.utils.server.controller.RequestMapping;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -13,11 +15,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Component
 public class ApiBridge {
 
     private final ApplicationContext context;
     private final Map<String, List<ControllerExecutable>> controllers;
 
+    @Autowired
     public ApiBridge(ApplicationContext context) {
         this.context = context;
         controllers = new HashMap<>();

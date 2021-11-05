@@ -1,6 +1,7 @@
 package io.solar.utils.context;
 
 import io.solar.utils.ApplicationContext;
+import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -10,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Component
 public class BeanCreator {
 
     private final ApplicationContext context;

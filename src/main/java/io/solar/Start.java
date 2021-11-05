@@ -25,10 +25,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-
+@SpringBootApplication
 public class Start {
 
     public static void main(String[] args) throws IOException {
+
+        SpringApplication app = new SpringApplication(Start.class);
+        app.run(args);
 
         Pool.init(
                 "jdbc:mysql://localhost/solar?useSSL=false&serverTimezone=UTC",
@@ -36,8 +39,6 @@ public class Start {
                 System.getenv("solar_db_pass"),
                 8
         );
-
-
 
         ApplicationContext context = new ApplicationContext();
         context.put(ApiBridge.class, new ApiBridge(context));
@@ -58,5 +59,6 @@ public class Start {
 
         Server s = new Server("assets", "api");
         s.start(context);
+
     }
 }
