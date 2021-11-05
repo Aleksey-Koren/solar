@@ -40,7 +40,11 @@ public class Start {
                 8
         );
 
-        ApplicationContext context = new ApplicationContext();
+//        ApplicationContext context = new ApplicationContext();
+        ApplicationContext context =
+                AppContextHolder.getContext().getBean("applicationContext", ApplicationContext.class);
+
+        context.put(ApiBridge.class, new ApiBridge(context));
         context.put(ApiBridge.class, new ApiBridge(context));
         context.put(ObjectService.class);
         context.put(StarShipService.class);

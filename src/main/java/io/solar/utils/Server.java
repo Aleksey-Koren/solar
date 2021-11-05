@@ -9,6 +9,7 @@ import java.net.InetSocketAddress;
 
 public class Server {
 
+
     private final String resources;
     private final String api;
 
