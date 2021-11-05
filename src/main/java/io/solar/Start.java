@@ -2,28 +2,19 @@ package io.solar;
 
 import io.solar.controller.*;
 import io.solar.controller.inventory.*;
-import io.solar.entity.User;
 import io.solar.service.ObjectService;
 import io.solar.service.StarShipService;
 import io.solar.utils.ApplicationContext;
 import io.solar.utils.Server;
 import io.solar.utils.context.ApiBridge;
 import io.solar.utils.db.Pool;
-import io.solar.utils.db.Query;
-import io.solar.utils.db.Transaction;
 import io.solar.utils.server.ObjectMapperFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
+
 
 import java.io.IOException;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+
 
 @SpringBootApplication
 public class Start {
@@ -40,12 +31,10 @@ public class Start {
                 8
         );
 
-//        ApplicationContext context = new ApplicationContext();
         ApplicationContext context =
                 AppContextHolder.getContext().getBean("applicationContext", ApplicationContext.class);
 
-        context.put(ApiBridge.class, new ApiBridge(context));
-        context.put(ApiBridge.class, new ApiBridge(context));
+        context.put(ApiBridge.class);
         context.put(ObjectService.class);
         context.put(StarShipService.class);
         context.put(PlanetController.class);

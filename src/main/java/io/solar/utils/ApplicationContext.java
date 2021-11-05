@@ -1,14 +1,12 @@
 package io.solar.utils;
 
 import io.solar.utils.context.ApiBridge;
-import io.solar.utils.context.BeanCreator;
 import io.solar.utils.server.beans.Controller;
 import io.solar.utils.server.controller.RequestMapping;
-import io.solar.utils.server.beans.Service;
 import io.solar.utils.server.controller.Scheduled;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -20,9 +18,11 @@ import java.util.TimerTask;
 public class ApplicationContext {
     private final Map<Class, Object> context;
 
+    @Autowired
+    private org.springframework.context.ApplicationContext springContext;
+
     public ApplicationContext() {
         context = new HashMap<>();
-        put(BeanCreator.class, new BeanCreator(this));
         put(ApplicationContext.class, this);
     }
 
@@ -40,8 +40,7 @@ public class ApplicationContext {
     }
 
     public <T> void put(Class<T> clazz) {
-        T instance = get(BeanCreator.class).create(clazz);
-        put(clazz, instance);
+        put(clazz, springContext.getBean(clazz));
     }
 
     public <T> void put(Class<T> clazz, T instance) {
