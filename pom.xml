@@ -74,6 +74,10 @@
             <artifactId>lombok</artifactId>
             <version>1.18.10</version>
         </dependency>
+
+
+
+
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
@@ -84,7 +88,6 @@
             <artifactId>java-jwt</artifactId>
             <version>3.3.0</version>
         </dependency>
-
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>

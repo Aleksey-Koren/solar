@@ -12,6 +12,7 @@ import io.solar.entity.Permission;
 import io.solar.entity.User;
 import io.solar.mapper.PermissionMapper;
 import io.solar.mapper.UserMapper;
+import io.solar.service.UserService;
 import io.solar.utils.BlockedToken;
 import io.solar.utils.context.AuthInterface;
 import io.solar.utils.db.Query;
@@ -19,7 +20,11 @@ import io.solar.utils.db.Transaction;
 import io.solar.utils.server.beans.Controller;
 import io.solar.utils.server.controller.RequestBody;
 import io.solar.utils.server.controller.RequestMapping;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
@@ -30,15 +35,62 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Component
-@Controller
+@RestController
 public class AuthController implements AuthInterface<User> {
+
+    private UserService userService;
+
+    public AuthController(UserService userService) {
+        this.userService = userService;
+    }
+
+    @GetMapping
+    public String index(){
+        return "index";
+    }
+
+    @PostMapping("/register")
+    public Register register(@org.springframework.web.bind.annotation.RequestBody User user) {
+        UserDetails userFromDb = userService.loadUserByUsername(user.getLogin());
+        if (userFromDb != null) {
+            return new Register(false, "", "User with this login already exists");
+        }
+
+        user = userService.registerUser(user);
+        //TODO Maybe I should rewrite token generation
+        Token token = createToken(user);
+        return new Register(true, token.getData(), "");
+    }
+
+
+//    @RequestMapping(value = "/register", method = "post")
+//    public Register register(@RequestBody User user, Transaction transaction) {
+//        if (user.getLogin() == null || user.getPassword() == null || user.getLogin().length() < 3 || user.getPassword().length() < 3) {
+//            return new Register(false, "", "bad request");
+//        }
+//        Query query = transaction.query("select * from users where login = :login");
+//        query.setString("login", user.getLogin());
+//        List<User> users = query.executeQuery(new UserMapper());
+//        if (users.size() > 0) {
+//            return new Register(false, "", "User with this login already exists");
+//        }
+//        query = transaction.query("insert into users (login, password, title) values (:login, :password, :title)");
+//        query.setString("login", user.getLogin());
+//        query.setString("password", hash(user.getPassword()));
+//        query.setString("title", user.getTitle() == null ? user.getLogin() : user.getTitle());
+//        query.executeUpdate();
+//        Long id = query.getLastGeneratedKey(Long.class);
+//        user.setId(id);
+//
+//        Token token = createToken(user);
+//        return new Register(true, token.getData(), "");
+//    }
 
 
     @RequestMapping(value = "/login", method = "post")
     public Token login(@RequestBody User user, Transaction transaction) {
         Query query = transaction.query("select * from users where login = :login ");
-        query.setString("login", user.getLogin());
+        query.setString("login", user.getUsername());
         List<User> users = query.executeQuery(new UserMapper());
 
         if (users.size() > 0) {
@@ -100,28 +152,7 @@ public class AuthController implements AuthInterface<User> {
         }
     }
 
-    @RequestMapping(value = "/register", method = "post")
-    public Register register(@RequestBody User user, Transaction transaction) {
-        if (user.getLogin() == null || user.getPassword() == null || user.getLogin().length() < 3 || user.getPassword().length() < 3) {
-            return new Register(false, "", "bad request");
-        }
-        Query query = transaction.query("select * from users where login = :login");
-        query.setString("login", user.getLogin());
-        List<User> users = query.executeQuery(new UserMapper());
-        if (users.size() > 0) {
-            return new Register(false, "", "User with this login already exists");
-        }
-        query = transaction.query("insert into users (login, password, title) values (:login, :password, :title)");
-        query.setString("login", user.getLogin());
-        query.setString("password", hash(user.getPassword()));
-        query.setString("title", user.getTitle() == null ? user.getLogin() : user.getTitle());
-        query.executeUpdate();
-        Long id = query.getLastGeneratedKey(Long.class);
-        user.setId(id);
 
-        Token token = createToken(user);
-        return new Register(true, token.getData(), "");
-    }
 
     private Token createToken(User user) {
         Token out = new Token();
@@ -182,20 +213,21 @@ public class AuthController implements AuthInterface<User> {
     }
 
     public static boolean userCan(User user, String permission, Transaction transaction) {
-        if(user == null) {
-            return false;
-        }
-        Map<String, Permission> permissions = user.getPermissions();
-        if (permissions == null) {
-            Query query = transaction.query("select permission.id, permission.user_id, permission.permission_type, permission_type.title" +
-                    " from permission" +
-                    " inner join permission_type on permission.permission_type = permission_type.id" +
-                    " where user_id = :userId");
-            query.setLong("userId", user.getId());
-            user.setPermissions(query.executeQuery(new PermissionMapper()).stream().collect(Collectors.toMap(Permission::getTitle, p -> p)));
-            permissions = user.getPermissions();
-        }
-        return permissions.containsKey(permission);
+//        if(user == null) {
+//            return false;
+//        }
+//        Map<String, Permission> permissions = user.getPermissions();
+//        if (permissions == null) {
+//            Query query = transaction.query("select permission.id, permission.user_id, permission.permission_type, permission_type.title" +
+//                    " from permission" +
+//                    " inner join permission_type on permission.permission_type = permission_type.id" +
+//                    " where user_id = :userId");
+//            query.setLong("userId", user.getId());
+//            user.setPermissions(query.executeQuery(new PermissionMapper()).stream().collect(Collectors.toMap(Permission::getTitle, p -> p)));
+//            permissions = user.getPermissions();
+//        }
+//        return permissions.containsKey(permission);
+        return true;
     }
 
 }
