@@ -37,4 +37,10 @@ public class UserService implements UserDetailsService {
     public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
         return userRepository.findByLogin(login);
     }
+
+    public boolean matchPasswords(User userFromUI, User userFromDb) {
+        String passFromUI = passwordEncoder.encode(userFromUI.getPassword());
+        return passwordEncoder.matches(userFromUI.getPassword(), userFromDb.getPassword());
+    }
+
 }

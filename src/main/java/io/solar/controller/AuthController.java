@@ -13,8 +13,10 @@ import io.solar.utils.db.Transaction;
 import io.solar.utils.server.controller.RequestBody;
 import io.solar.utils.server.controller.RequestMapping;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.view.RedirectView;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;
@@ -35,6 +37,11 @@ public class AuthController {
         this.jwtProvider = jwtProvider;
     }
 
+    @GetMapping("/")
+    public RedirectView index() {
+        return new RedirectView("http://localhost/index.html");
+    }
+
     @PostMapping("/api/register")
     public Register register(@org.springframework.web.bind.annotation.RequestBody User user) {
         UserDetails userFromDb = userService.loadUserByUsername(user.getLogin());
@@ -53,61 +60,32 @@ public class AuthController {
         return out;
     }
 
-
-    @RequestMapping(value = "/login", method = "post")
-    public Token login(@RequestBody User user, Transaction transaction) {
-        Query query = transaction.query("select * from users where login = :login ");
-        query.setString("login", user.getUsername());
-        List<User> users = query.executeQuery(new UserMapper());
-
-        if (users.size() > 0) {
-            String pass = hash(user.getPassword());
-            Instant now = Instant.now();
-            for (User userFromList : users) {
-                if(userFromList.getHackBlock() != null && now.isBefore(userFromList.getHackBlock())) {
-                    return new BlockedToken(userFromList.getHackBlock().toEpochMilli() - now.toEpochMilli());
-                }
-
-                if (pass.equals(userFromList.getPassword())) {
-                    query = transaction.query("update users set hack_attempts = 0, hack_block = '2010-01-01 00:00:00' where id = :id");
-                    query.setLong("id", userFromList.getId());
-                    query.executeUpdate();
-                    return createToken(userFromList);
-                } else {
-                    query = transaction.query("update users set" +
-                            " hack_attempts = if(hack_attempts is null, 1, hack_attempts + 1)," +
-                            " hack_block = if(hack_attempts < 4, '2010-01-01', " + DateTimeFormatter.ofPattern("yyyyMMddHHmmss")
-                            .withZone(ZoneId.of("UTC")).format(now) + " + 500) where id = :id");
-                    query.setLong("id", userFromList.getId());
-                    query.executeUpdate();
-                }
+    @PostMapping("/api/login")
+    public Token login(@org.springframework.web.bind.annotation.RequestBody User user) {
+        User userFromDb = (User) userService.loadUserByUsername(user.getLogin());
+        if (userFromDb != null) {
+            if (userService.matchPasswords(user, userFromDb)) {
+                return createToken(userFromDb);
             }
-
         }
         return new Token();
     }
 
-    private String hash(String password) {
-        String salt = System.getenv("solar_salt");
-        if (salt == null || "".equals(salt)) {
-            throw new RuntimeException("Can't register user, because no salt for pass");
-        }
-        MessageDigest md;
-        try {
-            md = MessageDigest.getInstance("MD5");
-            md.update((password + salt).getBytes());
-            byte[] digest = md.digest();
-            BigInteger bigInt = new BigInteger(1,digest);
-            StringBuilder hashtext = new StringBuilder(bigInt.toString(16));
-// Now we need to zero pad it if you actually want the full 32 chars.
-            while(hashtext.length() < 32 ){
-                hashtext.insert(0, "0");
-            }
-            return hashtext.toString();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     @RequestMapping(value = "/authorise", method = "post")
     public Token authorise(@RequestBody Token token) {
@@ -119,16 +97,98 @@ public class AuthController {
         }
     }
 
-    private User getUser(Long id, Transaction transaction) {
-        Query query = transaction.query("select * from users where id = :id");
-        query.setLong("id", id);
-        List<User> users = query.executeQuery(new UserMapper());
-        if (users.size() == 1) {
-            return users.get(0);
-        } else {
-            return null;
-        }
-    }
+
+
+
+//    @RequestMapping(value = "/login", method = "post")
+//    public Token login(@RequestBody User user, Transaction transaction) {
+//        Query query = transaction.query("select * from users where login = :login ");
+//        query.setString("login", user.getUsername());
+//        List<User> users = query.executeQuery(new UserMapper());
+//
+//        if (users.size() > 0) {
+//            String pass = hash(user.getPassword());
+//            Instant now = Instant.now();
+//            for (User userFromList : users) {
+//                if(userFromList.getHackBlock() != null && now.isBefore(userFromList.getHackBlock())) {
+//                    return new BlockedToken(userFromList.getHackBlock().toEpochMilli() - now.toEpochMilli());
+//                }
+//
+//                if (pass.equals(userFromList.getPassword())) {
+//                    query = transaction.query("update users set hack_attempts = 0, hack_block = '2010-01-01 00:00:00' where id = :id");
+//                    query.setLong("id", userFromList.getId());
+//                    query.executeUpdate();
+//                    return createToken(userFromList);
+//                } else {
+//                    query = transaction.query("update users set" +
+//                            " hack_attempts = if(hack_attempts is null, 1, hack_attempts + 1)," +
+//                            " hack_block = if(hack_attempts < 4, '2010-01-01', " + DateTimeFormatter.ofPattern("yyyyMMddHHmmss")
+//                            .withZone(ZoneId.of("UTC")).format(now) + " + 500) where id = :id");
+//                    query.setLong("id", userFromList.getId());
+//                    query.executeUpdate();
+//                }
+//            }
+//
+//        }
+//        return new Token();
+//    }
+
+//    private String hash(String password) {
+//        String salt = System.getenv("solar_salt");
+//        if (salt == null || "".equals(salt)) {
+//            throw new RuntimeException("Can't register user, because no salt for pass");
+//        }
+//        MessageDigest md;
+//        try {
+//            md = MessageDigest.getInstance("MD5");
+//            md.update((password + salt).getBytes());
+//            byte[] digest = md.digest();
+//            BigInteger bigInt = new BigInteger(1,digest);
+//            StringBuilder hashtext = new StringBuilder(bigInt.toString(16));
+//// Now we need to zero pad it if you actually want the full 32 chars.
+//            while(hashtext.length() < 32 ){
+//                hashtext.insert(0, "0");
+//            }
+//            return hashtext.toString();
+//        } catch (Exception e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
+
+//    @RequestMapping(value = "/register", method = "post")
+//    public Register register(@RequestBody User user, Transaction transaction) {
+//        if (user.getLogin() == null || user.getPassword() == null || user.getLogin().length() < 3 || user.getPassword().length() < 3) {
+//            return new Register(false, "", "bad request");
+//        }
+//        Query query = transaction.query("select * from users where login = :login");
+//        query.setString("login", user.getLogin());
+//        List<User> users = query.executeQuery(new UserMapper());
+//        if (users.size() > 0) {
+//            return new Register(false, "", "User with this login already exists");
+//        }
+//        query = transaction.query("insert into users (login, password, title) values (:login, :password, :title)");
+//        query.setString("login", user.getLogin());
+//        query.setString("password", hash(user.getPassword()));
+//        query.setString("title", user.getTitle() == null ? user.getLogin() : user.getTitle());
+//        query.executeUpdate();
+//        Long id = query.getLastGeneratedKey(Long.class);
+//        user.setId(id);
+//
+//        Token token = createToken(user);
+//        return new Register(true, token.getData(), "");
+//    }
+
+
+//    private User getUser(Long id, Transaction transaction) {
+//        Query query = transaction.query("select * from users where id = :id");
+//        query.setLong("id", id);
+//        List<User> users = query.executeQuery(new UserMapper());
+//        if (users.size() == 1) {
+//            return users.get(0);
+//        } else {
+//            return null;
+//        }
+//    }
 
     public static boolean userCan(User user, String permission, Transaction transaction) {
 //        if(user == null) {
