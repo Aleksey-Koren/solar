@@ -12,6 +12,10 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <flyway.user>root</flyway.user>
+        <flyway.password>06021988abc</flyway.password>
+        <flyway.schemas>solar</flyway.schemas>
+        <flyway.url>jdbc:mysql://localhost/solar1?useSSL=false</flyway.url>
     </properties>
 
     <parent>

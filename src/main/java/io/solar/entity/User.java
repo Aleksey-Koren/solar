@@ -1,24 +1,17 @@
 package io.solar.entity;
 
-import io.solar.controller.AuthController;
-import io.solar.utils.db.Transaction;
-import lombok.Getter;
-import lombok.Setter;
-import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.annotate.JsonProperty;
+
+import lombok.Data;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.time.Instant;
 import java.util.Collection;
-import java.util.Map;
 
-@Getter
-@Setter
+
+@Data
 @Entity
 public class User implements UserDetails {
     @Id
@@ -28,14 +21,17 @@ public class User implements UserDetails {
     private String login;
     private String password;
     private Long money;
-    private Long planet;
+    @ManyToOne
+    @JoinColumn(name = "planet")
+    private Planet planet;
     private Instant hackBlock;
     private Integer hackAttempts;
 
-//    private Map<String, Permission> permissions;
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
+        //TODO decide how to realize when i know witch authorities we have
         return null;
     }
 
@@ -88,5 +84,7 @@ public class User implements UserDetails {
 //    public void setPassword(String password) {
 //        this.password = password;
 //    }
+
+    //    private Map<String, Permission> permissions;
 
 }

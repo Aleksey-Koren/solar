@@ -54,12 +54,6 @@ public class AuthController {
         return new Register(true, token.getData(), "");
     }
 
-    private Token createToken(User user) {
-        Token out = new Token();
-        out.setData(jwtProvider.generateToken(user));
-        return out;
-    }
-
     @PostMapping("/api/login")
     public Token login(@org.springframework.web.bind.annotation.RequestBody User user) {
         User userFromDb = (User) userService.loadUserByUsername(user.getLogin());
@@ -69,6 +63,12 @@ public class AuthController {
             }
         }
         return new Token();
+    }
+
+    private Token createToken(User user) {
+        Token out = new Token();
+        out.setData(jwtProvider.generateToken(user));
+        return out;
     }
 
 

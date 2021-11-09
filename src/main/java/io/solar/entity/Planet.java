@@ -1,11 +1,16 @@
 package io.solar.entity;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
+import javax.persistence.*;
+import java.util.List;
+
+
+@Data
+@Entity
 public class Planet {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
     Float aldebo;
     Long aphelion;
@@ -15,11 +20,9 @@ public class Planet {
     String inclination;
     String mass;
     Float meanAnomaly;
-    Float angle;
     String meanOrbitRadius;
     String meanRadius;
     String title;
-    String type;
     String orbitalPeriod;
     String perihelion;
     String siderealRotationPeriod;
@@ -27,4 +30,8 @@ public class Planet {
     String surfacePressure;
     String volume;
     Long parent;
+    Float angle;
+    String type;
+    @OneToMany(mappedBy = "planet", fetch = FetchType.LAZY)
+    List<User> users;
 }

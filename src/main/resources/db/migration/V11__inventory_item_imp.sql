@@ -15,6 +15,5 @@ alter table object_type_socket add column sort_order int(11);
 
 create table inventory_item (
     id int(11) not null,
-    item_type int(11) not null,
-
-)
+    item_type int(11) not null
+);
