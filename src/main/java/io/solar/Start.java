@@ -22,11 +22,6 @@ import java.io.IOException;
 @SpringBootApplication
 public class Start {
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
     public static void main(String[] args) throws IOException {
 
 

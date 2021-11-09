@@ -6,6 +6,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import io.solar.config.jwt.JwtProvider;
 import io.solar.dto.Register;
 import io.solar.dto.Token;
 import io.solar.entity.Permission;
@@ -36,17 +37,15 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
-public class AuthController implements AuthInterface<User> {
+public class AuthController {
 
     private UserService userService;
 
-    public AuthController(UserService userService) {
-        this.userService = userService;
-    }
+    private JwtProvider jwtProvider;
 
-    @GetMapping
-    public String index(){
-        return "index";
+    public AuthController(UserService userService, JwtProvider jwtProvider) {
+        this.userService = userService;
+        this.jwtProvider = jwtProvider;
     }
 
     @PostMapping("/register")
@@ -57,34 +56,15 @@ public class AuthController implements AuthInterface<User> {
         }
 
         user = userService.registerUser(user);
-        //TODO Maybe I should rewrite token generation
         Token token = createToken(user);
         return new Register(true, token.getData(), "");
     }
 
-
-//    @RequestMapping(value = "/register", method = "post")
-//    public Register register(@RequestBody User user, Transaction transaction) {
-//        if (user.getLogin() == null || user.getPassword() == null || user.getLogin().length() < 3 || user.getPassword().length() < 3) {
-//            return new Register(false, "", "bad request");
-//        }
-//        Query query = transaction.query("select * from users where login = :login");
-//        query.setString("login", user.getLogin());
-//        List<User> users = query.executeQuery(new UserMapper());
-//        if (users.size() > 0) {
-//            return new Register(false, "", "User with this login already exists");
-//        }
-//        query = transaction.query("insert into users (login, password, title) values (:login, :password, :title)");
-//        query.setString("login", user.getLogin());
-//        query.setString("password", hash(user.getPassword()));
-//        query.setString("title", user.getTitle() == null ? user.getLogin() : user.getTitle());
-//        query.executeUpdate();
-//        Long id = query.getLastGeneratedKey(Long.class);
-//        user.setId(id);
-//
-//        Token token = createToken(user);
-//        return new Register(true, token.getData(), "");
-//    }
+    private Token createToken(User user) {
+        Token out = new Token();
+        out.setData(jwtProvider.generateToken(user));
+        return out;
+    }
 
 
     @RequestMapping(value = "/login", method = "post")
@@ -144,60 +124,11 @@ public class AuthController implements AuthInterface<User> {
 
     @RequestMapping(value = "/authorise", method = "post")
     public Token authorise(@RequestBody Token token) {
-        Optional<User> out = this.verify(token.getData());
+        Optional<User> out = jwtProvider.verifyToken(token.getData());
         if(out.isEmpty()) {
             return new Token();
         } else {
             return createToken(out.get());
-        }
-    }
-
-
-
-    private Token createToken(User user) {
-        Token out = new Token();
-        Algorithm algorithm;
-        try {
-            String secret = System.getenv("solar_token_secret");
-            if (secret == null || "".equals(secret)) {
-                throw new RuntimeException("solar_token_secret system env was not defined");
-            }
-            algorithm = Algorithm.HMAC256(secret);
-            String token = JWT.create()
-                    .withIssuer("auth0")
-                    .withExpiresAt(new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 7))
-                    .withClaim("user_id", user.getId())
-                    .sign(algorithm);
-            out.setData(token);
-            return out;
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public Optional<User> verify(String token) {
-        try {
-            Transaction transaction = Transaction.begin();
-            String secret = System.getenv("solar_token_secret");
-            if (secret == null || "".equals(secret)) {
-                throw new RuntimeException("solar_token_secret system env was not defined");
-            }
-            Algorithm algorithm = Algorithm.HMAC256(secret);
-            JWTVerifier verifier = JWT.require(algorithm)
-                    .withIssuer("auth0")
-                    .build(); //Reusable verifier instance
-            DecodedJWT jwt = verifier.verify(token);
-            Claim claim = jwt.getClaim("user_id");
-            Long userId = claim.as(Long.class);
-
-            return Optional.ofNullable(getUser(userId, transaction));
-        } catch (JWTVerificationException exception){
-            return Optional.empty();
-            //Invalid signature/claims
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Optional.empty();
         }
     }
 
