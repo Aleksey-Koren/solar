@@ -5,25 +5,14 @@ import io.solar.config.jwt.JwtProvider;
 import io.solar.dto.Register;
 import io.solar.dto.Token;
 import io.solar.entity.User;
-import io.solar.mapper.UserMapper;
 import io.solar.service.UserService;
-import io.solar.utils.BlockedToken;
-import io.solar.utils.db.Query;
 import io.solar.utils.db.Transaction;
-import io.solar.utils.server.controller.RequestBody;
-import io.solar.utils.server.controller.RequestMapping;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.view.RedirectView;
-
-import java.math.BigInteger;
-import java.security.MessageDigest;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
 
 @RestController
 public class AuthController {
@@ -43,7 +32,7 @@ public class AuthController {
     }
 
     @PostMapping("/api/register")
-    public Register register(@org.springframework.web.bind.annotation.RequestBody User user) {
+    public Register register(@RequestBody User user) {
         UserDetails userFromDb = userService.loadUserByUsername(user.getLogin());
         if (userFromDb != null) {
             return new Register(false, "", "User with this login already exists");
@@ -55,7 +44,7 @@ public class AuthController {
     }
 
     @PostMapping("/api/login")
-    public Token login(@org.springframework.web.bind.annotation.RequestBody User user) {
+    public Token login(@RequestBody User user) {
         User userFromDb = (User) userService.loadUserByUsername(user.getLogin());
         if (userFromDb != null) {
             if (userService.matchPasswords(user, userFromDb)) {
@@ -87,15 +76,15 @@ public class AuthController {
 
 
 
-    @RequestMapping(value = "/authorise", method = "post")
-    public Token authorise(@RequestBody Token token) {
-        Optional<User> out = jwtProvider.verifyToken(token.getData());
-        if(out.isEmpty()) {
-            return new Token();
-        } else {
-            return createToken(out.get());
-        }
-    }
+//    @RequestMapping(value = "/authorise", method = "post")
+//    public Token authorise(@RequestBody Token token) {
+//        Optional<User> out = jwtProvider.verifyToken(token.getData());
+//        if(out.isEmpty()) {
+//            return new Token();
+//        } else {
+//            return createToken(out.get());
+//        }
+//    }
 
 
 
