@@ -9,7 +9,6 @@ spring:
       minimum-idle: 10
       maximum-pool-size: 50
 
-
   jpa:
     properties:
       hibernate:
@@ -19,7 +18,7 @@ spring:
         ddl-auto: validate
     database-platform: org.hibernate.dialect.MySQL57InnoDBDialect
 
-  thymeleaf:
-    encoding: UTF-8
-    suffix: .html
-    prefix: /templates/
+server:
+  servlet:
+    encoding:
+      charset: UTF-8
