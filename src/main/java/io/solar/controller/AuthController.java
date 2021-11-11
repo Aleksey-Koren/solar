@@ -39,7 +39,7 @@ public class AuthController {
 
     @PostMapping("/api/register")
     public Register register(@RequestBody User user) {
-        UserDetails userFromDb = userService.loadUserByUsername(user.getLogin());
+        User userFromDb = userService.findByLogin(user.getLogin());
         if (userFromDb != null) {
             return new Register(false, "", "User with this login already exists");
         }
@@ -51,7 +51,7 @@ public class AuthController {
 
     @PostMapping("/api/login")
     public Token login(@RequestBody User user) {
-        User userFromDb = (User) userService.loadUserByUsername(user.getLogin());
+        User userFromDb = userService.findByLogin(user.getLogin());
         if (userFromDb != null) {
             Instant now = Instant.now();
             if (isHackBlocked(userFromDb, now)) {

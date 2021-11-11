@@ -12,10 +12,12 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.*;
+
 
 @Data
 @Entity
-public class User implements UserDetails {
+public class User{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -32,36 +34,16 @@ public class User implements UserDetails {
     @ManyToMany
     private Set<Permission> permissions;
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return permissions.stream()
-                .map(permission -> new SimpleGrantedAuthority(permission.getTitle()))
-                .collect(Collectors.toSet());
+    public static UserDetails retrieveUserDetails(User user) {
+        return new org.springframework.security.core.userdetails.User(
+                user.getLogin(), user.getPassword(),
+                true,
+                true,
+                true,
+                true,
+                user.getPermissions().stream()
+                        .map(permission -> new SimpleGrantedAuthority(permission.getTitle()))
+                        .collect(toSet())
+        );
     }
-
-    @Override
-    public String getUsername() {
-        return login;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
-
 }

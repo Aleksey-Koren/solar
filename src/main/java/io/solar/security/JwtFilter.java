@@ -1,5 +1,6 @@
 package io.solar.security;
 
+import io.solar.entity.User;
 import io.solar.service.UserService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -14,6 +15,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.Optional;
 
 @Component
 public class JwtFilter extends GenericFilterBean {
@@ -22,25 +24,24 @@ public class JwtFilter extends GenericFilterBean {
 
     private JwtProvider jwtProvider;
 
-    private UserService userService;
-
     public JwtFilter(JwtProvider jwtProvider, UserService userService) {
         this.jwtProvider = jwtProvider;
-        this.userService = userService;
     }
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         String token = request.getHeader(AUTH_TOKEN);
-        if (token != null && jwtProvider.verifyToken(token).isPresent()) {
-            if(jwtProvider.hasTooShortExpiration(token)) {
-                //TODO Here we should decide what to do
+        if (token != null) {
+            Optional<User> user =  jwtProvider.verifyToken(token);
+            if(user.isPresent()) {
+                if(jwtProvider.hasTooShortExpiration(token)) {
+                    //TODO Here we should decide what to do
+                }
+                UserDetails userDetails = User.retrieveUserDetails(user.get());
+                Authentication auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                SecurityContextHolder.getContext().setAuthentication(auth);
             }
-            String userLogin = jwtProvider.verifyToken(token).get().getLogin();
-            UserDetails userDetails = userService.loadUserByUsername(userLogin);
-            Authentication auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(auth);
         }
         filterChain.doFilter(servletRequest, servletResponse);
     }

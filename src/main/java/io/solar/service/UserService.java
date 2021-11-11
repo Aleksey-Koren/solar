@@ -32,6 +32,10 @@ public class UserService implements UserDetailsService {
         return userRepository.findById(id);
     }
 
+    public User findByLogin(String login) {
+        return userRepository.findByLogin(login);
+    }
+
     public User register(User user) {
         resetHackAttempts(user);
         return userRepository.save(user);
@@ -43,7 +47,7 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
-        return userRepository.findByLogin(login);
+        return User.retrieveUserDetails(userRepository.findByLogin(login));
     }
 
     public void registerHackAttempt(User user) {
