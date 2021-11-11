@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.UnsupportedEncodingException;
+import java.time.Instant;
 import java.util.Date;
 import java.util.Optional;
 
@@ -42,7 +43,7 @@ public class JwtProvider {
             algorithm = Algorithm.HMAC256(secret);
             return JWT.create()
                     .withIssuer("auth0")
-                    .withExpiresAt(new Date(new Date().getTime() + TOKEN_LIFETIME_MIN * 60 * 1000))
+                    .withExpiresAt(new Date(new Date(Instant.now().toEpochMilli()).getTime() + TOKEN_LIFETIME_MIN * 60 * 1000))
                     .withClaim("user_id", user.getId())
                     .sign(algorithm);
         } catch (UnsupportedEncodingException e) {
@@ -61,15 +62,25 @@ public class JwtProvider {
                     .withIssuer("auth0")
                     .build();
             DecodedJWT jwt = verifier.verify(token);
-            Claim claim = jwt.getClaim("user_id");
-            Long userId = claim.as(Long.class);
-
-            return userService.findById(userId);
+            Claim id = jwt.getClaim("user_id");
+            Instant expiration = jwt.getClaim("exp").asDate().toInstant();
+            Long userId = id.as(Long.class);
+            Optional<User> user = userService.findById(userId);
+            if(user.isPresent()) {
+                //TODO Here in not finished. We should decide what to do.
+                checkExpiration(expiration);
+            }
+            return user;
         } catch (JWTVerificationException exception){
             return Optional.empty();
         } catch (Exception e) {
             e.printStackTrace();
             return Optional.empty();
         }
+    }
+
+    private boolean checkExpiration(Instant expiration) {
+        //TODO Probably we should refresh token if expiration time less than 5 minutes
+        return expiration.toEpochMilli() - Instant.now().toEpochMilli() > 1000 * 60 * 60 * 5;
     }
 }

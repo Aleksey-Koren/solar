@@ -2,6 +2,7 @@ package io.solar.service;
 
 import io.solar.entity.User;
 import io.solar.repository.UserRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -9,9 +10,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Optional;
 
 @Service
@@ -55,10 +56,7 @@ public class UserService implements UserDetailsService {
 
     public void resetHackAttempts(User user) {
         user.setHackAttempts(0);
-        try {
-            user.setHackBlock(new SimpleDateFormat("yyyyMMddHHmmss").parse("2010-01-01 00:00:00").toInstant());
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        }
+            user.setHackBlock(LocalDateTime.of(2010, 1, 1, 0, 0, 0)
+                    .toInstant(ZoneOffset.ofTotalSeconds(0)));
     }
 }
