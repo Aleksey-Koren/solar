@@ -2,11 +2,10 @@ package io.solar.controller;
 
 import io.solar.entity.User;
 import io.solar.service.UserService;
-import io.solar.utils.context.AuthData;
-import io.solar.utils.db.Transaction;
-import io.solar.utils.server.Pageable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -22,30 +21,29 @@ public class UsersController {
 
     @GetMapping
     public Page<User> getList(
-            Pageable pageable,
-            Transaction transaction,
-            @AuthData User user,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "20") int pageSize,
             @RequestParam("login") String login,
-            @RequestParam("title") String title
+            @RequestParam("title") String title,
+            SecurityContextHolderAwareRequestWrapper rw
     ) {
-        return userService.getAllUsers(user, transaction, login, title, pageable);
+        PageRequest paging = PageRequest.of(page, pageSize);
+        return userService.getAllUsers(paging, login, title, rw.isUserInRole("edit-user"));
     }
 
     @GetMapping("{id}")
-    public User getOne(@PathVariable("id") Long id, Transaction transaction, @AuthData User user) {
-        return userService.getUserById(id, transaction, user);
+    public User getOne(@PathVariable("id") long id, SecurityContextHolderAwareRequestWrapper rw) {
+        return userService.getUserById(id, rw.isUserInRole("edit-user"));
     }
 
-    @PostMapping
-    public User updateUser(@AuthData User user, @RequestBody User payload, Transaction transaction) {
-        boolean canEdit = AuthController.userCan(user, "edit-user", transaction);
-        if (!((user.getId() != null && user.getId().equals(payload.getId())) || canEdit)) {
-            throw new RuntimeException("no permissions");
-        }
-        if (payload.getId() == null) {
-            throw new RuntimeException("bad request, id should be defined");
-        }
-
-        return userService.updateUserTitle(payload.getId(), payload.getTitle(), canEdit);
+    // TODO: edit request path on front-end
+    //  (make POST to /api/users/{id} instead of /api/users with 'id' and 'title' defined in payload)
+    @PostMapping("{id}")
+    public User updateUser(
+            @PathVariable("id") long id,
+            @RequestParam("title") String title,
+            SecurityContextHolderAwareRequestWrapper rw
+    ) {
+        return userService.updateUserTitle(id, title, rw.isUserInRole("edit-user"));
     }
 }

@@ -1,28 +1,26 @@
 package io.solar.service;
 
-import io.solar.controller.AuthController;
 import io.solar.entity.User;
 import io.solar.repository.UserRepository;
-import io.solar.utils.db.Transaction;
-import io.solar.utils.server.Pageable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
 public class UserService implements UserDetailsService {
 
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
@@ -49,8 +47,9 @@ public class UserService implements UserDetailsService {
         return passwordEncoder.matches(userFromUI.getPassword(), userFromDb.getPassword());
     }
 
-    public Page<User> getAllUsers(User user, Transaction transaction, String login, String title, Pageable pageable) {
-        boolean canEdit = AuthController.userCan(user, "edit-user", transaction);
+    public Page<User> getAllUsers(PageRequest paging, String login, String title, boolean canEdit) {
+        /*boolean canEdit = true AuthController.userCan(user, "edit-user", transaction);*/
+
         if(!canEdit) {
             login = null;
         } else if("".equals(login)) {
@@ -60,7 +59,6 @@ public class UserService implements UserDetailsService {
             title = null;
         }
 
-        PageRequest paging = PageRequest.of(pageable.getPage(), pageable.getPageSize());
         Page<User> users;
         if (login != null && title != null) {
             users = userRepository.findByLoginStartingWithAndTitleStartingWith(paging, login, title);
@@ -71,32 +69,23 @@ public class UserService implements UserDetailsService {
         } else {
             users = userRepository.findAll(paging);
         }
-
-        users.map(u -> mapUser(user, canEdit));
-
+        users.map(u -> mapUser(u, canEdit));
         return users;
     }
 
-    public User getUserById(Long id, Transaction transaction, User userData) {
-        boolean canEdit = AuthController.userCan(userData, "edit-user", transaction);
-        User user;
+    public User getUserById(Long id, boolean canEdit) {
+        /*boolean canEdit = true AuthController.userCan(userData, "edit-user", transaction);*/
 
-        try {
-            user = userRepository.findById(id).get();
-        } catch (NoSuchElementException e) {
-            return null;
-        }
+        Optional<User> user = userRepository.findById(id);
 
-        return mapUser(user, canEdit);
+        return mapUser(
+                user.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No user with such id")),
+                canEdit);
     }
 
     public User updateUserTitle(Long id, String title, boolean canEdit) {
-        User user;
-        try {
-            user = userRepository.findById(id).get();
-        } catch (NoSuchElementException e) {
-            throw new RuntimeException("no user with such id");
-        }
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No user with such id"));
 
         user.setTitle(title);
         user = userRepository.save(user);
