@@ -1,7 +1,7 @@
 package io.solar.config;
 
 
-import io.solar.config.jwt.JwtFilter;
+import io.solar.security.JwtFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;

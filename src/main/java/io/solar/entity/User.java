@@ -4,11 +4,14 @@ package io.solar.entity;
 import lombok.Data;
 
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.time.Instant;
 import java.util.Collection;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 
 @Data
@@ -26,13 +29,15 @@ public class User implements UserDetails {
     private Planet planet;
     private Instant hackBlock;
     private Integer hackAttempts;
-
-
+    //TODO finish here, when permissions table will be ready
+    @ManyToMany
+    private Set<Permission> permissions;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        //TODO decide how to realize when i know witch authorities we have
-        return null;
+        return permissions.stream()
+                .map(permission -> new SimpleGrantedAuthority(permission.getTitle()))
+                .collect(Collectors.toSet());
     }
 
     @Override

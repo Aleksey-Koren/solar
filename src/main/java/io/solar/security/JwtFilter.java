@@ -1,4 +1,4 @@
-package io.solar.config.jwt;
+package io.solar.security;
 
 import io.solar.service.UserService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -12,6 +12,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Component
@@ -34,10 +35,14 @@ public class JwtFilter extends GenericFilterBean {
         String token = request.getHeader(AUTH_TOKEN);
         if (token != null && jwtProvider.verifyToken(token).isPresent()) {
             String userLogin = jwtProvider.verifyToken(token).get().getLogin();
-            UserDetails user = userService.loadUserByUsername(userLogin);
-            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+            UserDetails userDetails = userService.loadUserByUsername(userLogin);
+            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(auth);
         }
+        HttpServletResponse rp = (HttpServletResponse) servletResponse;
+        System.out.println(rp.getStatus());
         filterChain.doFilter(servletRequest, servletResponse);
+        System.out.println(rp.getStatus());
+
     }
 }

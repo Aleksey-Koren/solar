@@ -1,4 +1,4 @@
-package io.solar.config.jwt;
+package io.solar.security;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;

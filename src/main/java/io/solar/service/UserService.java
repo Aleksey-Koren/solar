@@ -9,6 +9,12 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.Optional;
 
 @Service
@@ -16,12 +22,11 @@ public class UserService implements UserDetailsService {
 
     private UserRepository userRepository;
 
-    private PasswordEncoder passwordEncoder;
+    private final Long HACK_BLOCK_TIME = 300L;
 
     @Autowired
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
     }
 
     public Optional<User> findById (Long id) {
@@ -29,7 +34,7 @@ public class UserService implements UserDetailsService {
     }
 
     public User registerUser(User user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        resetHackAttempts(user);
         return userRepository.save(user);
     }
 
@@ -38,9 +43,20 @@ public class UserService implements UserDetailsService {
         return userRepository.findByLogin(login);
     }
 
-    public boolean matchPasswords(User userFromUI, User userFromDb) {
-        String passFromUI = passwordEncoder.encode(userFromUI.getPassword());
-        return passwordEncoder.matches(userFromUI.getPassword(), userFromDb.getPassword());
+    public void registerHackAttempt(User user) {
+        user.setHackAttempts(user.getHackAttempts() + 1);
+        if (user.getHackAttempts() > 4) {
+            user.setHackBlock(Instant.now().plusSeconds(HACK_BLOCK_TIME));
+        }
+        userRepository.save(user);
     }
 
+    public void resetHackAttempts(User user) {
+        user.setHackAttempts(0);
+        try {
+            user.setHackBlock(new SimpleDateFormat("yyyyMMddHHmmss").parse("2010-01-01 00:00:00").toInstant());
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

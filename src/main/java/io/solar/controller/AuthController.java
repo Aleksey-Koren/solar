@@ -1,29 +1,34 @@
 package io.solar.controller;
 
 
-import io.solar.config.jwt.JwtProvider;
+import io.solar.security.JwtProvider;
 import io.solar.dto.Register;
 import io.solar.dto.Token;
 import io.solar.entity.User;
 import io.solar.service.UserService;
+import io.solar.utils.BlockedToken;
 import io.solar.utils.db.Transaction;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.view.RedirectView;
 
+import java.time.Instant;
+
 @RestController
 public class AuthController {
 
     private UserService userService;
-
     private JwtProvider jwtProvider;
+    private PasswordEncoder passwordEncoder;
 
-    public AuthController(UserService userService, JwtProvider jwtProvider) {
+    public AuthController(UserService userService, JwtProvider jwtProvider, PasswordEncoder passwordEncoder) {
         this.userService = userService;
         this.jwtProvider = jwtProvider;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @GetMapping("/")
@@ -37,7 +42,7 @@ public class AuthController {
         if (userFromDb != null) {
             return new Register(false, "", "User with this login already exists");
         }
-
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         user = userService.registerUser(user);
         Token token = createToken(user);
         return new Register(true, token.getData(), "");
@@ -47,11 +52,27 @@ public class AuthController {
     public Token login(@RequestBody User user) {
         User userFromDb = (User) userService.loadUserByUsername(user.getLogin());
         if (userFromDb != null) {
-            if (userService.matchPasswords(user, userFromDb)) {
+            Instant now = Instant.now();
+            if (isHackBlocked(userFromDb, now)) {
+                return new BlockedToken(userFromDb.getHackBlock().toEpochMilli() - now.toEpochMilli());
+            }
+            if (matchPasswords(user, userFromDb)) {
+                userService.resetHackAttempts(userFromDb);
                 return createToken(userFromDb);
+            }else{
+                userService.registerHackAttempt(userFromDb);
             }
         }
         return new Token();
+    }
+
+    private boolean isHackBlocked(User userFromDb, Instant now) {
+        return userFromDb.getHackBlock() != null && now.isBefore(userFromDb.getHackBlock());
+    }
+
+    private boolean matchPasswords(User user, User userFromDb) {
+        String passFromUI = passwordEncoder.encode(user.getPassword());
+        return passwordEncoder.matches(passFromUI, userFromDb.getPassword());
     }
 
     private Token createToken(User user) {
