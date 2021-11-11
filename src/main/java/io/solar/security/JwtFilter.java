@@ -35,10 +35,12 @@ public class JwtFilter extends GenericFilterBean {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         String token = request.getHeader(AUTH_TOKEN);
         if (token != null && jwtProvider.verifyToken(token).isPresent()) {
+            if(jwtProvider.hasTooShortExpiration(token)) {
+                //TODO Here we should decide what to do
+            }
             String userLogin = jwtProvider.verifyToken(token).get().getLogin();
             UserDetails userDetails = userService.loadUserByUsername(userLogin);
             Authentication auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-//            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(auth);
         }
         HttpServletResponse rp = (HttpServletResponse) servletResponse;

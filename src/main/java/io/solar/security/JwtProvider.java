@@ -4,7 +4,6 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import io.solar.entity.User;
 import io.solar.service.UserService;
@@ -53,23 +52,16 @@ public class JwtProvider {
 
     public Optional<User> verifyToken(String token) {
         try {
-            String secret = SECRET;
-            if (secret == null || "".equals(secret)) {
+            if (SECRET == null || "".equals(SECRET)) {
                 throw new RuntimeException("solar_token_secret system env was not defined");
             }
-            Algorithm algorithm = Algorithm.HMAC256(secret);
+            Algorithm algorithm = Algorithm.HMAC256(SECRET);
             JWTVerifier verifier = JWT.require(algorithm)
                     .withIssuer("auth0")
                     .build();
             DecodedJWT jwt = verifier.verify(token);
-            Claim id = jwt.getClaim("user_id");
-            Instant expiration = jwt.getClaim("exp").asDate().toInstant();
-            Long userId = id.as(Long.class);
+            Long userId = jwt.getClaim("user_id").asLong();
             Optional<User> user = userService.findById(userId);
-            if(user.isPresent()) {
-                //TODO Here in not finished. We should decide what to do.
-                checkExpiration(expiration);
-            }
             return user;
         } catch (JWTVerificationException exception){
             return Optional.empty();
@@ -79,8 +71,25 @@ public class JwtProvider {
         }
     }
 
-    private boolean checkExpiration(Instant expiration) {
-        //TODO Probably we should refresh token if expiration time less than 5 minutes
-        return expiration.toEpochMilli() - Instant.now().toEpochMilli() > 1000 * 60 * 60 * 5;
+    public boolean hasTooShortExpiration(String token) {
+        Algorithm algorithm = null;
+        try {
+            algorithm = Algorithm.HMAC256(SECRET);
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+
+        JWTVerifier verifier = JWT.require(algorithm)
+                .withIssuer("auth0")
+                .build();
+
+        DecodedJWT jwt = null;
+        try {
+            jwt = verifier.verify(token);
+        } catch (JWTVerificationException e) {
+            throw new RuntimeException(e);
+        }
+        Instant expiration = jwt.getClaim("exp").asDate().toInstant();
+        return expiration.toEpochMilli() - Instant.now().toEpochMilli() < 1000 * 60 * 60 * 5;
     }
 }
