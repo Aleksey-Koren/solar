@@ -16,7 +16,7 @@ public class UserMapper implements DbMapper<User> {
         user.setPassword(resultSet.getString("password"));
         user.setTitle(resultSet.getString("title"));
         user.setMoney(resultSet.fetchLong("money"));
-        user.setPlanet(resultSet.fetchLong("planet"));
+//        user.setPlanet(resultSet.fetchLong("planet"));
         user.setHackAttempts(resultSet.getInt("hack_attempts"));
         Timestamp hackBlock = resultSet.getTimestamp("hack_block");
         user.setHackBlock(hackBlock != null ? Instant.ofEpochMilli(hackBlock.getTime()) : null);

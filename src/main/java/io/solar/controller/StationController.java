@@ -74,12 +74,12 @@ public class StationController {
         stationRestUtils.delete(id, transaction);
     }
 
-    @RequestMapping("user/marketplace")
-    public Marketplace getMarketplace(@AuthData User user, Transaction transaction) {
-        Long planetId = definePlanetId(user, transaction);
-        Query query = transaction.query("select * from ");
-        return new Marketplace(null, null, null);
-    }
+//    @RequestMapping("user/marketplace")
+//    public Marketplace getMarketplace(@AuthData User user, Transaction transaction) {
+//        Long planetId = definePlanetId(user, transaction);
+//        Query query = transaction.query("select * from ");
+//        return new Marketplace(null, null, null);
+//    }
 
     @Scheduled(interval = 1000/* * 60 * 60*/)
     public void stationUpdate() {
@@ -117,25 +117,25 @@ public class StationController {
         System.out.println("station update loop");
     }
 
-    private Long definePlanetId(User user, StarShip starShip) {
-        Long planetId = user.getPlanet();
-        if(planetId != null) {
-            return planetId;
-        }
-        if(starShip != null) {
-            return starShip.getPlanet();
-        } else {
-            return 4L;//earth id
-        }
-    }
-    private Long definePlanetId(User user, Transaction transaction) {
-        Long planetId = user.getPlanet();
-        if(planetId != null) {
-            return planetId;
-        }
-        Optional<StarShip> starShip = starShipService.getActiveShip(user, transaction);
-        return definePlanetId(user, starShip.get());
-    }
+//    private Long definePlanetId(User user, StarShip starShip) {
+//        Long planetId = user.getPlanet();
+//        if(planetId != null) {
+//            return planetId;
+//        }
+//        if(starShip != null) {
+//            return starShip.getPlanet();
+//        } else {
+//            return 4L;//earth id
+//        }
+//    }
+//    private Long definePlanetId(User user, Transaction transaction) {
+//        Long planetId = user.getPlanet();
+//        if(planetId != null) {
+//            return planetId;
+//        }
+//        Optional<StarShip> starShip = starShipService.getActiveShip(user, transaction);
+//        return definePlanetId(user, starShip.get());
+//    }
 
 
 }

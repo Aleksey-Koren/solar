@@ -2,17 +2,21 @@ package io.solar.service;
 
 import io.solar.entity.User;
 import io.solar.repository.UserRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Optional;
 
 @Service
@@ -22,31 +26,50 @@ public class UserService implements UserDetailsService {
 
     private final PasswordEncoder passwordEncoder;
 
+    @Value("${app.hack_block_time_min}")
+    private Integer HACK_BLOCK_TIME_MIN;
+
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
     }
 
     public Optional<User> findById (Long id) {
         return userRepository.findById(id);
     }
 
-    public User registerUser(User user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+    public User findByLogin(String login) {
+        return userRepository.findByLogin(login);
+    }
+
+    public User register(User user) {
+        resetHackAttempts(user);
         return userRepository.save(user);
+    }
+
+    public User update(User user) {
+       return userRepository.save(user);
     }
 
     @Override
     public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
-        return userRepository.findByLogin(login);
+        return User.retrieveUserDetails(userRepository.findByLogin(login));
     }
 
-    public boolean matchPasswords(User userFromUI, User userFromDb) {
-        String passFromUI = passwordEncoder.encode(userFromUI.getPassword());
-        return passwordEncoder.matches(userFromUI.getPassword(), userFromDb.getPassword());
+    public void registerHackAttempt(User user) {
+        user.setHackAttempts(user.getHackAttempts() + 1);
+        if (user.getHackAttempts() > 4) {
+            user.setHackBlock(Instant.now().plusSeconds(HACK_BLOCK_TIME_MIN * 60));
+        }
+        userRepository.save(user);
     }
-
+    
+    public void resetHackAttempts(User user) {
+        user.setHackAttempts(0);
+            user.setHackBlock(LocalDateTime.of(2010, 1, 1, 0, 0, 0)
+                    .toInstant(ZoneOffset.ofTotalSeconds(0)));
+    }
+    
     public Page<User> getAllUsers(PageRequest paging, String login, String title, boolean canEdit) {
         /*boolean canEdit = true AuthController.userCan(user, "edit-user", transaction);*/
 
