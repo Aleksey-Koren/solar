@@ -43,7 +43,7 @@ public class AuthController {
             return new Register(false, "", "User with this login already exists");
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user = userService.registerUser(user);
+        user = userService.register(user);
         Token token = createToken(user);
         return new Register(true, token.getData(), "");
     }
@@ -58,6 +58,7 @@ public class AuthController {
             }
             if (matchPasswords(user, userFromDb)) {
                 userService.resetHackAttempts(userFromDb);
+                userService.update(userFromDb);
                 return createToken(userFromDb);
             }else{
                 userService.registerHackAttempt(userFromDb);
@@ -72,7 +73,7 @@ public class AuthController {
 
     private boolean matchPasswords(User user, User userFromDb) {
         String passFromUI = passwordEncoder.encode(user.getPassword());
-        return passwordEncoder.matches(passFromUI, userFromDb.getPassword());
+        return passwordEncoder.matches(user.getPassword(), userFromDb.getPassword());
     }
 
     private Token createToken(User user) {

@@ -22,7 +22,7 @@ public class UserService implements UserDetailsService {
 
     private UserRepository userRepository;
 
-    private final Long HACK_BLOCK_TIME = 300L;
+    private final Long HACK_BLOCK_TIME = 60L;
 
     @Autowired
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
@@ -33,9 +33,13 @@ public class UserService implements UserDetailsService {
         return userRepository.findById(id);
     }
 
-    public User registerUser(User user) {
+    public User register(User user) {
         resetHackAttempts(user);
         return userRepository.save(user);
+    }
+
+    public User update(User user) {
+       return userRepository.save(user);
     }
 
     @Override
