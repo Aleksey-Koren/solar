@@ -1,8 +1,8 @@
 
 spring:
   datasource:
-    url: jdbc:mysql://localhost/solar?useSSL=false&serverTimezone=UTC
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mariadb://localhost/solar?useSSL=false&serverTimezone=UTC
+    driver-class-name: org.mariadb.jdbc.Driver
     username: ${solar_db_user}
     password: ${solar_db_pass}
     hikari:
@@ -16,7 +16,6 @@ spring:
         format_sql: true
         use_sql_comments: true
         ddl-auto: validate
-    database-platform: org.hibernate.dialect.MySQL57InnoDBDialect
 
 server:
   servlet:
