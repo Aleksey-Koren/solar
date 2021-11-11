@@ -2,7 +2,6 @@ package io.solar.entity;
 
 
 import lombok.Data;
-
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -64,32 +63,5 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
-
-
-
-
-
-//    @JsonIgnore
-//    public Instant getHackBlock() {
-//        return hackBlock;
-//    }
-//
-//    public boolean can(String permission, Transaction transaction) {
-//        return AuthController.userCan(this, permission, transaction);
-//    }
-//
-//    @JsonIgnore
-//    public String getPassword() {
-//        return password;
-//    }
-//
-//
-//
-//    @JsonProperty
-//    public void setPassword(String password) {
-//        this.password = password;
-//    }
-
-    //    private Map<String, Permission> permissions;
 
 }

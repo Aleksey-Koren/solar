@@ -22,3 +22,8 @@ server:
   servlet:
     encoding:
       charset: UTF-8
+
+app:
+  jwt_secret: ${solar_token_secret}
+  token_lifetime_min: 30
+  hack_block_time_min: 5

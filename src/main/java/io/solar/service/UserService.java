@@ -3,18 +3,15 @@ package io.solar.service;
 import io.solar.entity.User;
 import io.solar.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.Optional;
 
 @Service
@@ -22,10 +19,11 @@ public class UserService implements UserDetailsService {
 
     private UserRepository userRepository;
 
-    private final Long HACK_BLOCK_TIME = 60L;
+    @Value("${app.hack_block_time_min}")
+    private Integer HACK_BLOCK_TIME_MIN;
 
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
@@ -50,7 +48,7 @@ public class UserService implements UserDetailsService {
     public void registerHackAttempt(User user) {
         user.setHackAttempts(user.getHackAttempts() + 1);
         if (user.getHackAttempts() > 4) {
-            user.setHackBlock(Instant.now().plusSeconds(HACK_BLOCK_TIME));
+            user.setHackBlock(Instant.now().plusSeconds(HACK_BLOCK_TIME_MIN * 60));
         }
         userRepository.save(user);
     }

@@ -9,6 +9,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import io.solar.entity.User;
 import io.solar.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.UnsupportedEncodingException;
@@ -18,7 +19,11 @@ import java.util.Optional;
 @Component
 public class JwtProvider {
 
-    private final String SECRET = System.getenv("solar_token_secret");
+    @Value("${app.jwt_secret}")
+    private String SECRET;
+
+    @Value("${app.token_lifetime_min}")
+    private Long TOKEN_LIFETIME_MIN;
 
     private UserService userService;
 
@@ -37,7 +42,7 @@ public class JwtProvider {
             algorithm = Algorithm.HMAC256(secret);
             return JWT.create()
                     .withIssuer("auth0")
-                    .withExpiresAt(new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 7))
+                    .withExpiresAt(new Date(new Date().getTime() + TOKEN_LIFETIME_MIN * 60 * 1000))
                     .withClaim("user_id", user.getId())
                     .sign(algorithm);
         } catch (UnsupportedEncodingException e) {

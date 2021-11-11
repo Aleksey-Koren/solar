@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.time.Instant;
+import java.util.Optional;
 
 @RestController
 public class AuthController {
@@ -67,12 +68,21 @@ public class AuthController {
         return new Token();
     }
 
+    @PostMapping(value = "/api/refresh")
+    public Token authorise(@RequestBody Token token) {
+        Optional<User> out = jwtProvider.verifyToken(token.getData());
+        if(out.isEmpty()) {
+            return new Token();
+        } else {
+            return createToken(out.get());
+        }
+    }
+
     private boolean isHackBlocked(User userFromDb, Instant now) {
         return userFromDb.getHackBlock() != null && now.isBefore(userFromDb.getHackBlock());
     }
 
     private boolean matchPasswords(User user, User userFromDb) {
-        String passFromUI = passwordEncoder.encode(user.getPassword());
         return passwordEncoder.matches(user.getPassword(), userFromDb.getPassword());
     }
 
@@ -81,13 +91,6 @@ public class AuthController {
         out.setData(jwtProvider.generateToken(user));
         return out;
     }
-
-
-
-
-
-
-
 
 
 
@@ -107,8 +110,6 @@ public class AuthController {
 //            return createToken(out.get());
 //        }
 //    }
-
-
 
 
 //    @RequestMapping(value = "/login", method = "post")

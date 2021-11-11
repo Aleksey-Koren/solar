@@ -40,9 +40,6 @@ public class JwtFilter extends GenericFilterBean {
             SecurityContextHolder.getContext().setAuthentication(auth);
         }
         HttpServletResponse rp = (HttpServletResponse) servletResponse;
-        System.out.println(rp.getStatus());
         filterChain.doFilter(servletRequest, servletResponse);
-        System.out.println(rp.getStatus());
-
     }
 }
