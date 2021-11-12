@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.io.UnsupportedEncodingException;
 import java.time.Instant;
 import java.util.Date;
 import java.util.Optional;
@@ -45,7 +44,7 @@ public class JwtProvider {
                     .withExpiresAt(new Date(new Date(Instant.now().toEpochMilli()).getTime() + TOKEN_LIFETIME_MIN * 60 * 1000))
                     .withClaim("user_id", user.getId())
                     .sign(algorithm);
-        } catch (UnsupportedEncodingException e) {
+        } catch (IllegalArgumentException e) {
             throw new RuntimeException(e);
         }
     }
@@ -75,7 +74,7 @@ public class JwtProvider {
         Algorithm algorithm = null;
         try {
             algorithm = Algorithm.HMAC256(SECRET);
-        } catch (UnsupportedEncodingException e) {
+        } catch (IllegalArgumentException e) {
             throw new RuntimeException(e);
         }
 

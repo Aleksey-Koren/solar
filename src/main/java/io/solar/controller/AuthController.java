@@ -8,18 +8,15 @@ import io.solar.entity.User;
 import io.solar.service.UserService;
 import io.solar.utils.BlockedToken;
 import io.solar.utils.db.Transaction;
-import org.springframework.security.core.userdetails.UserDetails;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.view.RedirectView;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
 import java.util.Optional;
 
 @RestController
+@RequestMapping("/api")
 public class AuthController {
 
     private UserService userService;
@@ -32,12 +29,7 @@ public class AuthController {
         this.passwordEncoder = passwordEncoder;
     }
 
-    @GetMapping("/")
-    public RedirectView index() {
-        return new RedirectView("http://localhost/index.html");
-    }
-
-    @PostMapping("/api/register")
+    @PostMapping("/register")
     public Register register(@RequestBody User user) {
         User userFromDb = userService.findByLogin(user.getLogin());
         if (userFromDb != null) {
@@ -49,7 +41,7 @@ public class AuthController {
         return new Register(true, token.getData(), "");
     }
 
-    @PostMapping("/api/login")
+    @PostMapping("/login")
     public Token login(@RequestBody User user) {
         User userFromDb = userService.findByLogin(user.getLogin());
         if (userFromDb != null) {
@@ -68,14 +60,10 @@ public class AuthController {
         return new Token();
     }
 
-    @PostMapping(value = "/api/refresh")
-    public Token authorise(@RequestBody Token token) {
-        Optional<User> out = jwtProvider.verifyToken(token.getData());
-        if(out.isEmpty()) {
-            return new Token();
-        } else {
-            return createToken(out.get());
-        }
+    @GetMapping("/refresh")
+    public Token refresh(@RequestParam("auth_token") String token) {
+        Optional<User> out = jwtProvider.verifyToken(token);
+        return out.isPresent() ? createToken(out.get()) : new Token();
     }
 
     private boolean isHackBlocked(User userFromDb, Instant now) {

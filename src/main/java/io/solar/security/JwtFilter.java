@@ -24,7 +24,7 @@ public class JwtFilter extends GenericFilterBean {
 
     private JwtProvider jwtProvider;
 
-    public JwtFilter(JwtProvider jwtProvider, UserService userService) {
+    public JwtFilter(JwtProvider jwtProvider) {
         this.jwtProvider = jwtProvider;
     }
 
