@@ -1,6 +1,5 @@
 package io.solar.controller;
 
-
 import io.solar.security.JwtProvider;
 import io.solar.dto.Register;
 import io.solar.dto.Token;
@@ -50,8 +49,10 @@ public class AuthController {
                 return new BlockedToken(userFromDb.getHackBlock().toEpochMilli() - now.toEpochMilli());
             }
             if (matchPasswords(user, userFromDb)) {
-                userService.resetHackAttempts(userFromDb);
-                userService.update(userFromDb);
+                if(userFromDb.getHackAttempts() != null && userFromDb.getHackAttempts() > 0) {
+                    userService.resetHackAttempts(userFromDb);
+                    userService.update(userFromDb);
+                }
                 return createToken(userFromDb);
             }else{
                 userService.registerHackAttempt(userFromDb);
@@ -61,7 +62,7 @@ public class AuthController {
     }
 
     @GetMapping("/refresh")
-    public Token refresh(@RequestParam("auth_token") String token) {
+    public Token refresh(@RequestHeader("auth_token") String token) {
         Optional<User> out = jwtProvider.verifyToken(token);
         return out.isPresent() ? createToken(out.get()) : new Token();
     }
@@ -81,15 +82,20 @@ public class AuthController {
     }
 
 
-//    @RequestMapping(value = "/authorise", method = "post")
-//    public Token authorise(@RequestBody Token token) {
-//        Optional<User> out = jwtProvider.verifyToken(token.getData());
-//        if(out.isEmpty()) {
-//            return new Token();
-//        } else {
-//            return createToken(out.get());
-//        }
-//    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -121,5 +127,4 @@ public class AuthController {
 //        return permissions.containsKey(permission);
         return true;
     }
-
 }

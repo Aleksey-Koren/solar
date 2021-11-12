@@ -6,5 +6,3 @@ CREATE TABLE IF NOT EXISTS user_permission_type
     `permission_type_id` int NOT NULL
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb3;
-
-

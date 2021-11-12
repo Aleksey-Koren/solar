@@ -17,9 +17,6 @@ public class PermissionType {
     private Set<User> users;
 
 
-
-
-
     public String toString() {
         return "PermissionType(id=" + this.getId() + ", title=" + this.getTitle() + ")";
     }
