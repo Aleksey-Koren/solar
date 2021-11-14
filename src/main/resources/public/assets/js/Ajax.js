@@ -86,6 +86,7 @@ Rest._onRequest = function (url, type, data, responseType) {
     }
     return new Promise(function (resolve, reject) {
         Ajax.ajax({
+            headers: {"Content-Type": "application/json"},
             responseType: responseType ? responseType : 'json',
             type: type,
             url: url,
