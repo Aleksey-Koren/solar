@@ -14,8 +14,9 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
+
 @RestController
-@RequestMapping("users")
+@RequestMapping("/api/users")
 public class UsersController {
 
     private final UserService userService;

@@ -1,123 +1,90 @@
 package io.solar.controller;
 
-
-import io.solar.entity.Permission;
-import io.solar.entity.PermissionType;
+import io.solar.dto.PermissionDto;
 import io.solar.entity.User;
-import io.solar.mapper.PermissionMapper;
-import io.solar.mapper.PermissionTypeMappe;
-import io.solar.utils.context.AuthData;
-import io.solar.utils.db.Query;
-import io.solar.utils.db.Transaction;
-import io.solar.utils.server.beans.Controller;
-import io.solar.utils.server.controller.PathVariable;
-import io.solar.utils.server.controller.RequestBody;
-import io.solar.utils.server.controller.RequestMapping;
-import org.springframework.stereotype.Component;
+import io.solar.service.PermissionService;
+import io.solar.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 
-@Component
-@Controller
-@RequestMapping("/permissions")
+
+@RestController
+@RequestMapping("/api/permissions")
 public class PermissionsController {
 
-    @RequestMapping(method = "post")
-    public PermissionType save(@RequestBody PermissionType permissionType, @AuthData User user, Transaction transaction) {
-        if(!AuthController.userCan(user, "edit-permission", transaction)) {
-            throw new RuntimeException("no permissions");
-        }
-        if (permissionType == null || permissionType.getTitle() == null || "".equals(permissionType.getTitle())) {
-            throw new RuntimeException("bad request, permission type is blank");
-        }
+    private final PermissionService permissionService;
+    private final UserService userService;
 
-        String q;
-        if (permissionType.getId() == null) {
-            q = "select * from permission_type where title = :title";
-        } else {
-            q = "select * from permission_type where title = :title and id != :id";
-        }
-        Query query = transaction.query(q);
-        if (permissionType.getId() != null) {
-            query.setLong("id", permissionType.getId());
-        }
-        query.setString("title", permissionType.getTitle());
-        List<PermissionType> existing = query.executeQuery(new PermissionTypeMappe());
-        if (!existing.isEmpty()) {
-            return existing.get(0);
-        }
-        if (permissionType.getId() != null) {
-            query = transaction.query("update permission_type set title = :title where id = :id");
-            query.setLong("id", permissionType.getId());
-        } else {
-            query = transaction.query("insert into permission_type (title) values (:title)");
-        }
-        query.setString("title", permissionType.getTitle());
-        query.execute();
-        if (permissionType.getId() == null) {
-            permissionType.setId(query.getLastGeneratedKey(Long.class));
-        }
-        return permissionType;
+    @Autowired
+    public PermissionsController(PermissionService permissionService,
+                                 UserService userService) {
+        this.permissionService = permissionService;
+        this.userService = userService;
     }
 
-    @RequestMapping
-    public List<PermissionType> get(Transaction transaction) {
-        Query query = transaction.query("select * from permission_type");
-        return query.executeQuery(new PermissionTypeMappe());
+
+    @GetMapping
+    public List<PermissionDto> getAll() {
+        if (!hasPermissions(List.of("SEE_PERMISSION"))) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Viewing permissions is not allowed for you");
+        }
+        return permissionService.getAll();
     }
 
-    @RequestMapping(value = "elevate", method = "post")
-    public Permission elevate(@RequestBody Permission permission, @AuthData User user, Transaction transaction) {
-        if(!AuthController.userCan(user, "assign-permission", transaction)) {
-            throw new RuntimeException("no permissions");
+    @PostMapping
+    public PermissionDto savePermission(@RequestBody PermissionDto dto) {
+        if (!hasPermissions(List.of("EDIT_PERMISSION"))) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Editing permissions is not allowed for you");
         }
-        if (permission == null || permission.getPermissionTypeId() == null && permission.getUserId() == null) {
-            throw new RuntimeException("bad request, could not elevate, permission is blank");
-        }
-        boolean remove = Boolean.TRUE.equals(permission.getRemove());
-        Query query;
-        if (!remove) {
-            query = transaction.query("select permission.id, permission.user_id, permission.permission_type, permission_type.title" +
-                    " from permission" +
-                    " inner join permission_type on permission.permission_type = permission_type.id" +
-                    " where permission.permission_type = :permission_type and permission.user_id = :user_id");
-            query.setLong("permission_type", permission.getPermissionTypeId());
-            query.setLong("user_id", permission.getUserId());
-            List<Permission> existing = query.executeQuery(new PermissionMapper());
-            if (!existing.isEmpty()) {
-                return existing.get(0);
-            }
-        }
-
-        if (remove) {
-            query = transaction.query("delete from permission where user_id = :user_id and permission_type = :permission_type");
-        } else {
-            query = transaction.query("insert into permission (user_id, permission_type) values (:user_id, :permission_type)");
-        }
-        query.setLong("permission_type", permission.getPermissionTypeId());
-        query.setLong("user_id", permission.getUserId());
-        query.execute();
-        if(remove) {
-            return null;
-        } else {
-            if(permission.getId() == null) {
-                permission.setId(query.getLastGeneratedKey(Long.class));
-            }
-            return permission;
-        }
+        return permissionService.save(dto);
     }
 
-    @RequestMapping("user/{userId}")
-    public List<Permission> userPermissions(@PathVariable("userId") Long userId, @AuthData User user, Transaction transaction) {
-        if(!(userId.equals(user.getId()) || AuthController.userCan(user, "see-permissions", transaction))) {
-            throw new RuntimeException("no access");
+    // TODO: probably change endpoint path?
+    @GetMapping("/users/{id}")
+    public List<PermissionDto> getUserPermissions(@PathVariable("id") Long userId, Principal principal) {
+        User user = userService.findByLogin(principal.getName());
+        if (!(user.getId().equals(userId) || hasPermissions(List.of("SEE_PERMISSIONS")))) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Viewing permissions is not allowed for you");
         }
-        Query query = transaction.query("select permission.id, permission.user_id, permission.permission_type, permission_type.title" +
-                " from permission" +
-                " inner join permission_type on permission.permission_type = permission_type.id" +
-                " where permission.user_id = :user_id");
-        query.setLong("user_id", userId);
-        return query.executeQuery(new PermissionMapper());
+        return permissionService.getPermissionsByUserId(userId);
     }
 
+    // TODO: edit request endpoint on front-end
+    //  (was /api/permissions/elevate)
+    //  probably move to UsersController and change return type?
+    @PostMapping("/users/{id}/assign")
+    public PermissionDto assignPermissionToUser(@PathVariable("id") Long userId, @RequestBody PermissionDto dto) {
+        if (!hasPermissions(List.of("ASSIGN_PERMISSION"))) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Assigning permissions is not allowed for you");
+        }
+        return permissionService.assignPermission(userId, dto);
+    }
+
+    // TODO: edit request endpoint on front-end
+    //  (was /api/permissions/elevate)
+    //  probably move to UsersController and change return type?
+    @PostMapping("/users/{id}/revoke")
+    public PermissionDto revokePermissionFromUser(@PathVariable("id") Long userId, @RequestBody PermissionDto dto) {
+        if (!hasPermissions(List.of("REVOKE_PERMISSION"))) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Revoking permissions is not allowed for you");
+        }
+        return permissionService.revokePermission(userId, dto);
+    }
+
+
+    private boolean hasPermissions(List<String> permissions) {
+        List<String> authorities = new ArrayList<>();
+        SecurityContextHolder.getContext()
+                .getAuthentication().getAuthorities()
+                .forEach(a -> authorities.add(a.getAuthority()));
+
+        return authorities.containsAll(permissions);
+    }
 }

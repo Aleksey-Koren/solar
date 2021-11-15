@@ -17,6 +17,7 @@ import static java.util.stream.Collectors.*;
 
 @Data
 @Entity
+@Table(name = "users")
 public class User{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,8 +32,15 @@ public class User{
     private Instant hackBlock;
     private Integer hackAttempts;
     //TODO finish here, when permissions table will be ready
-    @ManyToMany
+
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "users_permissions",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "permission_id")
+    )
     private Set<Permission> permissions;
+
 
     public static UserDetails retrieveUserDetails(User user) {
         return new org.springframework.security.core.userdetails.User(
