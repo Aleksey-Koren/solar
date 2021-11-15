@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -69,7 +70,7 @@ public class UserService implements UserDetailsService {
                     .toInstant(ZoneOffset.ofTotalSeconds(0)));
     }
     
-    public Page<User> getAllUsers(PageRequest paging, String login, String title, boolean canEdit) {
+    public Page<User> getAllUsers(Pageable pageable, String login, String title, boolean canEdit) {
         if(!canEdit) {
             login = "";
         }
@@ -77,7 +78,7 @@ public class UserService implements UserDetailsService {
         Page<User> users = userRepository.findAll(
                 where(UserSpecifications.loginStartsWith(login)
                  .and(UserSpecifications.titleStartsWith(title))),
-                paging);
+                pageable);
 
         users.map(u -> mapUser(u, canEdit));
         return users;

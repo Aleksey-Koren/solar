@@ -4,7 +4,7 @@ import io.solar.entity.User;
 import io.solar.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -27,14 +27,12 @@ public class UsersController {
 
     @GetMapping
     public Page<User> getList(
-            @RequestParam(name = "page", defaultValue = "0") int page,
-            @RequestParam(name = "size", defaultValue = "20") int pageSize,
+            Pageable pageable,
             @RequestParam("login") String login,
             @RequestParam("title") String title
     ) {
-        PageRequest paging = PageRequest.of(page, pageSize);
         boolean canEdit = hasPermissions(List.of("EDIT_USER"));
-        return userService.getAllUsers(paging, login, title, canEdit);
+        return userService.getAllUsers(pageable, login, title, canEdit);
     }
 
     @GetMapping("{id}")
