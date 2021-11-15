@@ -9,6 +9,13 @@ spring:
       minimum-idle: 10
       maximum-pool-size: 50
 
+  flyway:
+    encoding: UTF-8
+    out-of-order: true
+    enabled: true
+    baseline-on-migrate: true
+    baseline-version: 0
+
   jpa:
     properties:
       hibernate:
@@ -26,3 +33,7 @@ app:
   jwt_secret: ${solar_token_secret}
   token_lifetime_min: 30
   hack_block_time_min: 5
+
+logging:
+  level:
+    root: debug

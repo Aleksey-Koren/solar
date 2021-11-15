@@ -18,6 +18,8 @@
         <flyway.url>jdbc:mariadb://localhost/solar?useSSL=false&amp;serverTimezone=UTC</flyway.url>
         <flyway.encoding>UTF-8</flyway.encoding>
         <flyway.outOfOrder>true</flyway.outOfOrder>
+        <flyway.baselineOnMigrate>true</flyway.baselineOnMigrate>
+        <flyway.baselineVersion>0</flyway.baselineVersion>
     </properties>
 
     <parent>
@@ -98,10 +100,11 @@
             <version>3.18.2</version>
         </dependency>
 
-<!--        <dependency>-->
-<!--            <groupId>com.h2database</groupId>-->
-<!--            <artifactId>h2</artifactId>-->
-<!--            <version>1.4.200</version>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+            <version>8.0.4</version>
+        </dependency>
+
     </dependencies>
 </project>
