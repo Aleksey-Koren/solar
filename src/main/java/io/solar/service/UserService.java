@@ -2,12 +2,11 @@ package io.solar.service;
 
 import io.solar.entity.User;
 import io.solar.repository.UserRepository;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -18,6 +17,8 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Optional;
+
+import static org.springframework.data.jpa.domain.Specification.where;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -70,24 +71,14 @@ public class UserService implements UserDetailsService {
     
     public Page<User> getAllUsers(PageRequest paging, String login, String title, boolean canEdit) {
         if(!canEdit) {
-            login = null;
-        } else if("".equals(login)) {
-            login = null;
-        }
-        if("".equals(title)) {
-            title = null;
+            login = "";
         }
 
-        Page<User> users;
-        if (login != null && title != null) {
-            users = userRepository.findByLoginStartingWithAndTitleStartingWith(paging, login, title);
-        } else if (login != null) {
-            users = userRepository.findByLoginStartingWith(paging, login);
-        } else if (title != null) {
-            users = userRepository.findByTitleStartingWith(paging, title);
-        } else {
-            users = userRepository.findAll(paging);
-        }
+        Page<User> users = userRepository.findAll(
+                where(UserSpecifications.loginStartsWith(login)
+                 .and(UserSpecifications.titleStartsWith(title))),
+                paging);
+
         users.map(u -> mapUser(u, canEdit));
         return users;
     }
