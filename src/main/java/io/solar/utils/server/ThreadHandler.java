@@ -7,7 +7,6 @@ import io.solar.utils.context.ApiBridge;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.*;
-import java.util.Map;
 
 public class ThreadHandler extends Thread {
 
@@ -43,10 +42,10 @@ public class ThreadHandler extends Thread {
                 } else {
                     exchange.sendResponseHeaders(response.getCode(), 0);
                 }
-            } else if(resources.equals(path[0]) || "favicon.ico".equals(path[0]) || "/".equals(path[0]) || "index.html".equals(path[0])) {
+            } else if(resources.equals(path[0]) || "public/assets/favicon.ico".equals(path[0]) || "/".equals(path[0]) || "public/assets/index.html".equals(path[0])) {
                 InputStream in;
                 if("/".equals(path[0])) {
-                    in = getClass().getResourceAsStream("/index.html");
+                    in = getClass().getResourceAsStream("/public/assets/index.html");
                 } else {
                     in = getClass().getResourceAsStream(exchange.getRequestURI().toString());
                 }
@@ -80,7 +79,7 @@ public class ThreadHandler extends Thread {
             return "";
         }
         String l = path[path.length - 1];
-        if("favicon.ico".equals(l)) {
+        if("public/assets/favicon.ico".equals(l)) {
             return "image/x-icon";
         } else {
             int index = l.lastIndexOf(".");
