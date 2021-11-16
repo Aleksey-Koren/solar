@@ -6,13 +6,13 @@ import io.solar.service.PermissionService;
 import io.solar.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.List;
+
+import static io.solar.controller.AuthController.hasPermissions;
 
 
 @RestController
@@ -31,11 +31,22 @@ public class PermissionsController {
 
 
     @GetMapping
-    public List<PermissionDto> getAll() {
-        if (!hasPermissions(List.of("SEE_PERMISSION"))) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Viewing permissions is not allowed for you");
+    public List<PermissionDto> getPermissions(
+            @RequestParam(required = false, name = "userId") Long userId,
+            Principal principal
+    ) {
+        if (userId == null) {
+            if (!hasPermissions(List.of("SEE_PERMISSIONS"))) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Viewing permissions is not allowed for you");
+            }
+            return permissionService.getAll();
+        } else {
+            User user = userService.findByLogin(principal.getName());
+            if (!(user.getId().equals(userId) || hasPermissions(List.of("SEE_PERMISSIONS")))) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Viewing permissions is not allowed for you");
+            }
+            return permissionService.getPermissionsByUserId(userId);
         }
-        return permissionService.getAll();
     }
 
     @PostMapping
@@ -44,16 +55,6 @@ public class PermissionsController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Editing permissions is not allowed for you");
         }
         return permissionService.save(dto);
-    }
-
-    // TODO: probably change endpoint path?
-    @GetMapping("/users/{id}")
-    public List<PermissionDto> getUserPermissions(@PathVariable("id") Long userId, Principal principal) {
-        User user = userService.findByLogin(principal.getName());
-        if (!(user.getId().equals(userId) || hasPermissions(List.of("SEE_PERMISSIONS")))) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Viewing permissions is not allowed for you");
-        }
-        return permissionService.getPermissionsByUserId(userId);
     }
 
     // TODO: edit request endpoint on front-end
@@ -76,15 +77,5 @@ public class PermissionsController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Revoking permissions is not allowed for you");
         }
         return permissionService.revokePermission(userId, dto);
-    }
-
-
-    private boolean hasPermissions(List<String> permissions) {
-        List<String> authorities = new ArrayList<>();
-        SecurityContextHolder.getContext()
-                .getAuthentication().getAuthorities()
-                .forEach(a -> authorities.add(a.getAuthority()));
-
-        return authorities.containsAll(permissions);
     }
 }

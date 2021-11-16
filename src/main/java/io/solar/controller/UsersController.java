@@ -6,13 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.List;
+
+import static io.solar.controller.AuthController.hasPermissions;
 
 
 @RestController
@@ -58,14 +58,5 @@ public class UsersController {
         } else {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No permission to edit user's title");
         }
-    }
-
-    private boolean hasPermissions(List<String> permissions) {
-        List<String> authorities = new ArrayList<>();
-        SecurityContextHolder.getContext()
-                .getAuthentication().getAuthorities()
-                .forEach(a -> authorities.add(a.getAuthority()));
-
-        return authorities.containsAll(permissions);
     }
 }
