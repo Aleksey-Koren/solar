@@ -1,32 +1,37 @@
 package io.solar.dto;
 
 import io.solar.entity.Planet;
+import lombok.Data;
 
+
+@Data
 public class PlanetDTO {
 
-    Long id;
-    Float aldebo;
-    Long aphelion;
-    String axialTilt;
-    String eccentricity;
+    private Long id;
+    private Float aldebo;
+    private Long aphelion;
+    private String axialTilt;
+    private String eccentricity;
+    private String escapeVelocity;
+    private String inclination;
+    private String mass;
+    private Float meanAnomaly;
+    private String meanOrbitRadius;
+    private String meanRadius;
+    private String title;
+    private String orbitalPeriod;
+    private String perihelion;
+    private String siderealRotationPeriod;
+    private String surfaceGravity;
+    private String surfacePressure;
+    private String volume;
+    private Long parent;
+    private Float angle;
+    private String type;
 
-    String escapeVelocity;
-    String inclination;
-    String mass;
-    Float meanAnomaly;
-    String meanOrbitRadius;
-    String meanRadius;
+    public PlanetDTO() {
 
-    String title;
-    String orbitalPeriod;
-    String perihelion;
-    String siderealRotationPeriod;
-    String surfaceGravity;
-    String surfacePressure;
-    String volume;
-    Long parent;
-    Float angle;
-    String type;
+    }
 
     public PlanetDTO (Planet planet) {
         this.id = planet.getId();

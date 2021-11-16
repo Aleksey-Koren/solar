@@ -34,13 +34,13 @@ public class PlanetController {
         this.planetService = planetService;
     }
 
-    @PreAuthorize("hasAuthority(edit-planets)")
+    @PreAuthorize("hasAuthority('edit-planets')")
     @PostMapping
     public Planet save(@RequestBody Planet planet) {
         return planetService.save(planet);
     }
 
-    @PreAuthorize("hasAuthority(play-the-game)")
+    @PreAuthorize("hasAuthority('play-the-game')")
     @GetMapping("/{id}")
     public PlanetDTO findById(@PathVariable("id") Long id) {
         Planet planet = planetService.findById(id)
@@ -48,16 +48,19 @@ public class PlanetController {
         return new PlanetDTO(planet);
     }
 
-    @PreAuthorize("hasAuthority(play-the-game)")
+    @PreAuthorize("hasAuthority('play-the-game')")
     @GetMapping
-    public Page<PlanetDTO> findAll(@PageableDefault() Pageable pageable, @RequestParam("ids") List<Long> ids) {
+    public Page<PlanetDTO> findAll(@PageableDefault(size = 5, page = 0) Pageable pageable, @RequestParam(value = "ids", required = false) List<Long> ids) {
         if(ids == null || ids.size() == 0) {
             return planetService.findAll(pageable).map(PlanetDTO::new);
         }else{
             List<PlanetDTO> planets = planetService.findAllById(ids).stream()
                     .map(PlanetDTO::new)
                     .collect(toList());
-            return new PageImpl<PlanetDTO>(planets, pageable, planets.size());
+
+            int begin = (int)pageable.getOffset();
+            int end = Math.min(begin + pageable.getPageSize(), planets.size());
+            return new PageImpl<>(planets.subList(begin, end), pageable, planets.size());
         }
     }
 
