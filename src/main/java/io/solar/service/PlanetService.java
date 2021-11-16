@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -27,7 +28,15 @@ public class PlanetService {
       return planetRepository.findAll(pageable);
     }
 
+    public List<Planet> findAllById(List<Long> ids) {
+        return planetRepository.findAllById(ids);
+    }
+
     public Planet save(Planet planet) {
         return planetRepository.save(planet);
+    }
+
+    public List<Planet> findAll() {
+       return planetRepository.findAll();
     }
 }
