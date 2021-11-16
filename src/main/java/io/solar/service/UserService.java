@@ -1,6 +1,7 @@
 package io.solar.service;
 
 import io.solar.entity.User;
+import io.solar.repository.PermissionTypeRepository;
 import io.solar.repository.UserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,18 +19,22 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
 
+    private final PermissionTypeRepository permissionTypeRepository;
+
     @Value("${app.hack_block_time_min}")
     private Integer HACK_BLOCK_TIME_MIN;
 
     @Autowired
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, PermissionTypeRepository permissionTypeRepository) {
         this.userRepository = userRepository;
+        this.permissionTypeRepository = permissionTypeRepository;
     }
 
     public Optional<User> findById (Long id) {
@@ -42,6 +47,7 @@ public class UserService implements UserDetailsService {
 
     public User register(User user) {
         resetHackAttempts(user);
+        user.setPermissionTypes(Set.of(permissionTypeRepository.getById(1L)));
         return userRepository.save(user);
     }
 
