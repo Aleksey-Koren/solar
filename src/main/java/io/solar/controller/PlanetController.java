@@ -34,7 +34,7 @@ public class PlanetController {
         this.planetService = planetService;
     }
 
-    @PreAuthorize("hasAuthority('edit-planets')")
+    @PreAuthorize("hasAuthority('edit-the-game')")
     @PostMapping
     public Planet save(@RequestBody Planet planet) {
         return planetService.save(planet);
