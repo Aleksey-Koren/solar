@@ -1,7 +1,9 @@
 package io.solar.entity;
 
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,6 +18,8 @@ import static java.util.stream.Collectors.*;
 
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "users")
 public class User{
@@ -31,8 +35,6 @@ public class User{
     private Planet planet;
     private Instant hackBlock;
     private Integer hackAttempts;
-    //TODO finish here, when permissions table will be ready
-
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
             name = "users_permissions",

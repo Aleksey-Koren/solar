@@ -1,6 +1,7 @@
 package io.solar.controller;
 
 
+import io.solar.dto.UserDTO;
 import io.solar.security.JwtProvider;
 import io.solar.dto.Register;
 import io.solar.dto.Token;
@@ -9,10 +10,8 @@ import io.solar.service.UserService;
 import io.solar.utils.BlockedToken;
 import io.solar.utils.db.Transaction;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.view.RedirectView;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -35,19 +34,21 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public Register register(@RequestBody User user) {
+    public Register register(@RequestBody UserDTO userDTO) {
+        User user = userDTO.userFromDTO();
         User userFromDb = userService.findByLogin(user.getLogin());
         if (userFromDb != null) {
             return new Register(false, "", "User with this login already exists");
         }
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         user = userService.register(user);
         Token token = createToken(user);
         return new Register(true, token.getData(), "");
     }
 
     @PostMapping("/login")
-    public Token login(@RequestBody User user) {
+    public Token login(@RequestBody UserDTO userDTO) {
+        User user = userDTO.userFromDTO();
         User userFromDb = userService.findByLogin(user.getLogin());
         if (userFromDb != null) {
             Instant now = Instant.now();
@@ -55,12 +56,12 @@ public class AuthController {
                 return new BlockedToken(userFromDb.getHackBlock().toEpochMilli() - now.toEpochMilli());
             }
             if (matchPasswords(user, userFromDb)) {
-                if(userFromDb.getHackAttempts() != null && userFromDb.getHackAttempts() > 0) {
+                if (userFromDb.getHackAttempts() != null && userFromDb.getHackAttempts() > 0) {
                     userService.resetHackAttempts(userFromDb);
                     userService.update(userFromDb);
                 }
                 return createToken(userFromDb);
-            }else{
+            } else {
                 userService.registerHackAttempt(userFromDb);
             }
         }
@@ -86,19 +87,6 @@ public class AuthController {
         out.setData(jwtProvider.generateToken(user));
         return out;
     }
-
-
-//    @RequestMapping(value = "/authorise", method = "post")
-//    public Token authorise(@RequestBody Token token) {
-//        Optional<User> out = jwtProvider.verifyToken(token.getData());
-//        if(out.isEmpty()) {
-//            return new Token();
-//        } else {
-//            return createToken(out.get());
-//        }
-//    }
-
-
 
     public static boolean hasPermissions(List<String> permissions) {
         List<String> authorities = new ArrayList<>();
