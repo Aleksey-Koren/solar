@@ -49,7 +49,7 @@ public class UserService implements UserDetailsService {
 
     public User register(User user) {
         resetHackAttempts(user);
-        user.setPermissionTypes(Set.of(permissionTypeRepository.getById(1L)));
+        user.setPermissions(Set.of(permissionTypeRepository.getById(1L)));
         return userRepository.save(user);
     }
 
