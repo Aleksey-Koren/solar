@@ -1,7 +1,7 @@
 
 spring:
   datasource:
-    url: jdbc:mariadb://localhost/solar?useSSL=false&serverTimezone=UTC
+    url: ${solar_db_url}
     driver-class-name: org.mariadb.jdbc.Driver
     username: ${solar_db_user}
     password: ${solar_db_pass}
@@ -10,6 +10,9 @@ spring:
       maximum-pool-size: 50
 
   flyway:
+    url: ${solar_db_url}
+    user: ${solar_db_user}
+    password: ${solar_db_pass}
     encoding: UTF-8
     out-of-order: true
     enabled: true
