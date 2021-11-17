@@ -11,6 +11,7 @@ import io.solar.utils.BlockedToken;
 import io.solar.utils.db.Transaction;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
@@ -32,7 +33,7 @@ public class AuthController {
         this.jwtProvider = jwtProvider;
         this.passwordEncoder = passwordEncoder;
     }
-
+    @Transactional
     @PostMapping("/register")
     public Register register(@RequestBody UserDTO userDTO) {
         User user = userDTO.userFromDTO();
@@ -45,7 +46,7 @@ public class AuthController {
         Token token = createToken(user);
         return new Register(true, token.getData(), "");
     }
-
+    @Transactional
     @PostMapping("/login")
     public Token login(@RequestBody UserDTO userDTO) {
         User user = userDTO.userFromDTO();
@@ -67,7 +68,7 @@ public class AuthController {
         }
         return new Token();
     }
-
+    @Transactional
     @GetMapping("/refresh")
     public Token refresh(@RequestHeader("auth_token") String token) {
         Optional<User> out = jwtProvider.verifyToken(token);

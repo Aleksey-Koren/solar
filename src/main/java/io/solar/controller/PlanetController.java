@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -40,6 +41,7 @@ public class PlanetController {
         return planetService.save(planet);
     }
 
+    @Transactional
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
     @GetMapping("/{id}")
     public PlanetDTO findById(@PathVariable("id") Long id) {
@@ -48,6 +50,7 @@ public class PlanetController {
         return new PlanetDTO(planet);
     }
 
+    @Transactional
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
     @GetMapping
     public Page<PlanetDTO> findAll(@PageableDefault(size = 5, page = 0) Pageable pageable, @RequestParam(value = "ids", required = false) List<Long> ids) {
@@ -64,6 +67,7 @@ public class PlanetController {
         }
     }
 
+    @Transactional
     @RequestMapping("/utils/dropdown")
     public List<Option> dropdown(Transaction transaction) {
         return planetService.findAll().stream()

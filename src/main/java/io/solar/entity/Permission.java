@@ -1,7 +1,6 @@
 package io.solar.entity;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -9,7 +8,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "permissions")
-@Getter @Setter
+@Data
 public class Permission {
 
     @Id
@@ -19,5 +18,7 @@ public class Permission {
     private String title;
 
     @ManyToMany(mappedBy = "permissions")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Set<User> users;
 }
