@@ -33,7 +33,7 @@ public class User{
     private Integer hackAttempts;
     //TODO finish here, when permissions table will be ready
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(
             name = "users_permissions",
             joinColumns = @JoinColumn(name = "user_id"),

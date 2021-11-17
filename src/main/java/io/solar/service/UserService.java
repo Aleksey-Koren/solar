@@ -1,5 +1,6 @@
 package io.solar.service;
 
+import io.solar.dto.UserFilter;
 import io.solar.entity.User;
 import io.solar.repository.PermissionRepository;
 import io.solar.repository.UserRepository;
@@ -75,16 +76,12 @@ public class UserService implements UserDetailsService {
                     .toInstant(ZoneOffset.ofTotalSeconds(0)));
     }
     
-    public Page<User> getAllUsers(Pageable pageable, String login, String title, boolean canEdit) {
+    public Page<User> getAllUsers(Pageable pageable, UserFilter filter, boolean canEdit) {
         if(!canEdit) {
-            login = "";
+            filter.setLogin("");
         }
 
-        Page<User> users = userRepository.findAll(
-                where(UserSpecifications.loginStartsWith(login)
-                 .and(UserSpecifications.titleStartsWith(title))),
-                pageable);
-
+        Page<User> users = userRepository.findAll(new UserSpecification(filter), pageable);
         users.map(u -> mapUser(u, canEdit));
         return users;
     }

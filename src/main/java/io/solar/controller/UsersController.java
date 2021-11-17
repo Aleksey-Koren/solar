@@ -1,6 +1,9 @@
 package io.solar.controller;
 
+import io.solar.dto.PermissionDto;
+import io.solar.dto.UserFilter;
 import io.solar.entity.User;
+import io.solar.service.PermissionService;
 import io.solar.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -20,10 +23,13 @@ import static io.solar.controller.AuthController.hasPermissions;
 public class UsersController {
 
     private final UserService userService;
+    private final PermissionService permissionService;
 
     @Autowired
-    public UsersController(UserService userService) {
+    public UsersController(UserService userService,
+                           PermissionService permissionService) {
         this.userService = userService;
+        this.permissionService = permissionService;
     }
 
     @GetMapping
@@ -33,7 +39,7 @@ public class UsersController {
             @RequestParam("title") String title
     ) {
         boolean canEdit = hasPermissions(List.of("EDIT_USER"));
-        return userService.getAllUsers(pageable, login, title, canEdit);
+        return userService.getAllUsers(pageable, new UserFilter(login, title), canEdit);
     }
 
     @GetMapping("{id}")
