@@ -40,7 +40,7 @@ public class AuthController {
         if (userFromDb != null) {
             return new Register(false, "", "User with this login already exists");
         }
-        userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         user = userService.register(user);
         Token token = createToken(user);
         return new Register(true, token.getData(), "");
