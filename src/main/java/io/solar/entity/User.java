@@ -1,20 +1,24 @@
 package io.solar.entity;
 
 
-import lombok.*;
+import lombok.Data;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.toSet;
+import static java.util.stream.Collectors.*;
 
 
 @Data
 @Entity
-public class User {
+@Table(name = "users")
+public class User{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -29,18 +33,20 @@ public class User {
     private Integer hackAttempts;
     //TODO finish here, when permissions table will be ready
 
-    @ManyToMany (fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinTable (name = "user_permission_type",
-        joinColumns = @JoinColumn(name = "user_id"),
-        inverseJoinColumns = @JoinColumn(name = "permission_type_id"))
-    private Set<PermissionType> permissionTypes;
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "users_permissions",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "permission_id")
+    )
+    private Set<Permission> permissions;
 
 
     public static UserDetails retrieveUserDetails(User user) {
         return new org.springframework.security.core.userdetails.User(
                 user.getLogin(), user.getPassword(),
                 true, true, true, true,
-                user.getPermissionTypes().stream()
+                user.getPermissions().stream()
                         .map(permission -> new SimpleGrantedAuthority(permission.getTitle()))
                         .collect(toSet())
         );
