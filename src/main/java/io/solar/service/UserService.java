@@ -48,7 +48,7 @@ public class UserService implements UserDetailsService {
 
     public User register(User user) {
         resetHackAttempts(user);
-        user.setPermissions(Set.of(permissionRepository.getById(1L)));
+//        user.setPermissions(Set.of(permissionRepository.getById(1L)));
         return userRepository.save(user);
     }
 

@@ -35,7 +35,7 @@ public class User{
     private Planet planet;
     private Instant hackBlock;
     private Integer hackAttempts;
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(
             name = "users_permissions",
             joinColumns = @JoinColumn(name = "user_id"),
