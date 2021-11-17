@@ -46,7 +46,7 @@ public class User{
         return new org.springframework.security.core.userdetails.User(
                 user.getLogin(), user.getPassword(),
                 true, true, true, true,
-                user.getPermissionTypes().stream()
+                user.getPermissions().stream()
                         .map(permission -> new SimpleGrantedAuthority(permission.getTitle()))
                         .collect(toSet())
         );

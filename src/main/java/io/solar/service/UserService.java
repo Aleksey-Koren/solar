@@ -1,12 +1,11 @@
 package io.solar.service;
 
 import io.solar.entity.User;
-import io.solar.repository.PermissionTypeRepository;
+import io.solar.repository.PermissionRepository;
 import io.solar.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -28,15 +27,15 @@ public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
 
-    private final PermissionTypeRepository permissionTypeRepository;
+    private final PermissionRepository permissionRepository;
 
     @Value("${app.hack_block_time_min}")
     private Integer HACK_BLOCK_TIME_MIN;
 
     @Autowired
-    public UserService(UserRepository userRepository, PermissionTypeRepository permissionTypeRepository) {
+    public UserService(UserRepository userRepository, PermissionRepository permissionRepository) {
         this.userRepository = userRepository;
-        this.permissionTypeRepository = permissionTypeRepository;
+        this.permissionRepository = permissionRepository;
     }
 
     public Optional<User> findById (Long id) {
@@ -49,7 +48,7 @@ public class UserService implements UserDetailsService {
 
     public User register(User user) {
         resetHackAttempts(user);
-        user.setPermissions(Set.of(permissionTypeRepository.getById(1L)));
+        user.setPermissions(Set.of(permissionRepository.getById(1L)));
         return userRepository.save(user);
     }
 
