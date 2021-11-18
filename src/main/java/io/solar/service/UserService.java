@@ -1,8 +1,10 @@
 package io.solar.service;
 
+import io.solar.entity.Permission;
 import io.solar.entity.User;
 import io.solar.repository.PermissionRepository;
 import io.solar.repository.UserRepository;
+import io.solar.security.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -20,6 +22,7 @@ import java.time.ZoneOffset;
 import java.util.Optional;
 import java.util.Set;
 
+import static java.util.stream.Collectors.*;
 import static org.springframework.data.jpa.domain.Specification.where;
 
 @Service
@@ -48,7 +51,10 @@ public class UserService implements UserDetailsService {
 
     public User register(User user) {
         resetHackAttempts(user);
-        user.setPermissions(Set.of(permissionRepository.findByTitle("PLAY_THE_GAME")));
+        Set<Permission> permissions = Role.USER.getPermissions().stream()
+                                                                .map(s -> permissionRepository.findByTitle(s))
+                                                                .collect(toSet());
+        user.setPermissions(permissions);
         return userRepository.save(user);
     }
 
