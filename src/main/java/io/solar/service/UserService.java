@@ -15,13 +15,12 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.security.Principal;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Optional;
 import java.util.Set;
-
-import static org.springframework.data.jpa.domain.Specification.where;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -92,6 +91,11 @@ public class UserService implements UserDetailsService {
         return mapUser(
                 user.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No user with such id")),
                 canEdit);
+    }
+
+    public User updateUser(User dto, Principal principal) {
+
+
     }
 
     public User updateUserTitle(Long id, String title) {

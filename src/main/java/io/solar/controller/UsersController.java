@@ -1,8 +1,8 @@
 package io.solar.controller;
 
-import io.solar.dto.PermissionDto;
 import io.solar.dto.UserFilter;
 import io.solar.entity.User;
+import io.solar.facade.UserFacade;
 import io.solar.service.PermissionService;
 import io.solar.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,12 +22,15 @@ import static io.solar.controller.AuthController.hasPermissions;
 @RequestMapping("/api/users")
 public class UsersController {
 
+    private final UserFacade userFacade;
     private final UserService userService;
     private final PermissionService permissionService;
 
     @Autowired
-    public UsersController(UserService userService,
+    public UsersController(UserFacade userFacade,
+                           UserService userService,
                            PermissionService permissionService) {
+        this.userFacade = userFacade;
         this.userService = userService;
         this.permissionService = permissionService;
     }
@@ -35,8 +38,8 @@ public class UsersController {
     @GetMapping
     public Page<User> getList(
             Pageable pageable,
-            @RequestParam("login") String login,
-            @RequestParam("title") String title
+            @RequestParam(value = "login", required = false) String login,
+            @RequestParam(value = "title", required = false) String title
     ) {
         boolean canEdit = hasPermissions(List.of("EDIT_USER"));
         return userService.getAllUsers(pageable, new UserFilter(login, title), canEdit);
@@ -46,6 +49,11 @@ public class UsersController {
     public User getOne(@PathVariable("id") long id) {
         boolean canEdit = hasPermissions(List.of("EDIT_USER"));
         return userService.getUserById(id, canEdit);
+    }
+
+    @PutMapping
+    public User updateUser(@RequestBody User dto, Principal principal) {
+        return userFacade.update(dto, principal);
     }
 
     // TODO: edit request path on front-end
