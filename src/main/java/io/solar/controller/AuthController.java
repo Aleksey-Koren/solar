@@ -2,6 +2,7 @@ package io.solar.controller;
 
 
 import io.solar.dto.UserDTO;
+import io.solar.mapper.UserMapper;
 import io.solar.security.JwtProvider;
 import io.solar.dto.Register;
 import io.solar.dto.Token;
@@ -9,6 +10,7 @@ import io.solar.entity.User;
 import io.solar.service.UserService;
 import io.solar.utils.BlockedToken;
 import io.solar.utils.db.Transaction;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,39 +26,42 @@ import java.util.Optional;
 @RequestMapping("/api")
 public class AuthController {
 
-    private UserService userService;
-    private JwtProvider jwtProvider;
-    private PasswordEncoder passwordEncoder;
+    private final UserService userService;
+    private final JwtProvider jwtProvider;
+    private final PasswordEncoder passwordEncoder;
+    private final UserMapper userMapper;
 
-    public AuthController(UserService userService, JwtProvider jwtProvider, PasswordEncoder passwordEncoder) {
+    @Autowired
+    public AuthController(UserService userService, JwtProvider jwtProvider, PasswordEncoder passwordEncoder, UserMapper userMapper) {
         this.userService = userService;
         this.jwtProvider = jwtProvider;
         this.passwordEncoder = passwordEncoder;
+        this.userMapper = userMapper;
     }
     @Transactional
     @PostMapping("/register")
-    public Register register(@RequestBody UserDTO userDTO) {
-        User user = userDTO.userFromDTO();
-        User userFromDb = userService.findByLogin(user.getLogin());
+    public Register register(@RequestBody UserDTO dto) {
+        User userFromClient = userMapper.toEntity(dto);
+        User userFromDb = userService.findByLogin(userFromClient.getLogin());
         if (userFromDb != null) {
             return new Register(false, "", "User with this login already exists");
         }
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user = userService.register(user);
-        Token token = createToken(user);
+        userFromClient.setPassword(passwordEncoder.encode(userFromClient.getPassword()));
+        userFromClient = userService.register(userFromClient);
+        Token token = createToken(userFromClient);
         return new Register(true, token.getData(), "");
     }
     @Transactional
     @PostMapping("/login")
-    public Token login(@RequestBody UserDTO userDTO) {
-        User user = userDTO.userFromDTO();
-        User userFromDb = userService.findByLogin(user.getLogin());
+    public Token login(@RequestBody UserDTO dto) {
+        User userFromClient = userMapper.toEntity(dto);
+        User userFromDb = userService.findByLogin(userFromClient.getLogin());
         if (userFromDb != null) {
             Instant now = Instant.now();
             if (isHackBlocked(userFromDb, now)) {
                 return new BlockedToken(userFromDb.getHackBlock().toEpochMilli() - now.toEpochMilli());
             }
-            if (matchPasswords(user, userFromDb)) {
+            if (matchPasswords(userFromClient, userFromDb)) {
                 if (userFromDb.getHackAttempts() != null && userFromDb.getHackAttempts() > 0) {
                     userService.resetHackAttempts(userFromDb);
                     userService.update(userFromDb);

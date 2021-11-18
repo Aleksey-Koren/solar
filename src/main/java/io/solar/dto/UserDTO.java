@@ -3,6 +3,7 @@ package io.solar.dto;
 import io.solar.entity.Permission;
 import io.solar.entity.Planet;
 import io.solar.entity.User;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,7 +13,7 @@ import java.util.Set;
 
 @Getter
 @Setter
-@Builder
+@AllArgsConstructor
 public class UserDTO {
 
     private Long id;
@@ -25,7 +26,4 @@ public class UserDTO {
     private Integer hackAttempts;
     private Set<Permission> permissions;
 
-    public User userFromDTO() {
-        return new User(id, title, login, password, money, planet, hackBlock, hackAttempts, permissions);
-    }
 }
