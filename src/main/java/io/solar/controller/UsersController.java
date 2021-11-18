@@ -19,7 +19,6 @@ import static io.solar.controller.AuthController.hasPermissions;
 
 @RestController
 @RequestMapping("/api/users")
-@Transactional
 public class UsersController {
 
     private final UserFacade userFacade;
