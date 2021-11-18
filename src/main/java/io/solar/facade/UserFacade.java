@@ -26,6 +26,8 @@ public class UserFacade {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Couldn't found user with such id"));
         //TODO what should i do if some of this parameters are NULL in dto. Should i check them, of directly set them one-to-one
         user.setTitle(dto.getTitle());
+        userService.update(user);
+        //TODO Should I set permissions = null before dto generation, or I should exclude permissions set from UserDto at all?
         return userMapper.toDto(userService.update(user));
     }
 

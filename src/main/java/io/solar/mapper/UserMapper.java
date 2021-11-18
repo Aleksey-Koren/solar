@@ -30,16 +30,15 @@ public class UserMapper {
             user.setPlanet(dto.getPlanet());
             user.setHackBlock(dto.getHackBlock());
             user.setHackAttempts(dto.getHackAttempts());
-            user.setPermissions(dto.getPermissions());
         }else{
             user = new User(null, dto.getTitle(), dto.getLogin(), dto.getPassword(), dto.getMoney(),
-                    dto.getPlanet(), dto.getHackBlock(), dto.getHackAttempts(),  dto.getPermissions());
+                    dto.getPlanet(), dto.getHackBlock(), dto.getHackAttempts(), null);
         }
         return user;
     }
 
     public UserDto toDto(User user) {
         return new UserDto(user.getId(), user.getTitle(), user.getLogin(), null, user.getMoney(),
-                user.getPlanet(), user.getHackBlock(), user.getHackAttempts(), user.getPermissions());
+                user.getPlanet(), user.getHackBlock(), user.getHackAttempts());
     }
  }
