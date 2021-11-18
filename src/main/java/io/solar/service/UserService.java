@@ -1,7 +1,9 @@
 package io.solar.service;
 
+import io.solar.dto.UserDto;
 import io.solar.dto.UserFilter;
 import io.solar.entity.User;
+import io.solar.mapper.UserMapper;
 import io.solar.repository.PermissionRepository;
 import io.solar.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,13 +11,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.security.Principal;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -26,15 +28,16 @@ import java.util.Set;
 public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
-
+    private final UserMapper userMapper;
     private final PermissionRepository permissionRepository;
 
     @Value("${app.hack_block_time_min}")
     private Integer HACK_BLOCK_TIME_MIN;
 
     @Autowired
-    public UserService(UserRepository userRepository, PermissionRepository permissionRepository) {
+    public UserService(UserRepository userRepository, UserMapper userMapper, PermissionRepository permissionRepository) {
         this.userRepository = userRepository;
+        this.userMapper = userMapper;
         this.permissionRepository = permissionRepository;
     }
 
@@ -75,14 +78,14 @@ public class UserService implements UserDetailsService {
                     .toInstant(ZoneOffset.ofTotalSeconds(0)));
     }
     
-    public Page<User> getAllUsers(Pageable pageable, UserFilter filter, boolean canEdit) {
+    public Page<UserDto> getAllUsers(Pageable pageable, UserFilter filter, boolean canEdit) {
         if(!canEdit) {
             filter.setLogin("");
         }
 
         Page<User> users = userRepository.findAll(new UserSpecification(filter), pageable);
         users.map(u -> mapUser(u, canEdit));
-        return users;
+        return users.map(userMapper::toDto);
     }
 
     public User getUserById(Long id, boolean canEdit) {
@@ -93,18 +96,13 @@ public class UserService implements UserDetailsService {
                 canEdit);
     }
 
-    public User updateUser(User dto, Principal principal) {
-
-
+    public User updateUserTitle(User user) {
+       return userRepository.save(user);
     }
 
-    public User updateUserTitle(Long id, String title) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No user with such id"));
-
-        user.setTitle(title);
-        user = userRepository.save(user);
-        return mapUser(user, true);
+    @PreAuthorize("hasAuthority('ASSIGN_PERMISSION')")
+    public User updateUserPermissions(User user) {
+        return userRepository.save(user);
     }
 
     private User mapUser(User user, boolean canEdit) {

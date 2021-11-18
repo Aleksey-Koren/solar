@@ -1,7 +1,7 @@
 package io.solar.controller;
 
 
-import io.solar.dto.UserDTO;
+import io.solar.dto.UserDto;
 import io.solar.mapper.UserMapper;
 import io.solar.security.JwtProvider;
 import io.solar.dto.Register;
@@ -40,7 +40,7 @@ public class AuthController {
     }
     @Transactional
     @PostMapping("/register")
-    public Register register(@RequestBody UserDTO dto) {
+    public Register register(@RequestBody UserDto dto) {
         User userFromClient = userMapper.toEntity(dto);
         User userFromDb = userService.findByLogin(userFromClient.getLogin());
         if (userFromDb != null) {
@@ -53,7 +53,7 @@ public class AuthController {
     }
     @Transactional
     @PostMapping("/login")
-    public Token login(@RequestBody UserDTO dto) {
+    public Token login(@RequestBody UserDto dto) {
         User userFromClient = userMapper.toEntity(dto);
         User userFromDb = userService.findByLogin(userFromClient.getLogin());
         if (userFromDb != null) {

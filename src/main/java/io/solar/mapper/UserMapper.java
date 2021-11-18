@@ -1,6 +1,6 @@
 package io.solar.mapper;
 
-import io.solar.dto.UserDTO;
+import io.solar.dto.UserDto;
 import io.solar.entity.User;
 import io.solar.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,7 @@ public class UserMapper {
         this.userRepository = userRepository;
     }
 
-    public User toEntity(UserDTO dto) {
+    public User toEntity(UserDto dto) {
         User user;
         if (dto.getId() != null) {
             user = userRepository.findById(dto.getId())
@@ -38,8 +38,8 @@ public class UserMapper {
         return user;
     }
 
-    public UserDTO toDTO (User user) {
-        return new UserDTO(user.getId(), user.getTitle(), user.getLogin(), user.getPassword(), user.getMoney()
+    public UserDto toDto (User user) {
+        return new UserDto(user.getId(), user.getTitle(), user.getLogin(), user.getPassword(), user.getMoney()
                 , user.getPlanet(), user.getHackBlock(), user.getHackAttempts(), user.getPermissions());
     }
  }
