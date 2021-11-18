@@ -1,10 +1,7 @@
 package io.solar.dto;
 
-import io.solar.entity.Permission;
 import io.solar.entity.Planet;
-import io.solar.entity.User;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -24,6 +21,6 @@ public class UserDto {
     private Planet planet;
     private Instant hackBlock;
     private Integer hackAttempts;
-    private Set<Permission> permissions;
+    private Set<PermissionDto> permissions;
 
 }
