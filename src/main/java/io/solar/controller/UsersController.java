@@ -53,6 +53,7 @@ public class UsersController {
     public UserDTO updateUser(@PathVariable("id") long id,
                                 @RequestBody UserDTO dto,
                                 Principal principal) {
+        //TODO Is user id in dto, or i should set it from pathVariable?
         dto.setId(id);
         User authUser = userService.findByLogin(principal.getName()
         );
@@ -70,6 +71,20 @@ public class UsersController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No permission to edit user's data");
         }
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 //    // TODO: edit request path on front-end
