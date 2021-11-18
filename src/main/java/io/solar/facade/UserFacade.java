@@ -1,6 +1,6 @@
 package io.solar.facade;
 
-import io.solar.dto.UserDTO;
+import io.solar.dto.UserDto;
 import io.solar.entity.User;
 import io.solar.mapper.UserMapper;
 import io.solar.service.UserService;
@@ -21,22 +21,21 @@ public class UserFacade {
         this.userMapper = userMapper;
     }
 
-    public UserDTO updateOnlyTitle(UserDTO dto) {
+    public UserDto updateOnlyTitle(UserDto dto) {
         User user = userService.findById(dto.getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Couldn't found user with such id"));
         //TODO what should i do if some of this parameters are NULL in dto. Should i check them, of directly set them one-to-one
         user.setTitle(dto.getTitle());
-        return userMapper.toDTO(userService.update(user));
+        return userMapper.toDto(userService.update(user));
     }
 
-    public UserDTO updateGameParameters(UserDTO dto) {
+    public UserDto updateGameParameters(UserDto dto) {
         User user = userService.findById(dto.getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Couldn't found user with such id"));
         //TODO what should i do if some of this parameters are NULL in dto. Should i check them, of directly set them one-to-one
         user.setTitle(dto.getTitle());
         user.setMoney(dto.getMoney());
         user.setPlanet(dto.getPlanet());
-        userService.update(user);
-        return userMapper.toDTO(userService.update(user));
+        return userMapper.toDto(userService.update(user));
     }
 }

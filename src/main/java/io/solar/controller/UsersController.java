@@ -1,6 +1,6 @@
 package io.solar.controller;
 
-import io.solar.dto.UserDTO;
+import io.solar.dto.UserDto;
 import io.solar.entity.Permission;
 import io.solar.entity.User;
 import io.solar.facade.UserFacade;
@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -49,23 +50,23 @@ public class UsersController {
 
     // TODO: edit request path on front-end
     //  (make POST to /api/users/{id} instead of /api/users with 'id' and 'title' defined in payload)
+    @Transactional
     @PostMapping("{id}")
-    public UserDTO updateUser(@PathVariable("id") long id,
-                                @RequestBody UserDTO dto,
-                                Principal principal) {
+    public UserDto updateUser(@PathVariable("id") long id,
+                              @RequestBody UserDto dto,
+                              Principal principal) {
         //TODO Is user id in dto, or i should set it from pathVariable?
         dto.setId(id);
-        User authUser = userService.findByLogin(principal.getName()
-        );
+        User authUser = userService.findByLogin(principal.getName());
         if (authUser.getId() == id && !hasPermissions(List.of("EDIT_USER"))) {
             return userFacade.updateOnlyTitle(dto);
         }else if (authUser.getId() == id && hasPermissions(List.of("EDIT_USER"))) {
             return userFacade.updateGameParameters(dto);
-        }else if (hasPermissions(List.of("EDIT_USER")) && !userService.findById(id)
+        }else if (hasPermissions(List.of("EDIT_USER")) && userService.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Couldn't found user with such id"))
                 .getPermissions().stream()
                                  .map(Permission::getTitle)
-                                 .anyMatch(s -> s.equals("EDIT_USER"))) {
+                                 .noneMatch(s -> s.equals("EDIT_USER"))) {
             return userFacade.updateGameParameters(dto);
         }else {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No permission to edit user's data");

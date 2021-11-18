@@ -1,6 +1,6 @@
 package io.solar.controller;
 
-import io.solar.dto.PlanetDTO;
+import io.solar.dto.PlanetDto;
 import io.solar.entity.Planet;
 import io.solar.service.PlanetService;
 import io.solar.utils.Option;
@@ -44,21 +44,21 @@ public class PlanetController {
     @Transactional
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
     @GetMapping("/{id}")
-    public PlanetDTO findById(@PathVariable("id") Long id) {
+    public PlanetDto findById(@PathVariable("id") Long id) {
         Planet planet = planetService.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("There is no planet with id = %s", id)));
-        return new PlanetDTO(planet);
+        return new PlanetDto(planet);
     }
 
     @Transactional
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
     @GetMapping
-    public Page<PlanetDTO> findAll(@PageableDefault(size = 5, page = 0) Pageable pageable, @RequestParam(value = "ids", required = false) List<Long> ids) {
+    public Page<PlanetDto> findAll(@PageableDefault(size = 5, page = 0) Pageable pageable, @RequestParam(value = "ids", required = false) List<Long> ids) {
         if(ids == null || ids.size() == 0) {
-            return planetService.findAll(pageable).map(PlanetDTO::new);
+            return planetService.findAll(pageable).map(PlanetDto::new);
         }else{
-            List<PlanetDTO> planets = planetService.findAllById(ids).stream()
-                    .map(PlanetDTO::new)
+            List<PlanetDto> planets = planetService.findAllById(ids).stream()
+                    .map(PlanetDto::new)
                     .collect(toList());
 
             int begin = (int)pageable.getOffset();

@@ -5,7 +5,7 @@ import lombok.Data;
 
 
 @Data
-public class PlanetDTO {
+public class PlanetDto {
 
     private Long id;
     private Float aldebo;
@@ -29,11 +29,11 @@ public class PlanetDTO {
     private Float angle;
     private String type;
 
-    public PlanetDTO() {
+    public PlanetDto() {
 
     }
 
-    public PlanetDTO (Planet planet) {
+    public PlanetDto(Planet planet) {
         this.id = planet.getId();
         this.aldebo = planet.getAldebo();
         this.aphelion = planet.getAphelion();
