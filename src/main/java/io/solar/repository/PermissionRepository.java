@@ -9,4 +9,5 @@ public interface PermissionRepository extends JpaRepository<Permission, Long> {
 
     boolean existsByTitle(String title);
     List<Permission> findByUsersId(Long userId);
+    Permission findByTitle(String title);
 }

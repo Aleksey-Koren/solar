@@ -26,6 +26,7 @@ spring:
         format_sql: true
         use_sql_comments: true
         ddl-auto: validate
+    open-in-view: false
 
 server:
   servlet:
@@ -36,7 +37,3 @@ app:
   jwt_secret: ${solar_token_secret}
   token_lifetime_min: 30
   hack_block_time_min: 5
-
-logging:
-  level:
-    root: debug

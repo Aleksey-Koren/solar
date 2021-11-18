@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -34,13 +35,14 @@ public class PlanetController {
         this.planetService = planetService;
     }
 
-    @PreAuthorize("hasAuthority('edit-the-game')")
+    @PreAuthorize("hasAuthority('EDIT_PLANETS')")
     @PostMapping
     public Planet save(@RequestBody Planet planet) {
         return planetService.save(planet);
     }
 
-    @PreAuthorize("hasAuthority('play-the-game')")
+    @Transactional
+    @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
     @GetMapping("/{id}")
     public PlanetDTO findById(@PathVariable("id") Long id) {
         Planet planet = planetService.findById(id)
@@ -48,7 +50,8 @@ public class PlanetController {
         return new PlanetDTO(planet);
     }
 
-    @PreAuthorize("hasAuthority('play-the-game')")
+    @Transactional
+    @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
     @GetMapping
     public Page<PlanetDTO> findAll(@PageableDefault(size = 5, page = 0) Pageable pageable, @RequestParam(value = "ids", required = false) List<Long> ids) {
         if(ids == null || ids.size() == 0) {
@@ -64,31 +67,11 @@ public class PlanetController {
         }
     }
 
-//    @RequestMapping
-//    public List<Planet> getAll(Transaction transaction) {
-//        Query query = transaction.query("select * from planets");
-//        List<Planet> existing = query.executeQuery(new PlanetMapper());
-//        return existing;
-//    }
-
-//    public List<Planet> getByIds(List<Long> ids, Transaction transaction) {
-//        Query query = transaction.query("select * from planets where id in (" +
-//                ids.stream().map(v -> "?").collect(joining(", ")) + ")");
-//        for (int i = 0; i < ids.size(); i++) {
-//            query.setLong(i + 1, ids.get(i));
-//        }
-//        return query.executeQuery(new PlanetMapper());
-//    }
-
-    //TODO I should check business logic of this method to define authorities
+    @Transactional
     @RequestMapping("/utils/dropdown")
     public List<Option> dropdown(Transaction transaction) {
         return planetService.findAll().stream()
                 .map(v -> new Option(v.getId(), v.getTitle()))
                 .collect(Collectors.toList());
     }
-//    @RequestMapping("utils/dropdown")
-//    public List<Option> dropdown(Transaction transaction) {
-//        return getAll(transaction).stream().map(v -> new Option(v.getId(), v.getTitle())).collect(Collectors.toList());
-//    }
 }

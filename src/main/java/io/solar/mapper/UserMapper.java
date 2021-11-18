@@ -1,25 +1,45 @@
 package io.solar.mapper;
 
+import io.solar.dto.UserDTO;
 import io.solar.entity.User;
-import io.solar.utils.db.DbMapper;
-import io.solar.utils.db.SafeResultSet;
+import io.solar.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
+import org.springframework.web.server.ResponseStatusException;
 
-import java.sql.Timestamp;
-import java.time.Instant;
+@Component
+public class UserMapper {
 
-public class UserMapper implements DbMapper<User> {
-    @Override
-    public User map(SafeResultSet resultSet) {
-        User user = new User();
-        user.setId(resultSet.fetchLong("id"));
-        user.setLogin(resultSet.getString("login"));
-        user.setPassword(resultSet.getString("password"));
-        user.setTitle(resultSet.getString("title"));
-        user.setMoney(resultSet.fetchLong("money"));
-//        user.setPlanet(resultSet.fetchLong("planet"));
-        user.setHackAttempts(resultSet.getInt("hack_attempts"));
-        Timestamp hackBlock = resultSet.getTimestamp("hack_block");
-        user.setHackBlock(hackBlock != null ? Instant.ofEpochMilli(hackBlock.getTime()) : null);
+    private final UserRepository userRepository;
+
+    @Autowired
+    public UserMapper(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    public User toEntity(UserDTO dto) {
+        User user;
+        if (dto.getId() != null) {
+            user = userRepository.findById(dto.getId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Couldn't found user with such id"));
+            user.setTitle(dto.getTitle());
+            user.setLogin(dto.getLogin());
+            user.setPassword(dto.getPassword());
+            user.setMoney(dto.getMoney());
+            user.setPlanet(dto.getPlanet());
+            user.setHackBlock(dto.getHackBlock());
+            user.setHackAttempts(dto.getHackAttempts());
+            user.setPermissions(dto.getPermissions());
+        }else{
+            user = new User(null, dto.getTitle(), dto.getLogin(), dto.getPassword(), dto.getMoney(),
+                    dto.getPlanet(), dto.getHackBlock(), dto.getHackAttempts(),  dto.getPermissions());
+        }
         return user;
     }
-}
+
+    public UserDTO toDTO (User user) {
+        return new UserDTO(user.getId(), user.getTitle(), user.getLogin(), user.getPassword(), user.getMoney()
+                , user.getPlanet(), user.getHackBlock(), user.getHackAttempts(), user.getPermissions());
+    }
+ }
