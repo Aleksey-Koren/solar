@@ -39,7 +39,7 @@ public class UserMapper {
     }
 
     public UserDTO toDTO (User user) {
-        return new UserDTO(user.getId(), user.getTitle(), user.getLogin(), user.getPassword(), user.getMoney()
-                , user.getPlanet(), user.getHackBlock(), user.getHackAttempts(), user.getPermissions());
+        return new UserDTO(user.getId(), user.getTitle(), user.getLogin(), null, user.getMoney(),
+                user.getPlanet(), user.getHackBlock(), user.getHackAttempts(), user.getPermissions());
     }
  }

@@ -1,6 +1,9 @@
 package io.solar.controller;
 
+import io.solar.dto.UserDTO;
+import io.solar.entity.Permission;
 import io.solar.entity.User;
+import io.solar.facade.UserFacade;
 import io.solar.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -20,10 +23,12 @@ import static io.solar.controller.AuthController.hasPermissions;
 public class UsersController {
 
     private final UserService userService;
+    private final UserFacade userFacade;
 
     @Autowired
-    public UsersController(UserService userService) {
+    public UsersController(UserService userService, UserFacade userFacade) {
         this.userService = userService;
+        this.userFacade = userFacade;
     }
 
     @GetMapping
@@ -45,18 +50,43 @@ public class UsersController {
     // TODO: edit request path on front-end
     //  (make POST to /api/users/{id} instead of /api/users with 'id' and 'title' defined in payload)
     @PostMapping("{id}")
-    public User updateUserTitle(
-            @PathVariable("id") long id,
-            @RequestParam("title") String title,
-            Principal principal
-    ) {
-        User user = userService.findByLogin(principal.getName());
-        boolean canEdit = user.getId() == id || hasPermissions(List.of("EDIT_USER"));
-
-        if (canEdit) {
-            return userService.updateUserTitle(id, title);
-        } else {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No permission to edit user's title");
+    public UserDTO updateUser(@PathVariable("id") long id,
+                                @RequestBody UserDTO dto,
+                                Principal principal) {
+        dto.setId(id);
+        User authUser = userService.findByLogin(principal.getName()
+        );
+        if (authUser.getId() == id && !hasPermissions(List.of("EDIT_USER"))) {
+            return userFacade.updateOnlyTitle(dto);
+        }else if (authUser.getId() == id && hasPermissions(List.of("EDIT_USER"))) {
+            return userFacade.updateGameParameters(dto);
+        }else if (hasPermissions(List.of("EDIT_USER")) && !userService.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Couldn't found user with such id"))
+                .getPermissions().stream()
+                                 .map(Permission::getTitle)
+                                 .anyMatch(s -> s.equals("EDIT_USER"))) {
+            return userFacade.updateGameParameters(dto);
+        }else {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No permission to edit user's data");
         }
     }
+
+
+//    // TODO: edit request path on front-end
+//    //  (make POST to /api/users/{id} instead of /api/users with 'id' and 'title' defined in payload)
+//    @PostMapping("{id}")
+//    public User updateUserTitle(
+//            @PathVariable("id") long id,
+//            @RequestParam("title") String title,
+//            Principal principal
+//    ) {
+//        User user = userService.findByLogin(principal.getName());
+//        boolean canEdit = user.getId() == id || hasPermissions(List.of("EDIT_USER"));
+//
+//        if (canEdit) {
+//            return userService.updateUserTitle(id, title);
+//        } else {
+//            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No permission to edit user's title");
+//        }
+//    }
 }
