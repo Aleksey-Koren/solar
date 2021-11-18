@@ -37,20 +37,6 @@ public class PermissionService {
         return permissions.stream().map(mapper::toDto).collect(Collectors.toList());
     }
 
-    public PermissionDto save(PermissionDto dto) {
-        if (dto.getTitle() == null || "".equals(dto.getTitle())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Permission's title is blank");
-        }
-        if (dto.getId() == null && permissionRepository.existsByTitle(dto.getTitle())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Permission with such title is already existing");
-        }
-
-        Permission permission = mapper.toEntity(dto);
-        permission.setTitle(dto.getTitle());
-        permission = permissionRepository.save(permission);
-        return mapper.toDto(permission);
-    }
-
     public List<PermissionDto> getPermissionsByUserId(Long id) {
         List<Permission> permissions = permissionRepository.findByUsersId(id);
         return permissions.stream().map(mapper::toDto).collect(Collectors.toList());

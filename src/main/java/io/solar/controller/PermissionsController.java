@@ -49,14 +49,6 @@ public class PermissionsController {
         }
     }
 
-    @PostMapping
-    public PermissionDto savePermission(@RequestBody PermissionDto dto) {
-        if (!hasPermissions(List.of("EDIT_PERMISSION"))) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Editing permissions is not allowed for you");
-        }
-        return permissionService.save(dto);
-    }
-
     // TODO: edit request endpoint on front-end
     //  (was /api/permissions/elevate)
     //  probably move to UsersController and change return type?
