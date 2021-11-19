@@ -27,7 +27,7 @@ public class UserFacade {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Couldn't found user with such id"));
         //TODO what should i do if some of this parameters are NULL in dto. Should i check them, of directly set them one-to-one
         user.setTitle(dto.getTitle());
-        return userMapper.toDto(userService.update(user));
+        return userMapper.toDto(user);
     }
 
     public UserDto updateGameParameters(UserDto dto) {
@@ -36,7 +36,7 @@ public class UserFacade {
         //TODO what should i do if some of this parameters are NULL in dto. Should i check them, of directly set them one-to-one
         user.setTitle(dto.getTitle());
         user.setMoney(dto.getMoney());
-        return userMapper.toDto(userService.update(user));
+        return userMapper.toDto(user);
     }
 
     public boolean userHasPermission(User user, String permissionTitle) {
