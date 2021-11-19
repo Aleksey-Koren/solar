@@ -2,6 +2,8 @@ package io.solar.service;
 
 import io.solar.entity.Planet;
 import io.solar.repository.PlanetRepository;
+import io.solar.specification.PlanetSpecification;
+import io.solar.specification.filter.PlanetFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,8 +30,8 @@ public class PlanetService {
       return planetRepository.findAll(pageable);
     }
 
-    public List<Planet> findAllById(List<Long> ids) {
-        return planetRepository.findAllById(ids);
+    public Page<Planet> findAllFiltered(PlanetFilter filter, Pageable pageable) {
+        return planetRepository.findAll(new PlanetSpecification(filter), pageable);
     }
 
     public Planet save(Planet planet) {

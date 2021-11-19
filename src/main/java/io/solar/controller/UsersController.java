@@ -1,7 +1,6 @@
 package io.solar.controller;
 
 import io.solar.dto.UserDto;
-import io.solar.entity.Permission;
 import io.solar.entity.User;
 import io.solar.facade.UserFacade;
 import io.solar.service.UserService;
