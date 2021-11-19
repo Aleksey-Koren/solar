@@ -85,6 +85,7 @@ public class PlanetMapper  {
     public PlanetDto toDto (Planet planet) {
         PlanetDto dto = new PlanetDto();
 
+        dto.setId(planet.getId());
         dto.setAldebo(planet.getAldebo());
         dto.setAphelion(planet.getAphelion());
         dto.setAxialTilt(planet.getAxialTilt());
