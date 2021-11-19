@@ -1,6 +1,8 @@
 package io.solar.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.List;
@@ -29,7 +31,7 @@ public class Planet {
     String surfaceGravity;
     String surfacePressure;
     String volume;
-    Long parent;
+    Long parent; //TODO If this is planetId for the Moon, we should change it to Entity
     Float angle;
     String type;
     @OneToMany(mappedBy = "planet", fetch = FetchType.LAZY)

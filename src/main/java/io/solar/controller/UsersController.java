@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -50,12 +51,11 @@ public class UsersController {
     // TODO: edit request path on front-end
     //  (make POST to /api/users/{id} instead of /api/users with 'id' and 'title' defined in payload)
     @Transactional
+    @PreAuthorize("hasAnyAuthority('PLAY_THE_GAME', 'EDIT_USER')")
     @PostMapping("{id}")
     public UserDto updateUser(@PathVariable("id") long id,
                               @RequestBody UserDto dto,
                               Principal principal) {
-        //TODO Is user id in dto, or i should set it from pathVariable?
-        dto.setId(id);
         User authUser = userService.findByLogin(principal.getName());
         User userToChange = userService.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Couldn't found user with such id"));

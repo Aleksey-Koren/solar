@@ -2,12 +2,14 @@ package io.solar.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.solar.entity.Planet;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
 
-@Getter
-@Setter
+
+@Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class PlanetDto {
 
@@ -33,31 +35,6 @@ public class PlanetDto {
     private Float angle;
     private String type;
 
-    public PlanetDto() {
+    List<UserDto> users;
 
-    }
-
-    public PlanetDto(Planet planet) {
-        this.id = planet.getId();
-        this.aldebo = planet.getAldebo();
-        this.aphelion = planet.getAphelion();
-        this.axialTilt = planet.getAxialTilt();
-        this.eccentricity = planet.getEccentricity();
-        this.escapeVelocity = planet.getEscapeVelocity();
-        this.inclination = planet.getInclination();
-        this.mass = planet.getMass();
-        this.meanAnomaly = planet.getMeanAnomaly();
-        this.meanOrbitRadius = planet.getMeanOrbitRadius();
-        this.meanRadius = planet.getMeanRadius();
-        this.title = planet.getTitle();
-        this.orbitalPeriod = planet.getOrbitalPeriod();
-        this.perihelion = planet.getPerihelion();
-        this.siderealRotationPeriod = planet.getSiderealRotationPeriod();
-        this.surfaceGravity = planet.getSurfaceGravity();
-        this.surfacePressure = planet.getSurfacePressure();
-        this.volume = planet.getVolume();
-        this.parent = planet.getParent();
-        this.angle = planet.getAngle();
-        this.type = planet.getType();
-    }
 }

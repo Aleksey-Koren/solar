@@ -1,37 +1,112 @@
 package io.solar.mapper;
 
+import io.solar.dto.PlanetDto;
 import io.solar.entity.Planet;
-import io.solar.utils.db.DbMapper;
-import io.solar.utils.db.SafeResultSet;
+import io.solar.repository.PlanetRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
+import org.springframework.web.server.ResponseStatusException;
 
-public class PlanetMapper implements DbMapper<Planet> {
 
-    @Override
-    public Planet map(SafeResultSet resultSet) {
-        Planet out = new Planet();
+import static java.util.stream.Collectors.*;
 
-        out.setId(resultSet.fetchLong("id"));
-        out.setAldebo(resultSet.fetchFloat("aldebo"));
-        out.setAphelion(resultSet.fetchLong("aphelion"));
-        out.setAxialTilt(resultSet.getString("axial_tilt"));
-        out.setEccentricity(resultSet.getString("eccentricity"));
-        out.setEscapeVelocity(resultSet.getString("escape_velocity"));
-        out.setInclination(resultSet.getString("inclination"));
-        out.setMass(resultSet.getString("mass"));
-        out.setMeanAnomaly(resultSet.fetchFloat("mean_anomaly"));
-        out.setAngle(resultSet.fetchFloat("angle"));
-        out.setMeanOrbitRadius(resultSet.getString("mean_orbit_radius"));
-        out.setMeanRadius(resultSet.getString("mean_radius"));
-        out.setTitle(resultSet.getString("title"));
-        out.setType(resultSet.getString("type"));
-        out.setOrbitalPeriod(resultSet.getString("orbital_period"));
-        out.setPerihelion(resultSet.getString("perihelion"));
-        out.setSiderealRotationPeriod(resultSet.getString("sidereal_rotation_period"));
-        out.setSurfaceGravity(resultSet.getString("surface_gravity"));
-        out.setSurfacePressure(resultSet.getString("surface_pressure"));
-        out.setVolume(resultSet.getString("volume"));
-        out.setParent(resultSet.fetchLong("parent"));
+@Component
+public class PlanetMapper  {
 
-        return out;
+    private PlanetRepository planetRepository;
+    private UserMapper userMapper;
+
+    @Autowired
+    public PlanetMapper(PlanetRepository planetRepository, UserMapper userMapper) {
+        this.planetRepository = planetRepository;
+        this.userMapper = userMapper;
+    }
+
+    public Planet toEntity(PlanetDto dto) {
+
+        Planet planet;
+        if (dto.getId() != null) {
+            planet = planetRepository.findById(dto.getId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "There is no such planet ID in database"));
+
+            planet.setAldebo(dto.getAldebo());
+            planet.setAphelion(dto.getAphelion());
+            planet.setAxialTilt(dto.getAxialTilt());
+            planet.setEccentricity(dto.getEccentricity());
+            planet.setEscapeVelocity(dto.getEscapeVelocity());
+            planet.setInclination(dto.getInclination());
+            planet.setMass(dto.getMass());
+            planet.setMeanAnomaly(dto.getMeanAnomaly());
+            planet.setMeanOrbitRadius(dto.getMeanOrbitRadius());
+            planet.setMeanRadius(dto.getMeanRadius());
+            planet.setTitle(dto.getTitle());
+            planet.setOrbitalPeriod(dto.getOrbitalPeriod());
+            planet.setPerihelion(dto.getPerihelion());
+            planet.setSiderealRotationPeriod(dto.getSiderealRotationPeriod());
+            planet.setSurfaceGravity(dto.getSurfaceGravity());
+            planet.setSurfacePressure(dto.getSurfacePressure());
+            planet.setVolume(dto.getVolume());
+            planet.setParent(dto.getParent());
+            planet.setAngle(dto.getAngle());
+            planet.setType(dto.getType());
+
+            planet.setUsers(dto.getUsers().stream().map(userMapper::toEntity).collect(toList()));
+        }else{
+            planet = new Planet();
+
+            planet.setAldebo(dto.getAldebo());
+            planet.setAphelion(dto.getAphelion());
+            planet.setAxialTilt(dto.getAxialTilt());
+            planet.setEccentricity(dto.getEccentricity());
+            planet.setEscapeVelocity(dto.getEscapeVelocity());
+            planet.setInclination(dto.getInclination());
+            planet.setMass(dto.getMass());
+            planet.setMeanAnomaly(dto.getMeanAnomaly());
+            planet.setMeanOrbitRadius(dto.getMeanOrbitRadius());
+            planet.setMeanRadius(dto.getMeanRadius());
+            planet.setTitle(dto.getTitle());
+            planet.setOrbitalPeriod(dto.getOrbitalPeriod());
+            planet.setPerihelion(dto.getPerihelion());
+            planet.setSiderealRotationPeriod(dto.getSiderealRotationPeriod());
+            planet.setSurfaceGravity(dto.getSurfaceGravity());
+            planet.setSurfacePressure(dto.getSurfacePressure());
+            planet.setVolume(dto.getVolume());
+            planet.setParent(dto.getParent());
+            planet.setAngle(dto.getAngle());
+            planet.setType(dto.getType());
+
+            planet.setUsers(dto.getUsers().stream().map(userMapper::toEntity).collect(toList()));
+        }
+
+        return planet;
+    }
+
+    public PlanetDto toDto (Planet planet) {
+        PlanetDto dto = new PlanetDto();
+
+        dto.setAldebo(planet.getAldebo());
+        dto.setAphelion(planet.getAphelion());
+        dto.setAxialTilt(planet.getAxialTilt());
+        dto.setEccentricity(planet.getEccentricity());
+        dto.setEscapeVelocity(planet.getEscapeVelocity());
+        dto.setInclination(planet.getInclination());
+        dto.setMass(planet.getMass());
+        dto.setMeanAnomaly(planet.getMeanAnomaly());
+        dto.setMeanOrbitRadius(planet.getMeanOrbitRadius());
+        dto.setMeanRadius(planet.getMeanRadius());
+        dto.setTitle(planet.getTitle());
+        dto.setOrbitalPeriod(planet.getOrbitalPeriod());
+        dto.setPerihelion(planet.getPerihelion());
+        dto.setSiderealRotationPeriod(planet.getSiderealRotationPeriod());
+        dto.setSurfaceGravity(planet.getSurfaceGravity());
+        dto.setSurfacePressure(planet.getSurfacePressure());
+        dto.setVolume(planet.getVolume());
+        dto.setParent(planet.getParent());
+        dto.setAngle(planet.getAngle());
+        dto.setType(planet.getType());
+
+        dto.setUsers(planet.getUsers().stream().map(userMapper::toDto).collect(toList()));
+        return dto;
     }
 }

@@ -1,7 +1,7 @@
 package io.solar.controller;
 
 import io.solar.dto.PlanetDto;
-import io.solar.entity.Planet;
+import io.solar.mapper.PlanetMapper;
 import io.solar.service.PlanetService;
 import io.solar.specification.filter.PlanetFilter;
 import io.solar.utils.Option;
@@ -10,11 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,35 +25,35 @@ import java.util.stream.Collectors;
 public class PlanetController {
 
     private PlanetService planetService;
+    private PlanetMapper planetMapper;
 
     @Autowired
-    public PlanetController(PlanetService planetService) {
+    public PlanetController(PlanetService planetService, PlanetMapper planetMapper) {
         this.planetService = planetService;
+        this.planetMapper = planetMapper;
     }
 
-    @PreAuthorize("hasAuthority('EDIT_PLANETS')")
+    @PreAuthorize("hasAuthority('EDIT_PLANET')")
     @PostMapping
-    public Planet save(@RequestBody Planet planet) {
-        return planetService.save(planet);
+    public PlanetDto save(@RequestBody PlanetDto dto) {
+        return planetMapper.toDto(planetService.save(planetMapper.toEntity(dto)));
     }
 
     @Transactional
-    @PreAuthorize("hasAnyAuthority('PLAY_THE_GAME', 'EDIT_THE_GAME')")
+    @PreAuthorize("hasAnyAuthority('PLAY_THE_GAME', 'EDIT_PLANET')")
     @GetMapping("/{id}")
     public PlanetDto findById(@PathVariable("id") Long id) {
-        Planet planet = planetService.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("There is no planet with id = %s", id)));
-        return new PlanetDto(planet);
+        return planetMapper.toDto(planetService.findById(id));
     }
 
     @Transactional
-    @PreAuthorize("hasAnyAuthority('PLAY_THE_GAME', 'EDIT_THE_GAME')")
+    @PreAuthorize("hasAnyAuthority('PLAY_THE_GAME', 'EDIT_PLANET')")
     @GetMapping
     public Page<PlanetDto> findAll(@PageableDefault(size = 5, page = 0) Pageable pageable, @RequestParam(value = "ids", required = false) List<Long> ids) {
         if(ids == null || ids.size() == 0) {
-            return planetService.findAll(pageable).map(PlanetDto::new);
+            return planetService.findAll(pageable).map(planetMapper::toDto);
         }else {
-            return planetService.findAllFiltered(new PlanetFilter(ids), pageable).map(PlanetDto::new);
+            return planetService.findAllFiltered(new PlanetFilter(ids), pageable).map(planetMapper::toDto);
         }
     }
 
