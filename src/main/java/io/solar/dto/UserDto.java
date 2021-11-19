@@ -24,5 +24,5 @@ public class UserDto {
     private Planet planet;
     private Instant hackBlock;
     private Integer hackAttempts;
-    private Set<Permission> permissions;
+    private Set<PermissionDto> permissions;
 }

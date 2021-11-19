@@ -8,14 +8,20 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.*;
+
 @Component
 public class UserMapper {
 
     private final UserRepository userRepository;
+    private final PermissionMapper permissionMapper;
 
     @Autowired
-    public UserMapper(UserRepository userRepository) {
+    public UserMapper(UserRepository userRepository, PermissionMapper permissionMapper) {
         this.userRepository = userRepository;
+        this.permissionMapper = permissionMapper;
     }
 
     public User toEntity(UserDto dto) {
@@ -30,15 +36,18 @@ public class UserMapper {
             user.setPlanet(dto.getPlanet());
             user.setHackBlock(dto.getHackBlock());
             user.setHackAttempts(dto.getHackAttempts());
+            user.setPermissions(dto.getPermissions() == null ? null : dto.getPermissions().stream().map(permissionMapper::toEntity).collect(toSet()));
         }else{
             user = new User(null, dto.getTitle(), dto.getLogin(), dto.getPassword(), dto.getMoney(),
-                    dto.getPlanet(), dto.getHackBlock(), dto.getHackAttempts(), dto.getPermissions());
+                    dto.getPlanet(), dto.getHackBlock(), dto.getHackAttempts(),
+                    dto.getPermissions() == null ? null : dto.getPermissions().stream().map(permissionMapper::toEntity).collect(toSet()));
         }
         return user;
     }
 
     public UserDto toDto(User user) {
         return new UserDto(user.getId(), user.getTitle(), user.getLogin(), null, user.getMoney(),
-                user.getPlanet(), user.getHackBlock(), user.getHackAttempts(), user.getPermissions());
+                user.getPlanet(), user.getHackBlock(), user.getHackAttempts(),
+                user.getPermissions().stream().map(permissionMapper::toDto).collect(Collectors.toSet()));
     }
  }

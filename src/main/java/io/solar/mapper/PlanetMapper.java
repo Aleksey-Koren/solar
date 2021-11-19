@@ -51,7 +51,7 @@ public class PlanetMapper  {
             planet.setAngle(dto.getAngle());
             planet.setType(dto.getType());
 
-            planet.setUsers(dto.getUsers().stream().map(userMapper::toEntity).collect(toList()));
+            planet.setUsers(dto.getUsers() == null ? null : dto.getUsers().stream().map(userMapper::toEntity).collect(toList()));
         }else{
             planet = new Planet();
 
@@ -76,7 +76,7 @@ public class PlanetMapper  {
             planet.setAngle(dto.getAngle());
             planet.setType(dto.getType());
 
-            planet.setUsers(dto.getUsers().stream().map(userMapper::toEntity).collect(toList()));
+            planet.setUsers(dto.getUsers() == null ? null : dto.getUsers().stream().map(userMapper::toEntity).collect(toList()));
         }
 
         return planet;
