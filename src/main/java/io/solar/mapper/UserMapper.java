@@ -32,13 +32,13 @@ public class UserMapper {
             user.setHackAttempts(dto.getHackAttempts());
         }else{
             user = new User(null, dto.getTitle(), dto.getLogin(), dto.getPassword(), dto.getMoney(),
-                    dto.getPlanet(), dto.getHackBlock(), dto.getHackAttempts(), null);
+                    dto.getPlanet(), dto.getHackBlock(), dto.getHackAttempts(), dto.getPermissions());
         }
         return user;
     }
 
     public UserDto toDto(User user) {
         return new UserDto(user.getId(), user.getTitle(), user.getLogin(), null, user.getMoney(),
-                user.getPlanet(), user.getHackBlock(), user.getHackAttempts());
+                user.getPlanet(), user.getHackBlock(), user.getHackAttempts(), user.getPermissions());
     }
  }

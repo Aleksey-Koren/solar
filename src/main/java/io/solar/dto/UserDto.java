@@ -1,15 +1,19 @@
 package io.solar.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import io.solar.entity.Permission;
 import io.solar.entity.Planet;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.Instant;
+import java.util.Set;
 
 @Getter
 @Setter
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserDto {
 
     private Long id;
@@ -20,4 +24,5 @@ public class UserDto {
     private Planet planet;
     private Instant hackBlock;
     private Integer hackAttempts;
+    private Set<Permission> permissions;
 }
