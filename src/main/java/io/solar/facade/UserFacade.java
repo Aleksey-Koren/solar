@@ -1,6 +1,7 @@
 package io.solar.facade;
 
 import io.solar.dto.UserDto;
+import io.solar.entity.Permission;
 import io.solar.entity.User;
 import io.solar.mapper.UserMapper;
 import io.solar.service.UserService;
@@ -26,8 +27,6 @@ public class UserFacade {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Couldn't found user with such id"));
         //TODO what should i do if some of this parameters are NULL in dto. Should i check them, of directly set them one-to-one
         user.setTitle(dto.getTitle());
-        userService.update(user);
-        //TODO Should I set permissions = null before dto generation, or I should exclude permissions set from UserDto at all?
         return userMapper.toDto(userService.update(user));
     }
 
@@ -37,7 +36,10 @@ public class UserFacade {
         //TODO what should i do if some of this parameters are NULL in dto. Should i check them, of directly set them one-to-one
         user.setTitle(dto.getTitle());
         user.setMoney(dto.getMoney());
-        user.setPlanet(dto.getPlanet());
         return userMapper.toDto(userService.update(user));
+    }
+
+    public boolean userHasPermission(User user, String permissionTitle) {
+        return user.getPermissions().stream().map(Permission::getTitle).anyMatch(s -> s.equals(permissionTitle));
     }
 }

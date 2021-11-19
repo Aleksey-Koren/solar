@@ -58,15 +58,13 @@ public class UsersController {
         //TODO Is user id in dto, or i should set it from pathVariable?
         dto.setId(id);
         User authUser = userService.findByLogin(principal.getName());
+        User userToChange = userService.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Couldn't found user with such id"));
         if (authUser.getId() == id && !hasPermissions(List.of("EDIT_USER"))) {
             return userFacade.updateOnlyTitle(dto);
         }else if (authUser.getId() == id && hasPermissions(List.of("EDIT_USER"))) {
             return userFacade.updateGameParameters(dto);
-        }else if (hasPermissions(List.of("EDIT_USER")) && userService.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Couldn't found user with such id"))
-                .getPermissions().stream()
-                                 .map(Permission::getTitle)
-                                 .noneMatch(s -> s.equals("EDIT_USER"))) {
+        }else if (hasPermissions(List.of("EDIT_USER")) && !userFacade.userHasPermission(userToChange, "EDIT_USER")) {
             return userFacade.updateGameParameters(dto);
         }else {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No permission to edit user's data");
