@@ -39,7 +39,7 @@ AuthManagement.prototype.createRegister = function() {
 
 AuthManagement.prototype.authorise = function(token) {
     var me = this;
-    Rest.doPost('/api/authorise', {data: token}).then(function(response){
+    Rest.doGet('/api/refresh', {'auth_token': token}).then(function(response){
         if(response.data) {
             me.context.loginStorage.setItem('token', response.data);
             Ajax.addStaticHeader('auth_token', response.data);
