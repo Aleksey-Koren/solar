@@ -12,8 +12,9 @@ PlanetsStore.prototype.find = function(id) {
 };
 PlanetsStore.prototype.update = function() {
     var me = this;
-    Rest.doGet('/api/planet').then(function (value) {
+    Rest.doGet('/api/planet?page=0&size=1000').then(function (value) {
         me.isLoaded = true;
+        value = value.content;
         me.planets = value;
         me.dropdown = [];
         var map = {};

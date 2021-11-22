@@ -68,25 +68,29 @@ Ajax.getXhr = function () {
 var Rest = {
     host: null
 };
-Rest.doGet = function (url, responseType) {
-    return Rest._onRequest(url, 'get', null, responseType)
+Rest.doGet = function (url, headers, responseType) {
+    return Rest._onRequest(url, 'get', null, headers, responseType)
 };
-Rest.doPost = function (url, data, responseType) {
-    return Rest._onRequest(url, 'post', data, responseType)
+Rest.doPost = function (url, data, headers, responseType) {
+    return Rest._onRequest(url, 'post', data, headers, responseType)
 };
-Rest.doPut = function (url, data, responseType) {
-    return Rest._onRequest(url, 'put', data, responseType)
+Rest.doPut = function (url, data, headers, responseType) {
+    return Rest._onRequest(url, 'put', data, headers, responseType)
 };
-Rest.doDelete = function (url, data, responseType) {
-    return Rest._onRequest(url, 'delete', data, responseType)
+Rest.doDelete = function (url, data, headers, responseType) {
+    return Rest._onRequest(url, 'delete', data, headers, responseType)
 };
-Rest._onRequest = function (url, type, data, responseType) {
+Rest._onRequest = function (url, type, data, headers, responseType) {
     if (Rest.host !== null) {
         url = Rest.host + url;
     }
     return new Promise(function (resolve, reject) {
+        headers = headers || {};
+        if(!headers["Content-Type"]) {
+            headers["Content-Type"] = "application/json";
+        }
         Ajax.ajax({
-            headers: {"Content-Type": "application/json"},
+            headers: headers,
             responseType: responseType ? responseType : 'json',
             type: type,
             url: url,
