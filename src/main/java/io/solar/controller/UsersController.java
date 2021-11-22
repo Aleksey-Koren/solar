@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -48,25 +49,27 @@ public class UsersController {
         return userService.getUserById(id, canEdit);
     }
 
-    // TODO: edit request path on front-end
-    //  (make POST to /api/users/{id} instead of /api/users with 'id' and 'title' defined in payload)
+    @PutMapping("{id}")
     @Transactional
     @PreAuthorize("hasAnyAuthority('PLAY_THE_GAME', 'EDIT_USER')")
-    @PostMapping("{id}")
-    public UserDto updateUser(@PathVariable("id") long id,
+    public ResponseEntity<UserDto> updateUser(@PathVariable("id") long id,
                               @RequestBody UserDto dto,
                               Principal principal) {
         User authUser = userService.findByLogin(principal.getName());
         User userToChange = userService.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Couldn't found user with such id"));
+        userToChange.setId(id);
         if (authUser.getId() == id && !hasPermissions(List.of("EDIT_USER"))) {
-            return userFacade.updateOnlyTitle(dto);
+            UserDto responseDto = userFacade.updateOnlyTitle(dto);
+            return ResponseEntity.ok().body(responseDto);
         }else if (authUser.getId() == id && hasPermissions(List.of("EDIT_USER"))) {
-            return userFacade.updateGameParameters(dto);
+            UserDto responseDto = userFacade.updateGameParameters(dto);
+            return ResponseEntity.ok().body(responseDto);
         }else if (hasPermissions(List.of("EDIT_USER")) && !userFacade.userHasPermission(userToChange, "EDIT_USER")) {
-            return userFacade.updateGameParameters(dto);
+            UserDto responseDto = userFacade.updateGameParameters(dto);
+            return ResponseEntity.ok().body(responseDto);
         }else {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No permission to edit user's data");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new UserDto());
         }
     }
 
