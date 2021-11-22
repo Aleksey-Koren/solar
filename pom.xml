@@ -15,7 +15,7 @@
         <flyway.user>${env.SOLAR_DB_USER}</flyway.user>
         <flyway.password>${env.SOLAR_DB_PASS}</flyway.password>
         <flyway.schemas>solar</flyway.schemas>
-        <flyway.url>jdbc:mariadb://localhost/solar?useSSL=false&amp;serverTimezone=UTC</flyway.url>
+        <flyway.url>${env.SOLAR_DB_URL}</flyway.url>
         <flyway.encoding>UTF-8</flyway.encoding>
         <flyway.outOfOrder>true</flyway.outOfOrder>
         <flyway.baselineOnMigrate>true</flyway.baselineOnMigrate>
