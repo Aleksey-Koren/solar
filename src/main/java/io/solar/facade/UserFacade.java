@@ -25,17 +25,19 @@ public class UserFacade {
     public UserDto updateOnlyTitle(UserDto dto) {
         User user = userService.findById(dto.getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Couldn't found user with such id"));
-        //TODO what should i do if some of this parameters are NULL in dto. Should i check them, of directly set them one-to-one
+        //TODO What should I do if some of this parameters are NULL in dto. Should I check them, of directly set them one-to-one
         user.setTitle(dto.getTitle());
+        userService.update(user); //TODO Do we need this line since our controller method is @Transactional (I suppose that we do)?
         return userMapper.toDto(user);
     }
 
     public UserDto updateGameParameters(UserDto dto) {
         User user = userService.findById(dto.getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Couldn't found user with such id"));
-        //TODO what should i do if some of this parameters are NULL in dto. Should i check them, of directly set them one-to-one
+        //TODO What should I do if some of this parameters are NULL in dto. Should I check them, of directly set them one-to-one
         user.setTitle(dto.getTitle());
         user.setMoney(dto.getMoney());
+        userService.update(user); //TODO Do we need this line since our controller method is @Transactional (I suppose that we do)?
         return userMapper.toDto(user);
     }
 
