@@ -29,7 +29,6 @@ public class PermissionMapper implements EntityDtoMapper<Permission, PermissionD
             entity = repository.findById(dto.getId())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No permission with such id"));
         }
-        entity.setTitle(dto.getTitle());
         return entity;
     }
 
