@@ -34,12 +34,17 @@ public class InitService {
 
     private void defaultAdminInitialization() {
         if (adminNotExists != null && (adminNotExists.equals("yes") || adminNotExists.equals("no"))) {
+            User adminFromDb = userService.findByLogin(LOGIN);
             if (adminNotExists.equals("yes")) {
-                User adminFromDb = userService.findByLogin(LOGIN);
                 if (adminFromDb == null) {
                     createDefaultAdmin();
                 }
                 setUtility("no");
+            }else if (adminNotExists.equals("no")){
+                if (adminFromDb != null) {
+                    userService.delete(adminFromDb);
+                }
+                setUtility("yes");
             }
         }else{
             String value = utilityService.getValue("admin_not_exists").orElse("");
@@ -57,10 +62,6 @@ public class InitService {
         User admin = new User();
         admin.setLogin(LOGIN);
         admin.setPassword(PASSWORD);
-        User adminFromDb = userService.findByLogin(LOGIN);
-        if (adminFromDb != null) {
-            throw new ServiceException("Trying to create default admin, whet it exists");
-        }
         userService.registerNewUser(admin, Role.ADMIN);
     }
 
@@ -68,6 +69,4 @@ public class InitService {
         Utility utility = new Utility("admin_not_exists", value);
         utilityService.save(utility);
     }
-
-
 }

@@ -59,6 +59,9 @@ public class UserService implements UserDetailsService {
     }
 
     public User registerNewUser(User user, Role role) {
+        if (findByLogin(user.getLogin()) != null) {
+            throw new ServiceException("User with such login already exists");
+        }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         resetHackAttempts(user);
         Set<Permission> permissions = role.getPermissions().stream()
@@ -70,6 +73,10 @@ public class UserService implements UserDetailsService {
 
     public User update(User user) {
        return userRepository.save(user);
+    }
+
+    public void delete(User user) {
+        userRepository.delete(user);
     }
 
     @Override
