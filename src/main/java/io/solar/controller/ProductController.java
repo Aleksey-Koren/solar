@@ -34,7 +34,7 @@ public class ProductController {
         if (product.getId() != null) {
             Query query = transaction.query("select * from products where id = :id");
             query.setLong("id", product.getId());
-            List<Product> existing = query.executeQuery(new ProductMapper());
+            List<Product> existing = null;
 
             if (existing.size() == 1) {
                 save = transaction.query("UPDATE products set title=:title,image=:image,bulk=:bulk," +
@@ -111,7 +111,7 @@ public class ProductController {
     public Product get(@PathVariable("id") Long id, Transaction transaction) {
         Query query = transaction.query("select * from products where id = :id");
         query.setLong("id", id);
-        List<Product> existing = query.executeQuery(new ProductMapper());
+        List<Product> existing = null;
         return existing.size() == 1 ? existing.get(0) : null;
     }
 
@@ -126,7 +126,7 @@ public class ProductController {
 
         Query query = transaction.query("select * from products limit :skip, :pageSize");
         QueryUtils.applyPagination(query, pageable);
-        List<Product> existing = query.executeQuery(new ProductMapper());
+        List<Product> existing = null;
         return new Page<>(existing, count);
     }
 

@@ -1,7 +1,5 @@
 package io.solar.dto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import io.solar.entity.Permission;
 import io.solar.entity.Planet;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,7 +13,6 @@ import java.util.Set;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserDto {
 
     private Long id;
