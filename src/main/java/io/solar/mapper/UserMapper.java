@@ -5,14 +5,14 @@ import io.solar.entity.User;
 import io.solar.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.*;
 
-@Component
+@Service
 public class UserMapper {
 
     private final UserRepository userRepository;
