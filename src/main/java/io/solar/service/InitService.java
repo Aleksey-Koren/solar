@@ -1,7 +1,6 @@
 package io.solar.service;
 
 import io.solar.entity.User;
-import io.solar.entity.Utility;
 import io.solar.security.Role;
 
 import org.springframework.beans.factory.annotation.Autowired;
