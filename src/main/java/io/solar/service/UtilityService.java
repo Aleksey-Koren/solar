@@ -33,7 +33,7 @@ public class UtilityService {
        return utilityRepository.save(utility);
     }
 
-    public boolean deleteByUtilKey(String utilKey) {
-        return utilityRepository.deleteByUtilKey(utilKey) == 1;
+    public void deleteByUtilKey(String utilKey) {
+        utilityRepository.deleteById(utilKey);
     }
 }
