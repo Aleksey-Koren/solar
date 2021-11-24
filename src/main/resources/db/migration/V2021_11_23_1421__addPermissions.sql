@@ -5,3 +5,6 @@ VALUES
 
 ALTER TABLE product
 RENAME TO products;
+
+ALTER TABLE object_type
+RENAME TO object_types;
