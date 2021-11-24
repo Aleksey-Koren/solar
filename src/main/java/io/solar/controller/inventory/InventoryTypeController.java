@@ -12,6 +12,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 
 @RestController
 @RequestMapping("/api/inventory-type")
@@ -35,14 +37,26 @@ public class InventoryTypeController {
 
     //TODO I didn't see any fields fo filtration or searching on UI.
     // We should decide if we do filtration at this endpoint.
+    //TODO Frontend doesn't work with Page<InventoryTypeDto>. It works only with List<InventoryTypeDto>
+//    @Transactional
+//    @PreAuthorize("hasAnyAuthority('PLAY_THE_GAME', 'EDIT_INVENTORY_TYPE')")
+//    @GetMapping
+//    public ResponseEntity<Page<InventoryTypeDto>> getAll(@PageableDefault Pageable pageable) {
+//        return ResponseEntity.ok().body(facade.findAll(pageable));
+//    }
+
+
     @Transactional
     @PreAuthorize("hasAnyAuthority('PLAY_THE_GAME', 'EDIT_INVENTORY_TYPE')")
     @GetMapping
-    public ResponseEntity<Page<InventoryTypeDto>> getAll(@PageableDefault Pageable pageable) {
-        return ResponseEntity.ok().body(facade.findAll(pageable));
+    public ResponseEntity<List<InventoryTypeDto>> getAll(@PageableDefault Pageable pageable) {
+        return ResponseEntity.ok(facade.findAll(pageable).getContent());
     }
 
 
+
+    //TODO This method won't work, while I don't set all all ManyToMany or OneToMany relations in entities.
+    // Constraints in database reject deleting.
     @Transactional
     @PreAuthorize("hasAuthority('EDIT_INVENTORY_TYPE')")
     @DeleteMapping ("{id}")
