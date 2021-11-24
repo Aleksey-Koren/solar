@@ -37,7 +37,6 @@ public class InventoryTypeController {
 
     //TODO I didn't see any fields fo filtration or searching on UI.
     // We should decide if we do filtration at this endpoint.
-    //TODO Frontend doesn't work with Page<InventoryTypeDto>. It works only with List<InventoryTypeDto>
 //    @Transactional
 //    @PreAuthorize("hasAnyAuthority('PLAY_THE_GAME', 'EDIT_INVENTORY_TYPE')")
 //    @GetMapping
@@ -45,17 +44,17 @@ public class InventoryTypeController {
 //        return ResponseEntity.ok().body(facade.findAll(pageable));
 //    }
 
-
+    //TODO Frontend doesn't work with Page<InventoryTypeDto>. It works only with List<InventoryTypeDto>
     @Transactional
     @PreAuthorize("hasAnyAuthority('PLAY_THE_GAME', 'EDIT_INVENTORY_TYPE')")
     @GetMapping
-    public ResponseEntity<List<InventoryTypeDto>> getAll(@PageableDefault Pageable pageable) {
+    public ResponseEntity<List<InventoryTypeDto>> getAll(@PageableDefault(page = 0, size = 50) Pageable pageable) {
         return ResponseEntity.ok(facade.findAll(pageable).getContent());
     }
 
 
 
-    //TODO This method won't work, while I don't set all all ManyToMany or OneToMany relations in entities.
+    //TODO This method won't work, while I don't set all ManyToMany or OneToMany relations in entities.
     // Constraints in database reject deleting.
     @Transactional
     @PreAuthorize("hasAuthority('EDIT_INVENTORY_TYPE')")
