@@ -32,4 +32,8 @@ public class UtilityService {
     public Utility save(Utility utility) {
        return utilityRepository.save(utility);
     }
+
+    public boolean deleteByUtilKey(String utilKey) {
+        return utilityRepository.deleteByUtilKey(utilKey) == 1;
+    }
 }

@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -28,7 +27,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import static java.util.stream.Collectors.*;
-import static org.springframework.data.jpa.domain.Specification.where;
 
 @Service
 public class UserService implements UserDetailsService {

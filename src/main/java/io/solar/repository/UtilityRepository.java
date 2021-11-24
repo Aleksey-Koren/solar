@@ -14,4 +14,6 @@ public interface UtilityRepository extends JpaRepository<Utility, String> {
 
     @Query("Select u.utilValue from Utility u where u.utilKey = ?1")
     Optional<String> getValue(String key);
+
+    int deleteByUtilKey(String utilKey);
 }
