@@ -39,7 +39,8 @@ InventoryStore.prototype.update = function(type, params) {
         type = ['all'];
     }
     if(type.indexOf('type') > -1 || type.indexOf('all') > -1) {
-        promises.push(Rest.doGet('/api/inventory-type').then(function (value) {
+        promises.push(Rest.doGet('/api/inventory-type?page=0&size=1000').then(function (response) {
+            const value = response.content;
             me.isTypesLoaded = true;
             me.inventoryTypes = value;
             me.dropdown = [];

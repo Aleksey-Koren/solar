@@ -102,7 +102,7 @@ function SolarMap(context) {
             if(!me.objectWindow) {
                 me.objectWindow = new PlanetWindow(me.context);
             }
-            me.objectWindow.show(obj.obj);
+            me.objectWindow.show(obj.obj, false);
         }
     });
 }
@@ -159,7 +159,7 @@ SolarMap.prototype.render = function (planets) {
     var az = this.getAbsPoint(0, 0);
     ctx.strokeText("Zero: " + drawInt(az.x) + "/" + drawInt(az.y), 10, 110, {color: '#4fb169'});
     ctx.strokeText("Point: " + drawInt(ap.x) + "/" + drawInt(ap.y), 10, 90, {color: '#4fb169'});
-    ctx.strokeText("KM per pixel: " + (this.kkmPerPixel * 1000), 10, 130, {color: '#4fb169'});
+    this.drawKmPerPixel();
     ctx.stroke();
     ctx.save();
 
@@ -185,6 +185,16 @@ SolarMap.prototype.render = function (planets) {
     });
 };
 
+SolarMap.prototype.drawKmPerPixel = function () {
+    var ctx = this.ctx;
+    if(this.kkmPerPixel > 1.5) {
+        ctx.strokeText("KM per pixel: " + Math.floor(this.kkmPerPixel * 1000), 10, 130, {color: '#4fb169'});
+    } else if(this.kkmPerPixel > 0.001) {
+        ctx.strokeText("KM per pixel: " + Math.floor(this.kkmPerPixel * 10000) / 10, 10, 130, {color: '#4fb169'});
+    } else {
+        ctx.strokeText("M per pixel: " + Math.floor(this.kkmPerPixel * 1000000) , 10, 130, {color: '#4fb169'});
+    }
+}
 SolarMap.prototype.drawPlanet = function (ctx, planet, absWindow, zero) {
     if (planet.type === 'moon') {
         if (!planet.aphelion || this.kkmPerPixel > 400) {
@@ -198,7 +208,7 @@ SolarMap.prototype.drawPlanet = function (ctx, planet, absWindow, zero) {
     } else if (planet.type === 'planet') {
         ctx.strokeStyle = '#4fb169';
     } else {
-        ctx.strokeStyle = '#9f45b0';
+        ctx.strokeStyle = 'rgba(151,151,151,0.58)';
     }
     var angle = SolarTimer.angle(planet);
     var absX = Math.cos(angle) * planet.aphelion + zero.x;
@@ -316,6 +326,9 @@ SolarMap.prototype.init = function () {
     this.resize();
 };
 SolarMap.prototype.changeZoom = function (zoom, relX, relY) {
+    if(this.zoomStack.length > 0) {
+        this.zoomStack.pop();
+    }
     if (this.zoomStack.length > 4) {
         return;
     }
@@ -327,6 +340,7 @@ SolarMap.prototype.changeZoom = function (zoom, relX, relY) {
             zoom: zoom,
             kkm: this.kkmPerPixel,
             point: {x: relX, y: relY},
+            time: new Date().getTime() + 2000,
             step: 0,
             maxStep: 20
         });
