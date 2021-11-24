@@ -41,7 +41,7 @@ public class ProductController {
         return ResponseEntity.ok().body(productFacade.save(dto));
     }
 
-    //TODO I didn't see any fields fo filtration or searching on UI.
+    //TODO I didn't see any fields for filtration or searching on UI.
     // We should decide if we do filtration at this endpoint.
     @Transactional
     @PreAuthorize("hasAnyAuthority('PLAY_THE_GAME', 'EDIT_PRODUCT')")
