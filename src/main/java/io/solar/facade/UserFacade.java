@@ -27,7 +27,6 @@ public class UserFacade {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Couldn't found user with such id"));
         user.setTitle(dto.getTitle());
         userService.update(user);
-        user.setPassword(null);
         return userMapper.toDto(user);
     }
 

@@ -1,22 +1,51 @@
 package io.solar.mapper;
 
+import io.solar.dto.ProductDto;
 import io.solar.entity.Product;
-import io.solar.utils.db.DbMapper;
-import io.solar.utils.db.SafeResultSet;
+import io.solar.service.ProductService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
+import org.springframework.web.server.ResponseStatusException;
 
-public class ProductMapper implements DbMapper<Product> {
+@Component
+public class ProductMapper {
 
-    @Override
-    public Product map(SafeResultSet resultSet) {
-        Product out = new Product();
+    private ProductService productService;
 
-        out.setId(resultSet.fetchLong("id"));
-        out.setTitle(resultSet.getString("title"));
-        out.setImage(resultSet.getString("image"));
-        out.setBulk(resultSet.fetchFloat("bulk"));
-        out.setMass(resultSet.fetchFloat("mass"));
-        out.setPrice(resultSet.fetchFloat("price"));
+    @Autowired
+    public ProductMapper(ProductService productService) {
+        this.productService = productService;
+    }
 
-        return out;
+    public Product toEntity(ProductDto dto) {
+        Product product;
+        if (dto.getId() != null) {
+            product = productService.findById(dto.getId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "There is no such product ID in database"));
+        }else{
+            product = new Product();
+        }
+
+        product.setTitle(dto.getTitle());
+        product.setImage(dto.getImage());
+        product.setBulk(dto.getBulk());
+        product.setMass(dto.getMass());
+        product.setPrice(dto.getPrice());
+
+        return product;
+    }
+
+    public ProductDto toDto(Product product) {
+        ProductDto dto = new ProductDto();
+
+        dto.setId(product.getId());
+        dto.setTitle(product.getTitle());
+        dto.setImage(product.getImage());
+        dto.setBulk(product.getBulk());
+        dto.setMass(product.getMass());
+        dto.setPrice(product.getPrice());
+
+        return dto;
     }
 }

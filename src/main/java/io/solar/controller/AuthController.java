@@ -7,12 +7,12 @@ import io.solar.security.JwtProvider;
 import io.solar.dto.Register;
 import io.solar.dto.Token;
 import io.solar.entity.User;
+import io.solar.security.Role;
 import io.solar.service.UserService;
 import io.solar.utils.BlockedToken;
 import io.solar.utils.db.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,29 +28,30 @@ public class AuthController {
 
     private final UserService userService;
     private final JwtProvider jwtProvider;
-    private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
 
     @Autowired
-    public AuthController(UserService userService, JwtProvider jwtProvider, PasswordEncoder passwordEncoder, UserMapper userMapper) {
+    public AuthController(UserService userService, JwtProvider jwtProvider, UserMapper userMapper) {
         this.userService = userService;
         this.jwtProvider = jwtProvider;
-        this.passwordEncoder = passwordEncoder;
         this.userMapper = userMapper;
     }
     @Transactional
     @PostMapping("/register")
     public Register register(@RequestBody UserDto dto) {
         User userFromClient = userMapper.toEntity(dto);
+        if (userFromClient.getLogin().equals("admin")) {
+            return new Register(false, "", "Login \"admin\" is reserved. You have to choose another login");
+        }
         User userFromDb = userService.findByLogin(userFromClient.getLogin());
         if (userFromDb != null) {
             return new Register(false, "", "User with this login already exists");
         }
-        userFromClient.setPassword(passwordEncoder.encode(userFromClient.getPassword()));
-        userFromClient = userService.register(userFromClient);
+        userFromClient = userService.registerNewUser(userFromClient, Role.USER);
         Token token = createToken(userFromClient);
         return new Register(true, token.getData(), "");
     }
+
     @Transactional
     @PostMapping("/login")
     public Token login(@RequestBody UserDto dto) {
@@ -61,7 +62,7 @@ public class AuthController {
             if (isHackBlocked(userFromDb, now)) {
                 return new BlockedToken(userFromDb.getHackBlock().toEpochMilli() - now.toEpochMilli());
             }
-            if (matchPasswords(userFromClient, userFromDb)) {
+            if (userService.matchPasswords(userFromClient, userFromDb)) {
                 if (userFromDb.getHackAttempts() != null && userFromDb.getHackAttempts() > 0) {
                     userService.resetHackAttempts(userFromDb);
                     userService.update(userFromDb);
@@ -73,6 +74,7 @@ public class AuthController {
         }
         return new Token();
     }
+
     @Transactional
     @GetMapping("/refresh")
     public Token refresh(@RequestHeader("auth_token") String token) {
@@ -82,10 +84,6 @@ public class AuthController {
 
     private boolean isHackBlocked(User userFromDb, Instant now) {
         return userFromDb.getHackBlock() != null && now.isBefore(userFromDb.getHackBlock());
-    }
-
-    private boolean matchPasswords(User user, User userFromDb) {
-        return passwordEncoder.matches(user.getPassword(), userFromDb.getPassword());
     }
 
     private Token createToken(User user) {

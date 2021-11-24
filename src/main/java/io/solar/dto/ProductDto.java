@@ -1,16 +1,10 @@
-package io.solar.entity;
+package io.solar.dto;
 
 import lombok.Data;
 
-import javax.persistence.*;
-
-
 @Data
-@Entity
-@Table(name = "products")
-public class Product {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class ProductDto {
+
     private Long id;
     private String title;
     private String image;

@@ -6,6 +6,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import io.solar.entity.User;
+import io.solar.repository.UserRepository;
 import io.solar.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,11 +25,11 @@ public class JwtProvider {
     @Value("${app.token_lifetime_min}")
     private Long TOKEN_LIFETIME_MIN;
 
-    private UserService userService;
+    private UserRepository userRepository;
 
     @Autowired
-    public JwtProvider(UserService userService) {
-        this.userService = userService;
+    public JwtProvider(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     public String generateToken(User user) {
@@ -60,7 +61,7 @@ public class JwtProvider {
                     .build();
             DecodedJWT jwt = verifier.verify(token);
             Long userId = jwt.getClaim("user_id").asLong();
-            Optional<User> user = userService.findById(userId);
+            Optional<User> user = userRepository.findById(userId);
             return user;
         } catch (JWTVerificationException exception){
             return Optional.empty();

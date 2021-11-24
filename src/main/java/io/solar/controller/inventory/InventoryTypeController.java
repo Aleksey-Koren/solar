@@ -1,85 +1,65 @@
 package io.solar.controller.inventory;
 
-import io.solar.controller.AuthController;
-import io.solar.entity.inventory.InventoryType;
-import io.solar.entity.User;
-import io.solar.mapper.InventoryTypeMapper;
-import io.solar.utils.context.AuthData;
-import io.solar.utils.db.Query;
-import io.solar.utils.db.Transaction;
-import io.solar.utils.server.beans.Controller;
-import io.solar.utils.server.controller.PathVariable;
-import io.solar.utils.server.controller.RequestBody;
-import io.solar.utils.server.controller.RequestMapping;
-import org.springframework.stereotype.Component;
+import io.solar.dto.InventoryTypeDto;
+import io.solar.facade.InventoryTypeFacade;
+import io.solar.service.InventoryTypeService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Component
-@Controller
-@RequestMapping(value = "inventory-type")
+
+@RestController
+@RequestMapping("/api/inventory-type")
 public class InventoryTypeController {
 
-    @RequestMapping(method = "post")
-    public InventoryType save(@RequestBody InventoryType inventoryType, @AuthData User user, Transaction transaction) {
-        if (!AuthController.userCan(user, "edit-inventory-type", transaction)) {
-            throw new RuntimeException("no privileges");
-        }
+    private InventoryTypeFacade facade;
+    private InventoryTypeService service;
 
-        Query query = transaction.query("select * from object_type where title = :title");
-        query.setString("title", inventoryType.getTitle());
-        List<InventoryType> check = query.executeQuery(new InventoryTypeMapper());
-        if (check.size() > 0) {
-            return check.get(0);
-        }
-        if (inventoryType.getId() != null) {
-            query = transaction.query("update object_type set title = :title where id = :id");
-            query.setLong("id", inventoryType.getId());
-        } else {
-            query = transaction.query("insert into object_type (title) values (:title)");
-        }
-        query.setString("title", inventoryType.getTitle());
-        query.execute();
-        if (inventoryType.getId() == null) {
-            inventoryType.setId(query.getLastGeneratedKey(Long.class));
-        }
-        return inventoryType;
+    @Autowired
+    public InventoryTypeController(InventoryTypeFacade inventoryTypeFacade, InventoryTypeService inventoryTypeService) {
+        this.facade = inventoryTypeFacade;
+        this.service = inventoryTypeService;
+    }
+
+    @Transactional
+    @PreAuthorize("hasAuthority('EDIT_INVENTORY_TYPE')")
+    @PostMapping
+    public ResponseEntity<InventoryTypeDto> save(@RequestBody InventoryTypeDto dto) {
+        return ResponseEntity.ok(facade.save(dto));
+    }
+
+    //TODO I didn't see any fields for filtration or searching on UI.
+    // We should decide if we do filtration at this endpoint.
+//    @Transactional
+//    @PreAuthorize("hasAnyAuthority('PLAY_THE_GAME', 'EDIT_INVENTORY_TYPE')")
+//    @GetMapping
+//    public ResponseEntity<Page<InventoryTypeDto>> getAll(@PageableDefault Pageable pageable) {
+//        return ResponseEntity.ok().body(facade.findAll(pageable));
+//    }
+
+    //TODO Frontend doesn't work with Page<InventoryTypeDto>. It works only with List<InventoryTypeDto>
+    @Transactional
+    @PreAuthorize("hasAnyAuthority('PLAY_THE_GAME', 'EDIT_INVENTORY_TYPE')")
+    @GetMapping
+    public ResponseEntity<List<InventoryTypeDto>> getAll(@PageableDefault(page = 0, size = 50) Pageable pageable) {
+        return ResponseEntity.ok(facade.findAll(pageable).getContent());
     }
 
 
-    @RequestMapping
-    public List<InventoryType> getAll(Transaction transaction) {
-        Query query = transaction.query("select * from object_type");
-        return query.executeQuery(new InventoryTypeMapper());
+
+    //TODO This method won't work, while I don't set all ManyToMany or OneToMany relations in entities.
+    // Constraints in database reject deleting.
+    @Transactional
+    @PreAuthorize("hasAuthority('EDIT_INVENTORY_TYPE')")
+    @DeleteMapping ("{id}")
+    public void delete(@PathVariable("id") Long id) {
+        service.delete(id);
     }
-
-    @RequestMapping(method = "delete", value = "{id}")
-    public void delete(@PathVariable("id") Long id, @AuthData User user, Transaction transaction) {
-        if (!AuthController.userCan(user, "edit-inventory-type", transaction)) {
-            throw new RuntimeException("no privileges");
-        }
-        Query deleteObjects = transaction.query("delete from objects where hull_id in (" +
-                "select id from object_type_description where object_type_description.inventory_type = :id)");
-        deleteObjects.setLong("id", id);
-        deleteObjects.execute();
-
-        Query deleteObjectModifications = transaction.query("delete from object_modification" +
-                " where item_id in (select id from object_type_description where inventory_type = :id)");
-        deleteObjectModifications.setLong("id", id);
-        deleteObjectModifications.execute();
-
-        Query deleteObjectsDescriptions = transaction.query("delete from object_type_description where inventory_type = :id");
-        deleteObjectsDescriptions.setLong("id", id);
-        deleteObjectsDescriptions.execute();
-
-        Query deleteSockets = transaction.query("delete from object_type_socket where item_type_id = :id");
-        deleteSockets.setLong("id", id);
-        deleteSockets.execute();
-
-        Query deleteObjectType = transaction.query("delete from object_type where id = :id");
-        deleteObjectType.setLong("id", id);
-        deleteObjectType.execute();
-    }
-
-
 }

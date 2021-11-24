@@ -1,6 +1,7 @@
 package io.solar.controller;
 
 import io.solar.dto.UserDto;
+import io.solar.dto.UserFilter;
 import io.solar.entity.User;
 import io.solar.facade.UserFacade;
 import io.solar.service.UserService;
@@ -34,13 +35,13 @@ public class UsersController {
     }
 
     @GetMapping
-    public Page<User> getList(
+    public Page<UserDto> getList(
             Pageable pageable,
-            @RequestParam("login") String login,
-            @RequestParam("title") String title
+            @RequestParam(value = "login", required = false) String login,
+            @RequestParam(value = "title", required = false) String title
     ) {
         boolean canEdit = hasPermissions(List.of("EDIT_USER"));
-        return userService.getAllUsers(pageable, login, title, canEdit);
+        return userService.getAllUsers(pageable, new UserFilter(login, title), canEdit);
     }
 
     @GetMapping("{id}")
@@ -72,37 +73,4 @@ public class UsersController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new UserDto());
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//    // TODO: edit request path on front-end
-//    //  (make POST to /api/users/{id} instead of /api/users with 'id' and 'title' defined in payload)
-//    @PostMapping("{id}")
-//    public User updateUserTitle(
-//            @PathVariable("id") long id,
-//            @RequestParam("title") String title,
-//            Principal principal
-//    ) {
-//        User user = userService.findByLogin(principal.getName());
-//        boolean canEdit = user.getId() == id || hasPermissions(List.of("EDIT_USER"));
-//
-//        if (canEdit) {
-//            return userService.updateUserTitle(id, title);
-//        } else {
-//            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No permission to edit user's title");
-//        }
-//    }
 }
