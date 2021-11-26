@@ -7,6 +7,7 @@ import java.util.List;
 
 @Data
 @Entity
+@Table(name = "planets")
 public class Planet {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,7 +29,7 @@ public class Planet {
     String surfaceGravity;
     String surfacePressure;
     String volume;
-    Long parent; //TODO If this is planetId for the Moon, we should change it to Entity
+    Long parent;
     Float angle;
     String type;
     @OneToMany(mappedBy = "planet")
