@@ -4,12 +4,17 @@ import io.solar.entity.inventory.InventorySocket;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.persistence.*;
 import java.util.List;
 
 @Getter
 @Setter
+@Entity
+@Table(name = "objects")
+@Inheritance(strategy = InheritanceType.JOINED)
 public abstract class AbstractObject {
 
+    @Id
     private Long id;
     private Long planet;
     private Long population;
@@ -26,10 +31,13 @@ public abstract class AbstractObject {
     private Long durability;
     private Long attachedToShip;
     private Long attachedToSocket;
+    @Enumerated(EnumType.STRING)
     private ObjectStatus status;
     private Float acceleration;
     private Float speed;
 
-    private List<InventorySocket> socketList;
-    private List<ObjectItem> attachedObjects;
+
+    //TODO ??????
+//    private List<InventorySocket> socketList;
+//    private List<ObjectItem> attachedObjects;
 }

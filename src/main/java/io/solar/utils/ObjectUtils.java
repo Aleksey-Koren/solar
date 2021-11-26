@@ -104,13 +104,13 @@ public class ObjectUtils {
                 " from object_type_socket " +
                 " where item_id = :itemId order by sort_order");
         query.setLong("itemId", object.getHullId());
-        object.setSocketList(query.executeQuery(new SocketMapper()));
+//        object.setSocketList(query.executeQuery(new SocketMapper()));
     }
 
     public static void appendObjects(AbstractObject object, Transaction transaction) {
         Query query = transaction.query("select * from objects where attached_to_ship = :attachedToShip");
         query.setLong("attachedToShip", object.getId());
         List<ObjectItem> objects = query.executeQuery(new ObjectItemMapper());
-        object.setAttachedObjects(objects);
+//        object.setAttachedObjects(objects);
     }
 }

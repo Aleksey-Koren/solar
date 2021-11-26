@@ -73,10 +73,11 @@ public class ObjectService {
         Query query = transaction.query("update objects set attached_to_ship = null where attached_to_ship = :id");
         query.setLong("id", object.getId());
         query.executeUpdate();
-        if(object.getAttachedObjects() == null || object.getAttachedObjects().isEmpty()) {
-            return;
-        }
-        List<ObjectItem> objects = object.getAttachedObjects();
+//        if(object.getAttachedObjects() == null || object.getAttachedObjects().isEmpty()) {
+//            return;
+//        }
+//        List<ObjectItem> objects = object.getAttachedObjects();
+        List<ObjectItem> objects = null;
         Query q = transaction.query("update objects" +
                 " set attached_to_ship = :attachedToShip, attached_to_socket = :attachedToSocket" +
                 " where id = :id");
