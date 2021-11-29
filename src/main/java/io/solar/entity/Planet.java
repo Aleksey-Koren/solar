@@ -5,7 +5,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
-import java.io.ObjectInputFilter;
 import java.util.List;
 
 @Data
@@ -17,7 +16,6 @@ public class Planet extends AbstractObject {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Float aldebo;
-//    private Long aphelion;
     private String axialTilt;
     private String eccentricity;
     private String escapeVelocity;
@@ -26,15 +24,12 @@ public class Planet extends AbstractObject {
     private Float meanAnomaly;
     private String meanOrbitRadius;
     private String meanRadius;
-//    private String title;
-//    private String orbitalPeriod;
     private String perihelion;
     private String siderealRotationPeriod;
     private String surfaceGravity;
     private String surfacePressure;
     private String volume;
     private Long parent;
-//    private Float angle;
     private String type;
     @OneToMany(mappedBy = "planet")
     List<User> users;

@@ -15,6 +15,7 @@ import java.util.List;
 public abstract class AbstractObject {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Long planet;
     private Long population;

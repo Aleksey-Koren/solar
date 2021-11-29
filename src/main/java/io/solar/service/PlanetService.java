@@ -24,13 +24,13 @@ public class PlanetService {
         this.planetRepository = planetRepository;
     }
 
-    public Planet findById (Long id) {
-        return  planetRepository.findById(id)
+    public Planet findById(Long id) {
+        return planetRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("There is no planet with id = %s", id)));
     }
 
-    public Page<Planet> findAll (Pageable pageable) {
-      return planetRepository.findAll(pageable);
+    public Page<Planet> findAll(Pageable pageable) {
+        return planetRepository.findAll(pageable);
     }
 
     public Page<Planet> findAllFiltered(PlanetFilter filter, Pageable pageable) {
@@ -42,6 +42,6 @@ public class PlanetService {
     }
 
     public List<Planet> findAll() {
-       return planetRepository.findAll();
+        return planetRepository.findAll();
     }
 }
