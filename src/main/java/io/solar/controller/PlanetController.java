@@ -54,7 +54,7 @@ public class PlanetController {
     @GetMapping
     public Page<PlanetDto> findAll(@PageableDefault Pageable pageable, @RequestParam(value = "ids", required = false) List<Long> ids) {
         Station s = stationRepository.findById(6L).get();
-        s.getProductions().remove(0);
+        s.getProductions().get(0).setPower(150.6666F);
         stationRepository.save(s);
         System.out.println(s);
         if(ids == null || ids.size() == 0) {

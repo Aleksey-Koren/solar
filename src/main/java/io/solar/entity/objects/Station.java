@@ -11,7 +11,6 @@ import java.util.List;
 @Table(name = "stations")
 public class Station extends BasicObject {
 
-
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     @OneToMany(mappedBy = "station", cascade = CascadeType.ALL)
