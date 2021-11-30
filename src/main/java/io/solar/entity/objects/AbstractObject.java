@@ -26,7 +26,10 @@ public abstract class AbstractObject {
     private Float aphelion;
     private Float orbitalPeriod;
     private Float angle;
-    private Long hullId;
+    @ManyToOne
+    @JoinColumn(name = "hull_id")
+    private ObjectTypeDescription objectTypeDescription;
+//    private Long hullId;
     private Long userId;
     private Boolean active;
     private Long durability;

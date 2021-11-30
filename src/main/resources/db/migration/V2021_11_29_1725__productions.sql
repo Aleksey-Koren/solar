@@ -14,3 +14,5 @@ SELECT station, id FROM productions;
 ALTER TABLE productions DROP FOREIGN KEY productions_ibfk_2;
 
 ALTER TABLE productions DROP COLUMN station;
+
+alter table object_type_description modify sub_type enum('STATIC', 'MINING', 'MILITARY', 'SCIENCE', 'PRODUCTION', 'ASYLUM') null;
