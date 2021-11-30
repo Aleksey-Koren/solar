@@ -10,7 +10,7 @@ import javax.persistence.*;
 public class ObjectTypeDescription {
 
     @Id
-    private Integer id;
+    private Long id;
     private Integer inventoryType;
     private String title;
     private Float power_min;

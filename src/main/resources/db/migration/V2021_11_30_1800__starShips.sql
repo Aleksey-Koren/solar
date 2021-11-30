@@ -1,0 +1,4 @@
+CREATE TABLE star_ships
+(
+    id INT(11) PRIMARY KEY AUTO_INCREMENT
+);

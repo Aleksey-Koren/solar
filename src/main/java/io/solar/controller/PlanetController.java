@@ -1,8 +1,11 @@
 package io.solar.controller;
 
 import io.solar.dto.PlanetDto;
+import io.solar.entity.objects.StarShip;
 import io.solar.entity.objects.Station;
 import io.solar.mapper.PlanetMapper;
+import io.solar.repository.ObjectTypeDescriptionRepository;
+import io.solar.repository.StarShipRepository;
 import io.solar.repository.StationRepository;
 import io.solar.service.PlanetService;
 import io.solar.specification.filter.PlanetFilter;
@@ -28,9 +31,6 @@ public class PlanetController {
     private PlanetMapper planetMapper;
 
     @Autowired
-    private StationRepository stationRepository;
-
-    @Autowired
     public PlanetController(PlanetService planetService, PlanetMapper planetMapper) {
         this.planetService = planetService;
         this.planetMapper = planetMapper;
@@ -53,10 +53,6 @@ public class PlanetController {
     @PreAuthorize("hasAnyAuthority('PLAY_THE_GAME', 'EDIT_PLANET')")
     @GetMapping
     public Page<PlanetDto> findAll(@PageableDefault Pageable pageable, @RequestParam(value = "ids", required = false) List<Long> ids) {
-        Station s = stationRepository.findById(6L).get();
-        s.getProductions().get(0).setPower(150.6666F);
-        stationRepository.save(s);
-        System.out.println(s);
         if(ids == null || ids.size() == 0) {
             return planetService.findAll(pageable).map(planetMapper::toDto);
         }else {

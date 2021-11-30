@@ -35,7 +35,6 @@ public class BasicObject {
     private Float acceleration;
     private Float speed;
 
-
     //TODO ??????
 //    private List<InventorySocket> socketList;
 //    private List<ObjectItem> attachedObjects;

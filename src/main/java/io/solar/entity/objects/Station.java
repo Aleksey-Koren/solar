@@ -7,6 +7,7 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
+@PrimaryKeyJoinColumn(name = "id")
 @Data
 @Table(name = "stations")
 public class Station extends BasicObject {

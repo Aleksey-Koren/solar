@@ -1,17 +1,22 @@
 package io.solar.entity.objects;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
+import javax.persistence.Entity;
+import javax.persistence.PrimaryKeyJoinColumn;
+import javax.persistence.Table;
+
+@Data
+@Entity
+@Table(name = "star_ships")
+@PrimaryKeyJoinColumn(name = "id")
 public class StarShip extends BasicObject {
 
-    private String hullTitle;
+//TODO All this fields will be in ObjectTypeDescription field of BaseObject
 
-    private Float powerDegradation;
-    private Float energyConsumption;
-    private Long maxDurability;
-    private String hullDescription;
-
+//    private String hullTitle;
+//    private Float powerDegradation;
+//    private Float energyConsumption;
+//    private Long maxDurability;
+//    private String hullDescription;
 }
