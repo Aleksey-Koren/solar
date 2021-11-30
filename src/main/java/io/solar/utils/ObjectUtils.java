@@ -1,12 +1,9 @@
 package io.solar.utils;
 
-import io.solar.entity.objects.AbstractObject;
+import io.solar.entity.objects.BasicObject;
 import io.solar.entity.objects.ObjectItem;
 import io.solar.entity.objects.ObjectStatus;
-import io.solar.entity.objects.ObjectView;
 import io.solar.mapper.objects.ObjectItemMapper;
-import io.solar.mapper.objects.ObjectViewMapper;
-import io.solar.mapper.SocketMapper;
 import io.solar.utils.db.Query;
 import io.solar.utils.db.SafeResultSet;
 import io.solar.utils.db.Transaction;
@@ -17,7 +14,7 @@ import java.util.List;
 
 public class ObjectUtils {
 
-    public static void populate(AbstractObject out, SafeResultSet resultSet) {
+    public static void populate(BasicObject out, SafeResultSet resultSet) {
 
         ResultSetMetaData metadata = resultSet.getMetaData();
         try {
@@ -65,9 +62,9 @@ public class ObjectUtils {
                     case "angle":
                         out.setAngle(resultSet.fetchFloat(idx));
                         break;
-                    case "hull_id":
-                        out.setHullId(resultSet.fetchLong(idx));
-                        break;
+//                    case "hull_id":
+//                        out.setHullId(resultSet.fetchLong(idx));
+//                        break;
                     case "user_id":
                         out.setUserId(resultSet.fetchLong(idx));
                         break;
@@ -96,18 +93,18 @@ public class ObjectUtils {
         }
     }
 
-    public static void appendSockets(AbstractObject object, Transaction transaction) {
+    public static void appendSockets(BasicObject object, Transaction transaction) {
         Query query = transaction.query("select" +
                 " object_type_socket.id, object_type_socket.item_id, " +
                 " object_type_socket.item_type_id, object_type_socket.sort_order, " +
                 " object_type_socket.alias" +
                 " from object_type_socket " +
                 " where item_id = :itemId order by sort_order");
-        query.setLong("itemId", object.getHullId());
+//        query.setLong("itemId", object.getHullId());
 //        object.setSocketList(query.executeQuery(new SocketMapper()));
     }
 
-    public static void appendObjects(AbstractObject object, Transaction transaction) {
+    public static void appendObjects(BasicObject object, Transaction transaction) {
         Query query = transaction.query("select * from objects where attached_to_ship = :attachedToShip");
         query.setLong("attachedToShip", object.getId());
         List<ObjectItem> objects = query.executeQuery(new ObjectItemMapper());

@@ -1,7 +1,9 @@
 package io.solar.controller;
 
 import io.solar.dto.PlanetDto;
+import io.solar.entity.objects.Station;
 import io.solar.mapper.PlanetMapper;
+import io.solar.repository.StationRepository;
 import io.solar.service.PlanetService;
 import io.solar.specification.filter.PlanetFilter;
 import io.solar.utils.Option;
@@ -26,6 +28,9 @@ public class PlanetController {
     private PlanetMapper planetMapper;
 
     @Autowired
+    private StationRepository stationRepository;
+
+    @Autowired
     public PlanetController(PlanetService planetService, PlanetMapper planetMapper) {
         this.planetService = planetService;
         this.planetMapper = planetMapper;
@@ -41,6 +46,7 @@ public class PlanetController {
     @PreAuthorize("hasAnyAuthority('PLAY_THE_GAME', 'EDIT_PLANET')")
     @GetMapping("/{id}")
     public PlanetDto findById(@PathVariable("id") Long id) {
+        Station s = stationRepository.findById(6L).get();
         return planetMapper.toDto(planetService.findById(id));
     }
 

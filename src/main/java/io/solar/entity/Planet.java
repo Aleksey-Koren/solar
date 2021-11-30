@@ -1,6 +1,6 @@
 package io.solar.entity;
 
-import io.solar.entity.objects.AbstractObject;
+import io.solar.entity.objects.BasicObject;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -11,7 +11,7 @@ import java.util.List;
 @Entity
 @Table(name = "planets")
 @EqualsAndHashCode(callSuper = true)
-public class Planet extends AbstractObject {
+public class Planet extends BasicObject {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

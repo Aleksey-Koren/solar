@@ -1,8 +1,8 @@
 package io.solar.service;
 
+import io.solar.entity.objects.BasicObject;
 import io.solar.entity.objects.ObjectItem;
 import io.solar.entity.objects.Station;
-import io.solar.entity.objects.AbstractObject;
 import io.solar.mapper.StationMapper;
 import io.solar.utils.db.Query;
 import io.solar.utils.db.Transaction;
@@ -17,7 +17,7 @@ import java.util.List;
 @Slf4j
 public class ObjectService {
 
-    public AbstractObject save(AbstractObject object, Transaction transaction) {
+    public BasicObject save(BasicObject object, Transaction transaction) {
         Query save = null;
         if (object.getId() != null) {
             Query query = transaction.query("select * from objects where id = :id");
@@ -52,7 +52,7 @@ public class ObjectService {
             save.setFloat("angle", object.getPlanet() != null ? object.getAngle() : null);
             save.setFloat("orbital_period", object.getPlanet() != null ? object.getOrbitalPeriod() : null);
             save.setLong("user_id", object.getUserId());
-            save.setLong("hull_id", object.getHullId());
+//            save.setLong("hull_id", object.getHullId());
             save.setString("status", object.getStatus() != null ? object.getStatus().toString() : null);
             save.setLong("durability", object.getDurability());
 
@@ -69,7 +69,7 @@ public class ObjectService {
         return object;
     }
 
-    private void saveAttachedObjects(AbstractObject object, Transaction transaction) {
+    private void saveAttachedObjects(BasicObject object, Transaction transaction) {
         Query query = transaction.query("update objects set attached_to_ship = null where attached_to_ship = :id");
         query.setLong("id", object.getId());
         query.executeUpdate();

@@ -1,14 +1,11 @@
 package io.solar.entity.objects;
 
-import io.solar.entity.Inventory;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
-
 @Getter
 @Setter
-public class StarShip extends AbstractObject {
+public class StarShip extends BasicObject {
 
     private String hullTitle;
 

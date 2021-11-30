@@ -1,12 +1,7 @@
 package io.solar.entity.objects;
 
 
-import io.solar.entity.inventory.InventorySocket;
-import org.codehaus.jackson.annotate.JsonIgnore;
-
-import java.util.List;
-
-public class ObjectItem extends AbstractObject {
+public class ObjectItem extends BasicObject {
 //
 //    @Override
 //    @JsonIgnore

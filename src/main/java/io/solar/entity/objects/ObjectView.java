@@ -6,5 +6,5 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ObjectView extends AbstractObject {
+public class ObjectView extends BasicObject {
 }

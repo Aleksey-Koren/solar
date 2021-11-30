@@ -12,7 +12,7 @@ import java.util.List;
 @Entity
 @Table(name = "objects")
 @Inheritance(strategy = InheritanceType.JOINED)
-public abstract class AbstractObject {
+public class BasicObject {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,9 +26,7 @@ public abstract class AbstractObject {
     private Float aphelion;
     private Float orbitalPeriod;
     private Float angle;
-    @ManyToOne
-    @JoinColumn(name = "hull_id")
-    private ObjectTypeDescription objectTypeDescription;
+
 //    private Long hullId;
     private Long userId;
     private Boolean active;

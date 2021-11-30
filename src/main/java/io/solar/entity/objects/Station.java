@@ -9,7 +9,11 @@ import java.util.List;
 @Entity
 @Data
 @Table(name = "objects")
-public class Station extends AbstractObject {
+public class Station extends BasicObject {
+
+    @ManyToOne
+    @JoinColumn(name = "hull_id")
+    private ObjectTypeDescription objectTypeDescription;
 
     @ManyToMany
     @ToString.Exclude
@@ -18,6 +22,8 @@ public class Station extends AbstractObject {
                joinColumns = @JoinColumn(name = "object_id"),
                inverseJoinColumns = @JoinColumn(name = "production_id"))
     private List<Production> production;
+
+;
 //    private List<Goods> goods;
 //    private List<Inventory> inventory;
 
