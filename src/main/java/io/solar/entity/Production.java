@@ -2,9 +2,10 @@ package io.solar.entity;
 
 import io.solar.entity.objects.Station;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
-import java.util.List;
+
 
 
 @Data
@@ -16,6 +17,8 @@ public class Production {
     private Long id;
     private Long product;
     private Float power;
-
-
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "station")
+    @EqualsAndHashCode.Exclude
+    private Station station;
 }

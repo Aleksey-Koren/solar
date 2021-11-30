@@ -11,14 +11,11 @@ import java.util.List;
 @Table(name = "stations")
 public class Station extends BasicObject {
 
-    @ManyToMany(cascade = CascadeType.ALL)
+
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    @JoinTable(name = "objects_productions",
-               joinColumns = @JoinColumn(name = "object_id"),
-               inverseJoinColumns = @JoinColumn(name = "production_id"))
+    @OneToMany(mappedBy = "station", cascade = CascadeType.ALL)
     private List<Production> productions;
-
 
 //    private List<Goods> goods;
 //    private List<Inventory> inventory;

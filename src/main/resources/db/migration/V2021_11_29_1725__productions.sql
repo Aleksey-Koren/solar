@@ -11,7 +11,7 @@ ALTER TABLE production
 # INSERT INTO objects_productions (object_id, production_id)
 # SELECT station, id FROM productions;
 #
-# ALTER TABLE productions DROP FOREIGN KEY productions_ibfk_2;
+ALTER TABLE productions DROP FOREIGN KEY productions_ibfk_2;
 #
 # ALTER TABLE productions DROP COLUMN station;
 
