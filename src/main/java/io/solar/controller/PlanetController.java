@@ -46,7 +46,6 @@ public class PlanetController {
     @PreAuthorize("hasAnyAuthority('PLAY_THE_GAME', 'EDIT_PLANET')")
     @GetMapping("/{id}")
     public PlanetDto findById(@PathVariable("id") Long id) {
-        Station s = stationRepository.findById(6L).get();
         return planetMapper.toDto(planetService.findById(id));
     }
 
@@ -54,6 +53,10 @@ public class PlanetController {
     @PreAuthorize("hasAnyAuthority('PLAY_THE_GAME', 'EDIT_PLANET')")
     @GetMapping
     public Page<PlanetDto> findAll(@PageableDefault Pageable pageable, @RequestParam(value = "ids", required = false) List<Long> ids) {
+        Station s = stationRepository.findById(6L).get();
+        s.getProductions().remove(0);
+        stationRepository.save(s);
+        System.out.println(s);
         if(ids == null || ids.size() == 0) {
             return planetService.findAll(pageable).map(planetMapper::toDto);
         }else {

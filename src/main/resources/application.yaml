@@ -38,3 +38,4 @@ app:
   token_lifetime_min: 30
   hack_block_time_min: 5
   admin_not_exists: "yes"
+

@@ -32,7 +32,7 @@ public class StationRestUtils {
 
         objectService.save(station, transaction);
 
-        List<Production> production = station.getProduction();
+        List<Production> production = station.getProductions();
         if (production != null && production.size() > 0) {
             Map<Long, Production> existing;
             if (!isNew) {
@@ -47,7 +47,7 @@ public class StationRestUtils {
             boolean updateFlag = false;
             boolean insertFlag = false;
             for (Production v : production) {
-                v.setStation(station.getId());
+//                v.setStation(station.getId());
                 Query q;
                 if (existing.containsKey(v.getId())) {
                     q = update;
@@ -117,10 +117,10 @@ public class StationRestUtils {
             List<Production> productions = query.executeQuery(new ProductionMapper());
             Map<Long, List<Production>> map = new HashMap<>();
             for (Production p : productions) {
-                List<Production> mapped = map.computeIfAbsent(p.getStation(), k -> new ArrayList<>());
-                mapped.add(p);
+//                List<Production> mapped = map.computeIfAbsent(p.getStation(), k -> new ArrayList<>());
+//                mapped.add(p);
             }
-            existing.forEach(v -> v.setProduction(map.get(v.getId())));
+            existing.forEach(v -> v.setProductions(map.get(v.getId())));
         }
     }
 

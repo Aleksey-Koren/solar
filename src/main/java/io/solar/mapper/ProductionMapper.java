@@ -12,7 +12,7 @@ public class ProductionMapper implements DbMapper<Production> {
         production.setId(resultSet.fetchLong("id"));
         production.setPower(resultSet.fetchFloat("power"));
         production.setProduct(resultSet.fetchLong("product"));
-        production.setStation(resultSet.fetchLong("station"));
+//        production.setStation(resultSet.fetchLong("station"));
         return production;
     }
 }

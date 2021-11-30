@@ -11,7 +11,7 @@ public class ObjectTypeDescription {
 
     @Id
     private Integer id;
-    private Integer inventoryTypeId;
+    private Integer inventoryType;
     private String title;
     private Float power_min;
     private Float power_max;
@@ -26,5 +26,5 @@ public class ObjectTypeDescription {
     @Enumerated(EnumType.STRING)
     private ObjectType type;
     @Enumerated(EnumType.STRING)
-    private ObjectSubType objectSubType;
+    private ObjectSubType subType;
 }

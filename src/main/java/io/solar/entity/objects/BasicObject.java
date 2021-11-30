@@ -1,14 +1,14 @@
 package io.solar.entity.objects;
 
 import io.solar.entity.inventory.InventorySocket;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.List;
 
-@Getter
-@Setter
+@Data
 @Entity
 @Table(name = "objects")
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -26,8 +26,9 @@ public class BasicObject {
     private Float aphelion;
     private Float orbitalPeriod;
     private Float angle;
-
-//    private Long hullId;
+    @ManyToOne
+    @JoinColumn(name = "hull_id")
+    private ObjectTypeDescription objectTypeDescription;
     private Long userId;
     private Boolean active;
     private Long durability;

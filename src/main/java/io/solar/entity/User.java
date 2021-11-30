@@ -25,7 +25,7 @@ public class User{
     private String login;
     private String password;
     private Long money;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "planet")
     private Planet planet;
     private Instant hackBlock;
