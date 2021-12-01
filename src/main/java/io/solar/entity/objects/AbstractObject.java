@@ -27,6 +27,8 @@ public abstract class AbstractObject {
     private Long attachedToShip;
     private Long attachedToSocket;
     private ObjectStatus status;
+    private Float acceleration;
+    private Float speed;
 
     private List<InventorySocket> socketList;
     private List<ObjectItem> attachedObjects;

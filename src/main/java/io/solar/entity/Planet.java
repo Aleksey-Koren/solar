@@ -1,15 +1,13 @@
 package io.solar.entity;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.List;
 
-
 @Data
 @Entity
+@Table(name = "planets")
 public class Planet {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,9 +29,9 @@ public class Planet {
     String surfaceGravity;
     String surfacePressure;
     String volume;
-    Long parent; //TODO If this is planetId for the Moon, we should change it to Entity
+    Long parent;
     Float angle;
     String type;
-    @OneToMany(mappedBy = "planet", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "planet")
     List<User> users;
 }

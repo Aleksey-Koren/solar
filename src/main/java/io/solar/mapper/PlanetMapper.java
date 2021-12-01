@@ -5,13 +5,10 @@ import io.solar.entity.Planet;
 import io.solar.repository.PlanetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-
-import static java.util.stream.Collectors.*;
-
-@Component
+@Service
 public class PlanetMapper  {
 
     private PlanetRepository planetRepository;
@@ -24,7 +21,6 @@ public class PlanetMapper  {
     }
 
     public Planet toEntity(PlanetDto dto) {
-
         Planet planet;
         if (dto.getId() != null) {
             planet = planetRepository.findById(dto.getId())
@@ -54,13 +50,10 @@ public class PlanetMapper  {
         planet.setAngle(dto.getAngle());
         planet.setType(dto.getType());
 
-        planet.setUsers(dto.getUsers() == null ? null : dto.getUsers().stream().map(userMapper::toEntity).collect(toList()));
-
         return planet;
     }
 
     public PlanetDto toDto (Planet planet) {
-
         PlanetDto dto = new PlanetDto();
 
         dto.setId(planet.getId());
@@ -84,8 +77,6 @@ public class PlanetMapper  {
         dto.setParent(planet.getParent());
         dto.setAngle(planet.getAngle());
         dto.setType(planet.getType());
-
-        dto.setUsers(planet.getUsers().stream().map(userMapper::toDto).collect(toList()));
 
         return dto;
     }

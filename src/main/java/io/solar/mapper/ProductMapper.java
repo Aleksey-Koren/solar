@@ -2,26 +2,26 @@ package io.solar.mapper;
 
 import io.solar.dto.ProductDto;
 import io.solar.entity.Product;
-import io.solar.service.ProductService;
+import io.solar.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-@Component
+@Service
 public class ProductMapper {
 
-    private ProductService productService;
+    private ProductRepository productRepository;
 
     @Autowired
-    public ProductMapper(ProductService productService) {
-        this.productService = productService;
+    public ProductMapper(ProductRepository productRepository) {
+        this.productRepository = productRepository;
     }
 
     public Product toEntity(ProductDto dto) {
         Product product;
         if (dto.getId() != null) {
-            product = productService.findById(dto.getId())
+            product = productRepository.findById(dto.getId())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "There is no such product ID in database"));
         }else{
             product = new Product();

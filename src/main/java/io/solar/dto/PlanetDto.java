@@ -2,9 +2,6 @@ package io.solar.dto;
 
 import lombok.Data;
 
-import java.util.List;
-
-
 @Data
 public class PlanetDto {
 
@@ -29,7 +26,4 @@ public class PlanetDto {
     private Long parent;
     private Float angle;
     private String type;
-
-    List<UserDto> users;
-
 }
