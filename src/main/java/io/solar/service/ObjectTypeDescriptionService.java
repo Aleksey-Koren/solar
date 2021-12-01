@@ -10,7 +10,7 @@ import java.util.Optional;
 @Service
 public class ObjectTypeDescriptionService {
 
-    private ObjectTypeDescriptionRepository objectTypeDescriptionRepository;
+    private final ObjectTypeDescriptionRepository objectTypeDescriptionRepository;
 
     @Autowired
     public ObjectTypeDescriptionService(ObjectTypeDescriptionRepository objectTypeDescriptionRepository) {

@@ -74,9 +74,9 @@ public class ObjectUtils {
                     case "durability":
                         out.setDurability(resultSet.fetchLong(idx));
                         break;
-                    case "attached_to_ship":
-                        out.setAttachedToShip(resultSet.fetchLong(idx));
-                        break;
+//                    case "attached_to_ship":
+//                        out.setAttachedToShip(resultSet.fetchLong(idx));
+//                        break;
                     case "attached_to_socket":
                         out.setAttachedToSocket(resultSet.fetchLong(idx));
                         break;

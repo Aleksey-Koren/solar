@@ -2,6 +2,8 @@ package io.solar.dto;
 
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class StationDto {
 
@@ -16,4 +18,6 @@ public class StationDto {
     private Float angle;
     private Float orbitalPeriod;
     private Long objectTypeDescriptionId;
+
+    private List<ItemObjectDto> attachedObjects;
 }

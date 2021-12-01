@@ -4,6 +4,7 @@ import io.solar.dto.Marketplace;
 import io.solar.entity.*;
 import io.solar.entity.objects.StarShip;
 import io.solar.entity.objects.Station;
+import io.solar.facade.StationFacade;
 import io.solar.mapper.PopulationMapper;
 import io.solar.mapper.ProductionMapper;
 import io.solar.service.ObjectService;
@@ -17,28 +18,33 @@ import io.solar.utils.db.Transaction;
 import io.solar.utils.server.Pageable;
 import io.solar.utils.server.controller.PathVariable;
 import io.solar.utils.server.controller.RequestBody;
-import io.solar.utils.server.controller.RequestMapping;
 import io.solar.utils.server.controller.Scheduled;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Component
-@RequestMapping(value = "station")
+@RestController
+@RequestMapping(value = "api/station")
 @Slf4j
 public class StationController {
 
-    private final StationRestUtils stationRestUtils;
-    private final StarShipService starShipService;
 
-    public StationController(PlanetController planetsController, ObjectService objectService, StarShipService starShipService) {
-        this.stationRestUtils = new StationRestUtils(planetsController, objectService);
-        this.starShipService = starShipService;
+    private final StationFacade stationFacade;
+
+    @Autowired
+    public StationController(StationFacade stationFacade) {
+        this.stationFacade = stationFacade;
     }
 
-    @RequestMapping(method = "post")
+
+    @PostMapping
+    @PreAuthorize("hasAuthority('EDIT_STATION')")
+    @Transactional
     public Station save(@RequestBody Station station, @AuthData User user, Transaction transaction) {
         if (!AuthController.userCan(user, "edit-station", transaction)) {
             throw new RuntimeException("no privileges");
@@ -46,18 +52,18 @@ public class StationController {
         return stationRestUtils.save(station, transaction);
     }
 
-    @RequestMapping("{id}")
+    @GetMapping("{id}")
     public Station get(@PathVariable("id") Long id, Transaction transaction) {
         return stationRestUtils.get(id, transaction);
     }
 
 
-    @RequestMapping
+    @GetMapping
     public Page<Station> getAll(Pageable pageable, Transaction transaction) {
         return stationRestUtils.getAll(pageable, transaction);
     }
 
-    @RequestMapping("utils/dropdown")
+    @GetMapping("utils/dropdown")
     public List<Option> dropdown(Transaction transaction) {
         return getAll(new Pageable(0, 9999999), transaction).getContent()
                 .stream()
@@ -66,7 +72,7 @@ public class StationController {
     }
 
 
-    @RequestMapping(value = "{id}", method = "delete")
+    @DeleteMapping("{id}")
     public void delete(@PathVariable("id") Long id, @AuthData User user, Transaction transaction) {
         if (!AuthController.userCan(user, "edit-station", transaction)) {
             throw new RuntimeException("no privileges");

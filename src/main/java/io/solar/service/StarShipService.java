@@ -10,7 +10,7 @@ import java.util.Optional;
 @Service
 public class StarShipService {
 
-    private StarShipRepository starShipRepository;
+    private final StarShipRepository starShipRepository;
 
     @Autowired
     public StarShipService(StarShipRepository starShipRepository) {

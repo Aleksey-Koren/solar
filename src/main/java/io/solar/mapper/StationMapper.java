@@ -1,28 +1,38 @@
 package io.solar.mapper;
 
+import io.solar.dto.ItemObjectDto;
 import io.solar.dto.StationDto;
 import io.solar.entity.objects.Station;
-import io.solar.service.ObjectTypeDescriptionService;
-import io.solar.service.PlanetService;
-import io.solar.service.ServiceException;
-import io.solar.service.StationService;
-import io.solar.utils.server.beans.Service;
+import io.solar.mapper.objects.BasicObjectMapper;
+import io.solar.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+
+import static java.util.stream.Collectors.*;
 
 @Service
 public class StationMapper {
 
-    private StationService stationService;
-    private ObjectTypeDescriptionService objectTypeDescriptionService;
-    private PlanetService planetService;
+    private final StationService stationService;
+    private final ObjectTypeDescriptionService objectTypeDescriptionService;
+    private final PlanetService planetService;
+    private final BasicObjectService basicObjectService;
+    private final BasicObjectMapper basicObjectMapper;
 
     @Autowired
-    public StationMapper(StationService stationService, ObjectTypeDescriptionService objectTypeDescriptionService, PlanetService planetService) {
+    public StationMapper(StationService stationService,
+                         ObjectTypeDescriptionService objectTypeDescriptionService,
+                         PlanetService planetService,
+                         BasicObjectService basicObjectService,
+                         BasicObjectMapper basicObjectMapper
+                         ) {
         this.stationService = stationService;
         this.objectTypeDescriptionService = objectTypeDescriptionService;
         this.planetService = planetService;
+        this.basicObjectService = basicObjectService;
+        this.basicObjectMapper = basicObjectMapper;
     }
 
     public Station toEntity(StationDto dto) {
@@ -46,6 +56,14 @@ public class StationMapper {
         station.setOrbitalPeriod(dto.getOrbitalPeriod());
         station.setObjectTypeDescription(objectTypeDescriptionService.findById(dto.getObjectTypeDescriptionId()).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "There is no ObjectTypeDescription with such id in database")));
+        station.setAttachedObjects(dto.getAttachedObjects() != null
+                ?
+                dto.getAttachedObjects().stream()
+                        .map(ItemObjectDto::getId)
+                        .map(s -> basicObjectService.findById(s)
+                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "There is no Object with such id in database")))
+                        .collect(toList())
+                : null);
 
         return station;
     }
@@ -67,6 +85,10 @@ public class StationMapper {
             throw new ServiceException("Station must not exist without an ObjectTypeDescription field");
         }
         dto.setObjectTypeDescriptionId(station.getObjectTypeDescription().getId());
+        dto.setAttachedObjects(station.getAttachedObjects() != null ?
+                station.getAttachedObjects().stream().map(basicObjectMapper::toItemObjectDto).collect(toList())
+                : null);
+
 
         return dto;
     }

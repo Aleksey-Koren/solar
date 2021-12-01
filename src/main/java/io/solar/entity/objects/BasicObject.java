@@ -4,6 +4,7 @@ import io.solar.entity.Planet;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Data
 @Entity
@@ -31,14 +32,19 @@ public class BasicObject {
     private Long userId;
     private Boolean active;
     private Long durability;
-    private Long attachedToShip;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "attached_to_ship")
+    private StarShip attachedToShip;
     private Long attachedToSocket;
     @Enumerated(EnumType.STRING)
     private ObjectStatus status;
     private Float acceleration;
     private Float speed;
 
+    @OneToMany(mappedBy = "attachedToShip")
+    private List<BasicObject> attachedObjects;
+
     //TODO ??????
 //    private List<InventorySocket> socketList;
-//    private List<ObjectItem> attachedObjects;
+
 }
