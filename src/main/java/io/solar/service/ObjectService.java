@@ -22,7 +22,8 @@ public class ObjectService {
         if (object.getId() != null) {
             Query query = transaction.query("select * from objects where id = :id");
             query.setLong("id", object.getId());
-            List<Station> existing = query.executeQuery(new StationMapper());
+//            List<Station> existing = query.executeQuery(new StationMapper());
+            List<Station> existing = null;
 
             if (existing.size() == 1) {
                 save = transaction.query("UPDATE objects set planet=:planet,population=:population,fraction=:fraction," +
@@ -42,7 +43,7 @@ public class ObjectService {
         }
 
         if (save != null) {
-            save.setLong("planet", object.getPlanet());
+            save.setLong("planet", object.getPlanet().getId());
             save.setLong("population", object.getPopulation());
             save.setString("fraction", object.getFraction());
             save.setString("title", object.getTitle());

@@ -1,12 +1,7 @@
 package io.solar.controller;
 
 import io.solar.dto.PlanetDto;
-import io.solar.entity.objects.StarShip;
-import io.solar.entity.objects.Station;
 import io.solar.mapper.PlanetMapper;
-import io.solar.repository.ObjectTypeDescriptionRepository;
-import io.solar.repository.StarShipRepository;
-import io.solar.repository.StationRepository;
 import io.solar.service.PlanetService;
 import io.solar.specification.filter.PlanetFilter;
 import io.solar.utils.Option;

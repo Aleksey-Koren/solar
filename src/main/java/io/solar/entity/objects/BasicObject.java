@@ -1,5 +1,6 @@
 package io.solar.entity.objects;
 
+import io.solar.entity.Planet;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -13,7 +14,9 @@ public class BasicObject {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long planet;
+    @ManyToOne
+    @JoinColumn(name = "planet")
+    private Planet planet;
     private Long population;
     private String fraction;
     private String title;

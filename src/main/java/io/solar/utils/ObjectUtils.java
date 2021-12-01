@@ -35,9 +35,9 @@ public class ObjectUtils {
                     case "id":
                         out.setId(resultSet.fetchLong(idx));
                         break;
-                    case "planet":
-                        out.setPlanet(resultSet.fetchLong(idx));
-                        break;
+//                    case "planet":
+//                        out.setPlanet(resultSet.fetchLong(idx));
+//                        break;
                     case "population":
                         out.setPopulation(resultSet.fetchLong(idx));
                         break;

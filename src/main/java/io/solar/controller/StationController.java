@@ -123,7 +123,8 @@ public class StationController {
             return planetId;
         }
         if(starShip != null) {
-            return starShip.getPlanet();
+//            return starShip.getPlanet();
+            return null;
         } else {
             return 4L;//earth id
         }
@@ -133,7 +134,8 @@ public class StationController {
         if(planetId != null) {
             return planetId;
         }
-        Optional<StarShip> starShip = starShipService.getActiveShip(user, transaction);
+//        Optional<StarShip> starShip = starShipService.getActiveShip(user, transaction);
+        Optional<StarShip> starShip = null;
         return definePlanetId(user, starShip.get());
     }
 

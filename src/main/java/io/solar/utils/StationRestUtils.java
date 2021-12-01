@@ -101,7 +101,8 @@ public class StationRestUtils {
                 " inner join object_type_description otd on objects.hull_id = otd.id " +
                 "where objects.id = :id and otd.type = 'station'");
         query.setLong("id", id);
-        List<Station> existing = query.executeQuery(new StationMapper());
+//        List<Station> existing = query.executeQuery(new StationMapper());
+        List<Station> existing = null;
         appendProductions(existing, transaction);
         return existing.size() == 1 ? existing.get(0) : null;
     }
@@ -140,7 +141,9 @@ public class StationRestUtils {
 
         query.setInt("skip", pageable.getPage() * pageable.getPageSize());
         query.setInt("pageSize", pageable.getPageSize());
-        List<Station> existing = query.executeQuery(new StationMapper());
+//        List<Station> existing = query.executeQuery(new StationMapper());
+        List<Station> existing = null;
+
 
         appendProductions(existing, transaction);
 

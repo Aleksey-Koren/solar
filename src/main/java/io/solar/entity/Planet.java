@@ -1,6 +1,7 @@
 package io.solar.entity;
 
 import io.solar.entity.objects.BasicObject;
+import io.solar.entity.objects.Station;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -31,6 +32,10 @@ public class Planet extends BasicObject {
     private String volume;
     private Long parent;
     private String type;
+
     @OneToMany(mappedBy = "planet")
     List<User> users;
+
+    @OneToMany(mappedBy = "planet")
+    List<Station> stations;
 }
