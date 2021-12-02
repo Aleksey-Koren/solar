@@ -1,26 +1,33 @@
 package io.solar.controller.inventory;
 
 import io.solar.controller.AuthController;
-import io.solar.entity.inventory.InventoryModification;
+import io.solar.dto.InventoryModificationDto;
 import io.solar.entity.User;
-import io.solar.mapper.InventoryModificationMapper;
+import io.solar.entity.inventory.InventoryModification;
+import io.solar.facade.InventoryModificationFacade;
 import io.solar.utils.context.AuthData;
 import io.solar.utils.db.Query;
 import io.solar.utils.db.Transaction;
-import io.solar.utils.server.beans.Controller;
-import io.solar.utils.server.controller.PathVariable;
 import io.solar.utils.server.controller.RequestBody;
-import io.solar.utils.server.controller.RequestMapping;
-import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Component
-@Controller
-@RequestMapping(value = "inventory-modification")
+@RestController
+@RequestMapping(value = "api/inventory-modification")
 public class InventoryModificationsController {
 
-    @RequestMapping(method = "post")
+    private final InventoryModificationFacade inventoryModificationFacade;
+
+    @Autowired
+    public InventoryModificationsController(InventoryModificationFacade inventoryModificationFacade) {
+        this.inventoryModificationFacade = inventoryModificationFacade;
+    }
+
+
+    @PostMapping
     public InventoryModification save(@RequestBody InventoryModification inventoryTweek, @AuthData User user, Transaction transaction) {
         if (!AuthController.userCan(user, "edit-inventory", transaction)) {
             throw new RuntimeException("no privileges");
@@ -45,19 +52,16 @@ public class InventoryModificationsController {
     }
 
 
-    @RequestMapping
-    public List<InventoryModification> getAll(Transaction transaction) {
-        return transaction.query("select * from object_modification_type").executeQuery(new InventoryModificationMapper());
+    @GetMapping
+    public List<InventoryModificationDto> getAll() {
+
+        return inventoryModificationFacade.getAll();
     }
 
-    @RequestMapping(method = "delete", value = "{id}")
-    public void delete(@PathVariable("id") Long id, @AuthData User user, Transaction transaction) {
-        if (!AuthController.userCan(user, "edit-inventory", transaction)) {
-            throw new RuntimeException("no privileges");
-        }
-        Query query = transaction.query("delete from object_modification_type where id = :id");
-        query.setLong("id", id);
-        query.execute();
+    @DeleteMapping("{id}")
+    @PreAuthorize("hasAuthority('ASSIGN_PERMISSIONS')") //todo: change authority role (add in db 'edit-authority')
+    public void delete(@PathVariable("id") Long id) {
+        inventoryModificationFacade.delete(id);
     }
 
 }

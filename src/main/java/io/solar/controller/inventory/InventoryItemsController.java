@@ -127,7 +127,9 @@ public class InventoryItemsController {
                     " left join object_modification_type on object_modification.modification_id = object_modification_type.id" +
                     " where object_modification.item_id = :id");
             query.setLong("id", itemId);
-            out.setModifications(query.executeQuery(new InventoryModificationMapper()));
+
+//            out.setModifications(query.executeQuery(new InventoryModificationMapper()));
+//          todo: rewrite mapper
 
             query = transaction.query("select object_type_socket.* from object_type_socket" +
                     " where object_type_socket.item_id = :id order by object_type_socket.sort_order");
