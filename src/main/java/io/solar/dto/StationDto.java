@@ -20,5 +20,5 @@ public class StationDto {
     private Long objectTypeDescriptionId;
 
     private List<ProductionDto> production;
-    private List<ItemObjectDto> attachedObjects;
+    private List<BasicObjectViewDto> attachedObjects;
 }

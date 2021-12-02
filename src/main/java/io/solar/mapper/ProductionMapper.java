@@ -16,16 +16,6 @@ import org.springframework.web.server.ResponseStatusException;
 @NoArgsConstructor
 public class ProductionMapper {
 
-//    @Override
-//    public Production map(SafeResultSet resultSet) {
-//        Production production = new Production();
-//        production.setId(resultSet.fetchLong("id"));
-//        production.setPower(resultSet.fetchFloat("power"));
-////        production.setProduct(resultSet.fetchLong("product"));
-////        production.setStation(resultSet.fetchLong("station"));
-//        return production;
-//    }
-
     private ProductionRepository productionRepository;
     private ProductRepository productRepository;
     private StationRepository stationRepository;

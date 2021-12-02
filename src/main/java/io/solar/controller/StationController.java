@@ -1,22 +1,14 @@
 package io.solar.controller;
 
+import io.solar.dto.BasicObjectViewDto;
 import io.solar.dto.Marketplace;
-import io.solar.dto.StationDto;
 import io.solar.entity.*;
 import io.solar.entity.objects.StarShip;
-import io.solar.entity.objects.Station;
 import io.solar.facade.StationFacade;
 import io.solar.mapper.PopulationMapper;
-import io.solar.mapper.ProductionMapper;
-import io.solar.service.ObjectService;
-import io.solar.service.StarShipService;
-import io.solar.utils.Option;
-import io.solar.utils.StationRestUtils;
 import io.solar.utils.context.AuthData;
 import io.solar.utils.db.Query;
 import io.solar.utils.db.Transaction;
-import io.solar.utils.server.controller.PathVariable;
-import io.solar.utils.server.controller.RequestBody;
 import io.solar.utils.server.controller.Scheduled;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = "api/station")
@@ -44,45 +35,45 @@ public class StationController {
     }
 
 
-    @PostMapping
-    @PreAuthorize("hasAuthority('EDIT_STATION')")
-    @Transactional
-    public Station save(@RequestBody Station station, @AuthData User user, Transaction transaction) {
-        if (!AuthController.userCan(user, "edit-station", transaction)) {
-            throw new RuntimeException("no privileges");
-        }
-        return stationRestUtils.save(station, transaction);
-    }
+//    @PostMapping
+//    @PreAuthorize("hasAuthority('EDIT_STATION')")
+//    @Transactional
+//    public Station save(@RequestBody Station station, @AuthData User user, Transaction transaction) {
+//        if (!AuthController.userCan(user, "edit-station", transaction)) {
+//            throw new RuntimeException("no privileges");
+//        }
+//        return stationRestUtils.save(station, transaction);
+//    }
 
-    @GetMapping("{id}")
-    public Station get(@PathVariable("id") Long id, Transaction transaction) {
-        return stationRestUtils.get(id, transaction);
-    }
+//    @GetMapping("{id}")
+//    public Station get(@PathVariable("id") Long id, Transaction transaction) {
+//        return stationRestUtils.get(id, transaction);
+//    }
 
 
     @GetMapping
     @PreAuthorize("hasAnyAuthority('EDIT_STATION', 'PLAY_THE_GAME')")
     @Transactional
-    public ResponseEntity<Page<StationDto>> getAll(Pageable pageable) {
-        return stationFacade.findAllAsBasicObjects(pageable);
+    public ResponseEntity<Page<BasicObjectViewDto>> getAll(Pageable pageable) {
+        return ResponseEntity.ok(stationFacade.findAllAsBasicObjects(pageable));
     }
 
-    @GetMapping("utils/dropdown")
-    public List<Option> dropdown(Transaction transaction) {
-        return getAll(new Pageable(0, 9999999), transaction).getContent()
-                .stream()
-                .map(v -> new Option(v.getId(), v.getTitle()))
-                .collect(Collectors.toList());
-    }
+//    @GetMapping("utils/dropdown")
+//    public List<Option> dropdown(Transaction transaction) {
+//        return getAll(new Pageable(0, 9999999), transaction).getContent()
+//                .stream()
+//                .map(v -> new Option(v.getId(), v.getTitle()))
+//                .collect(Collectors.toList());
+//    }
 
 
-    @DeleteMapping("{id}")
-    public void delete(@PathVariable("id") Long id, @AuthData User user, Transaction transaction) {
-        if (!AuthController.userCan(user, "edit-station", transaction)) {
-            throw new RuntimeException("no privileges");
-        }
-        stationRestUtils.delete(id, transaction);
-    }
+//    @DeleteMapping("{id}")
+//    public void delete(@PathVariable("id") Long id, @AuthData User user, Transaction transaction) {
+//        if (!AuthController.userCan(user, "edit-station", transaction)) {
+//            throw new RuntimeException("no privileges");
+//        }
+//        stationRestUtils.delete(id, transaction);
+//    }
 
     @RequestMapping("user/marketplace")
     public Marketplace getMarketplace(@AuthData User user, Transaction transaction) {
@@ -112,7 +103,7 @@ public class StationController {
                     " where hull_id = :station");
             for(StarShip station : stations) {
                 productionQuery.setLong("station", station.getId());
-                List<Production> productions = productionQuery.executeQuery(new ProductionMapper());
+//                List<Production> productions = productionQuery.executeQuery(new ProductionMapper());
 
                 /*List<Long> bulk =
                 System.out.println(productions);*/

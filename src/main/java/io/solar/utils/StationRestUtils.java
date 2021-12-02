@@ -1,11 +1,8 @@
 package io.solar.utils;
 
 import io.solar.controller.PlanetController;
-import io.solar.entity.Planet;
 import io.solar.entity.Production;
 import io.solar.entity.objects.Station;
-import io.solar.mapper.ProductionMapper;
-import io.solar.mapper.StationMapper;
 import io.solar.mapper.TotalMapper;
 import io.solar.service.ObjectService;
 import io.solar.utils.db.Query;
@@ -32,7 +29,7 @@ public class StationRestUtils {
 
         objectService.save(station, transaction);
 
-        List<Production> production = station.getProductions();
+        List<Production> production = station.getProduction();
         if (production != null && production.size() > 0) {
             Map<Long, Production> existing;
             if (!isNew) {
@@ -128,7 +125,7 @@ public class StationRestUtils {
 //                List<Production> mapped = map.computeIfAbsent(p.getStation(), k -> new ArrayList<>());
 //                mapped.add(p);
             }
-            existing.forEach(v -> v.setProductions(map.get(v.getId())));
+            existing.forEach(v -> v.setProduction(map.get(v.getId())));
         }
     }
 

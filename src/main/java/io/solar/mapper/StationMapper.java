@@ -1,6 +1,6 @@
 package io.solar.mapper;
 
-import io.solar.dto.ItemObjectDto;
+import io.solar.dto.BasicObjectViewDto;
 import io.solar.dto.StationDto;
 import io.solar.entity.objects.Station;
 import io.solar.mapper.objects.BasicObjectMapper;
@@ -57,12 +57,12 @@ public class StationMapper {
         station.setObjectTypeDescription(objectTypeDescriptionService.findById(dto.getObjectTypeDescriptionId()).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "There is no ObjectTypeDescription with such id in database")));
 
-        station.setProductions();
+//        station.setProduction(dto.getProduction());
 
         station.setAttachedObjects(dto.getAttachedObjects() != null
                 ?
                 dto.getAttachedObjects().stream()
-                        .map(ItemObjectDto::getId)
+                        .map(BasicObjectViewDto::getId)
                         .map(s -> basicObjectService.findById(s)
                                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "There is no Object with such id in database")))
                         .collect(toList())
@@ -89,10 +89,8 @@ public class StationMapper {
         }
         dto.setObjectTypeDescriptionId(station.getObjectTypeDescription().getId());
         dto.setAttachedObjects(station.getAttachedObjects() != null ?
-                station.getAttachedObjects().stream().map(basicObjectMapper::toItemObjectDto).collect(toList())
+                station.getAttachedObjects().stream().map(basicObjectMapper::toBasicObjectViewDto).collect(toList())
                 : null);
-
-
         return dto;
     }
 }
