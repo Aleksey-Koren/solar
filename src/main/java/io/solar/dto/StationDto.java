@@ -19,5 +19,6 @@ public class StationDto {
     private Float orbitalPeriod;
     private Long objectTypeDescriptionId;
 
+    private List<ProductionDto> production;
     private List<ItemObjectDto> attachedObjects;
 }

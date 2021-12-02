@@ -56,6 +56,9 @@ public class StationMapper {
         station.setOrbitalPeriod(dto.getOrbitalPeriod());
         station.setObjectTypeDescription(objectTypeDescriptionService.findById(dto.getObjectTypeDescriptionId()).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "There is no ObjectTypeDescription with such id in database")));
+
+        station.setProductions();
+
         station.setAttachedObjects(dto.getAttachedObjects() != null
                 ?
                 dto.getAttachedObjects().stream()

@@ -1,6 +1,7 @@
 package io.solar.controller;
 
 import io.solar.dto.Marketplace;
+import io.solar.dto.StationDto;
 import io.solar.entity.*;
 import io.solar.entity.objects.StarShip;
 import io.solar.entity.objects.Station;
@@ -10,17 +11,18 @@ import io.solar.mapper.ProductionMapper;
 import io.solar.service.ObjectService;
 import io.solar.service.StarShipService;
 import io.solar.utils.Option;
-import io.solar.utils.Page;
 import io.solar.utils.StationRestUtils;
 import io.solar.utils.context.AuthData;
 import io.solar.utils.db.Query;
 import io.solar.utils.db.Transaction;
-import io.solar.utils.server.Pageable;
 import io.solar.utils.server.controller.PathVariable;
 import io.solar.utils.server.controller.RequestBody;
 import io.solar.utils.server.controller.Scheduled;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -59,8 +61,10 @@ public class StationController {
 
 
     @GetMapping
-    public Page<Station> getAll(Pageable pageable, Transaction transaction) {
-        return stationRestUtils.getAll(pageable, transaction);
+    @PreAuthorize("hasAnyAuthority('EDIT_STATION', 'PLAY_THE_GAME')")
+    @Transactional
+    public ResponseEntity<Page<StationDto>> getAll(Pageable pageable) {
+        return stationFacade.findAllAsBasicObjects(pageable);
     }
 
     @GetMapping("utils/dropdown")
