@@ -12,6 +12,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class StationFacade {
 
@@ -30,6 +32,11 @@ public class StationFacade {
         Page<Station> stations = stationService.findAll(pageable);
         Page<BasicObject> stationsAsObjects = stations.map(BasicObject.class::cast);
         return stationsAsObjects.map(basicObjectMapper::toBasicObjectViewDto);
+    }
+
+    public Optional<StationDto> findById(Long id) {
+        Optional<Station> station = stationService.findById(id);
+        return station.isPresent() ? Optional.of(stationMapper.toDto(station.get())) : Optional.empty();
     }
 }
 

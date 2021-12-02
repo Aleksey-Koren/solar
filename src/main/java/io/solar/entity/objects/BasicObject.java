@@ -6,6 +6,7 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Objects;
 
 @Data
 @Entity
@@ -35,7 +36,7 @@ public class BasicObject {
     private Long durability;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "attached_to_ship")
-    private StarShip attachedToShip;
+    private BasicObject attachedToShip;
     private Long attachedToSocket;
     @Enumerated(EnumType.STRING)
     private ObjectStatus status;

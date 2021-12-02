@@ -2,6 +2,7 @@ package io.solar.controller;
 
 import io.solar.dto.BasicObjectViewDto;
 import io.solar.dto.Marketplace;
+import io.solar.dto.StationDto;
 import io.solar.entity.*;
 import io.solar.entity.objects.StarShip;
 import io.solar.facade.StationFacade;
@@ -50,10 +51,13 @@ public class StationController {
 //        return stationRestUtils.save(station, transaction);
 //    }
 
-//    @GetMapping("{id}")
-//    public ResponseEntity<Page<BasicObjectViewDto>> get(@PathVariable("id") Long id, Transaction transaction) {
-//        return stationRestUtils.get(id, transaction);
-//    }
+    @GetMapping("{id}")
+    @PreAuthorize("hasAnyAuthority('EDIT_STATION', 'PLAY_THE_GAME')")
+    @Transactional
+    public ResponseEntity<StationDto> get(@PathVariable("id") Long id) {
+        Optional<StationDto> station = stationFacade.findById(id);
+        return station.isPresent() ? ResponseEntity.ok(station.get()) : ResponseEntity.notFound().build();
+    }
 
 
     @GetMapping

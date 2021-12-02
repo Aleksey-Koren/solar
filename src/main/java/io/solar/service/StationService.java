@@ -31,4 +31,8 @@ public class StationService {
     public List<Station> findAll() {
         return stationRepository.findAll();
     }
+
+    public Station save(Station station) {
+        return stationRepository.save(station);
+    }
 }
