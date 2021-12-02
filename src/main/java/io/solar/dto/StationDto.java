@@ -1,24 +1,19 @@
 package io.solar.dto;
 
+import io.solar.entity.Goods;
+import io.solar.entity.Inventory;
+import io.solar.entity.inventory.InventorySocket;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
-public class StationDto {
-
-    private Long id;
-    private Long planetId;
-    private Long population;
-    private String fraction;
-    private String title;
-    private Float x;
-    private Float y;
-    private Float aphelion;
-    private Float angle;
-    private Float orbitalPeriod;
-    private Long objectTypeDescriptionId;
+public class StationDto extends BasicObjectViewDto{
 
     private List<ProductionDto> production;
+    private List<Goods> goods;
+    private List<Inventory> inventory;
+
     private List<BasicObjectViewDto> attachedObjects;
+    private List<InventorySocket> socketList;
 }

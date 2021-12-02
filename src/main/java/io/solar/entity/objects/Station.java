@@ -1,5 +1,7 @@
 package io.solar.entity.objects;
 
+import io.solar.entity.Goods;
+import io.solar.entity.Inventory;
 import io.solar.entity.Production;
 import lombok.*;
 
@@ -16,7 +18,6 @@ public class Station extends BasicObject {
     @EqualsAndHashCode.Exclude
     @OneToMany(mappedBy = "station")
     private List<Production> production;
-
 //    private List<Goods> goods;
 //    private List<Inventory> inventory;
 }

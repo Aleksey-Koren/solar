@@ -46,7 +46,7 @@ public class StationMapper {
 
         station.setId(dto.getId());
         station.setTitle(dto.getTitle());
-        station.setPlanet(dto.getPlanetId() != null ? planetService.findById(dto.getPlanetId()) : null);
+        station.setPlanet(dto.getPlanet() != null ? planetService.findById(dto.getPlanet()) : null);
         station.setPopulation(dto.getPopulation());
         station.setFraction(dto.getFraction());
         station.setX(dto.getX());
@@ -54,7 +54,7 @@ public class StationMapper {
         station.setAphelion(dto.getAphelion());
         station.setAngle(dto.getAngle());
         station.setOrbitalPeriod(dto.getOrbitalPeriod());
-        station.setObjectTypeDescription(objectTypeDescriptionService.findById(dto.getObjectTypeDescriptionId()).orElseThrow(
+        station.setObjectTypeDescription(objectTypeDescriptionService.findById(dto.getHullId()).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "There is no ObjectTypeDescription with such id in database")));
 
 //        station.setProduction(dto.getProduction());
@@ -76,7 +76,7 @@ public class StationMapper {
 
         dto.setId(station.getId());
         dto.setTitle(station.getTitle());
-        dto.setPlanetId(station.getPlanet() != null ? station.getPlanet().getId() : null);
+        dto.setPlanet(station.getPlanet() != null ? station.getPlanet().getId() : null);
         dto.setPopulation(station.getPopulation());
         dto.setFraction(dto.getFraction());
         dto.setX(station.getX());
@@ -87,7 +87,7 @@ public class StationMapper {
         if(station.getObjectTypeDescription() == null) {
             throw new ServiceException("Station must not exist without an ObjectTypeDescription field");
         }
-        dto.setObjectTypeDescriptionId(station.getObjectTypeDescription().getId());
+        dto.setHullId(station.getObjectTypeDescription().getId());
         dto.setAttachedObjects(station.getAttachedObjects() != null ?
                 station.getAttachedObjects().stream().map(basicObjectMapper::toBasicObjectViewDto).collect(toList())
                 : null);

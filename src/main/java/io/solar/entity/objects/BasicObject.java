@@ -1,6 +1,7 @@
 package io.solar.entity.objects;
 
 import io.solar.entity.Planet;
+import io.solar.entity.inventory.InventorySocket;
 import lombok.Data;
 
 import javax.persistence.*;
