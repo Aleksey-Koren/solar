@@ -1,11 +1,8 @@
 package io.solar.utils;
 
 import io.solar.controller.PlanetController;
-import io.solar.entity.Planet;
 import io.solar.entity.Production;
 import io.solar.entity.objects.Station;
-import io.solar.mapper.ProductionMapper;
-import io.solar.mapper.StationMapper;
 import io.solar.mapper.TotalMapper;
 import io.solar.service.ObjectService;
 import io.solar.utils.db.Query;
@@ -38,7 +35,10 @@ public class StationRestUtils {
             if (!isNew) {
                 Query prodQuery = transaction.query("select * from productions where station=:station");
                 prodQuery.setLong("station", station.getId());
-                existing = prodQuery.executeQuery(new ProductionMapper()).stream().collect(Collectors.toMap(Production::getId, v -> v));
+//                existing = prodQuery.executeQuery(new ProductionMapper()).stream().collect(Collectors.toMap(Production::getId, v -> v));
+//                existing = prodQuery.executeQuery(new ProductionMapper()).stream().collect(Collectors.toMap(Production::getId, v -> v));
+                existing = null;
+
             } else {
                 existing = new HashMap<>();
             }
@@ -47,7 +47,7 @@ public class StationRestUtils {
             boolean updateFlag = false;
             boolean insertFlag = false;
             for (Production v : production) {
-                v.setStation(station.getId());
+//                v.setStation(station.getId());
                 Query q;
                 if (existing.containsKey(v.getId())) {
                     q = update;
@@ -58,7 +58,7 @@ public class StationRestUtils {
                     insertFlag = true;
                 }
                 q.setFloat("power", v.getPower());
-                q.setLong("product", v.getProduct());
+//                q.setLong("product", v.getProduct());
                 q.setLong("station", station.getId());
                 q.addBatch();
             }
@@ -101,7 +101,8 @@ public class StationRestUtils {
                 " inner join object_type_description otd on objects.hull_id = otd.id " +
                 "where objects.id = :id and otd.type = 'station'");
         query.setLong("id", id);
-        List<Station> existing = query.executeQuery(new StationMapper());
+//        List<Station> existing = query.executeQuery(new StationMapper());
+        List<Station> existing = null;
         appendProductions(existing, transaction);
         return existing.size() == 1 ? existing.get(0) : null;
     }
@@ -114,11 +115,15 @@ public class StationRestUtils {
                 query.setLong(i + 1, station.getId());
             }
 
-            List<Production> productions = query.executeQuery(new ProductionMapper());
-            Map<Long, List<Production>> map = new HashMap<>();
+//            List<Production> productions = query.executeQuery(new ProductionMapper());
+            List<Production> productions = null;
+
+//            Map<Long, List<Production>> map = new HashMap<>();
+            Map<Long, List<Production>> map = null;
+
             for (Production p : productions) {
-                List<Production> mapped = map.computeIfAbsent(p.getStation(), k -> new ArrayList<>());
-                mapped.add(p);
+//                List<Production> mapped = map.computeIfAbsent(p.getStation(), k -> new ArrayList<>());
+//                mapped.add(p);
             }
             existing.forEach(v -> v.setProduction(map.get(v.getId())));
         }
@@ -140,7 +145,9 @@ public class StationRestUtils {
 
         query.setInt("skip", pageable.getPage() * pageable.getPageSize());
         query.setInt("pageSize", pageable.getPageSize());
-        List<Station> existing = query.executeQuery(new StationMapper());
+//        List<Station> existing = query.executeQuery(new StationMapper());
+        List<Station> existing = null;
+
 
         appendProductions(existing, transaction);
 

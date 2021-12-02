@@ -9,15 +9,16 @@ public class StarShipMapper implements DbMapper<StarShip> {
 
     @Override
     public StarShip map(SafeResultSet resultSet) {
-        StarShip out = new StarShip();
-        ObjectUtils.populate(out, resultSet);
-
-        out.setHullTitle(resultSet.getString("hull_title"));
-        out.setPowerDegradation(resultSet.fetchFloat("hull_power_degradation"));
-        out.setEnergyConsumption(resultSet.fetchFloat("hull_energy_consumption"));
-        out.setMaxDurability(resultSet.fetchLong("hull_durability"));
-        out.setHullDescription(resultSet.getString("hull_description"));
-
-        return out;
+//        StarShip out = new StarShip();
+//        ObjectUtils.populate(out, resultSet);
+//
+//        out.setHullTitle(resultSet.getString("hull_title"));
+//        out.setPowerDegradation(resultSet.fetchFloat("hull_power_degradation"));
+//        out.setEnergyConsumption(resultSet.fetchFloat("hull_energy_consumption"));
+//        out.setMaxDurability(resultSet.fetchLong("hull_durability"));
+//        out.setHullDescription(resultSet.getString("hull_description"));
+//
+//        return out;
+        return null;
     }
 }

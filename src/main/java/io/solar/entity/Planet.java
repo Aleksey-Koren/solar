@@ -1,6 +1,9 @@
 package io.solar.entity;
 
+import io.solar.entity.objects.BasicObject;
+import io.solar.entity.objects.Station;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import java.util.List;
@@ -8,30 +11,31 @@ import java.util.List;
 @Data
 @Entity
 @Table(name = "planets")
-public class Planet {
+@EqualsAndHashCode(callSuper = true)
+public class Planet extends BasicObject {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
-    Float aldebo;
-    Long aphelion;
-    String axialTilt;
-    String eccentricity;
-    String escapeVelocity;
-    String inclination;
-    String mass;
-    Float meanAnomaly;
-    String meanOrbitRadius;
-    String meanRadius;
-    String title;
-    String orbitalPeriod;
-    String perihelion;
-    String siderealRotationPeriod;
-    String surfaceGravity;
-    String surfacePressure;
-    String volume;
-    Long parent;
-    Float angle;
-    String type;
+    private Long id;
+    private Float aldebo;
+    private String axialTilt;
+    private String eccentricity;
+    private String escapeVelocity;
+    private String inclination;
+    private String mass;
+    private Float meanAnomaly;
+    private String meanOrbitRadius;
+    private String meanRadius;
+    private String perihelion;
+    private String siderealRotationPeriod;
+    private String surfaceGravity;
+    private String surfacePressure;
+    private String volume;
+    private Long parent;
+    private String type;
+
     @OneToMany(mappedBy = "planet")
     List<User> users;
+
+    @OneToMany(mappedBy = "planet")
+    List<Station> stations;
 }
