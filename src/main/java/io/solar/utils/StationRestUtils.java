@@ -38,7 +38,10 @@ public class StationRestUtils {
             if (!isNew) {
                 Query prodQuery = transaction.query("select * from productions where station=:station");
                 prodQuery.setLong("station", station.getId());
-                existing = prodQuery.executeQuery(new ProductionMapper()).stream().collect(Collectors.toMap(Production::getId, v -> v));
+//                existing = prodQuery.executeQuery(new ProductionMapper()).stream().collect(Collectors.toMap(Production::getId, v -> v));
+//                existing = prodQuery.executeQuery(new ProductionMapper()).stream().collect(Collectors.toMap(Production::getId, v -> v));
+                existing = null;
+
             } else {
                 existing = new HashMap<>();
             }
@@ -58,7 +61,7 @@ public class StationRestUtils {
                     insertFlag = true;
                 }
                 q.setFloat("power", v.getPower());
-                q.setLong("product", v.getProduct());
+//                q.setLong("product", v.getProduct());
                 q.setLong("station", station.getId());
                 q.addBatch();
             }
@@ -115,8 +118,12 @@ public class StationRestUtils {
                 query.setLong(i + 1, station.getId());
             }
 
-            List<Production> productions = query.executeQuery(new ProductionMapper());
-            Map<Long, List<Production>> map = new HashMap<>();
+//            List<Production> productions = query.executeQuery(new ProductionMapper());
+            List<Production> productions = null;
+
+//            Map<Long, List<Production>> map = new HashMap<>();
+            Map<Long, List<Production>> map = null;
+
             for (Production p : productions) {
 //                List<Production> mapped = map.computeIfAbsent(p.getStation(), k -> new ArrayList<>());
 //                mapped.add(p);

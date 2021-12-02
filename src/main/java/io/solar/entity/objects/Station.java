@@ -14,7 +14,7 @@ public class Station extends BasicObject {
 
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    @OneToMany(mappedBy = "station", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "station")
     private List<Production> productions;
 
 //    private List<Goods> goods;

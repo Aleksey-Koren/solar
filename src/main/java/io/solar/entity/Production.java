@@ -15,9 +15,11 @@ public class Production {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long product;
+    @ManyToOne
+    @JoinColumn(name = "product")
+    private Product product;
     private Float power;
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "station")
     @EqualsAndHashCode.Exclude
     private Station station;
