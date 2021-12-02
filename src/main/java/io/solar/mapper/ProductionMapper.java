@@ -5,8 +5,6 @@ import io.solar.entity.Production;
 import io.solar.repository.ProductRepository;
 import io.solar.repository.ProductionRepository;
 import io.solar.repository.StationRepository;
-import io.solar.utils.db.DbMapper;
-import io.solar.utils.db.SafeResultSet;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -37,16 +35,16 @@ public class ProductionMapper {
         }else {
             production = new Production();
         }
-            production.setProduct(dto.getProduct() != null
-                    ?
+            production.setProduct(dto.getProduct() != null ?
                     productRepository.findById(dto.getProduct())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "There is no Product with such id in database"))
+                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "There is no Product with such id in database"))
                     : null);
 
             production.setPower(dto.getPower());
-            production.setStation(dto.getStation() != null
-                    ? stationRepository.findById(dto.getStation())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "There is no Station with such id in database"))
+
+            production.setStation(dto.getStation() != null ?
+                    stationRepository.findById(dto.getStation())
+                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "There is no Station with such id in database"))
                     : null);
         return production;
     }

@@ -12,7 +12,7 @@ import javax.persistence.Table;
 @PrimaryKeyJoinColumn(name = "id")
 public class StarShip extends BasicObject {
 
-//TODO All this fields will be in ObjectTypeDescription field of BaseObject
+//TODO All this fields would be in ObjectTypeDescription field of BaseObject
 
 //    private String hullTitle;
 //    private Float powerDegradation;

@@ -6,6 +6,8 @@ import io.solar.entity.*;
 import io.solar.entity.objects.StarShip;
 import io.solar.facade.StationFacade;
 import io.solar.mapper.PopulationMapper;
+import io.solar.service.StationService;
+import io.solar.utils.Option;
 import io.solar.utils.context.AuthData;
 import io.solar.utils.db.Query;
 import io.solar.utils.db.Transaction;
@@ -21,6 +23,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
+import static java.util.stream.Collectors.toList;
+
 @RestController
 @RequestMapping(value = "api/station")
 @Slf4j
@@ -28,14 +32,15 @@ public class StationController {
 
 
     private final StationFacade stationFacade;
+    private final StationService stationService;
 
     @Autowired
-    public StationController(StationFacade stationFacade) {
+    public StationController(StationFacade stationFacade, StationService stationService) {
         this.stationFacade = stationFacade;
+        this.stationService = stationService;
     }
 
-
-//    @PostMapping
+    //    @PostMapping
 //    @PreAuthorize("hasAuthority('EDIT_STATION')")
 //    @Transactional
 //    public Station save(@RequestBody Station station, @AuthData User user, Transaction transaction) {
@@ -46,7 +51,7 @@ public class StationController {
 //    }
 
 //    @GetMapping("{id}")
-//    public Station get(@PathVariable("id") Long id, Transaction transaction) {
+//    public ResponseEntity<Page<BasicObjectViewDto>> get(@PathVariable("id") Long id, Transaction transaction) {
 //        return stationRestUtils.get(id, transaction);
 //    }
 
@@ -58,13 +63,13 @@ public class StationController {
         return ResponseEntity.ok(stationFacade.findAllAsBasicObjects(pageable));
     }
 
-//    @GetMapping("utils/dropdown")
-//    public List<Option> dropdown(Transaction transaction) {
-//        return getAll(new Pageable(0, 9999999), transaction).getContent()
-//                .stream()
-//                .map(v -> new Option(v.getId(), v.getTitle()))
-//                .collect(Collectors.toList());
-//    }
+    @GetMapping("utils/dropdown")
+    public List<Option> dropdown(Transaction transaction) {
+        return stationService.findAll()
+                .stream()
+                .map(v -> new Option(v.getId(), v.getTitle()))
+                .collect(toList());
+    }
 
 
 //    @DeleteMapping("{id}")
