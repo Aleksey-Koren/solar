@@ -24,8 +24,8 @@ public class InventoryModificationMapper implements EntityDtoMapper<ObjectModifi
     public ObjectModificationType toEntity(InventoryModificationDto dto) {
 
         return Objects.isNull(dto.getId())
-                ? findModification(dto)
-                : createModification(dto);
+                ? createModification(dto)
+                : findModification(dto);
     }
 
     @Override

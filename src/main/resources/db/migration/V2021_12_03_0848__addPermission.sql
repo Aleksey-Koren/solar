@@ -1,0 +1,1 @@
+INSERT INTO solar.permissions (title) value ('EDIT_INVENTORY');

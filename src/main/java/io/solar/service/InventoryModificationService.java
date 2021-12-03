@@ -21,6 +21,11 @@ public class InventoryModificationService {
         return objectModificationTypeRepository.findAll();
     }
 
+    public ObjectModificationType save(ObjectModificationType objectModificationType) {
+
+        return objectModificationTypeRepository.save(objectModificationType);
+    }
+
     public void delete(Long modificationId){
         objectModificationTypeRepository.deleteById(modificationId);
     }
