@@ -8,5 +8,8 @@ import java.util.List;
 
 @Repository
 public interface InventorySocketRepository extends JpaRepository<InventorySocket, Long> {
-    List<InventorySocket> findAllByItemId(Long objectDescriptionId);
+
+    List<InventorySocket> findAllByItemId(Integer objectDescriptionId);
+
+    void deleteByItemId(Long itemId);
 }

@@ -1,16 +1,27 @@
 package io.solar.controller.inventory;
 
 import io.solar.dto.inventory.InventoryItemDto;
+import io.solar.dto.inventory.InventoryModificationDto;
+import io.solar.dto.inventory.InventorySocketDto;
+import io.solar.entity.objects.ObjectTypeDescription;
 import io.solar.facade.ObjectTypeDescriptionFacade;
 import io.solar.service.ObjectTypeDescriptionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.transaction.Transaction;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "api/inventory-item")
@@ -33,105 +44,49 @@ public class InventoryItemsController {
         return objectTypeDescriptionFacade.getAll();
     }
 
-//    @PostMapping
-//    public InventoryItem save(@RequestBody InventoryItem inventoryItem, @AuthData User user, Transaction transaction) {
-//        if (!AuthController.userCan(user, "edit-inventory", transaction)) {
-//            throw new RuntimeException("no privileges");
-//        }
-//        Query query;
-//        if (inventoryItem.getId() != null) {
-//            query = transaction.query("update object_type_description set inventory_type = :inventoryType," +
-//                    " title = :title, power_min = :powerMin," +
-//                    " power_max = :powerMax, power_degradation = :powerDegradation," +
-//                    " cooldown = :cooldown, distance = :distance, energy_consumption = :energyConsumption," +
-//                    " durability = :durability, mass = :mass, description = :description, price = :price where id = :id ");
-//            query.setLong("id", inventoryItem.getId());
-//        } else {
-//            query = transaction.query("insert into object_type_description (" +
-//                    "inventory_type, title, power_min, power_max, power_degradation, cooldown, distance, energy_consumption, durability, mass, description, price" +
-//                    ") values (" +
-//                    ":inventoryType, :title, :powerMin, :powerMax, :powerDegradation, :cooldown, :distance, :energyConsumption, :durability, :mass, :description, :price" +
-//                    ")");
-//        }
-//        query.setLong("inventoryType", inventoryItem.getInventoryType());
-//        query.setString("title", inventoryItem.getTitle());
-//        query.setFloat("powerMin", inventoryItem.getPowerMin());
-//        query.setFloat("powerMax", inventoryItem.getPowerMax());
-//        query.setFloat("powerDegradation", inventoryItem.getPowerDegradation());
-//        query.setFloat("cooldown", inventoryItem.getCooldown());
-//        query.setLong("distance", inventoryItem.getDistance());
-//        query.setLong("energyConsumption", inventoryItem.getEnergyConsumption());
-//        query.setLong("durability", inventoryItem.getDurability());
-//        query.setLong("mass", inventoryItem.getMass());
-//        query.setString("description", inventoryItem.getDescription());
-//        query.setLong("price", inventoryItem.getPrice());
-//
-//        query.execute();
-//
-//
-//        if (inventoryItem.getId() == null) {
-//            inventoryItem.setId(query.getLastGeneratedKey(Long.class));
-//        }
-//
+    @PostMapping
+    @PreAuthorize("hasAuthority('EDIT_INVENTORY')")
+    public ResponseEntity<InventoryItemDto> save(@RequestBody InventoryItemDto inventoryItem) {
+
+        InventoryItemDto savedInventoryItem = objectTypeDescriptionFacade.save(inventoryItem);
+
 //        saveModifications(inventoryItem, transaction);
 //        saveSockets(inventoryItem, transaction);
-//
-//        return inventoryItem;
-//    }
-//
-//    @DeleteMapping("{id}")
-//    public void delete(@PathVariable("id") Long id, @AuthData User user, Transaction transaction) {
-//        if (!AuthController.userCan(user, "edit-inventory", transaction)) {
-//            throw new RuntimeException("no privileges");
-//        }
-//
-//        Query modification = transaction.query("delete from object_modification where item_id = :id");
-//        modification.setLong("id", id);
-//        modification.execute();
-//
-//        Query deleteSockets = transaction.query("delete from object_type_socket where item_id = :id");
-//        deleteSockets.setLong("id", id);
-//        deleteSockets.execute();
-//
-//        Query productions = transaction.query("delete from productions where station in (" +
-//                "select id from objects where hull_id = :id)");
-//        productions.setLong("id", id);
-//        productions.execute();
-//
-//        Query objects = transaction.query("delete from objects where hull_id = :id");
-//        objects.setLong("id", id);
-//        objects.execute();
-//
-//        Query query = transaction.query("delete from object_type_description where id = :id");
-//        query.setLong("id", id);
-//        query.execute();
-//    }
-//
-//    @GetMapping("{id}")
-//    public InventoryItem getOne(@PathVariable("id") Long itemId, Transaction transaction) {
-//        Query query = transaction.query("select * from object_type_description where id = :id");
-//        query.setLong("id", itemId);
-//        List<InventoryItem> list = query.executeQuery(null);
-//        if (list.size() == 1) {
-//            InventoryItem out = list.get(0);
-//            query = transaction.query("select object_modification_type.* from object_modification" +
-//                    " left join object_modification_type on object_modification.modification_id = object_modification_type.id" +
-//                    " where object_modification.item_id = :id");
-//            query.setLong("id", itemId);
-//
-////            out.setModifications(query.executeQuery(new InventoryModificationMapper()));
-////          todo: rewrite mapper
-//
+
+        return ResponseEntity.ok(savedInventoryItem);
+    }
+
+    @DeleteMapping("{id}")
+    @PreAuthorize("hasAuthority('EDIT_INVENTORY')")
+    public void delete(@PathVariable("id") Long id) {
+        objectTypeDescriptionFacade.delete(id);
+    }
+
+    @GetMapping("{id}")
+    public ResponseEntity<InventoryItemDto> getOne(@PathVariable("id") Long itemId) {
+
+        Optional<ObjectTypeDescription> objectOptional = objectTypeDescriptionService.findById(itemId);
+
+        if (objectOptional.isPresent()) {
+
+            ObjectTypeDescription objectTypeDescription = objectOptional.get();
+
+            List<InventoryModificationDto> modifications = objectTypeDescriptionFacade.findAllModifications(objectTypeDescription.getId());
+
+            List<InventorySocketDto> sockets = null; //todo: get all sockets from 'object_type_socket'
+
 //            query = transaction.query("select object_type_socket.* from object_type_socket" +
 //                    " where object_type_socket.item_id = :id order by object_type_socket.sort_order");
 //            query.setLong("id", itemId);
 //            out.setSockets(query.executeQuery(new SocketMapper()));
-//            return out;
-//        } else {
-//            return null;
-//        }
-//    }
 //
+            return null;
+
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
 //    private void saveModifications(InventoryItem inventoryItem, Transaction transaction) {
 //        List<InventoryModification> modifications = inventoryItem.getModifications();
 //        if (modifications == null || modifications.size() == 0) {

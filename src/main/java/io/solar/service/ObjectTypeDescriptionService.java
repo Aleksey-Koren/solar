@@ -27,4 +27,15 @@ public class ObjectTypeDescriptionService {
 
         return objectTypeDescriptionRepository.findAll();
     }
+
+    public ObjectTypeDescription save(ObjectTypeDescription objectTypeDescription) {
+
+        return objectTypeDescriptionRepository.save(objectTypeDescription);
+    }
+
+    public void delete(Long id) {
+
+        objectTypeDescriptionRepository.deleteById(id);
+    }
+
 }
