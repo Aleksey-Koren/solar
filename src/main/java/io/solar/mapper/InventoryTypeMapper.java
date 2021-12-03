@@ -1,7 +1,7 @@
 package io.solar.mapper;
 
 
-import io.solar.dto.InventoryTypeDto;
+import io.solar.dto.inventory.InventoryTypeDto;
 import io.solar.entity.inventory.InventoryType;
 import io.solar.service.InventoryTypeService;
 import org.springframework.beans.factory.annotation.Autowired;

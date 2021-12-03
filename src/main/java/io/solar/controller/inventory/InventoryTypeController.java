@@ -1,6 +1,6 @@
 package io.solar.controller.inventory;
 
-import io.solar.dto.InventoryTypeDto;
+import io.solar.dto.inventory.InventoryTypeDto;
 import io.solar.facade.InventoryTypeFacade;
 import io.solar.service.InventoryTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,8 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 
 @RestController

@@ -1,19 +1,31 @@
 package io.solar.entity.inventory;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-/**
- * modification for item, such as
- * +50% evasion from ray weapon
- * +20% damage to shields
- * +damage devices
- */
-@Getter
-@Setter
+import javax.persistence.*;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@Entity
+@Table(name = "object_modification_type")
 public class InventoryModification {
+
+    @Id
+    @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "title")
     private String title;
+
+    @Column(name = "data")
     private String data;
+
+    @Column(name = "description")
     private String description;
 }

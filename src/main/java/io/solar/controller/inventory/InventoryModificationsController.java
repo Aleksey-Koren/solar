@@ -1,6 +1,6 @@
 package io.solar.controller.inventory;
 
-import io.solar.dto.InventoryModificationDto;
+import io.solar.dto.inventory.InventoryModificationDto;
 import io.solar.facade.InventoryModificationFacade;
 import io.solar.service.InventoryModificationService;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,6 +1,6 @@
 package io.solar.service;
 
-import io.solar.entity.inventory.ObjectModificationType;
+import io.solar.entity.inventory.InventoryModification;
 import io.solar.repository.ObjectModificationTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,13 +17,13 @@ public class InventoryModificationService {
         this.objectModificationTypeRepository = objectModificationTypeRepository;
     }
 
-    public List<ObjectModificationType> getAll() {
+    public List<InventoryModification> getAll() {
         return objectModificationTypeRepository.findAll();
     }
 
-    public ObjectModificationType save(ObjectModificationType objectModificationType) {
+    public InventoryModification save(InventoryModification inventoryModification) {
 
-        return objectModificationTypeRepository.save(objectModificationType);
+        return objectModificationTypeRepository.save(inventoryModification);
     }
 
     public void delete(Long modificationId){

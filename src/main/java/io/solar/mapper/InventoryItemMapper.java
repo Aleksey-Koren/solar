@@ -1,29 +1,81 @@
 package io.solar.mapper;
 
-import io.solar.entity.inventory.InventoryItem;
-import io.solar.utils.db.DbMapper;
-import io.solar.utils.db.SafeResultSet;
+import io.solar.dto.inventory.InventoryItemDto;
+import io.solar.dto.inventory.InventorySocketDto;
+import io.solar.entity.objects.ObjectTypeDescription;
+import io.solar.repository.InventorySocketRepository;
+import io.solar.repository.ObjectTypeDescriptionRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
+import org.springframework.web.server.ResponseStatusException;
 
-public class InventoryItemMapper implements DbMapper<InventoryItem> {
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Component
+public class InventoryItemMapper implements EntityDtoMapper<ObjectTypeDescription, InventoryItemDto> {
+
+    private final ObjectTypeDescriptionRepository objectTypeDescriptionRepository;
+    private final InventorySocketRepository inventorySocketRepository;
+    private final SocketMapper socketMapper;
+
+    @Autowired
+    public InventoryItemMapper(ObjectTypeDescriptionRepository objectTypeDescriptionRepository,
+                               InventorySocketRepository inventorySocketRepository,
+                               SocketMapper socketMapper) {
+
+        this.objectTypeDescriptionRepository = objectTypeDescriptionRepository;
+        this.inventorySocketRepository = inventorySocketRepository;
+        this.socketMapper = socketMapper;
+    }
 
     @Override
-    public InventoryItem map(SafeResultSet resultSet) {
-        InventoryItem out = new InventoryItem();
+    public ObjectTypeDescription toEntity(InventoryItemDto dto) {
+        ObjectTypeDescription objectTypeDescription = objectTypeDescriptionRepository.findById(dto.getId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        String.format("Cannot find object type description with id = %d", dto.getId())
+                ));
 
-        out.setId(resultSet.fetchLong("id"));
-        out.setInventoryType(resultSet.fetchLong("inventory_type"));
-        out.setTitle(resultSet.getString("title"));
-        out.setPowerMin(resultSet.fetchFloat("power_min"));
-        out.setPowerMax(resultSet.fetchFloat("power_max"));
-        out.setPowerDegradation(resultSet.fetchFloat("power_degradation"));
-        out.setCooldown(resultSet.fetchFloat("cooldown"));
-        out.setDistance(resultSet.fetchLong("distance"));
-        out.setEnergyConsumption(resultSet.fetchLong("energy_consumption"));
-        out.setDurability(resultSet.fetchLong("durability"));
-        out.setMass(resultSet.fetchLong("mass"));
-        out.setDescription(resultSet.getString("description"));
-        out.setPrice(resultSet.fetchLong("price"));
+        objectTypeDescription.setTitle(dto.getTitle());
+        objectTypeDescription.setDescription(dto.getDescription());
+        objectTypeDescription.setInventoryTypeId(dto.getInventoryType());
+        objectTypeDescription.setCooldown(dto.getCooldown());
+        objectTypeDescription.setMass(dto.getMass());
+        objectTypeDescription.setDistance(dto.getDistance());
+        objectTypeDescription.setDurability(dto.getDurability());
+        objectTypeDescription.setEnergyConsumption(dto.getEnergyConsumption());
+        objectTypeDescription.setPowerMin(dto.getPowerMin());
+        objectTypeDescription.setPowerMax(dto.getPowerMax());
+        objectTypeDescription.setPrice(dto.getPrice());
+        objectTypeDescription.setPowerDegradation(dto.getPowerDegradation());
 
-        return out;
+        return objectTypeDescription;
+    }
+
+    @Override
+    public InventoryItemDto toDto(ObjectTypeDescription entity) {
+
+//        todo: sockets and modifications?
+//        List<InventorySocketDto> sockets = inventorySocketRepository.findAllByItemId(entity.getId())
+//                .stream()
+//                .map(socketMapper::toDto)
+//                .collect(Collectors.toList());
+
+        return InventoryItemDto.builder()
+                .id(entity.getId())
+                .title(entity.getTitle())
+                .description(entity.getDescription())
+                .inventoryType(entity.getInventoryTypeId())
+                .cooldown(entity.getCooldown())
+                .mass(entity.getMass())
+                .distance(entity.getDistance())
+                .durability(entity.getDurability())
+                .energyConsumption(entity.getEnergyConsumption())
+                .powerMin(entity.getPowerMin())
+                .powerMax(entity.getPowerMax())
+                .price(entity.getPrice())
+                .powerDegradation(entity.getPowerDegradation())
+                .build();
     }
 }

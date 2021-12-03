@@ -1,7 +1,7 @@
 package io.solar.mapper;
 
-import io.solar.dto.InventoryModificationDto;
-import io.solar.entity.inventory.ObjectModificationType;
+import io.solar.dto.inventory.InventoryModificationDto;
+import io.solar.entity.inventory.InventoryModification;
 import io.solar.repository.ObjectModificationTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,7 +11,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.Objects;
 
 @Component
-public class InventoryModificationMapper implements EntityDtoMapper<ObjectModificationType, InventoryModificationDto> {
+public class InventoryModificationMapper implements EntityDtoMapper<InventoryModification, InventoryModificationDto> {
 
     private final ObjectModificationTypeRepository objectModificationTypeRepository;
 
@@ -21,7 +21,7 @@ public class InventoryModificationMapper implements EntityDtoMapper<ObjectModifi
     }
 
     @Override
-    public ObjectModificationType toEntity(InventoryModificationDto dto) {
+    public InventoryModification toEntity(InventoryModificationDto dto) {
 
         return Objects.isNull(dto.getId())
                 ? createModification(dto)
@@ -29,7 +29,7 @@ public class InventoryModificationMapper implements EntityDtoMapper<ObjectModifi
     }
 
     @Override
-    public InventoryModificationDto toDto(ObjectModificationType entity) {
+    public InventoryModificationDto toDto(InventoryModification entity) {
 
         return new InventoryModificationDto(
                 entity.getId(),
@@ -39,22 +39,22 @@ public class InventoryModificationMapper implements EntityDtoMapper<ObjectModifi
         );
     }
 
-    private ObjectModificationType findModification(InventoryModificationDto dto) {
-        ObjectModificationType objectModificationType = objectModificationTypeRepository.findById(dto.getId())
+    private InventoryModification findModification(InventoryModificationDto dto) {
+        InventoryModification inventoryModification = objectModificationTypeRepository.findById(dto.getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
                         String.format("Cannot find object modification with id = %d", dto.getId())
                 ));
 
-        objectModificationType.setTitle(dto.getTitle());
-        objectModificationType.setData(dto.getData());
-        objectModificationType.setDescription(dto.getDescription());
+        inventoryModification.setTitle(dto.getTitle());
+        inventoryModification.setData(dto.getData());
+        inventoryModification.setDescription(dto.getDescription());
 
-        return objectModificationType;
+        return inventoryModification;
     }
 
-    private ObjectModificationType createModification(InventoryModificationDto dto) {
+    private InventoryModification createModification(InventoryModificationDto dto) {
 
-        return ObjectModificationType.builder()
+        return InventoryModification.builder()
                 .id(null)
                 .title(dto.getTitle())
                 .data(dto.getData())

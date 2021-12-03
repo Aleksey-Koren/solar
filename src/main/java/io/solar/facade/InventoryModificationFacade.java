@@ -1,7 +1,7 @@
 package io.solar.facade;
 
-import io.solar.dto.InventoryModificationDto;
-import io.solar.entity.inventory.ObjectModificationType;
+import io.solar.dto.inventory.InventoryModificationDto;
+import io.solar.entity.inventory.InventoryModification;
 import io.solar.mapper.InventoryModificationMapper;
 import io.solar.service.InventoryModificationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,10 +33,10 @@ public class InventoryModificationFacade {
     }
 
     public InventoryModificationDto save(InventoryModificationDto inventoryModificationDto) {
-        ObjectModificationType objectModificationType = inventoryModificationMapper.toEntity(inventoryModificationDto);
+        InventoryModification inventoryModification = inventoryModificationMapper.toEntity(inventoryModificationDto);
 
         return inventoryModificationMapper.toDto(
-                inventoryModificationService.save(objectModificationType)
+                inventoryModificationService.save(inventoryModification)
         );
     }
 }

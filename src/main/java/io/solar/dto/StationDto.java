@@ -2,7 +2,7 @@ package io.solar.dto;
 
 import io.solar.entity.Goods;
 import io.solar.entity.Inventory;
-import io.solar.entity.inventory.InventorySocket;
+import io.solar.dto.inventory.InventorySocketDto;
 import lombok.Data;
 
 import java.util.List;
@@ -16,5 +16,5 @@ public class StationDto extends BasicObjectViewDto{
     private List<Inventory> inventory;
 
     private List<BasicObjectViewDto> attachedObjects;
-    private List<InventorySocket> socketList;
+    private List<InventorySocketDto> socketList;
 }
