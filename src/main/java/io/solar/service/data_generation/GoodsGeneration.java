@@ -37,7 +37,7 @@ public class GoodsGeneration {
         List<Goods> goods = new ArrayList();
         for(Production production : station.getProduction()) {
             Product product = production.getProduct();
-            Long amount = (long) (production.getPower() * retrieveRandomModifier());
+            Long amount = (long) (production.getPower() * retrieveRandomModifier() + 10);
             goods.add(new Goods(station, product, amount));
         }
         station.setGoods(goods);
