@@ -35,9 +35,6 @@ public class JwtFilter extends GenericFilterBean {
         if (token != null) {
             Optional<User> user =  jwtProvider.verifyToken(token);
             if(user.isPresent()) {
-                if(jwtProvider.hasTooShortExpiration(token)) {
-                    //TODO Here we should decide what to do
-                }
                 UserDetails userDetails = User.retrieveUserDetails(user.get());
                 Authentication auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(auth);

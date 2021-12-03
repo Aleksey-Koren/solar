@@ -17,8 +17,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
-
 @Slf4j
 @RestController
 @RequestMapping("/api/planet")
@@ -49,14 +47,13 @@ public class PlanetController {
     @Transactional
     @PreAuthorize("hasAnyAuthority('PLAY_THE_GAME', 'EDIT_PLANET')")
     @GetMapping
-    public Page<PlanetDto> findAll(@PageableDefault(size = 5, page = 0) Pageable pageable, @RequestParam(value = "ids", required = false) List<Long> ids) {
+    public Page<PlanetDto> findAll(@PageableDefault Pageable pageable, @RequestParam(value = "ids", required = false) List<Long> ids) {
         if(ids == null || ids.size() == 0) {
             return planetService.findAll(pageable).map(planetMapper::toDto);
         }else {
             return planetService.findAllFiltered(new PlanetFilter(ids), pageable).map(planetMapper::toDto);
         }
     }
-
 
     @Transactional
     @RequestMapping("/utils/dropdown")

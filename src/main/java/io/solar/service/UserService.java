@@ -13,10 +13,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -27,7 +27,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import static java.util.stream.Collectors.*;
-import static org.springframework.data.jpa.domain.Specification.where;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -35,15 +34,18 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PermissionRepository permissionRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Value("${app.hack_block_time_min}")
     private Integer HACK_BLOCK_TIME_MIN;
 
     @Autowired
-    public UserService(UserRepository userRepository, UserMapper userMapper, PermissionRepository permissionRepository) {
+    public UserService(UserRepository userRepository, UserMapper userMapper,
+                       PermissionRepository permissionRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.permissionRepository = permissionRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public Optional<User> findById (Long id) {
@@ -54,9 +56,13 @@ public class UserService implements UserDetailsService {
         return userRepository.findByLogin(login);
     }
 
-    public User register(User user) {
+    public User registerNewUser(User user, Role role) {
+        if (findByLogin(user.getLogin()) != null) {
+            throw new ServiceException("User with such login already exists");
+        }
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         resetHackAttempts(user);
-        Set<Permission> permissions = Role.USER.getPermissions().stream()
+        Set<Permission> permissions = role.getPermissions().stream()
                                                                 .map(s -> permissionRepository.findByTitle(s))
                                                                 .collect(toSet());
         user.setPermissions(permissions);
@@ -65,6 +71,10 @@ public class UserService implements UserDetailsService {
 
     public User update(User user) {
        return userRepository.save(user);
+    }
+
+    public void delete(User user) {
+        userRepository.delete(user);
     }
 
     @Override
@@ -85,7 +95,11 @@ public class UserService implements UserDetailsService {
             user.setHackBlock(LocalDateTime.of(2010, 1, 1, 0, 0, 0)
                     .toInstant(ZoneOffset.ofTotalSeconds(0)));
     }
-    
+
+    public boolean matchPasswords(User user, User userFromDb) {
+        return passwordEncoder.matches(user.getPassword(), userFromDb.getPassword());
+    }
+
     public Page<UserDto> getAllUsers(Pageable pageable, UserFilter filter, boolean canEdit) {
         if(!canEdit) {
             filter.setLogin("");

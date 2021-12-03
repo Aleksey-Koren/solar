@@ -1,21 +1,13 @@
 package io.solar.dto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import io.solar.entity.Planet;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-
-import java.util.List;
-
 
 @Data
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class PlanetDto {
 
     private Long id;
     private Float aldebo;
-    private Long aphelion;
+    private Float aphelion; //TODO it was Long.  Might be that it will bring some troubles at frontend)))
     private String axialTilt;
     private String eccentricity;
     private String escapeVelocity;
@@ -25,7 +17,7 @@ public class PlanetDto {
     private String meanOrbitRadius;
     private String meanRadius;
     private String title;
-    private String orbitalPeriod;
+    private Float orbitalPeriod; //TODO It was String. Might be that it will bring some troubles at frontend)))
     private String perihelion;
     private String siderealRotationPeriod;
     private String surfaceGravity;
@@ -34,7 +26,4 @@ public class PlanetDto {
     private Long parent;
     private Float angle;
     private String type;
-
-    List<UserDto> users;
-
 }

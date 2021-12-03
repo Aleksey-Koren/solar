@@ -1,14 +1,10 @@
-package io.solar.entity.objects;
+package io.solar.dto;
 
-import io.solar.entity.inventory.InventorySocket;
-import lombok.Getter;
-import lombok.Setter;
+import io.solar.entity.objects.ObjectStatus;
+import lombok.Data;
 
-import java.util.List;
-
-@Getter
-@Setter
-public abstract class AbstractObject {
+@Data
+public class BasicObjectViewDto {
 
     private Long id;
     private Long planet;
@@ -20,6 +16,7 @@ public abstract class AbstractObject {
     private Float aphelion;
     private Float orbitalPeriod;
     private Float angle;
+//    private Long objectTypeDescriptionId;
     private Long hullId;
     private Long userId;
     private Boolean active;
@@ -27,7 +24,6 @@ public abstract class AbstractObject {
     private Long attachedToShip;
     private Long attachedToSocket;
     private ObjectStatus status;
-
-    private List<InventorySocket> socketList;
-    private List<ObjectItem> attachedObjects;
+    private Float acceleration;
+    private Float speed;
 }
