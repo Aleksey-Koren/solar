@@ -42,7 +42,7 @@ public class BasicObject {
     protected Float acceleration;
     protected Float speed;
 
-    @OneToMany(mappedBy = "attachedToShip")
+    @OneToMany(mappedBy = "attachedToShip", cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.DETACH})
     @EqualsAndHashCode.Exclude
     protected List<BasicObject> attachedObjects;
 

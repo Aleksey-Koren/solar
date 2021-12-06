@@ -8,9 +8,11 @@ import io.solar.repository.BasicObjectRepository;
 import io.solar.repository.GoodsRepository;
 import io.solar.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+@Service
 public class GoodsMapper {
 
     private GoodsRepository goodsRepository;

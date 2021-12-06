@@ -15,13 +15,14 @@ import java.util.List;
 public class Station extends BasicObject {
 
 
-    @OneToMany(mappedBy = "station", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "station", cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.DETACH})
     @EqualsAndHashCode.Exclude
     private List<Production> production;
 
-    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "owner", cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.DETACH})
     @EqualsAndHashCode.Exclude
     private List<Goods> goods;
+
 //    private List<Inventory> inventory;
 
 

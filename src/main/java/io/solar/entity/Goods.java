@@ -14,7 +14,7 @@ import java.io.Serializable;
 public class Goods {
 
     @Id
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "owner")
     @Getter
     @Setter
