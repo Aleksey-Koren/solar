@@ -35,4 +35,8 @@ public class StationService {
     public Station save(Station station) {
         return stationRepository.save(station);
     }
+
+    public void deleteById(Long id) {
+        stationRepository.deleteById(id);
+    }
 }
