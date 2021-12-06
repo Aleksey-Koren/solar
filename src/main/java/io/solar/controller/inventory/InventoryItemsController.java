@@ -67,8 +67,8 @@ public class InventoryItemsController {
 
         if (objectOptional.isPresent()) {
             InventoryItemDto inventoryItemDto = objectTypeDescriptionMapper.toDto(objectOptional.get());
-            inventoryItemDto.setModifications(objectTypeDescriptionFacade.findAllModifications(inventoryItemDto.getId()));
-            inventoryItemDto.setSockets(objectTypeDescriptionFacade.findAllSockets(inventoryItemDto.getId()));
+            inventoryItemDto.setModifications(objectTypeDescriptionFacade.findAllModifications(itemId));
+            inventoryItemDto.setSockets(objectTypeDescriptionFacade.findAllSockets(itemId));
 
             return ResponseEntity.ok(inventoryItemDto);
         } else {
