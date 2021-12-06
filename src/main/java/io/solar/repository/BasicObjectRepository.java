@@ -9,7 +9,7 @@ import java.util.List;
 @Repository
 public interface BasicObjectRepository extends JpaRepository<BasicObject, Long> {
 
-    void deleteByObjectTypeDescriptionId(Long hullId);
+    void deleteAllByObjectTypeDescriptionId(Long hullId);
 
     List<Long> findAllByObjectTypeDescriptionId(Long hullId);
 }

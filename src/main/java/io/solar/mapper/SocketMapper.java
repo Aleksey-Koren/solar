@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Objects;
+
 @Component
 public class SocketMapper implements EntityDtoMapper<InventorySocket, InventorySocketDto> {
 
@@ -20,6 +22,23 @@ public class SocketMapper implements EntityDtoMapper<InventorySocket, InventoryS
 
     @Override
     public InventorySocket toEntity(InventorySocketDto dto) {
+
+        return Objects.isNull(dto.getId())
+                ? createSocket(dto)
+                : findSocket(dto);
+    }
+
+    @Override
+    public InventorySocketDto toDto(InventorySocket entity) {
+
+        return new InventorySocketDto(entity.getId(),
+                entity.getItemId(),
+                entity.getItemTypeId(),
+                entity.getAlias(),
+                entity.getSortOrder());
+    }
+
+    private InventorySocket findSocket(InventorySocketDto dto) {
         InventorySocket socket = socketRepository.findById(dto.getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
                         String.format("Cannot find inventory socket with id = %d", dto.getId())
@@ -33,13 +52,8 @@ public class SocketMapper implements EntityDtoMapper<InventorySocket, InventoryS
         return socket;
     }
 
-    @Override
-    public InventorySocketDto toDto(InventorySocket entity) {
+    private InventorySocket createSocket(InventorySocketDto dto) {
 
-        return new InventorySocketDto(entity.getId(),
-                entity.getItemId(),
-                entity.getItemTypeId(),
-                entity.getAlias(),
-                entity.getSortOrder());
+        return new InventorySocket(null, dto.getItemId(), dto.getItemTypeId(), dto.getSortOrder(), dto.getAlias());
     }
 }

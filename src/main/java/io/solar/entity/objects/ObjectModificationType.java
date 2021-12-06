@@ -1,8 +1,9 @@
-package io.solar.entity.inventory;
+package io.solar.entity.objects;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
@@ -13,7 +14,8 @@ import javax.persistence.*;
 @Builder
 @Entity
 @Table(name = "object_modification_type")
-public class InventoryModification {
+@EqualsAndHashCode
+public class ObjectModificationType {
 
     @Id
     @Column(name = "id")

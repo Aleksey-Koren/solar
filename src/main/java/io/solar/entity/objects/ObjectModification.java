@@ -1,6 +1,5 @@
 package io.solar.entity.objects;
 
-import io.solar.entity.inventory.InventoryModification;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -33,5 +32,5 @@ public class ObjectModification {
 
     @JoinColumn(name = "modification_id")
     @ManyToOne(fetch = FetchType.EAGER)
-    private InventoryModification modification;
+    private ObjectModificationType modification;
 }

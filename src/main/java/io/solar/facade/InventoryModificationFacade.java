@@ -1,8 +1,8 @@
 package io.solar.facade;
 
-import io.solar.dto.inventory.InventoryModificationDto;
-import io.solar.entity.inventory.InventoryModification;
-import io.solar.mapper.InventoryModificationMapper;
+import io.solar.dto.ObjectModificationTypeDto;
+import io.solar.entity.objects.ObjectModificationType;
+import io.solar.mapper.ObjectModificationTypeMapper;
 import io.solar.service.InventoryModificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -14,29 +14,29 @@ import java.util.stream.Collectors;
 public class InventoryModificationFacade {
 
     private final InventoryModificationService inventoryModificationService;
-    private final InventoryModificationMapper inventoryModificationMapper;
+    private final ObjectModificationTypeMapper objectModificationTypeMapper;
 
     @Autowired
     public InventoryModificationFacade(InventoryModificationService inventoryModificationService,
-                                       InventoryModificationMapper inventoryModificationMapper) {
+                                       ObjectModificationTypeMapper objectModificationTypeMapper) {
 
         this.inventoryModificationService = inventoryModificationService;
-        this.inventoryModificationMapper = inventoryModificationMapper;
+        this.objectModificationTypeMapper = objectModificationTypeMapper;
     }
 
-    public List<InventoryModificationDto> getAll() {
+    public List<ObjectModificationTypeDto> getAll() {
 
         return inventoryModificationService.getAll()
                 .stream()
-                .map(inventoryModificationMapper::toDto)
+                .map(objectModificationTypeMapper::toDto)
                 .collect(Collectors.toList());
     }
 
-    public InventoryModificationDto save(InventoryModificationDto inventoryModificationDto) {
-        InventoryModification inventoryModification = inventoryModificationMapper.toEntity(inventoryModificationDto);
+    public ObjectModificationTypeDto save(ObjectModificationTypeDto objectModificationTypeDto) {
+        ObjectModificationType objectModificationType = objectModificationTypeMapper.toEntity(objectModificationTypeDto);
 
-        return inventoryModificationMapper.toDto(
-                inventoryModificationService.save(inventoryModification)
+        return objectModificationTypeMapper.toDto(
+                inventoryModificationService.save(objectModificationType)
         );
     }
 }

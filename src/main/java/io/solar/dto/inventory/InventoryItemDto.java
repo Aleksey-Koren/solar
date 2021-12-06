@@ -1,5 +1,6 @@
 package io.solar.dto.inventory;
 
+import io.solar.dto.ObjectModificationTypeDto;
 import lombok.Builder;
 import lombok.Data;
 
@@ -27,6 +28,6 @@ public class InventoryItemDto {
     private String description;
     private Integer price;
 
-    List<InventoryModificationDto> modifications;
+    List<ObjectModificationTypeDto> modifications;
     List<InventorySocketDto> sockets;
 }

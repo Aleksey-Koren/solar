@@ -19,12 +19,22 @@ public class ObjectModificationService {
 
     public void deleteByItemId(Long itemId) {
 
-        objectModificationRepository.deleteByItemId(itemId);
+        objectModificationRepository.deleteAllByItemId(itemId);
     }
 
-    public List<ObjectModification> findAllModifications(Long itemId) {
+    public List<ObjectModification> findAllObjectModifications(Long itemId) {
 
         return objectModificationRepository.findAllByItemId(itemId);
+    }
+
+    public void saveAll(List<ObjectModification> objectModifications) {
+
+        objectModificationRepository.saveAll(objectModifications);
+    }
+
+    public void deleteModificationsWithItemId(List<Long> modificationsId, Long itemId) {
+
+        objectModificationRepository.deleteAllByModificationIdInAndItemId(modificationsId, itemId);
     }
 
 }

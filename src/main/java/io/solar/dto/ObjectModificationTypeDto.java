@@ -1,11 +1,13 @@
-package io.solar.dto.inventory;
+package io.solar.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class InventoryModificationDto {
+@EqualsAndHashCode
+public class ObjectModificationTypeDto {
     private Long id;
     private String title;
     private String data;

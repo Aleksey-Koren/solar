@@ -1,12 +1,14 @@
 package io.solar.dto.inventory;
 
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
 @AllArgsConstructor
+@EqualsAndHashCode
 public class InventorySocketDto {
      private Long id;
      private Long itemId;

@@ -1,6 +1,6 @@
 package io.solar.controller.inventory;
 
-import io.solar.dto.inventory.InventoryModificationDto;
+import io.solar.dto.ObjectModificationTypeDto;
 import io.solar.facade.InventoryModificationFacade;
 import io.solar.service.InventoryModificationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,13 +34,13 @@ public class InventoryModificationsController {
 
     @PostMapping
     @PreAuthorize("hasAuthority('EDIT_INVENTORY')")
-    public ResponseEntity<InventoryModificationDto> save(@RequestBody InventoryModificationDto inventoryTweek) {
+    public ResponseEntity<ObjectModificationTypeDto> save(@RequestBody ObjectModificationTypeDto inventoryTweek) {
 
         return ResponseEntity.ok(inventoryModificationFacade.save(inventoryTweek));
     }
 
     @GetMapping
-    public List<InventoryModificationDto> getAll() {
+    public List<ObjectModificationTypeDto> getAll() {
 
         return inventoryModificationFacade.getAll();
     }

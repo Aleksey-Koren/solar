@@ -9,7 +9,7 @@ import java.util.List;
 @Repository
 public interface InventorySocketRepository extends JpaRepository<InventorySocket, Long> {
 
-    List<InventorySocket> findAllByItemId(Integer objectDescriptionId);
+    List<InventorySocket> findAllByItemIdOrderBySortOrder(Long objectDescriptionId);
 
-    void deleteByItemId(Long itemId);
+    void deleteAllByItemId(Long itemId);
 }

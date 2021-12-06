@@ -24,6 +24,6 @@ public class BasicObjectService {
 
     public void deleteByHullId(Long hullId) {
 
-        basicObjectRepository.deleteByObjectTypeDescriptionId(hullId);
+        basicObjectRepository.deleteAllByObjectTypeDescriptionId(hullId);
     }
 }
