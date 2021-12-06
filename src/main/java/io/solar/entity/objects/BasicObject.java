@@ -2,6 +2,7 @@ package io.solar.entity.objects;
 
 import io.solar.entity.Planet;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -26,37 +27,45 @@ public class BasicObject {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    protected Long id;
     @ManyToOne
     @JoinColumn(name = "planet")
-    private Planet planet;
-    private Long population;
-    private String fraction;
-    private String title;
-    private Float x;
-    private Float y;
-    private Float aphelion;
-    private Float orbitalPeriod;
-    private Float angle;
+    protected Planet planet;
+    protected Long population;
+    protected String fraction;
+    protected String title;
+    protected Float x;
+    protected Float y;
+    protected Float aphelion;
+    protected Float orbitalPeriod;
+    protected Float angle;
     @ManyToOne
     @JoinColumn(name = "hull_id")
-    private ObjectTypeDescription objectTypeDescription;
-    private Long userId;
-    private Boolean active;
-    private Long durability;
+    protected ObjectTypeDescription objectTypeDescription;
+    protected Long userId;
+    protected Boolean active;
+    protected Long durability;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "attached_to_ship")
-    private BasicObject attachedToShip;
-    private Long attachedToSocket;
+    protected BasicObject attachedToShip;
+    protected Long attachedToSocket;
     @Enumerated(EnumType.STRING)
-    private ObjectStatus status;
-    private Float acceleration;
-    private Float speed;
+    protected ObjectStatus status;
+    protected Float acceleration;
+    protected Float speed;
 
-    @OneToMany(mappedBy = "attachedToShip")
-    private List<BasicObject> attachedObjects;
+    @OneToMany(mappedBy = "attachedToShip", cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.DETACH})
+    @EqualsAndHashCode.Exclude
+    protected List<BasicObject> attachedObjects;
 
     //TODO ??????
 //    private List<InventorySocket> socketList;
 
+    @Override
+    public String toString() {
+        return "BasicObject{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                '}';
+    }
 }

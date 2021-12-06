@@ -38,5 +38,8 @@ public class StationFacade {
         Optional<Station> station = stationService.findById(id);
         return station.isPresent() ? Optional.of(stationMapper.toDto(station.get())) : Optional.empty();
     }
-}
 
+    public StationDto save(StationDto dto) {
+        return stationMapper.toDto(stationService.save(stationMapper.toEntity(dto)));
+    }
+}

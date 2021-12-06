@@ -16,7 +16,6 @@ public class BasicObjectViewDto {
     private Float aphelion;
     private Float orbitalPeriod;
     private Float angle;
-//    private Long objectTypeDescriptionId;
     private Long hullId;
     private Long userId;
     private Boolean active;

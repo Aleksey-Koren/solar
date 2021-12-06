@@ -27,14 +27,17 @@ public class StationMapper {
     private final BasicObjectMapper basicObjectMapper;
     private final ProductionMapper productionMapper;
     private final ProductionRepository productionRepository;
+    private final GoodsMapper goodsMapper;
 
     @Autowired
     public StationMapper(StationRepository stationRepository,
                          ObjectTypeDescriptionRepository objectTypeDescriptionRepository,
-                         PlanetService planetService, BasicObjectRepository basicObjectRepository,
+                         PlanetService planetService,
+                         BasicObjectRepository basicObjectRepository,
                          BasicObjectMapper basicObjectMapper,
                          ProductionMapper productionMapper,
-                         ProductionRepository productionRepository) {
+                         ProductionRepository productionRepository,
+                         GoodsMapper goodsMapper) {
         this.stationRepository = stationRepository;
         this.objectTypeDescriptionRepository = objectTypeDescriptionRepository;
         this.planetService = planetService;
@@ -42,6 +45,7 @@ public class StationMapper {
         this.basicObjectMapper = basicObjectMapper;
         this.productionMapper = productionMapper;
         this.productionRepository = productionRepository;
+        this.goodsMapper = goodsMapper;
     }
 
     public Station toEntity(StationDto dto) {
@@ -82,6 +86,10 @@ public class StationMapper {
                         .collect(toList())
                 : null);
 
+        station.setGoods(dto.getGoods() != null ?
+                dto.getGoods().stream().map(goodsMapper::toEntity).collect(toList())
+                : null);
+
         return station;
     }
 
@@ -109,6 +117,11 @@ public class StationMapper {
         dto.setProduction(station.getProduction() != null ?
                 station.getProduction().stream().map(productionMapper::toDto).collect(toList())
                 : null);
+
+        dto.setGoods(station.getGoods() != null ?
+                station.getGoods().stream().map(goodsMapper::toDto).collect(toList())
+                : null);
+
         return dto;
     }
 }
