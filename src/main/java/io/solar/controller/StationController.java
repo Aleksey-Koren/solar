@@ -63,8 +63,8 @@ public class StationController {
     @GetMapping
     @PreAuthorize("hasAnyAuthority('EDIT_STATION', 'PLAY_THE_GAME')")
     @Transactional
-    public ResponseEntity<Page<BasicObjectViewDto>> getAll(Pageable pageable) {
-        return ResponseEntity.ok(stationFacade.findAllAsBasicObjects(pageable));
+    public Page<BasicObjectViewDto> getAll(Pageable pageable) {
+        return stationFacade.findAllAsBasicObjects(pageable);
     }
 
     @GetMapping("utils/dropdown")
