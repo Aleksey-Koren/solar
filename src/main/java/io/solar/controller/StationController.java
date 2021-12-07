@@ -7,6 +7,7 @@ import io.solar.entity.*;
 import io.solar.entity.objects.StarShip;
 import io.solar.facade.StationFacade;
 import io.solar.service.StationService;
+import io.solar.specification.filter.StationFilter;
 import io.solar.utils.Option;
 import io.solar.utils.context.AuthData;
 import io.solar.utils.db.Query;
@@ -54,12 +55,12 @@ public class StationController {
         return station.isPresent() ? ResponseEntity.ok(station.get()) : ResponseEntity.notFound().build();
     }
 
-
     @GetMapping
     @PreAuthorize("hasAnyAuthority('EDIT_STATION', 'PLAY_THE_GAME')")
     @Transactional
-    public Page<BasicObjectViewDto> getAll(Pageable pageable) {
-        return stationFacade.findAllAsBasicObjects(pageable);
+    public Page<BasicObjectViewDto> getAll(Pageable pageable, StationFilter stationFilter) {
+
+        return stationFacade.findAllAsBasicObjects(pageable, stationFilter);
     }
 
     @DeleteMapping("{id}")

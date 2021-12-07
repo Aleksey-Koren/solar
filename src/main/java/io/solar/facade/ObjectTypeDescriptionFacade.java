@@ -98,7 +98,6 @@ public class ObjectTypeDescriptionFacade {
                 .map(modification -> new ObjectModification(null, objectTypeDescriptionMapper.toEntity(inventoryItemDto), modification))
                 .collect(Collectors.toList());
 
-
         objectModificationService.saveAll(toInsert);
         objectModificationService.deleteModificationsWithItemId(toDeleteIds, inventoryItemDto.getId());
     }
