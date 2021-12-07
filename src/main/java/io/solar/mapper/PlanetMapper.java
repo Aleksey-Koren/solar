@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
-public class PlanetMapper  {
+public class PlanetMapper {
 
     private PlanetRepository planetRepository;
     private UserMapper userMapper;

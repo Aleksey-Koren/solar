@@ -14,8 +14,10 @@ import io.solar.utils.Option;
 import io.solar.utils.context.AuthData;
 import io.solar.utils.db.Query;
 import io.solar.utils.db.Transaction;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -32,19 +34,13 @@ import static java.util.stream.Collectors.toList;
 @RestController
 @RequestMapping(value = "api/station")
 @Slf4j
+@RequiredArgsConstructor
 public class StationController {
-
 
     private final StationFacade stationFacade;
     private final StationService stationService;
     private final GoodsGeneration goodsGeneration;
 
-    @Autowired
-    public StationController(StationFacade stationFacade, StationService stationService, GoodsGeneration goodsGeneration, AppProperties appProperties) {
-        this.stationFacade = stationFacade;
-        this.stationService = stationService;
-        this.goodsGeneration = goodsGeneration;
-    }
 
     @PostMapping
     @PreAuthorize("hasAuthority('EDIT_STATION')")
