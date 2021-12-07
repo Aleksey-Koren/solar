@@ -61,7 +61,7 @@ public class BasicObject {
     protected List<BasicObject> attachedObjects;
 
     //TODO ??????
-    private List<InventorySocket> socketList;
+//    private List<InventorySocket> socketList;
 
     @Override
     public String toString() {
