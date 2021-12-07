@@ -10,35 +10,26 @@ import java.io.Serializable;
 @Entity
 @IdClass(Goods.Key.class)
 @Table(name = "goods")
-@EqualsAndHashCode
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Goods {
 
     @Id
     @ManyToOne
     @JoinColumn(name = "owner")
-    @Getter
-    @Setter
     private BasicObject owner;
 
     @Id
     @ManyToOne
     @JoinColumn(name = "product")
-    @Getter
-    @Setter
     private Product product;
-    @Getter
-    @Setter
+
     private Long amount;
+    private Float price;
 
-    public Goods() {
 
-    }
 
-    public Goods(BasicObject owner, Product product, Long amount) {
-        this.owner = owner;
-        this.product = product;
-        this.amount = amount;
-    }
 
     @EqualsAndHashCode
     @Getter

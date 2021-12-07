@@ -60,8 +60,7 @@ public class StationController {
     @GetMapping
     @PreAuthorize("hasAnyAuthority('EDIT_STATION', 'PLAY_THE_GAME')")
     @Transactional
-    public Page<BasicObjectViewDto> getAll(Pageable pageable, StationFilter stationFilter) {
-
+    public Page<StationDto> getAll(Pageable pageable, StationFilter stationFilter) {
         return stationFacade.findAllAsBasicObjects(pageable, stationFilter);
     }
 
