@@ -1,9 +1,15 @@
 package io.solar.dto;
 
 import io.solar.entity.objects.ObjectStatus;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class BasicObjectViewDto {
 
     private Long id;

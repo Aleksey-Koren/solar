@@ -33,7 +33,7 @@ public class StationFacade {
     public Page<BasicObjectViewDto> findAllAsBasicObjects(Pageable pageable, StationFilter stationFilter) {
         Page<Station> stations = stationService.findAll(new StationSpecification(stationFilter), pageable);
         Page<BasicObject> stationsAsObjects = stations.map(BasicObject.class::cast);
-        return stationsAsObjects.map(basicObjectMapper::toBasicObjectViewDto);
+        return stationsAsObjects.map(basicObjectMapper::toDto);
     }
 
     public Optional<StationDto> findById(Long id) {
