@@ -85,7 +85,7 @@ public class StationController {
     }
 
     @Scheduled(fixedDelayString = "#{@appProperties.getGoodsGenerationDelayMinutes()}",
-               initialDelayString = "#{@appProperties.getGoodsInitialDelaySeconds()}",
+               initialDelayString = "#{@appProperties.getGoodsInitialDelayMinutes()}",
                timeUnit = TimeUnit.MINUTES)
     @Transactional
     public void generateGoods() {

@@ -1,6 +1,7 @@
 package io.solar.entity.objects;
 
 import io.solar.entity.Planet;
+import io.solar.entity.inventory.InventorySocket;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -47,7 +48,7 @@ public class BasicObject {
     protected List<BasicObject> attachedObjects;
 
     //TODO ??????
-//    private List<InventorySocket> socketList;
+    private List<InventorySocket> socketList;
 
     @Override
     public String toString() {
