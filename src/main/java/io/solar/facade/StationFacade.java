@@ -7,6 +7,8 @@ import io.solar.entity.objects.Station;
 import io.solar.mapper.StationMapper;
 import io.solar.mapper.objects.BasicObjectMapper;
 import io.solar.service.StationService;
+import io.solar.specification.StationSpecification;
+import io.solar.specification.filter.StationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,8 +30,8 @@ public class StationFacade {
         this.basicObjectMapper = basicObjectMapper;
     }
 
-    public Page<BasicObjectViewDto> findAllAsBasicObjects(Pageable pageable) {
-        Page<Station> stations = stationService.findAll(pageable);
+    public Page<BasicObjectViewDto> findAllAsBasicObjects(Pageable pageable, StationFilter stationFilter) {
+        Page<Station> stations = stationService.findAll(new StationSpecification(stationFilter), pageable);
         Page<BasicObject> stationsAsObjects = stations.map(BasicObject.class::cast);
         return stationsAsObjects.map(basicObjectMapper::toBasicObjectViewDto);
     }
