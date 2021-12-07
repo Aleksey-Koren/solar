@@ -1,6 +1,6 @@
 package io.solar.facade;
 
-import io.solar.dto.InventoryTypeDto;
+import io.solar.dto.inventory.InventoryTypeDto;
 import io.solar.mapper.InventoryTypeMapper;
 import io.solar.service.InventoryTypeService;
 import org.springframework.beans.factory.annotation.Autowired;

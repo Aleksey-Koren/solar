@@ -21,4 +21,9 @@ public class BasicObjectService {
     public Optional<BasicObject> findById(Long id) {
         return basicObjectRepository.findById(id);
     }
+
+    public void deleteByHullId(Long hullId) {
+
+        basicObjectRepository.deleteAllByObjectTypeDescriptionId(hullId);
+    }
 }

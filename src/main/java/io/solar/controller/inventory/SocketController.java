@@ -1,6 +1,6 @@
 package io.solar.controller.inventory;
 
-import io.solar.entity.inventory.InventorySocket;
+import io.solar.dto.inventory.InventorySocketDto;
 import io.solar.mapper.SocketMapper;
 import io.solar.utils.db.Query;
 import io.solar.utils.db.Transaction;
@@ -19,26 +19,26 @@ import java.util.List;
 public class SocketController {
 
     @RequestMapping
-    public List<InventorySocket> getSocketList(
+    public List<InventorySocketDto> getSocketList(
             Transaction transaction,
             @RequestParam("itemDescription") Long itemDescription
     ) {
-        if(itemDescription == null) {
+        if (itemDescription == null) {
             return new ArrayList<>();
         }
         Query query = transaction.query("select * from object_type_socket where item_id = :itemDescription");
         query.setLong("itemDescription", itemDescription);
-        return query.executeQuery(new SocketMapper());
+        return query.executeQuery(/*new SocketMapper()*/ null);
     }
 
     @RequestMapping("{id}")
-    public InventorySocket getSocket(
+    public InventorySocketDto getSocket(
             Transaction transaction,
             @PathVariable("id") Long id
     ) {
         Query query = transaction.query("select * from object_type_socket where id = :id");
         query.setLong("id", id);
-        List<InventorySocket> out = query.executeQuery(new SocketMapper());
+        List<InventorySocketDto> out = query.executeQuery(/*new SocketMapper()*/ null);
         return out.size() == 1 ? out.get(0) : null;
     }
 

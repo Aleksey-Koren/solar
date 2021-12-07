@@ -111,7 +111,7 @@ public class StationMapper {
         }
         dto.setHullId(station.getObjectTypeDescription().getId());
         dto.setAttachedObjects(station.getAttachedObjects() != null ?
-                station.getAttachedObjects().stream().map(basicObjectMapper::toBasicObjectViewDto).collect(toList())
+                station.getAttachedObjects().stream().map(basicObjectMapper::toDto).collect(toList())
                 : null);
 
         dto.setProduction(station.getProduction() != null ?
