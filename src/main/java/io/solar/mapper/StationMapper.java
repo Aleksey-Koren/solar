@@ -4,7 +4,7 @@ import io.solar.dto.BasicObjectViewDto;
 import io.solar.dto.ProductionDto;
 import io.solar.dto.StationDto;
 import io.solar.entity.objects.Station;
-import io.solar.mapper.objects.BasicObjectMapper;
+import io.solar.mapper.objects.BasicObjectViewMapper;
 import io.solar.repository.BasicObjectRepository;
 import io.solar.repository.ObjectTypeDescriptionRepository;
 import io.solar.repository.ProductionRepository;
@@ -24,7 +24,7 @@ public class StationMapper {
     private final ObjectTypeDescriptionRepository objectTypeDescriptionRepository;
     private final PlanetService planetService;
     private final BasicObjectRepository basicObjectRepository;
-    private final BasicObjectMapper basicObjectMapper;
+    private final BasicObjectViewMapper basicObjectViewMapper;
     private final ProductionMapper productionMapper;
     private final ProductionRepository productionRepository;
     private final GoodsMapper goodsMapper;
@@ -34,7 +34,7 @@ public class StationMapper {
                          ObjectTypeDescriptionRepository objectTypeDescriptionRepository,
                          PlanetService planetService,
                          BasicObjectRepository basicObjectRepository,
-                         BasicObjectMapper basicObjectMapper,
+                         BasicObjectViewMapper basicObjectViewMapper,
                          ProductionMapper productionMapper,
                          ProductionRepository productionRepository,
                          GoodsMapper goodsMapper) {
@@ -42,7 +42,7 @@ public class StationMapper {
         this.objectTypeDescriptionRepository = objectTypeDescriptionRepository;
         this.planetService = planetService;
         this.basicObjectRepository = basicObjectRepository;
-        this.basicObjectMapper = basicObjectMapper;
+        this.basicObjectViewMapper = basicObjectViewMapper;
         this.productionMapper = productionMapper;
         this.productionRepository = productionRepository;
         this.goodsMapper = goodsMapper;
@@ -111,7 +111,7 @@ public class StationMapper {
         }
         dto.setHullId(station.getObjectTypeDescription().getId());
         dto.setAttachedObjects(station.getAttachedObjects() != null ?
-                station.getAttachedObjects().stream().map(basicObjectMapper::toDto).collect(toList())
+                station.getAttachedObjects().stream().map(basicObjectViewMapper::toDto).collect(toList())
                 : null);
 
         dto.setProduction(station.getProduction() != null ?

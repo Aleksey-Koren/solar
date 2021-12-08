@@ -34,7 +34,7 @@ public class GoodsGeneration {
     }
 
     private void generateGoods(Station station) {
-        List<Goods> goods = new ArrayList();
+        List<Goods> goods = new ArrayList<>();
         for(Production production : station.getProduction()) {
             Product product = production.getProduct();
             Long amount = (long) (production.getPower() * retrieveRandomModifier() + 10);

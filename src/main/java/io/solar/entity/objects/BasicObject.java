@@ -1,6 +1,7 @@
 package io.solar.entity.objects;
 
 import io.solar.entity.Planet;
+import io.solar.entity.inventory.InventorySocket;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -18,13 +19,14 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import java.io.Serializable;
 import java.util.List;
 
 @Data
 @Entity
 @Table(name = "objects")
 @Inheritance(strategy = InheritanceType.JOINED)
-public class BasicObject {
+public class BasicObject implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -59,8 +61,9 @@ public class BasicObject {
     @EqualsAndHashCode.Exclude
     protected List<BasicObject> attachedObjects;
 
-    //TODO ??????
-//    private List<InventorySocket> socketList;
+    @OneToMany(mappedBy = "item")
+    @EqualsAndHashCode.Exclude
+    protected List<InventorySocket> socketList;
 
     @Override
     public String toString() {

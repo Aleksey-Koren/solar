@@ -5,7 +5,7 @@ import io.solar.dto.StationDto;
 import io.solar.entity.objects.BasicObject;
 import io.solar.entity.objects.Station;
 import io.solar.mapper.StationMapper;
-import io.solar.mapper.objects.BasicObjectMapper;
+import io.solar.mapper.objects.BasicObjectViewMapper;
 import io.solar.service.StationService;
 import io.solar.specification.StationSpecification;
 import io.solar.specification.filter.StationFilter;
@@ -21,19 +21,19 @@ public class StationFacade {
 
     private final StationService stationService;
     private final StationMapper stationMapper;
-    private final BasicObjectMapper basicObjectMapper;
+    private final BasicObjectViewMapper basicObjectViewMapper;
 
     @Autowired
-    public StationFacade(StationService stationService, StationMapper stationMapper, BasicObjectMapper basicObjectMapper) {
+    public StationFacade(StationService stationService, StationMapper stationMapper, BasicObjectViewMapper basicObjectViewMapper) {
         this.stationService = stationService;
         this.stationMapper = stationMapper;
-        this.basicObjectMapper = basicObjectMapper;
+        this.basicObjectViewMapper = basicObjectViewMapper;
     }
 
     public Page<BasicObjectViewDto> findAllAsBasicObjects(Pageable pageable, StationFilter stationFilter) {
         Page<Station> stations = stationService.findAll(new StationSpecification(stationFilter), pageable);
         Page<BasicObject> stationsAsObjects = stations.map(BasicObject.class::cast);
-        return stationsAsObjects.map(basicObjectMapper::toDto);
+        return stationsAsObjects.map(basicObjectViewMapper::toDto);
     }
 
     public Optional<StationDto> findById(Long id) {
