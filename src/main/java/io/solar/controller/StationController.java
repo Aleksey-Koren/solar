@@ -1,23 +1,19 @@
 package io.solar.controller;
 
-import io.solar.config.AppProperties;
-import io.solar.dto.BasicObjectViewDto;
 import io.solar.dto.Marketplace;
 import io.solar.dto.StationDto;
-import io.solar.entity.*;
+import io.solar.entity.User;
 import io.solar.entity.objects.StarShip;
 import io.solar.facade.StationFacade;
 import io.solar.service.StationService;
-import io.solar.specification.filter.StationFilter;
 import io.solar.service.data_generation.GoodsGeneration;
+import io.solar.specification.filter.StationFilter;
 import io.solar.utils.Option;
 import io.solar.utils.context.AuthData;
 import io.solar.utils.db.Query;
 import io.solar.utils.db.Transaction;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +22,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import static java.util.stream.Collectors.toList;
@@ -61,7 +58,7 @@ public class StationController {
     @PreAuthorize("hasAnyAuthority('EDIT_STATION', 'PLAY_THE_GAME')")
     @Transactional
     public Page<StationDto> getAll(Pageable pageable, StationFilter stationFilter) {
-        return stationFacade.findAllAsBasicObjects(pageable, stationFilter);
+        return stationFacade.findAll(pageable, stationFilter);
     }
 
     @DeleteMapping("{id}")

@@ -16,7 +16,11 @@ public class StationFilter {
     private String fraction;
     private String title;
     private Long productId;
-    private
+    private Float goodsPriceMin;
+    private Float goodsPriceMax;
+    private Long goodsQuantityMin;
+    private Long goodsQuantityMax;
 
-    List<Long> stationsIds;
+
+    List<Long> stationIds;
 }
