@@ -102,7 +102,7 @@ public class StationController {
     }
 
     private Long definePlanetId(User user, StarShip starShip) {
-        Long planetId = user.getPlanet().getId();
+        Long planetId = user.getLocation().getId();
         if(planetId != null) {
             return planetId;
         }
@@ -114,7 +114,7 @@ public class StationController {
         }
     }
     private Long definePlanetId(User user, Transaction transaction) {
-        Long planetId = user.getPlanet().getId();
+        Long planetId = user.getLocation().getId();
         if(planetId != null) {
             return planetId;
         }

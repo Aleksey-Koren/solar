@@ -76,7 +76,4 @@ public class StationSpecification implements Specification<Station> {
 
         return criteriaBuilder.and(predicates.toArray(Predicate[]::new));
     }
-
 }
-
-
