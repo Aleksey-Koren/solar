@@ -22,6 +22,8 @@ public class GoodsGeneration {
         this.productionRepository = productionRepository;
     }
 
+    @Scheduled(fixedDelay = 5000, initialDelay = 1000)
+    @Transactional
     public void generateOnStations() {
         List<Station> stations = stationRepository.findAll();
         for(Station station : stations) {
@@ -30,7 +32,7 @@ public class GoodsGeneration {
     }
 
     private void generateGoods(Station station) {
-        List<Goods> goods = new ArrayList();
+        List<Goods> goods = new ArrayList<>();
         for(Production production : station.getProduction()) {
             Product product = production.getProduct();
             Long amount = (long) (production.getPower() * retrieveRandomModifier() + 10);

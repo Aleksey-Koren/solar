@@ -1,9 +1,20 @@
 package io.solar.entity.objects;
 
-import io.solar.entity.inventory.InventoryType;
+import io.solar.entity.inventory.InventorySocket;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import java.util.List;
 
 @Data
 @Entity
@@ -56,4 +67,8 @@ public class ObjectTypeDescription {
 
     @Enumerated(EnumType.STRING)
     private ObjectSubType subType;
+
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
+    @EqualsAndHashCode.Exclude
+    private List<InventorySocket> socketList;
 }

@@ -19,13 +19,14 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import java.io.Serializable;
 import java.util.List;
 
 @Data
 @Entity
 @Table(name = "objects")
 @Inheritance(strategy = InheritanceType.JOINED)
-public class BasicObject {
+public class BasicObject implements Serializable{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -60,14 +61,4 @@ public class BasicObject {
     @EqualsAndHashCode.Exclude
     protected List<BasicObject> attachedObjects;
 
-    //TODO ??????
-//    private List<InventorySocket> socketList;
-
-    @Override
-    public String toString() {
-        return "BasicObject{" +
-                "id=" + id +
-                ", title='" + title + '\'' +
-                '}';
-    }
 }
