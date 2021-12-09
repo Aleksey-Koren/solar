@@ -41,5 +41,4 @@ public class SocketController {
         List<InventorySocketDto> out = query.executeQuery(/*new SocketMapper()*/ null);
         return out.size() == 1 ? out.get(0) : null;
     }
-
 }

@@ -17,10 +17,10 @@ public interface BasicObjectRepository extends JpaRepository<BasicObject, Long>,
 
     List<BasicObject> findAllByAttachedToShipId(Long attachedToShipId);
 
-    @Query("select o from BasicObject o " +
-            "join ObjectTypeDescription otd " +
+    @Query("select o from BasicObject as o " +
+            "join o.objectTypeDescription as otd " +
             "where o.attachedToShip.id = ?1 and o.attachedToSocket is not null and otd.inventoryTypeId = ?2")
-    List<BasicObject> getObjectsInSlotsByTypeId(Long objectId, Long TypeId);
+    List<BasicObject> getObjectsInSlotsByTypeId(Long objectId, Integer TypeId);
 
     @Query("select o from BasicObject o " +
             "where o.status = 'IN_SPACE'" +
@@ -35,6 +35,7 @@ public interface BasicObjectRepository extends JpaRepository<BasicObject, Long>,
             "and" +
             "((o.x <= ?1 + ?3) and (o.x >= ?1 - ?3))" +
             "and" +
-            "((o.y <= ?2 + ?3) and (o.y >= ?2 - ?3))")
+            "((o.y <= ?2 + ?3) and (o.y >= ?2 - ?3))" +
+            "or o.x = ?1 and o.y = ?2")
     List<BasicObject> findAllWithZeroViewDistance(Float x, Float y, Float defaultDistance);
 }

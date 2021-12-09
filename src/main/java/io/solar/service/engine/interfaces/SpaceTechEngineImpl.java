@@ -18,7 +18,7 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
     @Override
     public Float retrieveViewDistance(SpaceTech spaceTech) {
         BasicObject spaceTechAsObject = (BasicObject) spaceTech;
-        List<BasicObject> radars = basicObjectRepository.getObjectsInSlotsByTypeId(spaceTechAsObject.getId(), 7L);
+        List<BasicObject> radars = basicObjectRepository.getObjectsInSlotsByTypeId(spaceTechAsObject.getId(), 7);
         Double distance = radars.stream()
                 .map(s -> s.getObjectTypeDescription().getDistance()).mapToDouble(Float::doubleValue)
                 .distinct()
