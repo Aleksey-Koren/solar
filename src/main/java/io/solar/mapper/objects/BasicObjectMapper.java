@@ -59,7 +59,8 @@ public class BasicObjectMapper implements EntityDtoMapper<BasicObject, BasicObje
                 .map(basicObjectViewMapper::toDto)
                 .collect(Collectors.toList());
 
-        List<InventorySocketDto> socketList = entity.getSocketList()
+        List<InventorySocketDto> socketList = entity.getObjectTypeDescription()
+                .getSocketList()
                 .stream()
                 .map(socketMapper::toDto)
                 .collect(Collectors.toList());
@@ -119,10 +120,14 @@ public class BasicObjectMapper implements EntityDtoMapper<BasicObject, BasicObje
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
                         String.format("Cannot find planet with id = %d", dto.getPlanet())));
 
-        BasicObject attachedToShip = basicObjectRepository.findById(dto.getAttachedToShip())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                        String.format("Cannot find attachedToShip with id = %d", dto.getAttachedToShip()))
-                );
+        BasicObject attachedToShip = null;
+
+        if (dto.getAttachedToShip() != null) {
+            attachedToShip = basicObjectRepository.findById(dto.getAttachedToShip())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                            String.format("Cannot find attachedToShip with id = %d", dto.getAttachedToShip()))
+                    );
+        }
 
         basicObject.setPopulation(dto.getPopulation());
         basicObject.setAcceleration(dto.getAcceleration());

@@ -6,7 +6,6 @@ import io.solar.entity.objects.BasicObject;
 import io.solar.mapper.objects.BasicObjectMapper;
 import io.solar.mapper.objects.BasicObjectViewMapper;
 import io.solar.service.BasicObjectService;
-import io.solar.service.InventorySocketService;
 import io.solar.specification.BasicObjectSpecification;
 import io.solar.specification.filter.BasicObjectFilter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,18 +19,15 @@ import org.springframework.web.server.ResponseStatusException;
 public class BasicObjectFacade {
 
     private final BasicObjectService basicObjectService;
-    private final InventorySocketService inventorySocketService;
     private final BasicObjectMapper basicObjectMapper;
     private final BasicObjectViewMapper basicObjectViewMapper;
 
     @Autowired
     public BasicObjectFacade(BasicObjectService basicObjectService,
-                             InventorySocketService inventorySocketService,
                              BasicObjectMapper basicObjectMapper,
                              BasicObjectViewMapper basicObjectViewMapper) {
 
         this.basicObjectService = basicObjectService;
-        this.inventorySocketService = inventorySocketService;
         this.basicObjectMapper = basicObjectMapper;
         this.basicObjectViewMapper = basicObjectViewMapper;
 

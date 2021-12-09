@@ -26,7 +26,7 @@ import java.util.List;
 @Entity
 @Table(name = "objects")
 @Inheritance(strategy = InheritanceType.JOINED)
-public class BasicObject implements Serializable {
+public class BasicObject implements Serializable{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -61,15 +61,4 @@ public class BasicObject implements Serializable {
     @EqualsAndHashCode.Exclude
     protected List<BasicObject> attachedObjects;
 
-    @OneToMany(mappedBy = "item")
-    @EqualsAndHashCode.Exclude
-    protected List<InventorySocket> socketList;
-
-    @Override
-    public String toString() {
-        return "BasicObject{" +
-                "id=" + id +
-                ", title='" + title + '\'' +
-                '}';
-    }
 }

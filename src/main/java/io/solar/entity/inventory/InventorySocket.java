@@ -1,11 +1,10 @@
 package io.solar.entity.inventory;
 
-import io.solar.entity.objects.BasicObject;
+import io.solar.entity.objects.ObjectTypeDescription;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -15,7 +14,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import java.io.Serializable;
 
 @Data
 @AllArgsConstructor
@@ -29,11 +27,9 @@ public class InventorySocket {
     @Column(name = "id")
     private Long id;
 
-//    , referencedColumnName = "hull_id"
-
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id")
-    private BasicObject item;
+    private ObjectTypeDescription item;
 
     @Column(name = "item_type_id")
     private Long itemTypeId;
