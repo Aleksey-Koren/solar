@@ -24,7 +24,7 @@ public class GoodsGeneration {
         this.productionRepository = productionRepository;
     }
 
-//    @Scheduled(fixedDelay = 5000, initialDelay = 1000)
+    @Scheduled(fixedDelay = 5000, initialDelay = 1000)
     @Transactional
     public void generateOnStations() {
         List<Station> stations = stationRepository.findAll();
