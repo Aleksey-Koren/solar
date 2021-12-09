@@ -1,8 +1,9 @@
-package io.solar.service.engine.interfaces;
+package io.solar.service.engine;
 
 import io.solar.entity.interfaces.SpaceTech;
 import io.solar.entity.objects.BasicObject;
 import io.solar.repository.BasicObjectRepository;
+import io.solar.service.engine.interfaces.SpaceTechEngine;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
