@@ -119,5 +119,4 @@ public class BasicObjectViewMapper implements EntityDtoMapper<BasicObject, Basic
         basicObject.setObjectTypeDescription(objectTypeDescription);
         basicObject.setAttachedToShip(attachedToShip);
     }
-
 }

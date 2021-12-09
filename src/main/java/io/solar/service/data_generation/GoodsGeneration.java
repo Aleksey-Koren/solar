@@ -6,7 +6,9 @@ import io.solar.entity.Production;
 import io.solar.entity.objects.Station;
 import io.solar.repository.ProductionRepository;
 import io.solar.repository.StationRepository;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
