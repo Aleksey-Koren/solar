@@ -36,6 +36,6 @@ public interface BasicObjectRepository extends JpaRepository<BasicObject, Long>,
             "((o.x <= ?1 + ?3) and (o.x >= ?1 - ?3))" +
             "and" +
             "((o.y <= ?2 + ?3) and (o.y >= ?2 - ?3))" +
-            "or o.x = ?1 and o.y = ?2")
+            "or o.x = ?1 and o.y = ?2 and o.status = 'IN_SPACE'")
     List<BasicObject> findAllWithZeroViewDistance(Float x, Float y, Float defaultDistance);
 }
