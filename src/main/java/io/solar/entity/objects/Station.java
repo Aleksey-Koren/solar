@@ -2,6 +2,7 @@ package io.solar.entity.objects;
 
 import io.solar.entity.Goods;
 import io.solar.entity.Production;
+import io.solar.entity.interfaces.SpaceTech;
 import lombok.*;
 
 import javax.persistence.*;
@@ -12,7 +13,7 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Table(name = "stations")
-public class Station extends BasicObject {
+public class Station extends BasicObject implements SpaceTech {
 
 
     @OneToMany(mappedBy = "station", cascade = CascadeType.ALL)

@@ -3,7 +3,10 @@ package io.solar.facade;
 import io.solar.dto.BasicObjectViewDto;
 import io.solar.entity.objects.BasicObject;
 import io.solar.entity.objects.StarShip;
+import io.solar.mapper.objects.BasicObjectMapper;
 import io.solar.repository.BasicObjectRepository;
+import io.solar.service.StarMapService;
+import io.solar.service.engine.interfaces.SpaceTechEngine;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,13 +16,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class StarMapFacade {
 
-    private final BasicObjectRepository basicObjectRepository;
+
+    private final StarMapService starMapService;
+    private final BasicObjectMapper basicObjectMapper;
+
 
     public List<BasicObjectViewDto> getStarshipView(StarShip starShip) {
-        List<BasicObject> radars = basicObjectRepository.getObjectsInSlotsByTypeId(starShip.getId(), 7L);
-
-        //TODO I have to finish this method
-
-        return null;
+        return starMapService.findAllInViewDistance(starShip);
     }
 }
