@@ -6,6 +6,7 @@ import io.solar.service.exception.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.MimeType;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -36,21 +37,20 @@ public class ImageUploadService {
     public void uploadAvatar(ImageDto imageDto) {
         byte[] decodedImageData = Base64.getDecoder().decode(imageDto.getImageData());
 
-        String imagePath = buildImagePath(imageDto.getUserId());
+        String imagePath = buildImagePath(imageDto.getUserId(), imageDto.getMimeType());
 
-        byte[] croppedImage = cutImage(decodedImageData);
+        byte[] croppedImage = cutImage(decodedImageData, imageDto.getMimeType());
 
         byte[] imageWithoutMetadata = removeImageMetadata(croppedImage);
 
-        documentService.upload(imagePath, imageWithoutMetadata);
+        documentService.upload(imagePath, imageWithoutMetadata, imageDto.getUserId());
     }
 
-    private String buildImagePath(Long userId) {
-
+    private String buildImagePath(Long userId, String mimeType) {
         String userIdRage = getUserIdRange(userId);
+        String imageExtension = MimeType.valueOf(mimeType).getSubtype();
 
-        //todo: remove hardcode image extension
-        return String.format("%s/%s/%d/%s.%s", imagesPath, userIdRage, userId, "avatar", "png");
+        return String.format("%s/%s/%d/avatar.%s", imagesPath, userIdRage, userId, imageExtension);
     }
 
     private String getUserIdRange(Long userId) {
@@ -72,7 +72,7 @@ public class ImageUploadService {
         return range.toString();
     }
 
-    private byte[] cutImage(byte[] imageData) {
+    private byte[] cutImage(byte[] imageData, String mimeType) {
         ByteArrayInputStream in = new ByteArrayInputStream(imageData);
         try {
             BufferedImage img = ImageIO.read(in);
@@ -81,7 +81,7 @@ public class ImageUploadService {
                 BufferedImage croppedImage = img.getSubimage(0, 0, imageWidth, imageHeight);
 
                 ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-                ImageIO.write(croppedImage, "png", buffer); //todo: remove hardcode image format
+                ImageIO.write(croppedImage, MimeType.valueOf(mimeType).getSubtype(), buffer);
 
                 imageData = buffer.toByteArray();
             }

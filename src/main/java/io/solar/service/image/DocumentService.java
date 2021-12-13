@@ -10,7 +10,7 @@ import java.nio.file.Files;
 @Service
 public class DocumentService {
 
-    public void upload(String imagePath, byte[] imageData) {
+    public void upload(String imagePath, byte[] imageData, Long userId) {
         File file = new File(imagePath);
 
         try {
