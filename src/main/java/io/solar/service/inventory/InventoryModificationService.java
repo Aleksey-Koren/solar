@@ -1,4 +1,4 @@
-package io.solar.service;
+package io.solar.service.inventory;
 
 import io.solar.entity.objects.ObjectModificationType;
 import io.solar.repository.ObjectModificationTypeRepository;

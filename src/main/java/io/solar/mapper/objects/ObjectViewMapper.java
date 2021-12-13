@@ -1,10 +1,8 @@
 package io.solar.mapper.objects;
 
 import io.solar.entity.objects.ObjectView;
-import io.solar.service.ObjectService;
 import io.solar.utils.ObjectUtils;
 import io.solar.utils.db.DbMapper;
-import io.solar.utils.db.Query;
 import io.solar.utils.db.SafeResultSet;
 import io.solar.utils.db.Transaction;
 

@@ -3,8 +3,6 @@ package io.solar.controller.inventory;
 import io.solar.dto.BasicObjectDto;
 import io.solar.dto.BasicObjectViewDto;
 import io.solar.facade.BasicObjectFacade;
-import io.solar.mapper.objects.ObjectViewMapper;
-import io.solar.mapper.TotalMapper;
 import io.solar.specification.filter.BasicObjectFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;

@@ -3,7 +3,7 @@ package io.solar.mapper;
 
 import io.solar.dto.inventory.InventoryTypeDto;
 import io.solar.entity.inventory.InventoryType;
-import io.solar.service.InventoryTypeService;
+import io.solar.service.inventory.InventoryTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;

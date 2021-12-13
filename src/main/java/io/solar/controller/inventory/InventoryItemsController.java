@@ -4,7 +4,7 @@ import io.solar.dto.inventory.InventoryItemDto;
 import io.solar.entity.objects.ObjectTypeDescription;
 import io.solar.facade.ObjectTypeDescriptionFacade;
 import io.solar.mapper.ObjectTypeDescriptionMapper;
-import io.solar.service.ObjectTypeDescriptionService;
+import io.solar.service.object.ObjectTypeDescriptionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

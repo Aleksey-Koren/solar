@@ -8,6 +8,7 @@ import io.solar.mapper.UserMapper;
 import io.solar.repository.PermissionRepository;
 import io.solar.repository.UserRepository;
 import io.solar.security.Role;
+import io.solar.service.exception.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
