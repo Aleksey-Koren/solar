@@ -26,4 +26,15 @@ public class Test {
             return List.of(1L, 1000L);
         }
     }
+
+    public void foo() {
+        ImageInputStream iis = ImageIO.createImageInputStream(file);
+
+        Iterator<ImageReader> imageReaders = ImageIO.getImageReaders(iis);
+
+        while (imageReaders.hasNext()) {
+            ImageReader reader = (ImageReader) imageReaders.next();
+            System.out.printf("formatName: %s%n", reader.getFormatName());
+        }
+    }
 }
