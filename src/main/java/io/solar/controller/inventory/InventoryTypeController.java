@@ -2,7 +2,7 @@ package io.solar.controller.inventory;
 
 import io.solar.dto.inventory.InventoryTypeDto;
 import io.solar.facade.InventoryTypeFacade;
-import io.solar.service.InventoryTypeService;
+import io.solar.service.inventory.InventoryTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

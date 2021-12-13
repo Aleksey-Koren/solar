@@ -1,4 +1,4 @@
-package io.solar.service;
+package io.solar.service.exception;
 
 public class ServiceException extends RuntimeException {
 

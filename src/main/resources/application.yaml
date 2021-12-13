@@ -40,3 +40,7 @@ app:
   admin_not_exists: "yes"
   goods_generation_delay_minutes: 60
   goods_initial_delay_minutes: 60
+  images:
+    path: src/main/resources/images
+    width: 300
+    height: 300

@@ -3,7 +3,7 @@ package io.solar.facade;
 import io.solar.dto.ObjectModificationTypeDto;
 import io.solar.entity.objects.ObjectModificationType;
 import io.solar.mapper.ObjectModificationTypeMapper;
-import io.solar.service.InventoryModificationService;
+import io.solar.service.inventory.InventoryModificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
