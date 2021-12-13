@@ -8,11 +8,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Base64;
+import java.util.Iterator;
 
 @Service
 public class ImageUploadService {
@@ -42,7 +45,7 @@ public class ImageUploadService {
 
         byte[] imageWithoutMetadata = removeImageMetadata(croppedImage);
 
-        documentService.upload(imagePath, imageWithoutMetadata);
+        documentService.upload(imagePath, imageWithoutMetadata, imageDto.getUserId());
     }
 
     private String buildImagePath(Long userId) {
