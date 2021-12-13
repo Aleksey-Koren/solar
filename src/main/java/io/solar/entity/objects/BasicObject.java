@@ -1,7 +1,6 @@
 package io.solar.entity.objects;
 
 import io.solar.entity.Planet;
-import io.solar.entity.inventory.InventorySocket;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -48,7 +47,7 @@ public class BasicObject implements Serializable{
     protected Long userId;
     protected Boolean active;
     protected Long durability;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.DETACH})
     @JoinColumn(name = "attached_to_ship")
     protected BasicObject attachedToShip;
     protected Long attachedToSocket;

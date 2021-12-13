@@ -35,7 +35,7 @@ public class UserFacade {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Couldn't found user with such id"));
         user.setTitle(dto.getTitle());
         user.setMoney(dto.getMoney());
-        user.setPlanet(dto.getPlanet());
+        user.setLocation(dto.getLocation());
         userService.update(user);
         return userMapper.toDto(user);
     }

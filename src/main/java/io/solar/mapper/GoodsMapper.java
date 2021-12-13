@@ -33,6 +33,7 @@ public class GoodsMapper {
         dto.setStation(goods.getOwner() != null ? goods.getOwner().getId() : null);
         dto.setProduct(goods.getProduct() != null ? goods.getProduct().getId() : null);
         dto.setAmount(goods.getAmount());
+        dto.setPrice(goods.getPrice());
         return dto;
     }
 
@@ -49,7 +50,8 @@ public class GoodsMapper {
             goods.setOwner(owner);
             goods.setProduct(product);
         }
-        goods.setAmount(dto.getAmount());
+        goods.setAmount(dto.getAmount() != null ? dto.getAmount() : 0);
+        goods.setPrice(dto.getPrice() != null ? dto.getPrice() : 0);
         return goods;
     }
 }

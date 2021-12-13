@@ -1,16 +1,14 @@
 package io.solar.specification;
 
-import io.solar.entity.objects.BasicObject;
+import io.solar.entity.*;
 import io.solar.entity.objects.Station;
 import io.solar.entity.objects.BasicObject_;
+import io.solar.entity.objects.Station_;
 import io.solar.specification.filter.StationFilter;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.data.jpa.domain.Specification;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,9 +51,29 @@ public class StationSpecification implements Specification<Station> {
 
         }
 
+        if(stationFilter.getStationIds() != null) {
+            predicates.add(criteriaBuilder.isTrue(root.get(Station_.id).in(stationFilter.getStationIds())));
+        }
+
+        if(stationFilter.getProductId() != null) {
+            ListJoin<Station, Goods> join = root.join(Station_.goods);
+            predicates.add(criteriaBuilder.equal(join.get(Goods_.product).get(Product_.id), stationFilter.getProductId()));
+
+
+            if(stationFilter.getGoodsPriceMax() != null) {
+                predicates.add(criteriaBuilder.lessThanOrEqualTo(join.get(Goods_.price), stationFilter.getGoodsPriceMax()));
+            }
+            if(stationFilter.getGoodsPriceMin() != null) {
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo(join.get(Goods_.price), stationFilter.getGoodsPriceMin()));
+            }
+            if(stationFilter.getGoodsQuantityMin() != null) {
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo(join.get(Goods_.amount), stationFilter.getGoodsQuantityMin()));
+            }
+            if(stationFilter.getGoodsQuantityMax() != null) {
+                predicates.add(criteriaBuilder.lessThanOrEqualTo(join.get(Goods_.amount), stationFilter.getGoodsQuantityMax()));
+            }
+        }
+
         return criteriaBuilder.and(predicates.toArray(Predicate[]::new));
     }
-
 }
-
-

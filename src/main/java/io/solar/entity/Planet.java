@@ -35,10 +35,6 @@ public class Planet extends BasicObject {
 
     @OneToMany(mappedBy = "planet")
     @EqualsAndHashCode.Exclude
-    List<User> users;
-
-    @OneToMany(mappedBy = "planet")
-    @EqualsAndHashCode.Exclude
     List<Station> stations;
 
     @Override
