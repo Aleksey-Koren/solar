@@ -5,7 +5,7 @@ import io.solar.dto.BasicObjectViewDto;
 import io.solar.entity.objects.BasicObject;
 import io.solar.mapper.objects.BasicObjectMapper;
 import io.solar.mapper.objects.BasicObjectViewMapper;
-import io.solar.service.BasicObjectService;
+import io.solar.service.object.BasicObjectService;
 import io.solar.specification.BasicObjectSpecification;
 import io.solar.specification.filter.BasicObjectFilter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +37,7 @@ public class BasicObjectFacade {
         Page<BasicObject> basicObjects = basicObjectService.findAll(new BasicObjectSpecification(basicObjectFilter), pageable);
         return basicObjects.map(basicObjectViewMapper::toDto);
     }
+
 
     public BasicObjectDto findById(Long objectId) {
 

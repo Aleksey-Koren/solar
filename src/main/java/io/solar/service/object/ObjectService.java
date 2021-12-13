@@ -1,4 +1,4 @@
-package io.solar.service;
+package io.solar.service.object;
 
 import io.solar.entity.objects.BasicObject;
 import io.solar.entity.objects.ObjectItem;

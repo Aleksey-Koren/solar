@@ -4,7 +4,7 @@ import io.solar.controller.PlanetController;
 import io.solar.entity.Production;
 import io.solar.entity.objects.Station;
 import io.solar.mapper.TotalMapper;
-import io.solar.service.ObjectService;
+import io.solar.service.object.ObjectService;
 import io.solar.utils.db.Query;
 import io.solar.utils.db.Transaction;
 import io.solar.utils.server.Pageable;

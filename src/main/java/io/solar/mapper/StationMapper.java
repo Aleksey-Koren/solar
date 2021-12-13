@@ -10,6 +10,7 @@ import io.solar.repository.ObjectTypeDescriptionRepository;
 import io.solar.repository.ProductionRepository;
 import io.solar.repository.StationRepository;
 import io.solar.service.*;
+import io.solar.service.exception.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
