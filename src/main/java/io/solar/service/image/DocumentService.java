@@ -38,20 +38,34 @@ public class DocumentService {
     private void updateDatabase(String imagePath, Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "There is no user with such id in database"));
-        deletePreviousFile(user.getAvatar());
+        if(user.getAvatar() != null) {
+            deleteAvatarFile(user.getAvatar());
+        }
         user.setAvatar(imagePath);
         userRepository.save(user);
     }
 
-    private void deletePreviousFile(String avatar) {
-        File previous = new File(avatar);
+    public void deleteAvatarByUserId(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "There is no user with such id in database"));
+        if(user.getAvatar() != null) {
+            deleteAvatarFile(user.getAvatar());
+            user.setAvatar(null);
+            userRepository.save(user);
+        }else{
+            log.warn("Attempt to delete an avatar from a user without an avatar user id = {}", userId);
+        }
+    }
+
+    private void deleteAvatarFile(String avatarPath) {
+        File previous = new File(avatarPath);
 
         try {
             Files.delete(previous.toPath());
         } catch (NoSuchFileException e) {
-            log.warn("Tried do delete previous avatar, but hadn't found file with path from database: {}", avatar);
+            log.warn("Tried do delete avatar, but hadn't found file with path from database: {}", avatarPath);
         } catch (IOException e) {
-            throw new ServiceException("Troubles with deleting previous avatar", e);
+            throw new ServiceException(String.format("Troubles with deleting avatar, path = %s", avatarPath), e);
         }
     }
 }
