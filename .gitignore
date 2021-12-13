@@ -1,4 +1,5 @@
 .idea/
 target/
 *.iml
-/docker
+#src/main/java/io/solar/Test.java
+docker/

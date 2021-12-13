@@ -24,5 +24,6 @@ public class UserDto {
     private BasicObject location;
     private Instant hackBlock;
     private Integer hackAttempts;
+    private String avatar;
     private Set<PermissionDto> permissions;
 }

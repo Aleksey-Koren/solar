@@ -3,19 +3,24 @@ package io.solar.service.image;
 import com.groupdocs.metadata.Metadata;
 import io.solar.dto.ImageDto;
 import io.solar.service.exception.ServiceException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MimeType;
 
 import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Base64;
+import java.util.Iterator;
 
 @Service
+@RequiredArgsConstructor
 public class ImageUploadService {
 
     @Value("${app.images.path}")
@@ -28,11 +33,6 @@ public class ImageUploadService {
     private Integer imageHeight;
 
     private final DocumentService documentService;
-
-    @Autowired
-    public ImageUploadService(DocumentService documentService) {
-        this.documentService = documentService;
-    }
 
     public void uploadAvatar(ImageDto imageDto) {
         byte[] decodedImageData = Base64.getDecoder().decode(imageDto.getImageData());

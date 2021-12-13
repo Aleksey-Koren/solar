@@ -31,6 +31,7 @@ public class User{
     private BasicObject location;
     private Instant hackBlock;
     private Integer hackAttempts;
+    private String avatar;
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "users_permissions",

@@ -36,10 +36,11 @@ public class UserMapper {
             user.setLocation(dto.getLocation());
             user.setHackBlock(dto.getHackBlock());
             user.setHackAttempts(dto.getHackAttempts());
+            user.setAvatar(dto.getAvatar());
             user.setPermissions(dto.getPermissions() == null ? null : dto.getPermissions().stream().map(permissionMapper::toEntity).collect(toSet()));
         }else{
             user = new User(null, dto.getTitle(), dto.getLogin(), dto.getPassword(), dto.getMoney(),
-                    dto.getLocation(), dto.getHackBlock(), dto.getHackAttempts(),
+                    dto.getLocation(), dto.getHackBlock(), dto.getHackAttempts(), dto.getAvatar(),
                     dto.getPermissions() == null ? null : dto.getPermissions().stream().map(permissionMapper::toEntity).collect(toSet()));
         }
         return user;
@@ -47,7 +48,7 @@ public class UserMapper {
 
     public UserDto toDto(User user) {
         return new UserDto(user.getId(), user.getTitle(), user.getLogin(), null, user.getMoney(),
-                user.getLocation(), user.getHackBlock(), user.getHackAttempts(),
+                user.getLocation(), user.getHackBlock(), user.getHackAttempts(), user.getAvatar(),
                 user.getPermissions().stream().map(permissionMapper::toDto).collect(Collectors.toSet()));
     }
  }
