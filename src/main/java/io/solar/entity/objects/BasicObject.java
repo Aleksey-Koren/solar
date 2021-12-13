@@ -59,5 +59,4 @@ public class BasicObject implements Serializable{
     @OneToMany(mappedBy = "attachedToShip", cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.DETACH})
     @EqualsAndHashCode.Exclude
     protected List<BasicObject> attachedObjects;
-
 }
