@@ -4,6 +4,7 @@ import io.solar.entity.User;
 import io.solar.repository.UserRepository;
 import io.solar.service.exception.ServiceException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -11,9 +12,11 @@ import org.springframework.web.server.ResponseStatusException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 
 @Service
 @RequiredArgsConstructor
+@Log
 public class DocumentService {
 
     private final UserRepository userRepository;
@@ -35,7 +38,21 @@ public class DocumentService {
     private void updateDatabase(String imagePath, Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "There is no user with such id in database"));
+        deletePreviousFile(user.getAvatar());
         user.setAvatar(imagePath);
         userRepository.save(user);
+    }
+
+    private void deletePreviousFile(String avatar) {
+        File previous = new File(avatar);
+
+        try {
+            Files.delete(previous.toPath());
+        } catch (NoSuchFileException e) {
+            //TODO Log this place, but not throw an exception?
+            e.printStackTrace();
+        } catch (IOException e) {
+            throw new ServiceException("Troubles with deleting previous avatar", e);
+        }
     }
 }
