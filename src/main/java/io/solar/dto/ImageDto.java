@@ -8,4 +8,6 @@ import lombok.Setter;
 public class ImageDto {
     private Long userId;
     private String imageData;
+    private String mimeType;
+    private String filename;
 }
