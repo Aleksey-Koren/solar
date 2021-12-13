@@ -30,7 +30,7 @@ public class BasicObject implements Serializable{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Long id;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "planet")
     protected Planet planet;
     protected Long population;

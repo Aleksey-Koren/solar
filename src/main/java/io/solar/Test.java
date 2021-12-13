@@ -5,7 +5,7 @@ import java.util.List;
 public class Test {
 
     public static void main(String[] args) {
-        System.out.println(calculateRange(7));
+        System.out.println(calculateRange(18965000));
     }
 
     private static List<Long> calculateRange(int range) {
