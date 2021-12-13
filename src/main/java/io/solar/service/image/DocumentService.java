@@ -4,7 +4,7 @@ import io.solar.entity.User;
 import io.solar.repository.UserRepository;
 import io.solar.service.exception.ServiceException;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -16,7 +16,7 @@ import java.nio.file.NoSuchFileException;
 
 @Service
 @RequiredArgsConstructor
-@Log
+@Slf4j
 public class DocumentService {
 
     private final UserRepository userRepository;
@@ -49,8 +49,7 @@ public class DocumentService {
         try {
             Files.delete(previous.toPath());
         } catch (NoSuchFileException e) {
-            //TODO Log this place, but not throw an exception?
-            e.printStackTrace();
+            log.warn("Tried do delete previous avatar, but hadn't found file with path from database: {}", avatar);
         } catch (IOException e) {
             throw new ServiceException("Troubles with deleting previous avatar", e);
         }
