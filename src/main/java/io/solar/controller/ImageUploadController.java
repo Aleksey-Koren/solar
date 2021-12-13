@@ -17,14 +17,14 @@ public class ImageUploadController {
     private final DocumentService documentService;
 
     @Transactional
-    @PreAuthorize("hasAnyAuthoriy('EDIT_USER', 'PLAY_THE_GAME')")
+    @PreAuthorize("hasAnyAuthority('EDIT_USER', 'PLAY_THE_GAME')")
     @PostMapping
     public void uploadAvatar(@RequestBody ImageDto imageDto) {
         imageUploadService.uploadAvatar(imageDto);
     }
 
     @DeleteMapping("{id}")
-    @PreAuthorize("hasAnyAuthoriy('EDIT_USER', 'PLAY_THE_GAME')")
+    @PreAuthorize("hasAnyAuthority('EDIT_USER', 'PLAY_THE_GAME')")
     @Transactional
     public void deleteAvatar(@PathVariable("id") Long id) {
         documentService.deleteAvatarByUserId(id);
