@@ -22,6 +22,7 @@ public class DocumentService {
         updateDatabase(imagePath, userId);
 
         File file = new File(imagePath);
+
         try {
             Files.createDirectories(file.getParentFile().toPath());
             Files.write(file.toPath(), imageData);
