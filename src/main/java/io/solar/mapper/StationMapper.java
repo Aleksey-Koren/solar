@@ -11,7 +11,7 @@ import io.solar.repository.ProductionRepository;
 import io.solar.repository.StationRepository;
 import io.solar.service.*;
 import io.solar.service.exception.ServiceException;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -19,6 +19,7 @@ import org.springframework.web.server.ResponseStatusException;
 import static java.util.stream.Collectors.*;
 
 @Service
+@RequiredArgsConstructor
 public class StationMapper {
 
     private final StationRepository stationRepository;
@@ -29,25 +30,6 @@ public class StationMapper {
     private final ProductionMapper productionMapper;
     private final ProductionRepository productionRepository;
     private final GoodsMapper goodsMapper;
-
-    @Autowired
-    public StationMapper(StationRepository stationRepository,
-                         ObjectTypeDescriptionRepository objectTypeDescriptionRepository,
-                         PlanetService planetService,
-                         BasicObjectRepository basicObjectRepository,
-                         BasicObjectViewMapper basicObjectViewMapper,
-                         ProductionMapper productionMapper,
-                         ProductionRepository productionRepository,
-                         GoodsMapper goodsMapper) {
-        this.stationRepository = stationRepository;
-        this.objectTypeDescriptionRepository = objectTypeDescriptionRepository;
-        this.planetService = planetService;
-        this.basicObjectRepository = basicObjectRepository;
-        this.basicObjectViewMapper = basicObjectViewMapper;
-        this.productionMapper = productionMapper;
-        this.productionRepository = productionRepository;
-        this.goodsMapper = goodsMapper;
-    }
 
     public Station toEntity(StationDto dto) {
         Station station;
@@ -94,7 +76,7 @@ public class StationMapper {
         return station;
     }
 
-    public StationDto toDto(Station station) {
+    public StationDto toListDto(Station station) {
         StationDto dto = new StationDto();
 
         dto.setId(station.getId());
@@ -111,9 +93,6 @@ public class StationMapper {
             throw new ServiceException("Station must not exist without an ObjectTypeDescription field");
         }
         dto.setHullId(station.getObjectTypeDescription().getId());
-        dto.setAttachedObjects(station.getAttachedObjects() != null ?
-                station.getAttachedObjects().stream().map(basicObjectViewMapper::toDto).collect(toList())
-                : null);
 
         dto.setProduction(station.getProduction() != null ?
                 station.getProduction().stream().map(productionMapper::toDto).collect(toList())
@@ -123,6 +102,15 @@ public class StationMapper {
                 station.getGoods().stream().map(goodsMapper::toDto).collect(toList())
                 : null);
 
+        return dto;
+    }
+
+    public StationDto toDto (Station station) {
+        StationDto dto  = toListDto(station);
+
+        dto.setAttachedObjects(station.getAttachedObjects() != null ?
+                station.getAttachedObjects().stream().map(basicObjectViewMapper::toDto).collect(toList())
+                : null);
         return dto;
     }
 }

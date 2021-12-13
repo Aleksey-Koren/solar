@@ -21,8 +21,8 @@ public class StationFacade {
     private final StationMapper stationMapper;
 
     public Page<StationDto> findAll(Pageable pageable, StationFilter stationFilter) {
-        Page<Station> stations = stationService.findAll(new StationSpecification(stationFilter), pageable);
-        return stations.map(stationMapper::toDto);
+        return stationService.findAll(new StationSpecification(stationFilter), pageable)
+                .map(stationMapper::toListDto);
     }
 
     public Optional<StationDto> findById(Long id) {

@@ -29,14 +29,6 @@
         <relativePath/>
     </parent>
 
-    <repositories>
-        <repository>
-            <id>GroupDocsJavaAPI</id>
-            <name>GroupDocs Java API</name>
-            <url>https://repository.groupdocs.com/repo/</url>
-        </repository>
-    </repositories>
-
     <build>
         <plugins>
             <plugin>
@@ -140,12 +132,6 @@
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
             <version>8.0.4</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.groupdocs</groupId>
-            <artifactId>groupdocs-metadata</artifactId>
-            <version>21.8</version>
         </dependency>
     </dependencies>
 </project>

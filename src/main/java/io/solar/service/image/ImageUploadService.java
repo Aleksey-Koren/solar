@@ -1,23 +1,18 @@
 package io.solar.service.image;
 
-import com.groupdocs.metadata.Metadata;
 import io.solar.dto.ImageDto;
 import io.solar.service.exception.ServiceException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MimeType;
 
 import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
-import javax.imageio.stream.ImageInputStream;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Base64;
-import java.util.Iterator;
 
 @Service
 @RequiredArgsConstructor
@@ -41,9 +36,7 @@ public class ImageUploadService {
 
         byte[] croppedImage = cutImage(decodedImageData, imageDto.getMimeType());
 
-        byte[] imageWithoutMetadata = removeImageMetadata(croppedImage);
-
-        documentService.upload(imagePath, imageWithoutMetadata, imageDto.getUserId());
+        documentService.upload(imagePath, croppedImage, imageDto.getUserId());
     }
 
     private String buildImagePath(Long userId, String mimeType) {
@@ -53,61 +46,33 @@ public class ImageUploadService {
         return String.format("%s/%s/%d/avatar.%s", imagesPath, userIdRage, userId, imageExtension);
     }
 
-    private String getUserIdRange(Long userId) {
-        StringBuilder range = new StringBuilder();
-        double startMidResult = userId / 1000.00;
-
-        if (startMidResult >= 1.001) {
-            long start = (long) startMidResult;
-
-            start = (userId % 1000 == 0)
-                    ? start - 999
-                    : start * 1000 + 1;
-
-            range.append(start).append("_").append(start + 999);
-        } else {
-            range.append("1_1000");
+    private String getUserIdRange(Long id) {
+        long count;
+        if(id%1000 != 0) {
+            count = (id/1000) * 1000 + 1;
+        } else{
+            count = (id/1000 - 1) * 1000 + 1;
         }
-
-        return range.toString();
+        return count + "_" + (count+999);
     }
 
     private byte[] cutImage(byte[] imageData, String mimeType) {
         ByteArrayInputStream in = new ByteArrayInputStream(imageData);
         try {
             BufferedImage img = ImageIO.read(in);
+            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 
-            if (img.getWidth() != imageWidth || img.getHeight() != imageHeight) {
-                BufferedImage croppedImage = img.getSubimage(0, 0, imageWidth, imageHeight);
-
-                ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+            if (img.getWidth() > imageWidth || img.getHeight() > imageHeight) {
+                BufferedImage croppedImage = img.getSubimage(0, 0, Math.min(img.getWidth(), imageWidth), Math.min(img.getHeight(), imageHeight));
                 ImageIO.write(croppedImage, MimeType.valueOf(mimeType).getSubtype(), buffer);
-
-                imageData = buffer.toByteArray();
+            }else{
+                ImageIO.write(img, MimeType.valueOf(mimeType).getSubtype(), buffer);
             }
+            imageData = buffer.toByteArray();
 
         } catch (IOException e) {
             throw new ServiceException("Cannot cut image");
         }
-
         return imageData;
-    }
-
-    private byte[] removeImageMetadata(byte[] imageData) {
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(imageData);
-        byte[] imageDataWithoutMetadata;
-
-        try (Metadata metadata = new Metadata(inputStream);
-             ByteArrayOutputStream buffer = new ByteArrayOutputStream()) {
-
-            metadata.sanitize();
-            metadata.save(buffer);
-            imageDataWithoutMetadata = buffer.toByteArray();
-
-        } catch (IOException e) {
-            throw new ServiceException("Cannot remove metadata from image");
-        }
-
-        return imageDataWithoutMetadata;
     }
 }
