@@ -46,14 +46,13 @@ public class ImageUploadService {
         return String.format("%s/%s/%d/avatar.%s", imagesPath, userIdRage, userId, imageExtension);
     }
 
-    private String getUserIdRange(Long id) {
-        long count;
-        if(id%1000 != 0) {
-            count = (id/1000) * 1000 + 1;
-        } else{
-            count = (id/1000 - 1) * 1000 + 1;
-        }
-        return count + "_" + (count+999);
+    private String getUserIdRange(Long userId) {
+
+        long count = (userId % 1000 != 0)
+                ? (userId / 1000) * 1000 + 1
+                : (userId / 1000 - 1) * 1000 + 1;
+
+        return count + "_" + (count + 999);
     }
 
     private byte[] cutImage(byte[] imageData, String mimeType) {
@@ -63,9 +62,13 @@ public class ImageUploadService {
             ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 
             if (img.getWidth() > imageWidth || img.getHeight() > imageHeight) {
-                BufferedImage croppedImage = img.getSubimage(0, 0, Math.min(img.getWidth(), imageWidth), Math.min(img.getHeight(), imageHeight));
+                BufferedImage croppedImage = img.getSubimage(
+                        0, 0,
+                        Math.min(img.getWidth(), imageWidth),
+                        Math.min(img.getHeight(), imageHeight)
+                );
                 ImageIO.write(croppedImage, MimeType.valueOf(mimeType).getSubtype(), buffer);
-            }else{
+            } else {
                 ImageIO.write(img, MimeType.valueOf(mimeType).getSubtype(), buffer);
             }
             imageData = buffer.toByteArray();
