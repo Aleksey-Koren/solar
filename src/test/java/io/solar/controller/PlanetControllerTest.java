@@ -1,62 +1,145 @@
 package io.solar.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.solar.Start;
 import io.solar.dto.PlanetDto;
-import io.solar.dto.Token;
-import io.solar.dto.UserDto;
-import org.codehaus.jackson.map.ObjectMapper;
+import io.solar.entity.Planet;
+import io.solar.mapper.PlanetMapper;
+import io.solar.service.PlanetService;
+//import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InOrder;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.json.JsonTest;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.json.JacksonTester;
+import org.springframework.boot.test.json.ObjectContent;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MockMvcBuilder;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.util.LinkedMultiValueMap;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
-@SpringBootTest(classes = {Start.class})
-@ExtendWith(SpringExtension.class)
+//@SpringBootTest(classes = {Start.class})
+@ExtendWith(MockitoExtension.class)
 @AutoConfigureMockMvc
+@JsonTest
 public class PlanetControllerTest {
 
     @Autowired
-    private MockMvc mockMvc;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private JacksonTester<PlanetDto> json;
+//    @Autowired
+//    private JacksonTester<PageImpl<PlanetDto>> pageJson;
 
-    private String authToken;
+    private MockMvc mockMvc;
+
+    @Mock
+    private PlanetService planetService;
+
+    @Spy
+    private PlanetMapper planetMapper;
 
     @BeforeEach
-    public void getAuthToken() throws Exception {
-
-        UserDto userDto = new UserDto();
-        userDto.setLogin("admin");
-        userDto.setPassword("admin");
-
-        MvcResult mvcResult = mockMvc
-                .perform(post("/api/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(userDto))
-                )
-                .andExpect(status().isOk())
-                .andReturn();
-
-        Token token = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), Token.class);
-
-        authToken = token.getData();
+    private void setup() {
+        this.mockMvc = MockMvcBuilders.standaloneSetup(new PlanetController(planetService, planetMapper))
+                                        .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
+                                        .build();
     }
 
     @Test
+    @WithMockUser(authorities = {"PLAY_THE_GAME", "EDIT_PLANET"})
     void findById_shouldReturnPlanetByCurrentId() throws Exception {
-        int planetId = 500;
+        long planetId = 500;
+        Planet mockPlanet = new Planet();
+        mockPlanet.setId(planetId);
+        when(planetService.findById(planetId)).thenReturn(mockPlanet);
+
         MvcResult mvcResult = mockMvc.perform(get("/api/planet/{id}", planetId).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk()).andReturn();
-        PlanetDto dto = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), PlanetDto.class);
-        System.out.println("!!!!!!!!!!!!!!!" + dto.getId());
+        PlanetDto dto = json.parseObject(mvcResult.getResponse().getContentAsString());
+
+        assertEquals(planetId, dto.getId());
     }
+
+    @Test
+    void save_shouldWorkCorrectly() throws Exception {
+        String planetTitle = "Zhelezyaka";
+        PlanetDto requestDto = PlanetDto.builder()
+                .title(planetTitle)
+                .build();
+        Planet toSave = new Planet();
+        Planet saved = new Planet();
+        saved.setId(666L);
+        toSave.setTitle(planetTitle);
+        when(planetMapper.toEntity(requestDto)).thenReturn(toSave);
+        when(planetService.save(toSave)).thenReturn(saved);
+        InOrder inOrder = Mockito.inOrder(planetService, planetMapper);
+
+        MvcResult mvcResult = mockMvc.perform(post("/api/planet")
+                                                     .content(json.write(requestDto).getJson())
+                                                     .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        inOrder.verify(planetMapper).toEntity(requestDto);
+        inOrder.verify(planetService).save(toSave);
+        inOrder.verify(planetMapper).toDto(saved);
+        inOrder.verifyNoMoreInteractions();
+
+        PlanetDto dto = json.parseObject(mvcResult.getResponse().getContentAsString());
+
+        assertEquals(dto.getId(), saved.getId());
+    }
+
+//    @Test
+//    void findAll_shouldWorkCorrectly() throws Exception {
+//        Planet planet = new Planet();
+//        planet.setId(666L);
+//        planet.setTitle("Zhelezyaka");
+//
+//        Pageable pageable = PageRequest.of(0, 10);
+//
+//        Page<Planet> page = new PageImpl<>(List.of(planet), pageable, 1);
+//        when(planetService.findAll(pageable)).thenReturn(page);
+//
+//        LinkedMultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+//        queryParams.add("page", "0");
+//        queryParams.add("size", "10");
+//
+//        MvcResult mvcResult = mockMvc
+//                .perform(get("/api/planet")
+//                        .params(queryParams))
+//                .andExpect(status().isOk())
+//                .andReturn();
+//
+//        ObjectContent<PageImpl<PlanetDto>> dto = pageJson.parse(mvcResult.getResponse().
+//
+//        );
+//        System.out.println(dto);
+//
+//    }
 }
