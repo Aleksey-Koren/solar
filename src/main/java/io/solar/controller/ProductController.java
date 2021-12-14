@@ -38,8 +38,8 @@ public class ProductController {
     @Transactional
     @PreAuthorize("hasAnyAuthority('PLAY_THE_GAME', 'EDIT_PRODUCT')")
     @GetMapping
-    public ResponseEntity<Page<ProductDto>> getAll(@PageableDefault Pageable pageable) {
-        return ResponseEntity.ok().body(productFacade.findAll(pageable));
+    public Page<ProductDto> getAll(@PageableDefault Pageable pageable) {
+        return productFacade.findAll(pageable);
     }
 
     @Transactional
