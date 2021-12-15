@@ -20,6 +20,7 @@
         <flyway.outOfOrder>true</flyway.outOfOrder>
         <flyway.baselineOnMigrate>true</flyway.baselineOnMigrate>
         <flyway.baselineVersion>0</flyway.baselineVersion>
+        <jUnit.version>5.8.2</jUnit.version>
     </properties>
 
     <parent>
@@ -145,13 +146,6 @@
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
             <version>8.0.4</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <version>5.8.2</version>
-            <scope>test</scope>
         </dependency>
 
     </dependencies>
