@@ -1,17 +1,16 @@
 package io.solar.controller;
 
 import io.solar.dto.ProductDto;
+import io.solar.utils.PageResponse;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -39,7 +38,6 @@ public class ProductControllerTest {
 
     @Test
     @WithMockUser(authorities = {"PLAY_THE_GAME", "EDIT_PRODUCT"})
-    @Disabled
     public void getAllProducts_pageable_notEmptyPage() throws Exception {
 
         LinkedMultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
@@ -52,9 +50,9 @@ public class ProductControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        Page<ProductDto> productDtoList = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<>() {});
+        PageResponse<ProductDto> productDtoList = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<PageResponse<ProductDto>>() {});
 
-        Assertions.assertEquals(10, productDtoList.getTotalElements());
+        Assertions.assertEquals(10, productDtoList.getNumberOfElements());
     }
 
     @Test
