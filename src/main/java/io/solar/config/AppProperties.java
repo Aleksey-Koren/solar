@@ -13,8 +13,6 @@ import org.springframework.stereotype.Component;
 @Getter
 @Setter
 public class AppProperties {
-
     private String goodsGenerationDelayMinutes;
     private String goodsInitialDelayMinutes;
-
 }

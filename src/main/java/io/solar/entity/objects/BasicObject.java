@@ -41,6 +41,7 @@ public class BasicObject implements Serializable{
     protected Float aphelion;
     protected Float orbitalPeriod;
     protected Float angle;
+    protected Float rotationAngle;
     @ManyToOne
     @JoinColumn(name = "hull_id")
     protected ObjectTypeDescription objectTypeDescription;
@@ -53,8 +54,12 @@ public class BasicObject implements Serializable{
     protected Long attachedToSocket;
     @Enumerated(EnumType.STRING)
     protected ObjectStatus status;
-    protected Float acceleration;
-    protected Float speed;
+    protected Float speedX;
+    protected Float speedY;
+    protected Float accelerationX;
+    protected Float accelerationY;
+
+
 
     @OneToMany(mappedBy = "attachedToShip", cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.DETACH})
     @EqualsAndHashCode.Exclude
