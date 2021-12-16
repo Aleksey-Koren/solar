@@ -4,20 +4,7 @@ import io.solar.entity.Planet;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
 
@@ -60,8 +47,17 @@ public class BasicObject implements Serializable{
     protected Float accelerationY;
 
 
-
     @OneToMany(mappedBy = "attachedToShip", cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.DETACH})
     @EqualsAndHashCode.Exclude
     protected List<BasicObject> attachedObjects;
+
+    @Transient
+    public Double getSpeed() {
+        return Math.sqrt(Math.pow(this.speedX, 2) + Math.pow(this.speedY, 2));
+    }
+
+    @Transient
+    public Double getAcceleration() {
+        return Math.sqrt(Math.pow(this.accelerationX, 2) + Math.pow(this.accelerationY, 2));
+    }
 }
