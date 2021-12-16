@@ -41,9 +41,13 @@ public class BasicObject implements Serializable{
     protected Long attachedToSocket;
     @Enumerated(EnumType.STRING)
     protected ObjectStatus status;
+    @Column(name = "speed_x")
     protected Float speedX;
+    @Column(name = "speed_y")
     protected Float speedY;
+    @Column(name = "acceleration_x")
     protected Float accelerationX;
+    @Column(name = "acceleration_y")
     protected Float accelerationY;
 
 
