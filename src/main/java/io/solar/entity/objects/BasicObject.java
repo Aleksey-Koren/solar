@@ -4,20 +4,7 @@ import io.solar.entity.Planet;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
 
@@ -41,6 +28,7 @@ public class BasicObject implements Serializable{
     protected Float aphelion;
     protected Float orbitalPeriod;
     protected Float angle;
+    protected Float rotationAngle;
     @ManyToOne
     @JoinColumn(name = "hull_id")
     protected ObjectTypeDescription objectTypeDescription;
@@ -53,10 +41,27 @@ public class BasicObject implements Serializable{
     protected Long attachedToSocket;
     @Enumerated(EnumType.STRING)
     protected ObjectStatus status;
-    protected Float acceleration;
-    protected Float speed;
+    @Column(name = "speed_x")
+    protected Float speedX;
+    @Column(name = "speed_y")
+    protected Float speedY;
+    @Column(name = "acceleration_x")
+    protected Float accelerationX;
+    @Column(name = "acceleration_y")
+    protected Float accelerationY;
+
 
     @OneToMany(mappedBy = "attachedToShip", cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.DETACH})
     @EqualsAndHashCode.Exclude
     protected List<BasicObject> attachedObjects;
+
+    @Transient
+    public Double getSpeed() {
+        return Math.sqrt(Math.pow(this.speedX, 2) + Math.pow(this.speedY, 2));
+    }
+
+    @Transient
+    public Double getAcceleration() {
+        return Math.sqrt(Math.pow(this.accelerationX, 2) + Math.pow(this.accelerationY, 2));
+    }
 }

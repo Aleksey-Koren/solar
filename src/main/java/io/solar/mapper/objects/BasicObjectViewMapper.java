@@ -8,27 +8,18 @@ import io.solar.mapper.EntityDtoMapper;
 import io.solar.repository.BasicObjectRepository;
 import io.solar.repository.ObjectTypeDescriptionRepository;
 import io.solar.repository.PlanetRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
+@RequiredArgsConstructor
 public class BasicObjectViewMapper implements EntityDtoMapper<BasicObject, BasicObjectViewDto> {
 
     private final ObjectTypeDescriptionRepository objectTypeDescriptionRepository;
     private final BasicObjectRepository basicObjectRepository;
     private final PlanetRepository planetRepository;
-
-    @Autowired
-    public BasicObjectViewMapper(ObjectTypeDescriptionRepository objectTypeDescriptionRepository,
-                                 BasicObjectRepository basicObjectRepository,
-                                 PlanetRepository planetRepository) {
-
-        this.objectTypeDescriptionRepository = objectTypeDescriptionRepository;
-        this.basicObjectRepository = basicObjectRepository;
-        this.planetRepository = planetRepository;
-    }
 
     @Override
     public BasicObject toEntity(BasicObjectViewDto dto) {
@@ -52,6 +43,7 @@ public class BasicObjectViewMapper implements EntityDtoMapper<BasicObject, Basic
                 .aphelion(entity.getAphelion())
                 .orbitalPeriod(entity.getOrbitalPeriod())
                 .angle(entity.getAngle())
+                .rotationAngle(entity.getRotationAngle())
                 .hullId(entity.getObjectTypeDescription().getId())
                 .userId(entity.getUserId())
                 .active(entity.getActive())
@@ -59,8 +51,10 @@ public class BasicObjectViewMapper implements EntityDtoMapper<BasicObject, Basic
                 .attachedToShip(entity.getAttachedToShip() != null ? entity.getAttachedToShip().getId() : null)
                 .attachedToSocket(entity.getAttachedToSocket())
                 .status(entity.getStatus())
-                .acceleration(entity.getAcceleration())
-                .speed(entity.getSpeed())
+                .speedX(entity.getSpeedX())
+                .speedY(entity.getSpeedY())
+                .accelerationX(entity.getAccelerationX())
+                .accelerationY(entity.getAccelerationY())
                 .build();
     }
 
@@ -104,16 +98,19 @@ public class BasicObjectViewMapper implements EntityDtoMapper<BasicObject, Basic
         basicObject.setTitle(dto.getTitle());
         basicObject.setActive(dto.getActive());
         basicObject.setAngle(dto.getAngle());
+        basicObject.setRotationAngle(dto.getRotationAngle());
         basicObject.setAphelion(dto.getAphelion());
         basicObject.setDurability(dto.getDurability());
         basicObject.setFraction(dto.getFraction());
         basicObject.setOrbitalPeriod(dto.getOrbitalPeriod());
-        basicObject.setAcceleration(dto.getAcceleration());
+        basicObject.setAccelerationX(dto.getAccelerationX());
+        basicObject.setAccelerationY(dto.getAccelerationY());
         basicObject.setX(dto.getX());
         basicObject.setY(dto.getY());
         basicObject.setUserId(dto.getUserId());
         basicObject.setStatus(dto.getStatus());
-        basicObject.setSpeed(dto.getSpeed());
+        basicObject.setSpeedX(dto.getSpeedX());
+        basicObject.setSpeedY(dto.getSpeedY());
         basicObject.setPlanet(planet);
         basicObject.setAttachedToSocket(dto.getAttachedToSocket());
         basicObject.setObjectTypeDescription(objectTypeDescription);
