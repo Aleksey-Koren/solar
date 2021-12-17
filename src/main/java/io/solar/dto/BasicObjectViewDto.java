@@ -22,6 +22,7 @@ public class BasicObjectViewDto {
     private Float aphelion;
     private Float orbitalPeriod;
     private Float angle;
+    private Float rotationAngle;
     private Long hullId;
     private Long userId;
     private Boolean active;
@@ -29,6 +30,8 @@ public class BasicObjectViewDto {
     private Long attachedToShip;
     private Long attachedToSocket;
     private ObjectStatus status;
-    private Float acceleration;
-    private Float speed;
+    private Float speedX;
+    private Float speedY;
+    private Float accelerationX;
+    private Float accelerationY;
 }

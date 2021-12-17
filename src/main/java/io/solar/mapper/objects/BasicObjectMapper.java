@@ -11,7 +11,7 @@ import io.solar.mapper.SocketMapper;
 import io.solar.repository.BasicObjectRepository;
 import io.solar.repository.ObjectTypeDescriptionRepository;
 import io.solar.repository.PlanetRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class BasicObjectMapper implements EntityDtoMapper<BasicObject, BasicObjectDto> {
 
     private final BasicObjectRepository basicObjectRepository;
@@ -27,21 +28,6 @@ public class BasicObjectMapper implements EntityDtoMapper<BasicObject, BasicObje
     private final PlanetRepository planetRepository;
     private final BasicObjectViewMapper basicObjectViewMapper;
     private final SocketMapper socketMapper;
-
-
-    @Autowired
-    public BasicObjectMapper(BasicObjectRepository basicObjectRepository,
-                             ObjectTypeDescriptionRepository objectTypeDescriptionRepository,
-                             PlanetRepository planetRepository,
-                             BasicObjectViewMapper basicObjectViewMapper,
-                             SocketMapper socketMapper) {
-
-        this.basicObjectRepository = basicObjectRepository;
-        this.objectTypeDescriptionRepository = objectTypeDescriptionRepository;
-        this.planetRepository = planetRepository;
-        this.basicObjectViewMapper = basicObjectViewMapper;
-        this.socketMapper = socketMapper;
-    }
 
     @Override
     public BasicObject toEntity(BasicObjectDto dto) {
@@ -67,10 +53,12 @@ public class BasicObjectMapper implements EntityDtoMapper<BasicObject, BasicObje
 
         return BasicObjectDto.builder()
                 .id(entity.getId())
-                .acceleration(entity.getAcceleration())
+                .accelerationX(entity.getAccelerationX())
+                .accelerationY(entity.getAccelerationY())
                 .active(entity.getActive())
                 .aphelion(entity.getAphelion())
                 .angle(entity.getAngle())
+                .rotationAngle(entity.getRotationAngle())
                 .attachedToShip(entity.getAttachedToShip() == null ? null : entity.getAttachedToShip().getId())
                 .attachedToSocket(entity.getAttachedToSocket())
                 .durability(entity.getDurability())
@@ -80,7 +68,8 @@ public class BasicObjectMapper implements EntityDtoMapper<BasicObject, BasicObje
                 .planet(entity.getPlanet() == null ? null : entity.getPlanet().getId())
                 .x(entity.getX())
                 .y(entity.getY())
-                .speed(entity.getSpeed())
+                .speedX(entity.getSpeedX())
+                .speedY(entity.getSpeedY())
                 .status(entity.getStatus())
                 .population(entity.getPopulation())
                 .title(entity.getTitle())
@@ -130,10 +119,12 @@ public class BasicObjectMapper implements EntityDtoMapper<BasicObject, BasicObje
         }
 
         basicObject.setPopulation(dto.getPopulation());
-        basicObject.setAcceleration(dto.getAcceleration());
+        basicObject.setAccelerationX(dto.getAccelerationX());
+        basicObject.setAccelerationY(dto.getAccelerationY());
         basicObject.setActive(dto.getActive());
         basicObject.setAphelion(dto.getAphelion());
         basicObject.setAngle(dto.getAngle());
+        basicObject.setRotationAngle(dto.getRotationAngle());
         basicObject.setAttachedToShip(attachedToShip);
         basicObject.setAttachedToSocket(dto.getAttachedToSocket());
         basicObject.setDurability(dto.getDurability());
@@ -143,7 +134,8 @@ public class BasicObjectMapper implements EntityDtoMapper<BasicObject, BasicObje
         basicObject.setPlanet(planet);
         basicObject.setX(dto.getX());
         basicObject.setY(dto.getY());
-        basicObject.setSpeed(dto.getSpeed());
+        basicObject.setSpeedX(dto.getSpeedX());
+        basicObject.setSpeedY(dto.getSpeedY());
         basicObject.setStatus(dto.getStatus());
         basicObject.setPopulation(dto.getPopulation());
         basicObject.setTitle(dto.getTitle());
