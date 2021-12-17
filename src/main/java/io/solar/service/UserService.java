@@ -4,6 +4,7 @@ import io.solar.dto.UserDto;
 import io.solar.dto.UserFilter;
 import io.solar.entity.Permission;
 import io.solar.entity.User;
+import io.solar.entity.objects.BasicObject;
 import io.solar.mapper.UserMapper;
 import io.solar.repository.PermissionRepository;
 import io.solar.repository.UserRepository;
@@ -117,6 +118,10 @@ public class UserService implements UserDetailsService {
         return mapUser(
                 user.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No user with such id")),
                 canEdit);
+    }
+
+    public boolean isUserLocatedInObject(User user, Long objectId) {
+        return user.getLocation().equals(objectId);
     }
 
     public User updateUserTitle(Long id, String title) {

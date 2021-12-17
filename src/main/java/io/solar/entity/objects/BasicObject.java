@@ -1,5 +1,6 @@
 package io.solar.entity.objects;
 
+import io.solar.entity.Course;
 import io.solar.entity.Planet;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -54,6 +55,10 @@ public class BasicObject implements Serializable{
     @OneToMany(mappedBy = "attachedToShip", cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.DETACH})
     @EqualsAndHashCode.Exclude
     protected List<BasicObject> attachedObjects;
+
+    @OneToMany(mappedBy = "object", cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.DETACH})
+    @EqualsAndHashCode.Exclude
+    protected List<Course> courses;
 
     @Transient
     public Double getSpeed() {
