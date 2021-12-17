@@ -13,7 +13,7 @@ import java.util.List;
 @Entity
 @Table(name = "objects")
 @Inheritance(strategy = InheritanceType.JOINED)
-public class BasicObject implements Serializable{
+public class BasicObject implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -50,6 +50,10 @@ public class BasicObject implements Serializable{
     protected Float accelerationX;
     @Column(name = "acceleration_y")
     protected Float accelerationY;
+    @Column(name = "position_iteration")
+    protected Long positionIteration;
+    @Column(name = "position_iteration_ts")
+    protected Long positionIterationTs;
 
 
     @OneToMany(mappedBy = "attachedToShip", cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.DETACH})

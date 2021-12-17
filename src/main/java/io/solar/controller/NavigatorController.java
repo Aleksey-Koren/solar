@@ -11,6 +11,9 @@ import io.solar.service.UserService;
 import io.solar.service.object.BasicObjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import io.solar.service.scheduler.ObjectCoordinatesService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +27,7 @@ import java.security.Principal;
 public class NavigatorController {
 
     private final NavigatorService navigatorService;
+    private final ObjectCoordinatesService objectCoordinatesService;
     private final CourseFacade courseFacade;
     private final CourseService courseService;
     private final UserService userService;
@@ -44,7 +48,7 @@ public class NavigatorController {
 
         navigatorService.undockShip(shipId);
     }
-
+  
     @PostMapping("/course")
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
     @Transactional
@@ -78,5 +82,11 @@ public class NavigatorController {
         throw new ResponseStatusException(HttpStatus.FORBIDDEN,
                 String.format("User can change course only for object where he is located in. User location_id = %d. " +
                         "Object's to change course id = %d", locationId, objectId));
+    }
+  
+    @Scheduled(fixedDelayString = "${app.navigator.update_coordinates_delay}")
+    public void updateObjectsCoordinate() {
+
+        objectCoordinatesService.update();
     }
 }
