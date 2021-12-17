@@ -121,7 +121,7 @@ public class UserService implements UserDetailsService {
     }
 
     public boolean isUserLocatedInObject(User user, Long objectId) {
-        return user.getLocation().equals(objectId);
+        return user.getLocation().getId().equals(objectId);
     }
 
     public User updateUserTitle(Long id, String title) {

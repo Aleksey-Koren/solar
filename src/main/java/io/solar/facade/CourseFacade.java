@@ -55,12 +55,16 @@ public class CourseFacade {
 
     private void adjustCourseChain(CourseDto dto) {
         Course newCourse = courseMapper.toEntity(dto);
-        Course previous = courseService.findByNext(courseService.findById(dto.getNextId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("There is no course with such id in database. id = %d", dto.getNextId()))))
-                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("There is no course with such next_id in database. next_id = %d", dto.getNextId())));
-        courseService.save(newCourse);
-        previous.setNext(newCourse);
-        courseService.save(previous);
+        Optional<Course> previousOptional = courseService.findByNext(courseService.findById(dto.getNextId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("There is no course with such id in database. id = %d", dto.getNextId()))));
+        if(previousOptional.isPresent()) {
+            Course previous = previousOptional.get();
+            courseService.save(newCourse);
+            previous.setNext(newCourse);
+            courseService.save(previous);
+        }else{
+            courseService.save(newCourse);
+        }
     }
 
     public void deleteCourse(Course course) {

@@ -8,8 +8,5 @@ CREATE TABLE courses
     acceleration_y FLOAT NOT NULL,
     next BIGINT REFERENCES courses(id),
     created_at TIMESTAMP,
-    expire_at TIMESTAMP,
-    CONSTRAINT courses_objects_id_fk
-        FOREIGN KEY (object_id) REFERENCES objects(id)
-            ON DELETE CASCADE
+    expire_at TIMESTAMP
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
