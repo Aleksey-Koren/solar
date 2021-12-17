@@ -1,8 +1,8 @@
 ALTER TABLE objects
-    ADD position_iteration_ts decimal(21) null;
+    ADD position_iteration_ts bigint null;
 
 ALTER TABLE objects
-    ADD position_iteration int null;
+    ADD position_iteration bigint null;
 
 ALTER TABLE objects
     ALTER COLUMN position_iteration set default 1;
