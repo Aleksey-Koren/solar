@@ -26,7 +26,7 @@ public class StarShipService {
 
     public StarShip dockShip(StarShip starShip, Station station) {
         starShip.setStatus(ObjectStatus.ATTACHED_TO);
-        starShip.setAttachedToShip(starShip);
+        starShip.setAttachedToShip(station);
 
         return starShipRepository.save(starShip);
     }
