@@ -38,11 +38,6 @@ public class InitService {
         event.getApplicationContext().getBean(InitService.class).defaultAdminInitialization();
     }
 
-//    @PostConstruct
-//    public void startup() {
-//        defaultAdminInitialization();
-//    }
-
     @Transactional
     public void defaultAdminInitialization() {
         if (!adminNotExists.equals("yes")) {
