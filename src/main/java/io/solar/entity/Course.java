@@ -16,7 +16,7 @@ public class Course {
     private Long id;
 
     @ToString.Exclude
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "object_id")
     private BasicObject object;
 

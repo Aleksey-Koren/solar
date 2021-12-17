@@ -31,7 +31,6 @@ public class NavigatorController {
     private final CourseService courseService;
     private final UserService userService;
 
-    private final StarShipRepository starShipRepository;
 
     @PostMapping("/dock")
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
@@ -93,16 +92,5 @@ public class NavigatorController {
         throw new ResponseStatusException(HttpStatus.FORBIDDEN,
                 String.format("User can change course only for object where he is located in. User location_id = %d. " +
                         "Object's to change course id = %d", locationId, objectId));
-    }
-
-
-
-
-
-    @DeleteMapping("/test/{id}")
-    @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
-    @Transactional
-    public void test(@PathVariable("id") Long id) {
-        starShipRepository.deleteById(id);
     }
 }

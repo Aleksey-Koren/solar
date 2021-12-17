@@ -74,7 +74,7 @@ public class BasicObject implements Serializable {
     @EqualsAndHashCode.Exclude
     protected List<BasicObject> attachedObjects;
 
-    @OneToMany(mappedBy = "object", cascade = {CascadeType.REMOVE})
+    @OneToMany(mappedBy = "object", cascade = CascadeType.REMOVE)
     @EqualsAndHashCode.Exclude
     protected List<Course> courses;
 
