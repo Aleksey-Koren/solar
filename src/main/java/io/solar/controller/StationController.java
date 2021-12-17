@@ -6,7 +6,7 @@ import io.solar.entity.User;
 import io.solar.entity.objects.StarShip;
 import io.solar.facade.StationFacade;
 import io.solar.service.StationService;
-import io.solar.service.data_generation.GoodsGeneration;
+import io.solar.service.scheduler.GoodsGeneration;
 import io.solar.specification.filter.StationFilter;
 import io.solar.utils.Option;
 import io.solar.utils.context.AuthData;

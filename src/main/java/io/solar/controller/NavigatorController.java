@@ -7,9 +7,11 @@ import io.solar.entity.objects.BasicObject;
 import io.solar.facade.CourseFacade;
 import io.solar.service.CourseService;
 import io.solar.service.NavigatorService;
+import io.solar.service.scheduler.ObjectCoordinatesService;
 import io.solar.service.UserService;
 import io.solar.service.object.BasicObjectService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +26,7 @@ import java.security.Principal;
 public class NavigatorController {
 
     private final NavigatorService navigatorService;
+    private final ObjectCoordinatesService objectCoordinatesService;
     private final CourseFacade courseFacade;
     private final CourseService courseService;
     private final UserService userService;
@@ -57,6 +60,13 @@ public class NavigatorController {
 
         courseFacade.updateCourseChain(dto);
     }
+
+    @Scheduled(fixedDelayString = "${app.navigator.update_coordinates_delay}")
+    public void updateObjectsCoordinate() {
+
+        objectCoordinatesService.update();
+    }
+}
 
     @DeleteMapping("/course")
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
