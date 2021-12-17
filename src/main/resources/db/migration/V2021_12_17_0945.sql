@@ -1,5 +1,5 @@
 ALTER TABLE objects
-    ADD position_iteration_ts int null;
+    ADD position_iteration_ts decimal(21) null;
 
 ALTER TABLE objects
     ADD position_iteration int null;
