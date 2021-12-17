@@ -44,3 +44,6 @@ app:
         path: src/main/resources/images
         width: 300
         height: 300
+    navigator:
+        max_distance: 10
+        max_speed: 1000
