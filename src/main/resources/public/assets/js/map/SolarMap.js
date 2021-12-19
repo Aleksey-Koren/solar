@@ -196,79 +196,11 @@ SolarMap.prototype.drawKmPerPixel = function () {
     }
 }
 SolarMap.prototype.drawPlanet = function (ctx, planet, absWindow, zero) {
-    if (planet.type === 'moon') {
-        if (!planet.aphelion || this.kkmPerPixel > 400) {
-            return;
-        }
-    }
-
-    this.drawPlanetOrbit(ctx, planet, absWindow, zero);
-    if (planet.type === 'star') {
-        ctx.strokeStyle = '#ffc562';
-    } else if (planet.type === 'planet') {
-        ctx.strokeStyle = '#4fb169';
-    } else {
-        ctx.strokeStyle = 'rgba(151,151,151,0.58)';
-    }
-    var angle = SolarTimer.angle(planet);
-    var absX = Math.cos(angle) * planet.aphelion + zero.x;
-    var absY = Math.sin(angle) * planet.aphelion + zero.y;
-
-
-    ctx.beginPath();
-    var radius = planet.meanRadius / 1000 / this.kkmPerPixel;
-    if (radius < 10) {
-        radius = 10;
-    }
-    var rel = this.getRelPoint(absX, absY);
-    this.objects.push({
-        type: 'planet',
-        obj: planet,
-        x: rel.x,
-        y: rel.y,
-        r: radius
-    });
-    ctx.arc(rel.x, rel.y, radius, 0, Math.PI * 2);
-    ctx.strokeText(planet.title, rel.x, rel.y, {color: ctx.strokeStyle});
-    ctx.stroke();
-    if (planet.moons && planet.moons.length) {
-        var me = this;
-        var newZero = {x: absX, y: absY};
-        planet.moons.forEach(function (moon) {
-            me.drawPlanet(ctx, moon, absWindow, newZero)
-        })
-    }
+    SolarMapPlanetRender.drawPlanet(this, ctx, planet, absWindow, zero);
 };
 
 SolarMap.prototype.fitInScreen = function (planet) {
     return planet.type !== 'moon';
-};
-
-SolarMap.prototype.drawPlanetOrbit = function (ctx, planet, absWindow, zero) {
-    var drawNormal = this.kkmPerPixel > 50 || (this.kkmPerPixel <= 50 && planet.type === 'moon');
-    var smallSize = this.kkmPerPixel < 4.5;
-    var points = null;
-    if (!drawNormal) {
-        points = OrbitGeometry.getIntersections(planet, absWindow, zero);
-        if (!smallSize) {
-            drawNormal = points.length;
-        }
-    }
-    ctx.strokeStyle = '#555555';
-    if (drawNormal) {
-        ctx.beginPath();
-        var dist = planet.aphelion / this.kkmPerPixel;
-        var relP = this.getRelPoint(zero.x, zero.y);
-        ctx.arc(relP.x, relP.y, dist, 0, Math.PI * 2);
-        ctx.stroke();
-    } else if (smallSize && points && points.length > 1) {
-        ctx.beginPath();
-        var p0 = this.getRelPoint(points[0].x, points[0].y);
-        var p1 = this.getRelPoint(points[1].x, points[1].y);
-        ctx.moveTo(p0.x, p0.y);
-        ctx.lineTo(p1.x, p1.y);
-        ctx.stroke();
-    }
 };
 
 
@@ -326,81 +258,12 @@ SolarMap.prototype.init = function () {
     this.resize();
 };
 SolarMap.prototype.changeZoom = function (zoom, relX, relY) {
-    if(this.zoomStack.length > 0) {
-        this.zoomStack.pop();
-    }
-    if (this.zoomStack.length > 4) {
-        return;
-    }
-    var last = this.zoomStack.length > 1 ? this.zoomStack[this.zoomStack.length - 1] : null;
-    if (last === null || (last && ((last.zoom > 1 && zoom > 1) || (last.zoom < 1 && last.zoom < 1)))) {
-        this.zoomStack.push({
-            absBefore: this.getAbsPoint(relX, relY),
-            absZeroBefore: this.getAbsPoint(0, 0),
-            zoom: zoom,
-            kkm: this.kkmPerPixel,
-            point: {x: relX, y: relY},
-            time: new Date().getTime() + 2000,
-            step: 0,
-            maxStep: 20
-        });
-    }
-
+    SolarMapZoom.changeZoom(this, zoom, relX, relY);
 };
 
 
 SolarMap.prototype.calculateZoom = function () {
-    if (this.zoomStack.length === 0) {
-        return;
-    }
-    var zoomInfo = this.zoomStack[0];
-    if (zoomInfo.step === zoomInfo.maxStep) {
-        this.zoomStack.shift();
-        if (this.zoomStack.length) {
-            zoomInfo = this.zoomStack[0];
-            zoomInfo.absZeroBefore = this.getAbsPoint(0, 0);
-            zoomInfo.kkm = this.kkmPerPixel;
-        } else {
-            return;
-        }
-    }
-
-    zoomInfo.step++;
-    if (this.kkmPerPixel > 51918 && zoomInfo.zoom > 1) {
-        this.zoomStack.shift();
-        this.calculateZoom();
-        return;
-    }
-
-    var zoom;
-    if (zoomInfo.zoom > 1) {
-        zoom = 1 + ((zoomInfo.zoom - 1) / zoomInfo.maxStep) * zoomInfo.step;
-    } else {
-        zoom = 1 - (((1 - zoomInfo.zoom) / zoomInfo.maxStep) * zoomInfo.step);
-    }
-
-    var absBefore = zoomInfo.absBefore;
-    var absZeroBefore = zoomInfo.absZeroBefore;
-    this.kkmPerPixel = zoomInfo.kkm * zoom;
-    var absZeroAfter = this.getAbsPoint(0, 0);
-    var dx = absZeroBefore.x - absZeroAfter.x;
-    var dy = absZeroBefore.y - absZeroAfter.y;
-
-    var zeroX = dx / this.kkmPerPixel;
-    var zeroY = dy / this.kkmPerPixel;
-
-    var windowShiftX, windowShiftY;
-    dx = absBefore.x - absZeroBefore.x;
-    dy = absBefore.y - absZeroBefore.y;
-    if (zoomInfo.zoom < 1) {
-        windowShiftX = (dx - dx * zoom) / this.kkmPerPixel;
-        windowShiftY = (dy - dy * zoom) / this.kkmPerPixel;
-    } else {
-        windowShiftX = -(dx * (zoom - 1) / zoom) / zoomInfo.kkm;
-        windowShiftY = -(dy * (zoom - 1) / zoom) / zoomInfo.kkm;
-    }
-    this.window.x += zeroX + windowShiftX;
-    this.window.y += zeroY + windowShiftY;
+    SolarMapZoom.calculateZoom(this);
 };
 
 SolarMap.prototype.resize = function () {

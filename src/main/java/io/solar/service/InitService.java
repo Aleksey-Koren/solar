@@ -54,7 +54,7 @@ public class InitService {
         User admin = new User();
         admin.setLogin(LOGIN);
         admin.setPassword(PASSWORD);
-        userService.registerNewUser(admin, Role.ADMIN);
+        admin = userService.registerNewUser(admin, Role.ADMIN);
         createDefaultShip(admin);
     }
 
@@ -63,6 +63,7 @@ public class InitService {
         adminStarShip.setTitle("Admin Starship");
         adminStarShip.setX(10f);
         adminStarShip.setY(10f);
+        adminStarShip.setUserId(admin.getId());
         adminStarShip.setObjectTypeDescription(objectTypeDescriptionRepository.findById(66L)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Couldn't find ObjectTypeDescription with such id")));
         adminStarShip.setStatus(ObjectStatus.IN_SPACE);

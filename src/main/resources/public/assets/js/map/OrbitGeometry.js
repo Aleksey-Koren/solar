@@ -57,6 +57,12 @@ var OrbitGeometry = {
             }
         }
     },
+    /**
+     * @param planet {{x:number, y: number, aphelion: number}}
+     * @param lines {Line[]}
+     * @param zero {Point}
+     * @returns {*[]}
+     */
     getIntersections: function(planet, lines, zero) {
         var circle = {x:zero.x, y: zero.y, r: planet.aphelion};
         var out = [];

@@ -70,6 +70,8 @@ ObjectsGrid.prototype.unmount = function() {
 };
 ObjectsGrid.prototype.showGrid = function() {
     var me = this;
+    Dom.clear(me.container);
+    me.container.appendChild(me.grid.container);
     Rest.doGet("/api/objects/config/?" + this.grid.queryString()).then(function(response){
         Dom.clear(me.container);
         me.container.appendChild(me.grid.container);
@@ -113,5 +115,4 @@ ObjectsGrid.prototype.showForm = function(id){
             clb();
         })
     }
-
 };
