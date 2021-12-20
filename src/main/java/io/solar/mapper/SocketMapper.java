@@ -6,6 +6,7 @@ import io.solar.entity.objects.BasicObject;
 import io.solar.entity.objects.ObjectTypeDescription;
 import io.solar.repository.InventorySocketRepository;
 import io.solar.repository.ObjectTypeDescriptionRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -14,18 +15,11 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.Objects;
 
 @Component
+@RequiredArgsConstructor
 public class SocketMapper implements EntityDtoMapper<InventorySocket, InventorySocketDto> {
 
     private final InventorySocketRepository socketRepository;
     private final ObjectTypeDescriptionRepository objectTypeDescriptionRepository;
-
-    @Autowired
-    public SocketMapper(InventorySocketRepository socketRepository,
-                        ObjectTypeDescriptionRepository objectTypeDescriptionRepository) {
-
-        this.socketRepository = socketRepository;
-        this.objectTypeDescriptionRepository = objectTypeDescriptionRepository;
-    }
 
     @Override
     public InventorySocket toEntity(InventorySocketDto dto) {

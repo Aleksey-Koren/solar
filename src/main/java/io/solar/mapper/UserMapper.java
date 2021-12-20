@@ -3,6 +3,7 @@ package io.solar.mapper;
 import io.solar.dto.UserDto;
 import io.solar.entity.User;
 import io.solar.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -13,16 +14,11 @@ import java.util.stream.Collectors;
 import static java.util.stream.Collectors.*;
 
 @Service
+@RequiredArgsConstructor
 public class UserMapper {
 
     private final UserRepository userRepository;
     private final PermissionMapper permissionMapper;
-
-    @Autowired
-    public UserMapper(UserRepository userRepository, PermissionMapper permissionMapper) {
-        this.userRepository = userRepository;
-        this.permissionMapper = permissionMapper;
-    }
 
     public User toEntity(UserDto dto) {
         User user;

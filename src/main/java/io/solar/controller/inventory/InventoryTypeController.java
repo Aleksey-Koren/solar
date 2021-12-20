@@ -3,7 +3,7 @@ package io.solar.controller.inventory;
 import io.solar.dto.inventory.InventoryTypeDto;
 import io.solar.facade.InventoryTypeFacade;
 import io.solar.service.inventory.InventoryTypeService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -15,22 +15,18 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/inventory-type")
+@RequiredArgsConstructor
 public class InventoryTypeController {
 
-    private InventoryTypeFacade facade;
-    private InventoryTypeService service;
+    private final InventoryTypeFacade inventoryTypeFacade;
+    private final InventoryTypeService inventoryTypeService;
 
-    @Autowired
-    public InventoryTypeController(InventoryTypeFacade inventoryTypeFacade, InventoryTypeService inventoryTypeService) {
-        this.facade = inventoryTypeFacade;
-        this.service = inventoryTypeService;
-    }
 
     @Transactional
     @PreAuthorize("hasAuthority('EDIT_INVENTORY_TYPE')")
     @PostMapping
     public ResponseEntity<InventoryTypeDto> save(@RequestBody InventoryTypeDto dto) {
-        return ResponseEntity.ok(facade.save(dto));
+        return ResponseEntity.ok(inventoryTypeFacade.save(dto));
     }
 
     //TODO I didn't see any fields for filtration or searching on UI.
@@ -39,7 +35,7 @@ public class InventoryTypeController {
     @PreAuthorize("hasAnyAuthority('PLAY_THE_GAME', 'EDIT_INVENTORY_TYPE')")
     @GetMapping
     public ResponseEntity<Page<InventoryTypeDto>> getAll(@PageableDefault Pageable pageable) {
-        return ResponseEntity.ok().body(facade.findAll(pageable));
+        return ResponseEntity.ok().body(inventoryTypeFacade.findAll(pageable));
     }
 
     //TODO This method won't work, while I don't set all ManyToMany or OneToMany relations in entities.
@@ -48,6 +44,6 @@ public class InventoryTypeController {
     @PreAuthorize("hasAuthority('EDIT_INVENTORY_TYPE')")
     @DeleteMapping ("{id}")
     public void delete(@PathVariable("id") Long id) {
-        service.delete(id);
+        inventoryTypeService.delete(id);
     }
 }

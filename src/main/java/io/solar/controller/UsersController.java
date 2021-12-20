@@ -28,6 +28,7 @@ public class UsersController {
 
     private final UserService userService;
     private final UserFacade userFacade;
+
     @GetMapping
     public Page<UserDto> getList(
             Pageable pageable,

@@ -4,6 +4,7 @@ import io.solar.entity.objects.Station;
 import io.solar.repository.StationRepository;
 import io.solar.specification.StationSpecification;
 import io.solar.specification.filter.StationFilter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,14 +14,10 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class StationService {
 
     private final StationRepository stationRepository;
-
-    @Autowired
-    public StationService(StationRepository stationRepository) {
-        this.stationRepository = stationRepository;
-    }
 
     public Optional<Station> findById(Long id) {
         return stationRepository.findById(id);

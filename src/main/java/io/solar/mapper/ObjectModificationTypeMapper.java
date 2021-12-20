@@ -3,6 +3,7 @@ package io.solar.mapper;
 import io.solar.dto.ObjectModificationTypeDto;
 import io.solar.entity.objects.ObjectModificationType;
 import io.solar.repository.ObjectModificationTypeRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -11,14 +12,10 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.Objects;
 
 @Component
+@RequiredArgsConstructor
 public class ObjectModificationTypeMapper implements EntityDtoMapper<ObjectModificationType, ObjectModificationTypeDto> {
 
     private final ObjectModificationTypeRepository objectModificationTypeRepository;
-
-    @Autowired
-    public ObjectModificationTypeMapper(ObjectModificationTypeRepository objectModificationTypeRepository) {
-        this.objectModificationTypeRepository = objectModificationTypeRepository;
-    }
 
     @Override
     public ObjectModificationType toEntity(ObjectModificationTypeDto dto) {

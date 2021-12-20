@@ -2,6 +2,7 @@ package io.solar.service.object;
 
 import io.solar.entity.objects.ObjectTypeDescription;
 import io.solar.repository.ObjectTypeDescriptionRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -9,14 +10,10 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class ObjectTypeDescriptionService {
 
     private final ObjectTypeDescriptionRepository objectTypeDescriptionRepository;
-
-    @Autowired
-    public ObjectTypeDescriptionService(ObjectTypeDescriptionRepository objectTypeDescriptionRepository) {
-        this.objectTypeDescriptionRepository = objectTypeDescriptionRepository;
-    }
 
     public Optional<ObjectTypeDescription> findById(Long id) {
 
