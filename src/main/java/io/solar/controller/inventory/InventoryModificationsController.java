@@ -3,6 +3,7 @@ package io.solar.controller.inventory;
 import io.solar.dto.ObjectModificationTypeDto;
 import io.solar.facade.InventoryModificationFacade;
 import io.solar.service.inventory.InventoryModificationService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,19 +19,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping(value = "api/inventory-modification")
+@RequiredArgsConstructor
 public class InventoryModificationsController {
 
     private final InventoryModificationFacade inventoryModificationFacade;
     private final InventoryModificationService inventoryModificationService;
-
-    @Autowired
-    public InventoryModificationsController(InventoryModificationFacade inventoryModificationFacade,
-                                            InventoryModificationService inventoryModificationService) {
-
-        this.inventoryModificationFacade = inventoryModificationFacade;
-        this.inventoryModificationService = inventoryModificationService;
-    }
-
 
     @PostMapping
     @PreAuthorize("hasAuthority('EDIT_INVENTORY')")

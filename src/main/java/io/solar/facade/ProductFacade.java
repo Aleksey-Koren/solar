@@ -4,6 +4,7 @@ import io.solar.dto.ProductDto;
 import io.solar.entity.Product;
 import io.solar.mapper.ProductMapper;
 import io.solar.service.ProductService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,16 +13,11 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 
 @Component
+@RequiredArgsConstructor
 public class ProductFacade {
 
-    private ProductService productService;
-    private ProductMapper productMapper;
-
-    @Autowired
-    public ProductFacade(ProductService productService, ProductMapper productMapper) {
-        this.productService = productService;
-        this.productMapper = productMapper;
-    }
+    private final ProductService productService;
+    private final ProductMapper productMapper;
 
     public ProductDto save(ProductDto dto) {
         return productMapper.toDto(productService.save(productMapper.toEntity(dto)));

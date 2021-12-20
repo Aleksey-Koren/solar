@@ -5,6 +5,7 @@ import io.solar.entity.objects.ObjectTypeDescription;
 import io.solar.facade.ObjectTypeDescriptionFacade;
 import io.solar.mapper.ObjectTypeDescriptionMapper;
 import io.solar.service.object.ObjectTypeDescriptionService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,21 +22,12 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "api/inventory-item")
+@RequiredArgsConstructor
 public class InventoryItemsController {
 
     private final ObjectTypeDescriptionFacade objectTypeDescriptionFacade;
     private final ObjectTypeDescriptionService objectTypeDescriptionService;
     private final ObjectTypeDescriptionMapper objectTypeDescriptionMapper;
-
-    @Autowired
-    public InventoryItemsController(ObjectTypeDescriptionMapper objectTypeDescriptionMapper,
-                                    ObjectTypeDescriptionService objectTypeDescriptionService,
-                                    ObjectTypeDescriptionFacade objectTypeDescriptionFacade) {
-
-        this.objectTypeDescriptionMapper = objectTypeDescriptionMapper;
-        this.objectTypeDescriptionService = objectTypeDescriptionService;
-        this.objectTypeDescriptionFacade = objectTypeDescriptionFacade;
-    }
 
     @GetMapping
     public List<InventoryItemDto> getAll() {

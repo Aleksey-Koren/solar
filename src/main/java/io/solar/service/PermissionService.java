@@ -3,6 +3,7 @@ package io.solar.service;
 import io.solar.entity.Permission;
 import io.solar.entity.User;
 import io.solar.repository.PermissionRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -13,18 +14,11 @@ import java.util.Set;
 
 
 @Service
+@RequiredArgsConstructor
 public class PermissionService {
 
     private final PermissionRepository permissionRepository;
     private final UserService userService;
-
-    @Autowired
-    public PermissionService(PermissionRepository permissionRepository,
-                             UserService userService) {
-        this.permissionRepository = permissionRepository;
-        this.userService = userService;
-    }
-
 
     public List<Permission> getAll() {
         return permissionRepository.findAll();

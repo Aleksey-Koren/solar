@@ -8,6 +8,7 @@ import io.solar.mapper.objects.BasicObjectViewMapper;
 import io.solar.service.object.BasicObjectService;
 import io.solar.specification.BasicObjectSpecification;
 import io.solar.specification.filter.BasicObjectFilter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,22 +17,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
 @Component
+@RequiredArgsConstructor
 public class BasicObjectFacade {
 
     private final BasicObjectService basicObjectService;
     private final BasicObjectMapper basicObjectMapper;
     private final BasicObjectViewMapper basicObjectViewMapper;
-
-    @Autowired
-    public BasicObjectFacade(BasicObjectService basicObjectService,
-                             BasicObjectMapper basicObjectMapper,
-                             BasicObjectViewMapper basicObjectViewMapper) {
-
-        this.basicObjectService = basicObjectService;
-        this.basicObjectMapper = basicObjectMapper;
-        this.basicObjectViewMapper = basicObjectViewMapper;
-
-    }
 
     public Page<BasicObjectViewDto> findAll(Pageable pageable, BasicObjectFilter basicObjectFilter) {
         Page<BasicObject> basicObjects = basicObjectService.findAll(new BasicObjectSpecification(basicObjectFilter), pageable);

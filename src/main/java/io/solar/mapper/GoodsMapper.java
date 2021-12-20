@@ -7,26 +7,19 @@ import io.solar.entity.objects.BasicObject;
 import io.solar.repository.BasicObjectRepository;
 import io.solar.repository.GoodsRepository;
 import io.solar.repository.ProductRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class GoodsMapper {
 
-    private GoodsRepository goodsRepository;
-    private BasicObjectRepository basicObjectRepository;
-    private ProductRepository productRepository;
-
-    @Autowired
-    public GoodsMapper(GoodsRepository goodsRepository,
-                       BasicObjectRepository basicObjectRepository,
-                       ProductRepository productRepository) {
-        this.goodsRepository = goodsRepository;
-        this.basicObjectRepository = basicObjectRepository;
-        this.productRepository = productRepository;
-    }
+    private final GoodsRepository goodsRepository;
+    private final BasicObjectRepository basicObjectRepository;
+    private final ProductRepository productRepository;
 
     public GoodsDto toDto(Goods goods) {
         GoodsDto dto = new GoodsDto();

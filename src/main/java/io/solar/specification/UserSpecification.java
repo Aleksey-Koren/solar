@@ -1,4 +1,4 @@
-package io.solar.service;
+package io.solar.specification;
 
 import io.solar.dto.UserFilter;
 import io.solar.entity.User;

@@ -2,20 +2,17 @@ package io.solar.service.inventory;
 
 import io.solar.entity.inventory.InventorySocket;
 import io.solar.repository.InventorySocketRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class InventorySocketService {
 
     private final InventorySocketRepository inventorySocketRepository;
-
-    @Autowired
-    public InventorySocketService(InventorySocketRepository inventorySocketRepository) {
-        this.inventorySocketRepository = inventorySocketRepository;
-    }
 
     public void deleteByItemId(Long itemId) {
 

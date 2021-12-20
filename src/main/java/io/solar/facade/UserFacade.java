@@ -5,22 +5,18 @@ import io.solar.entity.Permission;
 import io.solar.entity.User;
 import io.solar.mapper.UserMapper;
 import io.solar.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
 @Component
+@RequiredArgsConstructor
 public class UserFacade {
 
     private final UserService userService;
     private final UserMapper userMapper;
-
-    @Autowired
-    public UserFacade(UserService userService, UserMapper userMapper) {
-        this.userService = userService;
-        this.userMapper = userMapper;
-    }
 
     public UserDto updateOnlyTitle(UserDto dto) {
         User user = userService.findById(dto.getId())

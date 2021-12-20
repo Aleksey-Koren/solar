@@ -6,21 +6,18 @@ import io.solar.entity.Production;
 import io.solar.entity.objects.Station;
 import io.solar.repository.ProductionRepository;
 import io.solar.repository.StationRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class GoodsGeneration {
 
     private final StationRepository stationRepository;
     private final ProductionRepository productionRepository;
-
-    public GoodsGeneration(StationRepository stationRepository, ProductionRepository productionRepository) {
-        this.stationRepository = stationRepository;
-        this.productionRepository = productionRepository;
-    }
 
     public void generateOnStations() {
         List<Station> stations = stationRepository.findAll();
