@@ -1,7 +1,7 @@
 package io.solar.service;
 
 import io.solar.dto.UserDto;
-import io.solar.dto.UserFilter;
+import io.solar.specification.filter.UserFilter;
 import io.solar.entity.Permission;
 import io.solar.entity.User;
 import io.solar.mapper.UserMapper;
