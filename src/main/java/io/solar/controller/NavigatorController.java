@@ -49,7 +49,6 @@ public class NavigatorController {
         navigatorService.undockShip(shipId);
     }
 
-
     @PostMapping("/course")
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
     @Transactional
@@ -62,7 +61,6 @@ public class NavigatorController {
 
         courseFacade.updateCourseChain(dto);
     }
-
 
     @DeleteMapping("/course/{id}")
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
