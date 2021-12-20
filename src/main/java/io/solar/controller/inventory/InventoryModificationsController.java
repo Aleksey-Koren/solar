@@ -1,63 +1,48 @@
 package io.solar.controller.inventory;
 
-import io.solar.controller.AuthController;
-import io.solar.entity.inventory.InventoryModification;
-import io.solar.entity.User;
-import io.solar.mapper.InventoryModificationMapper;
-import io.solar.utils.context.AuthData;
-import io.solar.utils.db.Query;
-import io.solar.utils.db.Transaction;
-import io.solar.utils.server.beans.Controller;
-import io.solar.utils.server.controller.PathVariable;
-import io.solar.utils.server.controller.RequestBody;
-import io.solar.utils.server.controller.RequestMapping;
-import org.springframework.stereotype.Component;
+import io.solar.dto.ObjectModificationTypeDto;
+import io.solar.facade.InventoryModificationFacade;
+import io.solar.service.inventory.InventoryModificationService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@Component
-@Controller
-@RequestMapping(value = "inventory-modification")
+@RestController
+@RequestMapping(value = "api/inventory-modification")
+@RequiredArgsConstructor
 public class InventoryModificationsController {
 
-    @RequestMapping(method = "post")
-    public InventoryModification save(@RequestBody InventoryModification inventoryTweek, @AuthData User user, Transaction transaction) {
-        if (!AuthController.userCan(user, "edit-inventory", transaction)) {
-            throw new RuntimeException("no privileges");
-        }
-        Query query;
-        if(inventoryTweek.getId() != null) {
-            query = transaction.query("update object_modification_type set title = :title, data = :data, description = :description where id = :id ");
-            query.setLong("id", inventoryTweek.getId());
-        } else {
-            query = transaction.query("insert into object_modification_type (" +
-                    "title, data, description) values (:title, :data, :description)");
-        }
-        query.setString("title", inventoryTweek.getTitle());
-        query.setString("data", inventoryTweek.getData());
-        query.setString("description", inventoryTweek.getDescription());
+    private final InventoryModificationFacade inventoryModificationFacade;
+    private final InventoryModificationService inventoryModificationService;
 
-        query.execute();
-        if(inventoryTweek.getId() == null) {
-            inventoryTweek.setId(query.getLastGeneratedKey(Long.class));
-        }
-        return inventoryTweek;
+    @PostMapping
+    @PreAuthorize("hasAuthority('EDIT_INVENTORY')")
+    public ResponseEntity<ObjectModificationTypeDto> save(@RequestBody ObjectModificationTypeDto inventoryTweek) {
+
+        return ResponseEntity.ok(inventoryModificationFacade.save(inventoryTweek));
     }
 
+    @GetMapping
+    public List<ObjectModificationTypeDto> getAll() {
 
-    @RequestMapping
-    public List<InventoryModification> getAll(Transaction transaction) {
-        return transaction.query("select * from object_modification_type").executeQuery(new InventoryModificationMapper());
+        return inventoryModificationFacade.getAll();
     }
 
-    @RequestMapping(method = "delete", value = "{id}")
-    public void delete(@PathVariable("id") Long id, @AuthData User user, Transaction transaction) {
-        if (!AuthController.userCan(user, "edit-inventory", transaction)) {
-            throw new RuntimeException("no privileges");
-        }
-        Query query = transaction.query("delete from object_modification_type where id = :id");
-        query.setLong("id", id);
-        query.execute();
+    @DeleteMapping("{id}")
+    @PreAuthorize("hasAuthority('EDIT_INVENTORY')")
+    public void delete(@PathVariable("id") Long id) {
+
+        inventoryModificationService.delete(id);
     }
 
 }

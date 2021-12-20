@@ -1,9 +1,15 @@
 package io.solar.dto;
 
 import io.solar.entity.objects.ObjectStatus;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
+@SuperBuilder
 public class BasicObjectViewDto {
 
     private Long id;
@@ -16,7 +22,7 @@ public class BasicObjectViewDto {
     private Float aphelion;
     private Float orbitalPeriod;
     private Float angle;
-//    private Long objectTypeDescriptionId;
+    private Float rotationAngle;
     private Long hullId;
     private Long userId;
     private Boolean active;
@@ -24,6 +30,8 @@ public class BasicObjectViewDto {
     private Long attachedToShip;
     private Long attachedToSocket;
     private ObjectStatus status;
-    private Float acceleration;
-    private Float speed;
+    private Float speedX;
+    private Float speedY;
+    private Float accelerationX;
+    private Float accelerationY;
 }

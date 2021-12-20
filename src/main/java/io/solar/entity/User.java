@@ -1,5 +1,6 @@
 package io.solar.entity;
 
+import io.solar.entity.objects.BasicObject;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -26,10 +27,11 @@ public class User{
     private String password;
     private Long money;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "planet")
-    private Planet planet;
+    @JoinColumn(name = "location")
+    private BasicObject location;
     private Instant hackBlock;
     private Integer hackAttempts;
+    private String avatar;
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "users_permissions",

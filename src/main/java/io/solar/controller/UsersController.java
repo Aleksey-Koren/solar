@@ -1,11 +1,11 @@
 package io.solar.controller;
 
 import io.solar.dto.UserDto;
-import io.solar.dto.UserFilter;
+import io.solar.specification.filter.UserFilter;
 import io.solar.entity.User;
 import io.solar.facade.UserFacade;
 import io.solar.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -22,17 +22,12 @@ import static io.solar.controller.AuthController.hasPermissions;
 
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/users")
 public class UsersController {
 
     private final UserService userService;
     private final UserFacade userFacade;
-
-    @Autowired
-    public UsersController(UserService userService, UserFacade userFacade) {
-        this.userService = userService;
-        this.userFacade = userFacade;
-    }
 
     @GetMapping
     public Page<UserDto> getList(

@@ -1,0 +1,1 @@
+meaning of this package - IDE types support

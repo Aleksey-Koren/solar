@@ -1,14 +1,16 @@
 package io.solar.service;
 
 import io.solar.dto.UserDto;
-import io.solar.dto.UserFilter;
+import io.solar.specification.filter.UserFilter;
 import io.solar.entity.Permission;
 import io.solar.entity.User;
 import io.solar.mapper.UserMapper;
 import io.solar.repository.PermissionRepository;
 import io.solar.repository.UserRepository;
 import io.solar.security.Role;
-import org.springframework.beans.factory.annotation.Autowired;
+import io.solar.service.exception.ServiceException;
+import io.solar.specification.UserSpecification;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,6 +31,7 @@ import java.util.Set;
 import static java.util.stream.Collectors.*;
 
 @Service
+@RequiredArgsConstructor
 public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
@@ -38,15 +41,6 @@ public class UserService implements UserDetailsService {
 
     @Value("${app.hack_block_time_min}")
     private Integer HACK_BLOCK_TIME_MIN;
-
-    @Autowired
-    public UserService(UserRepository userRepository, UserMapper userMapper,
-                       PermissionRepository permissionRepository, PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.userMapper = userMapper;
-        this.permissionRepository = permissionRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
 
     public Optional<User> findById (Long id) {
         return userRepository.findById(id);
@@ -116,6 +110,10 @@ public class UserService implements UserDetailsService {
         return mapUser(
                 user.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No user with such id")),
                 canEdit);
+    }
+
+    public boolean isUserLocatedInObject(User user, Long objectId) {
+        return user.getLocation().getId().equals(objectId);
     }
 
     public User updateUserTitle(Long id, String title) {

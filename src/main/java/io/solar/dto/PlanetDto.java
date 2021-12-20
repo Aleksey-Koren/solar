@@ -1,8 +1,14 @@
 package io.solar.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class PlanetDto {
 
     private Long id;
@@ -17,7 +23,7 @@ public class PlanetDto {
     private String meanOrbitRadius;
     private String meanRadius;
     private String title;
-    private Float orbitalPeriod; //TODO It was String. Might be that it will bring some troubles at frontend)))
+    private Float orbitalPeriod;
     private String perihelion;
     private String siderealRotationPeriod;
     private String surfaceGravity;

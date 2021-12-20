@@ -9,9 +9,9 @@ import javax.persistence.*;
 import java.util.List;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "planets")
-@EqualsAndHashCode(callSuper = true)
 public class Planet extends BasicObject {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,8 +34,14 @@ public class Planet extends BasicObject {
     private String type;
 
     @OneToMany(mappedBy = "planet")
-    List<User> users;
-
-    @OneToMany(mappedBy = "planet")
+    @EqualsAndHashCode.Exclude
     List<Station> stations;
+
+    @Override
+    public String toString() {
+        return "Planet{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                '}';
+    }
 }

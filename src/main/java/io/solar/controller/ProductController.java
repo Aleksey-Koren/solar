@@ -4,8 +4,8 @@ import io.solar.dto.ProductDto;
 import io.solar.facade.ProductFacade;
 import io.solar.service.ProductService;
 import io.solar.utils.Option;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -20,19 +20,13 @@ import java.util.Optional;
 import static java.util.stream.Collectors.*;
 
 @Slf4j
+@RequiredArgsConstructor
 @RestController
 @RequestMapping(value = "/api/product")
 public class ProductController {
 
-    private ProductFacade productFacade;
-    private ProductService productService;
-
-
-    @Autowired
-    public ProductController(ProductFacade productFacade, ProductService productService) {
-        this.productFacade = productFacade;
-        this.productService = productService;
-    }
+    private final ProductFacade productFacade;
+    private final ProductService productService;
 
     @Transactional
     @PreAuthorize("hasAuthority('EDIT_PRODUCT')")
@@ -41,13 +35,11 @@ public class ProductController {
         return ResponseEntity.ok().body(productFacade.save(dto));
     }
 
-    //TODO I didn't see any fields for filtration or searching on UI.
-    // We should decide if we do filtration at this endpoint.
     @Transactional
     @PreAuthorize("hasAnyAuthority('PLAY_THE_GAME', 'EDIT_PRODUCT')")
     @GetMapping
-    public ResponseEntity<Page<ProductDto>> getAll(@PageableDefault Pageable pageable) {
-        return ResponseEntity.ok().body(productFacade.findAll(pageable));
+    public Page<ProductDto> getAll(@PageableDefault Pageable pageable) {
+        return productFacade.findAll(pageable);
     }
 
     @Transactional

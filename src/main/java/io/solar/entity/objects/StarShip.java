@@ -1,5 +1,6 @@
 package io.solar.entity.objects;
 
+import io.solar.entity.interfaces.SpaceTech;
 import lombok.Data;
 
 import javax.persistence.Entity;
@@ -10,7 +11,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "star_ships")
 @PrimaryKeyJoinColumn(name = "id")
-public class StarShip extends BasicObject {
+public class StarShip extends BasicObject implements SpaceTech {
 
 //TODO All this fields would be in ObjectTypeDescription field of BaseObject
 

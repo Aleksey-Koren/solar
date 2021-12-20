@@ -80,9 +80,9 @@ public class ObjectUtils {
                     case "attached_to_socket":
                         out.setAttachedToSocket(resultSet.fetchLong(idx));
                         break;
-                    case "status":
-                        out.setStatus(ObjectStatus.fromString(resultSet.getString(idx)));
-                        break;
+//                    case "status":
+//                        out.setStatus(ObjectStatus.fromString(resultSet.getString(idx)));
+//                        break;
                 }
             }
             if(out.getTitle() == null || "".equals(out.getTitle())) {

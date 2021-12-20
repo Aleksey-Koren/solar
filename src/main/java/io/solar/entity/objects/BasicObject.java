@@ -1,52 +1,90 @@
 package io.solar.entity.objects;
 
+import io.solar.entity.Course;
 import io.solar.entity.Planet;
-import io.solar.entity.inventory.InventorySocket;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.List;
-import java.util.Objects;
 
 @Data
 @Entity
 @Table(name = "objects")
 @Inheritance(strategy = InheritanceType.JOINED)
-public class BasicObject {
+public class BasicObject implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    @ManyToOne
+    protected Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "planet")
-    private Planet planet;
-    private Long population;
-    private String fraction;
-    private String title;
-    private Float x;
-    private Float y;
-    private Float aphelion;
-    private Float orbitalPeriod;
-    private Float angle;
+    protected Planet planet;
+
+    protected Long population;
+    protected String fraction;
+    protected String title;
+    protected Float x;
+    protected Float y;
+    protected Float aphelion;
+    protected Float orbitalPeriod;
+    protected Float angle;
+    protected Float rotationAngle;
+
     @ManyToOne
     @JoinColumn(name = "hull_id")
-    private ObjectTypeDescription objectTypeDescription;
-    private Long userId;
-    private Boolean active;
-    private Long durability;
+    protected ObjectTypeDescription objectTypeDescription;
+
+    protected Long userId;
+    protected Boolean active;
+    protected Long durability;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "attached_to_ship")
-    private BasicObject attachedToShip;
-    private Long attachedToSocket;
+    protected BasicObject attachedToShip;
+
+    protected Long attachedToSocket;
+
     @Enumerated(EnumType.STRING)
-    private ObjectStatus status;
-    private Float acceleration;
-    private Float speed;
+    protected ObjectStatus status;
+
+    @Column(name = "speed_x")
+    protected Float speedX;
+
+    @Column(name = "speed_y")
+    protected Float speedY;
+
+    @Column(name = "acceleration_x")
+    protected Float accelerationX;
+
+    @Column(name = "acceleration_y")
+    protected Float accelerationY;
+
+    @Column(name = "position_iteration")
+    protected Long positionIteration;
+
+    @Column(name = "position_iteration_ts")
+    protected Long positionIterationTs;
 
     @OneToMany(mappedBy = "attachedToShip")
-    private List<BasicObject> attachedObjects;
+    @EqualsAndHashCode.Exclude
+    protected List<BasicObject> attachedObjects;
 
-    //TODO ??????
-//    private List<InventorySocket> socketList;
+    @OneToMany(mappedBy = "object", cascade = CascadeType.REMOVE)
+    @EqualsAndHashCode.Exclude
+    protected List<Course> courses;
 
+    @Transient
+    public Double getSpeed() {
+        return Math.sqrt(Math.pow(this.speedX, 2) + Math.pow(this.speedY, 2));
+    }
+
+    @Transient
+    public Double getAcceleration() {
+        return Math.sqrt(Math.pow(this.accelerationX, 2) + Math.pow(this.accelerationY, 2));
+    }
 }

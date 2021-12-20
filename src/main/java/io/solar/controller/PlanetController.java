@@ -5,8 +5,8 @@ import io.solar.mapper.PlanetMapper;
 import io.solar.service.PlanetService;
 import io.solar.specification.filter.PlanetFilter;
 import io.solar.utils.Option;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -19,18 +19,14 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/planet")
 public class PlanetController {
 
-    private PlanetService planetService;
-    private PlanetMapper planetMapper;
+    private final PlanetService planetService;
+    private final PlanetMapper planetMapper;
 
-    @Autowired
-    public PlanetController(PlanetService planetService, PlanetMapper planetMapper) {
-        this.planetService = planetService;
-        this.planetMapper = planetMapper;
-    }
-
+    @Transactional
     @PreAuthorize("hasAuthority('EDIT_PLANET')")
     @PostMapping
     public PlanetDto save(@RequestBody PlanetDto dto) {

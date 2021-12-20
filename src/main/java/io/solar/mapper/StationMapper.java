@@ -4,13 +4,14 @@ import io.solar.dto.BasicObjectViewDto;
 import io.solar.dto.ProductionDto;
 import io.solar.dto.StationDto;
 import io.solar.entity.objects.Station;
-import io.solar.mapper.objects.BasicObjectMapper;
+import io.solar.mapper.objects.BasicObjectViewMapper;
 import io.solar.repository.BasicObjectRepository;
 import io.solar.repository.ObjectTypeDescriptionRepository;
 import io.solar.repository.ProductionRepository;
 import io.solar.repository.StationRepository;
 import io.solar.service.*;
-import org.springframework.beans.factory.annotation.Autowired;
+import io.solar.service.exception.ServiceException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -18,31 +19,17 @@ import org.springframework.web.server.ResponseStatusException;
 import static java.util.stream.Collectors.*;
 
 @Service
+@RequiredArgsConstructor
 public class StationMapper {
 
     private final StationRepository stationRepository;
     private final ObjectTypeDescriptionRepository objectTypeDescriptionRepository;
     private final PlanetService planetService;
     private final BasicObjectRepository basicObjectRepository;
-    private final BasicObjectMapper basicObjectMapper;
+    private final BasicObjectViewMapper basicObjectViewMapper;
     private final ProductionMapper productionMapper;
     private final ProductionRepository productionRepository;
-
-    @Autowired
-    public StationMapper(StationRepository stationRepository,
-                         ObjectTypeDescriptionRepository objectTypeDescriptionRepository,
-                         PlanetService planetService, BasicObjectRepository basicObjectRepository,
-                         BasicObjectMapper basicObjectMapper,
-                         ProductionMapper productionMapper,
-                         ProductionRepository productionRepository) {
-        this.stationRepository = stationRepository;
-        this.objectTypeDescriptionRepository = objectTypeDescriptionRepository;
-        this.planetService = planetService;
-        this.basicObjectRepository = basicObjectRepository;
-        this.basicObjectMapper = basicObjectMapper;
-        this.productionMapper = productionMapper;
-        this.productionRepository = productionRepository;
-    }
+    private final GoodsMapper goodsMapper;
 
     public Station toEntity(StationDto dto) {
         Station station;
@@ -82,10 +69,14 @@ public class StationMapper {
                         .collect(toList())
                 : null);
 
+        station.setGoods(dto.getGoods() != null ?
+                dto.getGoods().stream().map(goodsMapper::toEntity).collect(toList())
+                : null);
+
         return station;
     }
 
-    public StationDto toDto(Station station) {
+    public StationDto toListDto(Station station) {
         StationDto dto = new StationDto();
 
         dto.setId(station.getId());
@@ -102,12 +93,23 @@ public class StationMapper {
             throw new ServiceException("Station must not exist without an ObjectTypeDescription field");
         }
         dto.setHullId(station.getObjectTypeDescription().getId());
-        dto.setAttachedObjects(station.getAttachedObjects() != null ?
-                station.getAttachedObjects().stream().map(basicObjectMapper::toBasicObjectViewDto).collect(toList())
-                : null);
 
         dto.setProduction(station.getProduction() != null ?
                 station.getProduction().stream().map(productionMapper::toDto).collect(toList())
+                : null);
+
+        dto.setGoods(station.getGoods() != null ?
+                station.getGoods().stream().map(goodsMapper::toDto).collect(toList())
+                : null);
+
+        return dto;
+    }
+
+    public StationDto toDto (Station station) {
+        StationDto dto  = toListDto(station);
+
+        dto.setAttachedObjects(station.getAttachedObjects() != null ?
+                station.getAttachedObjects().stream().map(basicObjectViewMapper::toDto).collect(toList())
                 : null);
         return dto;
     }

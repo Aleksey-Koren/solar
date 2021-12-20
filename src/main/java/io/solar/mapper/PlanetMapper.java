@@ -3,13 +3,15 @@ package io.solar.mapper;
 import io.solar.dto.PlanetDto;
 import io.solar.entity.Planet;
 import io.solar.repository.PlanetRepository;
+import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
-public class PlanetMapper  {
+@NoArgsConstructor
+public class PlanetMapper {
 
     private PlanetRepository planetRepository;
     private UserMapper userMapper;

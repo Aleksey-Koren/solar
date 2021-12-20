@@ -1,13 +1,51 @@
 package io.solar.entity;
 
-import lombok.Getter;
-import lombok.Setter;
+import io.solar.entity.objects.BasicObject;
+import lombok.*;
 
-@Getter
-@Setter
+import javax.persistence.*;
+import java.io.Serializable;
+
+
+@Entity
+@IdClass(Goods.Key.class)
+@Table(name = "goods")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Goods {
-    private Long id;
-    private Long planet;
-    private Long product;
+
+    @Id
+    @ManyToOne
+    @JoinColumn(name = "owner")
+    private BasicObject owner;
+
+    @Id
+    @ManyToOne
+    @JoinColumn(name = "product")
+    private Product product;
+
     private Long amount;
+    private Float price;
+
+
+
+
+    @EqualsAndHashCode
+    @Getter
+    @Setter
+    public static class Key implements Serializable {
+
+        private BasicObject owner;
+        private Product product;
+
+        public Key() {
+
+        }
+
+        public Key(BasicObject owner, Product product) {
+            this.owner = owner;
+            this.product = product;
+        }
+    }
 }

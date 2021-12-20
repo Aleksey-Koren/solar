@@ -1,6 +1,7 @@
 package io.solar.dto;
 
 import io.solar.entity.Planet;
+import io.solar.entity.objects.BasicObject;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,8 +21,9 @@ public class UserDto {
     private String login;
     private String password;
     private Long money;
-    private Planet planet;
+    private BasicObject location;
     private Instant hackBlock;
     private Integer hackAttempts;
+    private String avatar;
     private Set<PermissionDto> permissions;
 }

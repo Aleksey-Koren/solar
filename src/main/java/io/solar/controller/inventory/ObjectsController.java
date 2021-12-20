@@ -1,109 +1,51 @@
 package io.solar.controller.inventory;
 
-import io.solar.controller.AuthController;
-import io.solar.entity.User;
-import io.solar.entity.objects.ObjectView;
-import io.solar.mapper.objects.ObjectViewMapper;
-import io.solar.mapper.TotalMapper;
-import io.solar.service.ObjectService;
-import io.solar.utils.Page;
-import io.solar.utils.context.AuthData;
-import io.solar.utils.db.Query;
-import io.solar.utils.db.Transaction;
-import io.solar.utils.server.Pageable;
-import io.solar.utils.server.beans.Controller;
-import io.solar.utils.server.controller.PathVariable;
-import io.solar.utils.server.controller.RequestBody;
-import io.solar.utils.server.controller.RequestMapping;
-import io.solar.utils.server.controller.RequestParam;
+import io.solar.dto.BasicObjectDto;
+import io.solar.dto.BasicObjectViewDto;
+import io.solar.facade.BasicObjectFacade;
+import io.solar.specification.filter.BasicObjectFilter;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @Component
-@Controller
-@RequestMapping("objects")
+@RestController
+@RequestMapping("api/objects/config")
+@RequiredArgsConstructor
 public class ObjectsController {
 
-    private final ObjectService objectService;
+    private final BasicObjectFacade basicObjectFacade;
 
-    public ObjectsController(ObjectService objectService) {
-        this.objectService = objectService;
+    @GetMapping
+    @PreAuthorize("hasAuthority('EDIT_INVENTORY')")
+    public Page<BasicObjectViewDto> getConfigPage(Pageable pageable, BasicObjectFilter basicObjectFilter) {
+
+        return basicObjectFacade.findAll(pageable, basicObjectFilter);
     }
 
-    @RequestMapping("config")
-    public Page<ObjectView> getConfigPage(
-            Pageable pageable,
-            Transaction transaction,
-            @AuthData User user,
-            @RequestParam("detached") Boolean detached,
-            @RequestParam("inventoryType") Long inventoryType
-    ) {
-        if (!AuthController.userCan(user, "edit-inventory", transaction)) {
-            throw new RuntimeException("no privileges");
-        }
-        boolean typePresent = inventoryType != null;
-        Query query = transaction.query("select " +
-                " objects.*" +
-                " from objects" +
-                " inner join object_type_description on objects.hull_id = object_type_description.id" +
-                " where 1 = 1 " +
-                        (typePresent ? " and object_type_description.inventory_type = :inventoryType" : "") +
-                        (Boolean.TRUE.equals(detached) ? " and objects.attached_to_ship is null and objects.attached_to_socket is null" : "") +
-                " order by objects.id limit :skip, :pageSize");
-        query.setInt("skip", pageable.getPage() * pageable.getPageSize());
-        query.setInt("pageSize", pageable.getPageSize());
-        if(typePresent) {
-            query.setLong("inventoryType", inventoryType);
-        }
-        Query countQuery = transaction.query("select count(1) " +
-                " from objects" +
-                " inner join object_type_description on objects.hull_id = object_type_description.id " +
-                " where 1 = 1 " +
-                (typePresent ? " and object_type_description.inventory_type = :inventoryType" : ""));
-        if(typePresent) {
-            countQuery.setLong("inventoryType", inventoryType);
-        }
+    @GetMapping("{id}")
+    @PreAuthorize("hasAuthority('EDIT_INVENTORY')")
+    @Transactional
+    public BasicObjectDto getConfigItem(@PathVariable("id") Long id) {
 
-        return new Page<>(
-                query.executeQuery(new ObjectViewMapper(transaction, false, false)),
-                countQuery.executeQuery(new TotalMapper()).get(0)
-        );
+        return basicObjectFacade.findById(id);
     }
 
-    @RequestMapping("config/{id}")
-    public ObjectView getConfigItem(
-            Pageable pageable,
-            Transaction transaction,
-            @AuthData User user,
-            @PathVariable("id") Long id
-    ) {
-        if (!AuthController.userCan(user, "edit-inventory", transaction)) {
-            throw new RuntimeException("no privileges");
-        }
-        return get(id, transaction);
-    }
+    @PostMapping
+    @PreAuthorize("hasAuthority('EDIT_INVENTORY')")
+    @Transactional
+    public BasicObjectDto saveItem(@RequestBody BasicObjectDto basicObjectDto) {
 
-    @RequestMapping(value = "config/", method = "post")
-    public ObjectView saveItem(
-            @RequestBody ObjectView objectView,
-            @AuthData User user,
-            Transaction transaction
-    ) {
-        if (!AuthController.userCan(user, "edit-inventory", transaction)) {
-            throw new RuntimeException("no privileges");
-        }
-        objectService.save(objectView, transaction);
-        return get(objectView.getId(), transaction);
-    }
-
-    private ObjectView get(Long id, Transaction transaction) {
-        Query query = transaction.query("select objects.*, object_type_description.title" +
-                " from objects " +
-                " inner join object_type_description on objects.hull_id = object_type_description.id" +
-                " where objects.id = :id");
-        query.setLong("id", id);
-        List<ObjectView> out = query.executeQuery(new ObjectViewMapper(transaction));
-        return out.size() == 1 ? out.get(0) : null;
+        return basicObjectFacade.save(basicObjectDto);
     }
 }

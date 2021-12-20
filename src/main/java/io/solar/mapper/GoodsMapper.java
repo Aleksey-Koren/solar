@@ -1,0 +1,50 @@
+package io.solar.mapper;
+
+import io.solar.dto.GoodsDto;
+import io.solar.entity.Goods;
+import io.solar.entity.Product;
+import io.solar.entity.objects.BasicObject;
+import io.solar.repository.BasicObjectRepository;
+import io.solar.repository.GoodsRepository;
+import io.solar.repository.ProductRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.Optional;
+
+@Service
+@RequiredArgsConstructor
+public class GoodsMapper {
+
+    private final GoodsRepository goodsRepository;
+    private final BasicObjectRepository basicObjectRepository;
+    private final ProductRepository productRepository;
+
+    public GoodsDto toDto(Goods goods) {
+        GoodsDto dto = new GoodsDto();
+        dto.setStation(goods.getOwner() != null ? goods.getOwner().getId() : null);
+        dto.setProduct(goods.getProduct() != null ? goods.getProduct().getId() : null);
+        dto.setAmount(goods.getAmount());
+        dto.setPrice(goods.getPrice());
+        return dto;
+    }
+
+    public Goods toEntity(GoodsDto dto) {
+        BasicObject owner = basicObjectRepository.getById(dto.getStation());
+        Product product = productRepository.getById(dto.getProduct());
+        Goods goods;
+        Optional<Goods> goodsOpt = goodsRepository
+                .findById(new Goods.Key(owner, product));
+        if(goodsOpt.isPresent()) {
+            goods = goodsOpt.get();
+        }else{
+            goods = new Goods();
+            goods.setOwner(owner);
+            goods.setProduct(product);
+        }
+        goods.setAmount(dto.getAmount() != null ? dto.getAmount() : 0);
+        goods.setPrice(dto.getPrice() != null ? dto.getPrice() : 0);
+        return goods;
+    }
+}
