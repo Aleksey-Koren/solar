@@ -1,6 +1,6 @@
-package io.solar.service;
+package io.solar.specification;
 
-import io.solar.dto.UserFilter;
+import io.solar.specification.filter.UserFilter;
 import io.solar.entity.User;
 import io.solar.entity.User_;
 import lombok.RequiredArgsConstructor;

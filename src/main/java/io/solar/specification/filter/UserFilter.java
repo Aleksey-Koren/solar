@@ -1,4 +1,4 @@
-package io.solar.dto;
+package io.solar.specification.filter;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

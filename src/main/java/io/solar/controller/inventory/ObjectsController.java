@@ -4,6 +4,7 @@ import io.solar.dto.BasicObjectDto;
 import io.solar.dto.BasicObjectViewDto;
 import io.solar.facade.BasicObjectFacade;
 import io.solar.specification.filter.BasicObjectFilter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,14 +21,10 @@ import org.springframework.web.bind.annotation.RestController;
 @Component
 @RestController
 @RequestMapping("api/objects/config")
+@RequiredArgsConstructor
 public class ObjectsController {
 
     private final BasicObjectFacade basicObjectFacade;
-
-    @Autowired
-    public ObjectsController(BasicObjectFacade basicObjectFacade) {
-        this.basicObjectFacade = basicObjectFacade;
-    }
 
     @GetMapping
     @PreAuthorize("hasAuthority('EDIT_INVENTORY')")

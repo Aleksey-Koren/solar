@@ -11,6 +11,7 @@ import io.solar.security.Role;
 import io.solar.service.UserService;
 import io.solar.utils.BlockedToken;
 import io.solar.utils.db.Transaction;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,18 +25,13 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
+@RequiredArgsConstructor
 public class AuthController {
 
     private final UserService userService;
     private final JwtProvider jwtProvider;
     private final UserMapper userMapper;
 
-    @Autowired
-    public AuthController(UserService userService, JwtProvider jwtProvider, UserMapper userMapper) {
-        this.userService = userService;
-        this.jwtProvider = jwtProvider;
-        this.userMapper = userMapper;
-    }
     @Transactional
     @PostMapping("/register")
     public Register register(@RequestBody UserDto dto) {

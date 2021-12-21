@@ -15,6 +15,7 @@ import io.solar.service.inventory.InventorySocketService;
 import io.solar.service.object.ObjectModificationService;
 import io.solar.service.object.ObjectTypeDescriptionService;
 import io.solar.service.ProductionService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
+@RequiredArgsConstructor
 public class ObjectTypeDescriptionFacade {
 
     private final ObjectTypeDescriptionService objectTypeDescriptionService;
@@ -34,26 +36,6 @@ public class ObjectTypeDescriptionFacade {
     private final ObjectTypeDescriptionMapper objectTypeDescriptionMapper;
     private final ObjectModificationTypeMapper objectModificationTypeMapper;
     private final SocketMapper socketMapper;
-
-    @Autowired
-    public ObjectTypeDescriptionFacade(ObjectTypeDescriptionService objectTypeDescriptionService,
-                                       BasicObjectService basicObjectService,
-                                       ProductionService productionService,
-                                       InventorySocketService inventorySocketService,
-                                       ObjectModificationService objectModificationService,
-                                       ObjectTypeDescriptionMapper objectTypeDescriptionMapper,
-                                       ObjectModificationTypeMapper objectModificationTypeMapper,
-                                       SocketMapper socketMapper) {
-
-        this.objectTypeDescriptionService = objectTypeDescriptionService;
-        this.basicObjectService = basicObjectService;
-        this.productionService = productionService;
-        this.inventorySocketService = inventorySocketService;
-        this.objectModificationService = objectModificationService;
-        this.objectTypeDescriptionMapper = objectTypeDescriptionMapper;
-        this.objectModificationTypeMapper = objectModificationTypeMapper;
-        this.socketMapper = socketMapper;
-    }
 
     public List<InventoryItemDto> getAll() {
 

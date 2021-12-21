@@ -4,6 +4,7 @@ import io.solar.dto.inventory.InventoryItemDto;
 import io.solar.entity.objects.ObjectTypeDescription;
 import io.solar.repository.InventorySocketRepository;
 import io.solar.repository.ObjectTypeDescriptionRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -12,21 +13,10 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.Objects;
 
 @Component
+@RequiredArgsConstructor
 public class ObjectTypeDescriptionMapper implements EntityDtoMapper<ObjectTypeDescription, InventoryItemDto> {
 
     private final ObjectTypeDescriptionRepository objectTypeDescriptionRepository;
-    private final InventorySocketRepository inventorySocketRepository;
-    private final SocketMapper socketMapper;
-
-    @Autowired
-    public ObjectTypeDescriptionMapper(ObjectTypeDescriptionRepository objectTypeDescriptionRepository,
-                                       InventorySocketRepository inventorySocketRepository,
-                                       SocketMapper socketMapper) {
-
-        this.objectTypeDescriptionRepository = objectTypeDescriptionRepository;
-        this.inventorySocketRepository = inventorySocketRepository;
-        this.socketMapper = socketMapper;
-    }
 
     @Override
     public ObjectTypeDescription toEntity(InventoryItemDto dto) {
@@ -34,8 +24,6 @@ public class ObjectTypeDescriptionMapper implements EntityDtoMapper<ObjectTypeDe
         return Objects.isNull(dto.getId())
                 ? createObjectTypeDescription(dto)
                 : findObjectTypeDescription(dto);
-
-
     }
 
     @Override

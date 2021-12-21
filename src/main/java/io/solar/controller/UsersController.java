@@ -1,7 +1,7 @@
 package io.solar.controller;
 
 import io.solar.dto.UserDto;
-import io.solar.dto.UserFilter;
+import io.solar.specification.filter.UserFilter;
 import io.solar.entity.User;
 import io.solar.facade.UserFacade;
 import io.solar.service.UserService;
@@ -28,6 +28,7 @@ public class UsersController {
 
     private final UserService userService;
     private final UserFacade userFacade;
+
     @GetMapping
     public Page<UserDto> getList(
             Pageable pageable,

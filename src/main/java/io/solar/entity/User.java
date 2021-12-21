@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.time.Instant;
+import java.util.List;
 import java.util.Set;
 
 import static java.util.stream.Collectors.*;
@@ -18,7 +19,7 @@ import static java.util.stream.Collectors.*;
 @NoArgsConstructor
 @Entity
 @Table(name = "users")
-public class User{
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -40,6 +41,13 @@ public class User{
     )
     private Set<Permission> permissions;
 
+    @ManyToMany
+    @JoinTable(
+            name = "users_rooms",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "room_id")
+    )
+    private List<Room> rooms;
 
     public static UserDetails retrieveUserDetails(User user) {
         return new org.springframework.security.core.userdetails.User(

@@ -38,7 +38,6 @@ public class StationController {
     private final StationService stationService;
     private final GoodsGeneration goodsGeneration;
 
-
     @PostMapping
     @PreAuthorize("hasAuthority('EDIT_STATION')")
     @Transactional

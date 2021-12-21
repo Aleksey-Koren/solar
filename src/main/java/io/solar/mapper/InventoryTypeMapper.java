@@ -4,20 +4,17 @@ package io.solar.mapper;
 import io.solar.dto.inventory.InventoryTypeDto;
 import io.solar.entity.inventory.InventoryType;
 import io.solar.service.inventory.InventoryTypeService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
 @Component
+@RequiredArgsConstructor
 public class InventoryTypeMapper {
 
-    private InventoryTypeService inventoryTypeService;
-
-    @Autowired
-    public InventoryTypeMapper(InventoryTypeService inventoryTypeService) {
-        this.inventoryTypeService = inventoryTypeService;
-    }
+    private final InventoryTypeService inventoryTypeService;
 
     public InventoryType toEntity(InventoryTypeDto dto) {
         InventoryType inventoryType;

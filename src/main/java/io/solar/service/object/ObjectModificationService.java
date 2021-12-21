@@ -2,20 +2,17 @@ package io.solar.service.object;
 
 import io.solar.entity.objects.ObjectModification;
 import io.solar.repository.ObjectModificationRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class ObjectModificationService {
 
     private final ObjectModificationRepository objectModificationRepository;
-
-    @Autowired
-    public ObjectModificationService(ObjectModificationRepository objectModificationRepository) {
-        this.objectModificationRepository = objectModificationRepository;
-    }
 
     public void deleteByItemId(Long itemId) {
 

@@ -49,7 +49,6 @@ public class NavigatorController {
         navigatorService.undockShip(shipId);
     }
 
-
     @PostMapping("/course")
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
     @Transactional
@@ -63,12 +62,10 @@ public class NavigatorController {
         courseFacade.updateCourseChain(dto);
     }
 
-
     @DeleteMapping("/course/{id}")
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
     @Transactional
     public void deleteCourse(@PathVariable("id") Long id, Principal principal) {
-        int i = 0;
         Course course = courseService.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
                 String.format("There is no course with such id in database. Course id = %d", id)));
         BasicObject object = course.getObject();

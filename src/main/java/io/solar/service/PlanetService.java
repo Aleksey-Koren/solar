@@ -4,6 +4,7 @@ import io.solar.entity.Planet;
 import io.solar.repository.PlanetRepository;
 import io.solar.specification.PlanetSpecification;
 import io.solar.specification.filter.PlanetFilter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,14 +16,10 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class PlanetService {
 
     private final PlanetRepository planetRepository;
-
-    @Autowired
-    public PlanetService(PlanetRepository planetRepository) {
-        this.planetRepository = planetRepository;
-    }
 
     public Planet findById(Long id) {
         return planetRepository.findById(id)
