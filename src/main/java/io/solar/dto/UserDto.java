@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -26,4 +27,5 @@ public class UserDto {
     private Integer hackAttempts;
     private String avatar;
     private Set<PermissionDto> permissions;
+    private List<RoomDto> rooms;
 }
