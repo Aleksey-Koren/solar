@@ -4,6 +4,7 @@ import io.solar.entity.objects.BasicObject;
 import io.solar.entity.objects.ObjectType;
 import io.solar.repository.BasicObjectRepository;
 import io.solar.repository.UtilityRepository;
+import io.solar.service.UtilityService;
 import io.solar.service.exception.ServiceException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,46 +22,44 @@ public class ObjectCoordinatesService {
     @Value("${app.navigator.num_update_object}")
     private Integer amountReceivedObjects;
 
-    private final UtilityRepository utilityRepository;
+    private final UtilityService utilityService;
     private final BasicObjectRepository basicObjectRepository;
 
     @Transactional
     public void update() {
 
-        String positionIteration = utilityRepository.getValue(POSITION_ITERATION_UTILITY_KEY)
-                .orElseThrow(() -> new ServiceException("Cannot find utility key: ".concat(POSITION_ITERATION_UTILITY_KEY)));
+        String positionIteration = utilityService.getValue(POSITION_ITERATION_UTILITY_KEY, "1");
 
+        long currentIteration = Long.parseLong(positionIteration);
         List<BasicObject> objects = basicObjectRepository.findObjectsToUpdateCoordinates(
-                List.of(ObjectType.STATION, ObjectType.SHIP), Long.parseLong(positionIteration), Pageable.ofSize(amountReceivedObjects)
+                List.of(ObjectType.STATION, ObjectType.SHIP), currentIteration, Pageable.ofSize(amountReceivedObjects)
         );
 
-        updateObjects(objects);
+        updateObjects(objects, currentIteration);
 
         basicObjectRepository.saveAllAndFlush(objects);
     }
 
-    private void updateObjects(List<BasicObject> objects) {
-
+    private void updateObjects(List<BasicObject> objects, long currentIteration) {
+        long now = System.currentTimeMillis();
         objects.forEach(object -> {
-            object.setX(determinePosition(object.getX(), object.getSpeedX(), object.getPositionIterationTs()));
-            object.setY(determinePosition(object.getY(), object.getSpeedY(), object.getPositionIterationTs()));
+            long time = now - object.getPositionIterationTs();
+            object.setX(determinePosition(object.getX(), object.getSpeedX(), time));
+            object.setY(determinePosition(object.getY(), object.getSpeedY(), time));
 
-            object.setSpeedX(calculateSpeed(object.getSpeedX(), object.getPositionIterationTs(), object.getAccelerationX()));
-            object.setSpeedY(calculateSpeed(object.getSpeedY(), object.getPositionIterationTs(), object.getAccelerationY()));
+            object.setSpeedX(calculateSpeed(object.getSpeedX(), object.getAccelerationX(), time));
+            object.setSpeedY(calculateSpeed(object.getSpeedY(), object.getAccelerationY(), time));
 
-            object.setPositionIterationTs(System.currentTimeMillis());
-            object.setPositionIteration(object.getPositionIteration() + 1);
+            object.setPositionIterationTs(now);
+            object.setPositionIteration(currentIteration + 1);
         });
     }
 
-    private Float determinePosition(Float coordinate, Float speed, Long positionIterationTs) {
-
-        return coordinate + (speed * (System.currentTimeMillis() - positionIterationTs) / 3_600_000);
+    private Float determinePosition(Float coordinate, Float speed, Long time) {
+        return coordinate + (speed * time / 3_600_000);
     }
 
-    //todo: maybe change basicObject.speedX(Y) -> double
-    private Float calculateSpeed(Float speed, Long positionIterationTs, Float acceleration) {
-
-        return (float) (speed + (acceleration * Math.pow((System.currentTimeMillis() - positionIterationTs), 2)));
+    private Float calculateSpeed(Float speed, Float acceleration, long time) {
+        return speed + (acceleration * time / 3_600_000);
     }
 }
