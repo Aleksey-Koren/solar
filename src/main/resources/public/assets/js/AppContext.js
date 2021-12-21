@@ -5,6 +5,8 @@ function AppContext() {
         inventory: new InventoryStore(),
         permissions: new PermissionsStore(),
         station: new StationStore(),
+        userStore: new UserStore(),
+        objects: new ObjectsStore(),
     };
     this.escListener = new EscListener();
     this.app = {
