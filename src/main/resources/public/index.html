@@ -1,92 +1,78 @@
-<!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Chat WebSocket</title>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+<!--    <script src="resources/js/sockjs-0.3.4.js"></script>-->
+<!--    <script src="resources/js/stomp.js"></script>-->
+    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@5.0.0/bundles/stomp.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@5.0.0/bundles/stomp.umd.min.js"></script>
+    <script type="text/javascript">
+        var stompClient = null;
 
-    <script src="/assets/js/EscListener.js"></script>
-    <script src="/assets/js/controls/GenericSelector.js"></script>
-    <script src="/assets/js/controls/PlanetsSelector.js"></script>
-    <script src="/assets/js/controls/ObjectDescriptionSelector.js"></script>
-    <script src="/assets/js/controls/UserSelector.js"></script>
-    <script src="/assets/js/controls/ObjectSelector.js"></script>
-    <script src="/assets/js/controls/SocketSelector.js"></script>
+        function setConnected(connected) {
+            document.getElementById('connect').disabled = connected;
+            document.getElementById('disconnect').disabled = !connected;
+            document.getElementById('conversationDiv').style.visibility
+                = connected ? 'visible' : 'hidden';
+            document.getElementById('response').innerHTML = '';
+        }
 
-    <script src="/assets/js/dahsboard/shop/AbstractShop.js"></script>
-    <script src="/assets/js/dahsboard/shop/GoodsShop.js"></script>
-    <script src="/assets/js/dahsboard/shop/InventoryShop.js"></script>
-    <script src="/assets/js/dahsboard/shop/StarShipShop.js"></script>
-    <script src="/assets/js/dahsboard/DashboardShop.js"></script>
-    <script src="/assets/js/dahsboard/DashboardManagement.js"></script>
+        function connect() {
+            var socket = new SockJS('/ws');
+            stompClient = Stomp.over(socket);
+            stompClient.connect({}, function(frame) {
+                setConnected(true);
+                console.log('Connected: ' + frame);
+                stompClient.subscribe('/room/roomId', function(messageOutput) {
+                    showMessageOutput(JSON.parse(messageOutput.body));
+                });
+            });
+        }
 
-    <script src="/assets/js/permissions/PermissionsManagement.js"></script>
-    <script src="/assets/js/permissions/PermissionTypesGrid.js"></script>
+        function disconnect() {
+            if(stompClient != null) {
+                stompClient.disconnect();
+            }
+            setConnected(false);
+            console.log("Disconnected");
+        }
 
-    <script src="/assets/js/user/UserForm.js"></script>
-    <script src="/assets/js/user/UserGrid.js"></script>
-    <script src="/assets/js/user/UserManagement.js"></script>
+        function sendMessage() {
+            var from = document.getElementById('from').value;
+            var text = document.getElementById('text').value;
+            stompClient.send("/app/chat", {},
+                JSON.stringify({'from':from, 'text':text}));
+        }
 
-    <script src="/assets/js/inventory/InventoryManagement.js"></script>
-    <script src="/assets/js/inventory/InventoryModificationsGrid.js"></script>
-    <script src="/assets/js/inventory/InventoryItemGrid.js"></script>
-    <script src="/assets/js/inventory/InventoryTypeGrid.js"></script>
-    <script src="/assets/js/inventory/InventoryItemForm.js"></script>
-    <script src="/assets/js/inventory/ItemModificationGrid.js"></script>
-    <script src="/assets/js/inventory/ItemSocketGrid.js"></script>
-    <script src="/assets/js/inventory/ObjectsGrid.js"></script>
-    <script src="/assets/js/inventory/ObjectsForm.js"></script>
-
-    <script src="/assets/js/auth/jwt_decode.js"></script>
-    <script src="/assets/js/auth/Login.js"></script>
-    <script src="/assets/js/auth/Register.js"></script>
-    <script src="/assets/js/auth/LogoutManagement.js"></script>
-    <script src="/assets/js/auth/AuthManagement.js"></script>
-
-    <script src="/assets/js/planets/PlanetsCreationForm.js"></script>
-    <script src="/assets/js/planets/PlanetsManagement.js"></script>
-
-    <script src="/assets/js/products/ProductsManagement.js"></script>
-    <script src="/assets/js/products/ProductsGrid.js"></script>
-    <script src="/assets/js/products/ProductsCreationForm.js"></script>
-
-    <script src="/assets/js/stations/StationsManagement.js"></script>
-    <script src="/assets/js/stations/StationsGrid.js"></script>
-    <script src="/assets/js/stations/ProductionGrid.js"></script>
-    <script src="/assets/js/stations/StationsCreationForm.js"></script>
-
-    <script src="/assets/js/map/SolarMapPlanetRender.js"></script>
-    <script src="/assets/js/map/SolarMapZoom.js"></script>
-    <script src="/assets/js/map/SolarMap.js"></script>
-    <script src="/assets/js/map/OrbitGeometry.js"></script>
-    <script src="/assets/js/map/SolarTimer.js"></script>
-    <script src="/assets/js/map/SolarWrapper.js"></script>
-    <script src="/assets/js/map/CollapsibleWindow.js"></script>
-    <script src="/assets/js/map/PlanetWindow.js"></script>
-    <script src="/assets/js/utils/DragHelper.js"></script>
-    <script src="/assets/js/utils/DragHelper.js"></script>
-
-    <script src="/assets/js/AppContext.js"></script>
-    <script src="/assets/js/store/AbstractStore.js"></script>
-    <script src="/assets/js/store/InventoryStore.js"></script>
-    <script src="/assets/js/store/PermissionsStore.js"></script>
-    <script src="/assets/js/store/PlanetsStore.js"></script>
-    <script src="/assets/js/store/StationStore.js"></script>
-    <script src="/assets/js/Components.js"></script>
-    <script src="/assets/js/Dom.js"></script>
-    <script src="/assets/js/Notification.js"></script>
-    <script src="/assets/js/Ajax.js"></script>
-    <script src="/assets/js/Menu.js"></script>
-    <script src="/assets/js/app.js"></script>
-    <link rel="stylesheet" href="/assets/css.css">
-    <link rel="shortcut icon" href="/assets/favicon.ico">
+        function showMessageOutput(messageOutput) {
+            var response = document.getElementById('response');
+            var p = document.createElement('p');
+            p.style.wordWrap = 'break-word';
+            p.appendChild(document.createTextNode(messageOutput.from + ": "
+                + messageOutput.text + " (" + messageOutput.time + ")"));
+            response.appendChild(p);
+        }
+    </script>
 </head>
-<body>
-<div id="app"></div>
-<script>
-    (function(){
-        var el = document.getElementById('app');
-        new App(el);
-    })()
-</script>
+<body onload="disconnect()">
+<div>
+    <div>
+        <input type="text" id="from" placeholder="Choose a nickname"/>
+    </div>
+    <br />
+    <div>
+        <button id="connect" onclick="connect();">Connect</button>
+        <button id="disconnect" disabled="disabled" onclick="disconnect();">
+            Disconnect
+        </button>
+    </div>
+    <br />
+    <div id="conversationDiv">
+        <input type="text" id="text" placeholder="Write a message..."/>
+        <button id="sendMessage" onclick="sendMessage();">Send</button>
+        <p id="response"></p>
+    </div>
+</div>
+
 </body>
 </html>

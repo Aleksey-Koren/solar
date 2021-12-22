@@ -3,3 +3,11 @@ target/
 *.iml
 #src/main/java/io/solar/Test.java
 docker/
+src/main/resources/public/index.html
+
+
+
+@Configuration
+public class CorsConfiguration {
+   @Bean
+   publicWebMvcConfigurer corsConfigurer() {     return new WebMvcConfigurer() {            @Override            publicvoid addCorsMappings(CorsRegistry registry) {                registry.addMapping("/**").allowedOrigins("http://localhost:8080");            }

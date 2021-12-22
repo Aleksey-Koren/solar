@@ -1,5 +1,7 @@
 package io.solar.specification;
 
+import io.solar.entity.inventory.InventoryType;
+import io.solar.entity.inventory.InventoryType_;
 import io.solar.entity.objects.BasicObject;
 import io.solar.entity.objects.BasicObject_;
 import io.solar.entity.objects.ObjectTypeDescription;
@@ -30,7 +32,7 @@ public class BasicObjectSpecification implements Specification<BasicObject> {
 
         List<Predicate> predicates = new ArrayList<>();
 
-        Join<BasicObject, ObjectTypeDescription> join = root.join(BasicObject_.objectTypeDescription);
+        Join<ObjectTypeDescription, InventoryType> join = root.join(BasicObject_.objectTypeDescription).join(ObjectTypeDescription_.inventoryType);
 
         if (TRUE.equals(basicObjectFilter.getDetached())) {
             predicates.add(criteriaBuilder.isNull(root.get(BasicObject_.attachedToShip)));
@@ -38,9 +40,10 @@ public class BasicObjectSpecification implements Specification<BasicObject> {
         }
 
         if (basicObjectFilter.getInventoryType() != null) {
-            predicates.add(criteriaBuilder.equal(join.get(ObjectTypeDescription_.inventoryTypeId), basicObjectFilter.getInventoryType()));
+            predicates.add(criteriaBuilder.equal(join.get(InventoryType_.id), basicObjectFilter.getInventoryType()));
         }
 
         return criteriaBuilder.and(predicates.toArray(Predicate[]::new));
     }
+
 }

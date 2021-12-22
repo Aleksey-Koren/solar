@@ -1,19 +1,11 @@
 package io.solar.entity.objects;
 
 import io.solar.entity.inventory.InventorySocket;
+import io.solar.entity.inventory.InventoryType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.List;
 
 @Data
@@ -26,8 +18,9 @@ public class ObjectTypeDescription {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "inventory_type")
-    private Integer inventoryTypeId;
+    @ManyToOne
+    @JoinColumn(name = "inventory_type")
+    private InventoryType inventoryType;
 
     @Column(name = "title")
     private String title;
