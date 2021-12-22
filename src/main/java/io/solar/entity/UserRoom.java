@@ -34,8 +34,8 @@ public class UserRoom {
     @Column(name = "subscribed_at")
     private Instant subscribedAt;
 
-    @Column(name = "last_seen")
-    private Instant lastSeen;
+    @Column(name = "last_seen_at")
+    private Instant lastSeenAt;
 }
 
 @Data
