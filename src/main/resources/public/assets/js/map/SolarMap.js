@@ -103,9 +103,10 @@ function SolarMap(context, types) {
             if(!me.objectWindow) {
                 me.objectWindow = new PlanetWindow(me.context);
             }
-            me.objectWindow.show(obj.obj, false);
+            me.objectWindow.show(obj, false);
         }
     });
+    new SolarMapControls(context, this).render();
 }
 
 SolarMap.MAX_RADIUS_KKM = 15000000;
@@ -266,6 +267,12 @@ SolarMap.prototype.init = function () {
 };
 SolarMap.prototype.changeZoom = function (zoom, relX, relY) {
     SolarMapZoom.changeZoom(this, zoom, relX, relY);
+};
+
+SolarMap.prototype.centerMap = function (relPoint) {
+    var screen = this.screenSize();
+    this.window.x = this.window.x + (relPoint.x - (screen.w / 2));
+    this.window.y = this.window.y + (relPoint.y - (screen.h / 2));
 };
 
 
