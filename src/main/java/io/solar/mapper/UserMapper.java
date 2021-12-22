@@ -39,7 +39,8 @@ public class UserMapper {
             user = new User(null, dto.getTitle(), dto.getLogin(), dto.getPassword(), dto.getMoney(),
                     dto.getLocation(), dto.getHackBlock(), dto.getHackAttempts(), dto.getAvatar(),
                     dto.getPermissions() == null ? null : dto.getPermissions().stream().map(permissionMapper::toEntity).collect(toSet()),
-                    dto.getRooms() == null ? null : dto.getRooms().stream().map(roomMapper::toEntity).toList());
+                    dto.getRooms() == null ? null : dto.getRooms().stream().map(roomMapper::toEntity).toList(),
+                    null);
         }
         return user;
     }

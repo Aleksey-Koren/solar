@@ -1,9 +1,10 @@
-function SolarMap(context) {
+function SolarMap(context, types) {
     this.context = context;
     this.zoom = 1;
     this.objects = [];
     this.canvas = Dom.el('canvas', {});
     this.ctx = this.canvas.getContext('2d');
+    this.types = types;
     var realFillText = this.ctx.fillText;
     var me = this;
     this.ctx.fillText = function (text, x, y, params) {
@@ -146,7 +147,7 @@ SolarMap.prototype.getRelPoint = function (x, y) {
 };
 
 
-SolarMap.prototype.render = function (planets) {
+SolarMap.prototype.render = function (planets, objects) {
     this.calculateZoom();
     var me = this;
     var ctx = this.ctx;
@@ -179,10 +180,12 @@ SolarMap.prototype.render = function (planets) {
     if (planets.length) {
         me.drawPlanet(ctx, planets[0], absWindow, zero);
     }
+    if (objects.length) {
+        objects.forEach(function(obj) {
+            me.drawObject(ctx, obj, absWindow, zero);
+        });
+    }
     ctx.restore();
-    this.objects.sort(function (o1, o2) {
-        return o1.x - o2.x
-    });
 };
 
 SolarMap.prototype.drawKmPerPixel = function () {
@@ -197,6 +200,10 @@ SolarMap.prototype.drawKmPerPixel = function () {
 }
 SolarMap.prototype.drawPlanet = function (ctx, planet, absWindow, zero) {
     SolarMapPlanetRender.drawPlanet(this, ctx, planet, absWindow, zero);
+};
+
+SolarMap.prototype.drawObject = function (ctx, object, absWindow, zero) {
+    SolarMapObjectRender.drawObject(this, ctx, object, absWindow, zero);
 };
 
 SolarMap.prototype.fitInScreen = function (planet) {

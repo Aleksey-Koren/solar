@@ -1,6 +1,8 @@
 package io.solar.dto.inventory;
 
 import io.solar.dto.ObjectModificationTypeDto;
+import io.solar.entity.objects.ObjectSubType;
+import io.solar.entity.objects.ObjectType;
 import lombok.Builder;
 import lombok.Data;
 
@@ -27,6 +29,8 @@ public class InventoryItemDto {
     private Integer mass;
     private String description;
     private Integer price;
+    private ObjectType type;
+    private ObjectSubType subType;
 
     List<ObjectModificationTypeDto> modifications;
     List<InventorySocketDto> sockets;

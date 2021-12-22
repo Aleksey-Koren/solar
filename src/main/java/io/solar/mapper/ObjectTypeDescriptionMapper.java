@@ -44,6 +44,8 @@ public class ObjectTypeDescriptionMapper implements EntityDtoMapper<ObjectTypeDe
                 .powerMin(entity.getPowerMin())
                 .powerMax(entity.getPowerMax())
                 .price(entity.getPrice())
+                .type(entity.getType())
+                .subType(entity.getSubType())
                 .powerDegradation(entity.getPowerDegradation())
                 .build();
     }

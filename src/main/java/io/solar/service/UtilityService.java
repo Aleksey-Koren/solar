@@ -2,6 +2,7 @@ package io.solar.service;
 
 import io.solar.entity.Utility;
 import io.solar.repository.UtilityRepository;
+import io.solar.service.exception.ServiceException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,11 +32,20 @@ public class UtilityService {
 
     public Utility save(Utility utility) {
 
-       return utilityRepository.save(utility);
+        return utilityRepository.save(utility);
     }
 
     public void deleteByUtilKey(String utilKey) {
 
         utilityRepository.deleteById(utilKey);
+    }
+
+    public Utility updateValueByKey(String utilKey, String value) {
+        Utility utility = utilityRepository.findByUtilKey(utilKey)
+                .orElseThrow(() -> new ServiceException(String.format("Cannot find util key = %s", utilKey)));
+
+        utility.setUtilValue(value);
+
+        return save(utility);
     }
 }
