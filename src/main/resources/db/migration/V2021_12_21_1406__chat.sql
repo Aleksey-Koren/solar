@@ -5,7 +5,6 @@ create table messages
     recipient_id int          	 not null,
     message      varchar(255) 	 not null,
     created_at   timestamp       not null,
-    viewed_at    timestamp       not null,
     constraint messages_pk
         primary key (id),
     constraint messages_users_id_fk
@@ -16,7 +15,6 @@ create table messages
 
 create unique index messages_id_uindex
     on messages (id);
-
 
 create table rooms
 (
@@ -52,3 +50,16 @@ alter table messages
 alter table messages
     add constraint messages_rooms_id_fk
         foreign key (room_id) references rooms (id);
+
+create table message_views
+(
+    message_id int       not null,
+    user_id    int       not null,
+    viewed_at  timestamp null,
+    constraint message_views_pk
+        primary key (message_id, user_id),
+    constraint message_views_messages_id_fk
+        foreign key (message_id) references messages (id),
+    constraint message_views_users_id_fk
+        foreign key (user_id) references users (id)
+);
