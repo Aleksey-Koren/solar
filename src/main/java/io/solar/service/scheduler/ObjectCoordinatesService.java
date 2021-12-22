@@ -11,7 +11,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -27,17 +30,26 @@ public class ObjectCoordinatesService {
 
     @Transactional
     public void update() {
-
         String positionIteration = utilityService.getValue(POSITION_ITERATION_UTILITY_KEY, "1");
-
         long currentIteration = Long.parseLong(positionIteration);
-        List<BasicObject> objects = basicObjectRepository.findObjectsToUpdateCoordinates(
-                List.of(ObjectType.STATION, ObjectType.SHIP), currentIteration, Pageable.ofSize(amountReceivedObjects)
+        List<BasicObject> objects;
+
+        while (!(objects = retrieveObjectsForUpdate(currentIteration)).isEmpty()) {
+
+            updateObjects(objects, currentIteration);
+            basicObjectRepository.saveAllAndFlush(objects);
+        }
+
+        utilityService.updateValueByKey(POSITION_ITERATION_UTILITY_KEY, String.valueOf(currentIteration + 1));
+    }
+
+    private List<BasicObject> retrieveObjectsForUpdate(long currentIteration) {
+
+        return basicObjectRepository.findObjectsToUpdateCoordinates(
+                List.of(ObjectType.STATION, ObjectType.SHIP),
+                currentIteration,
+                Pageable.ofSize(amountReceivedObjects)
         );
-
-        updateObjects(objects, currentIteration);
-
-        basicObjectRepository.saveAllAndFlush(objects);
     }
 
     private void updateObjects(List<BasicObject> objects, long currentIteration) {
