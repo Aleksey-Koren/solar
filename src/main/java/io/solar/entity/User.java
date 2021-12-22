@@ -49,6 +49,9 @@ public class User {
     )
     private List<Room> rooms;
 
+    @OneToMany(mappedBy = "user")
+    private List<UserRoom> userRooms;
+
     public static UserDetails retrieveUserDetails(User user) {
         return new org.springframework.security.core.userdetails.User(
                 user.getLogin(), user.getPassword(),
