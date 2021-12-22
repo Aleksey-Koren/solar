@@ -1,15 +1,13 @@
 package io.solar.repository;
 
+import io.solar.entity.inventory.InventoryType;
 import io.solar.entity.objects.BasicObject;
-import io.solar.entity.objects.ObjectStatus;
-import io.solar.entity.objects.ObjectSubType;
 import io.solar.entity.objects.ObjectType;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.query.Param;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -25,8 +23,9 @@ public interface BasicObjectRepository extends JpaRepository<BasicObject, Long>,
 
     @Query("select o from BasicObject as o " +
             "join o.objectTypeDescription as otd " +
-            "where o.attachedToShip.id = ?1 and o.attachedToSocket is not null and otd.inventoryTypeId = ?2")
-    List<BasicObject> getObjectsInSlotsByTypeId(Long objectId, Integer TypeId);
+            "where o.attachedToShip.id = :objectId and o.attachedToSocket is not null and otd.inventoryType = :type")
+    List<BasicObject> getObjectsInSlotsByTypeId(@Param("objectId") Long objectId, @Param("type")InventoryType type);
+
 
     @Query("select o from BasicObject o " +
             "where o.status = 'IN_SPACE'" +
@@ -36,14 +35,15 @@ public interface BasicObjectRepository extends JpaRepository<BasicObject, Long>,
             "((o.y <= :y + :distance) and (o.y >= :y - :distance))")
     List<BasicObject> findAllInViewDistance(@Param("x") Float x, @Param("y") Float y, @Param("distance") Float distance);
 
+
     @Query("select o from BasicObject o " +
             "where o.objectTypeDescription.title = 'Planet'" +
             "and" +
-            "((o.x <= ?1 + ?3) and (o.x >= ?1 - ?3))" +
+            "((o.x <= :x + :distance) and (o.x >= :x - :distance))" +
             "and" +
-            "((o.y <= ?2 + ?3) and (o.y >= ?2 - ?3))" +
-            "or o.x = ?1 and o.y = ?2 and o.status = 'IN_SPACE'")
-    List<BasicObject> findAllWithZeroViewDistance(Float x, Float y, Float defaultDistance);
+            "((o.y <= :y + :distance) and (o.y >= :y - :distance))" +
+            "or o.x = :x and o.y = :y and o.status = 'IN_SPACE'")
+    List<BasicObject> findAllWithZeroViewDistance(@Param("x") Float x, @Param("y") Float y, @Param("distance") Float defaultDistance);
 
     @Query(value = "SELECT bs FROM BasicObject bs WHERE bs.status = 'IN_SPACE' " +
             "AND bs.objectTypeDescription.type IN :shipOrStationTypes " +

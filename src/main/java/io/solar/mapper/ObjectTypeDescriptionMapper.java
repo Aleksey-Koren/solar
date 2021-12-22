@@ -3,6 +3,7 @@ package io.solar.mapper;
 import io.solar.dto.inventory.InventoryItemDto;
 import io.solar.entity.objects.ObjectTypeDescription;
 import io.solar.repository.InventorySocketRepository;
+import io.solar.repository.InventoryTypeRepository;
 import io.solar.repository.ObjectTypeDescriptionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import java.util.Objects;
 public class ObjectTypeDescriptionMapper implements EntityDtoMapper<ObjectTypeDescription, InventoryItemDto> {
 
     private final ObjectTypeDescriptionRepository objectTypeDescriptionRepository;
+    private final InventoryTypeRepository inventoryTypeRepository;
 
     @Override
     public ObjectTypeDescription toEntity(InventoryItemDto dto) {
@@ -33,7 +35,7 @@ public class ObjectTypeDescriptionMapper implements EntityDtoMapper<ObjectTypeDe
                 .id(entity.getId())
                 .title(entity.getTitle())
                 .description(entity.getDescription())
-                .inventoryType(entity.getInventoryTypeId())
+                .inventoryType(entity.getInventoryType().getId())
                 .cooldown(entity.getCooldown())
                 .mass(entity.getMass())
                 .distance(entity.getDistance())
@@ -72,7 +74,8 @@ public class ObjectTypeDescriptionMapper implements EntityDtoMapper<ObjectTypeDe
 
         objectTypeDescription.setTitle(dto.getTitle());
         objectTypeDescription.setDescription(dto.getDescription());
-        objectTypeDescription.setInventoryTypeId(dto.getInventoryType());
+        objectTypeDescription.setInventoryType(inventoryTypeRepository.findById(dto.getInventoryType())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, String.format("Can't find type with title [%d]", dto.getInventoryType()))));
         objectTypeDescription.setCooldown(dto.getCooldown());
         objectTypeDescription.setMass(dto.getMass());
         objectTypeDescription.setDistance(dto.getDistance());

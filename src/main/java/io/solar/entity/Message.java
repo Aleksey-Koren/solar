@@ -27,10 +27,6 @@ public class Message {
     private User sender;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "recipient_id")
-    private User recipient;
-
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_id")
     private Room room;
 
@@ -39,7 +35,4 @@ public class Message {
 
     @Column(name = "created_at")
     private Instant createdAt;
-
-    @Column(name = "viewed_at")
-    private Instant viewedAt;
 }

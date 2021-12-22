@@ -17,7 +17,7 @@ import java.util.List;
 @Builder
 public class InventoryItemDto {
     private Long id;
-    private Integer inventoryType;
+    private Long inventoryType;
     private String title;
     private Float powerMin;
     private Float powerMax;
