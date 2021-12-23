@@ -1,12 +1,15 @@
 package io.solar.controller.messenger;
 
+import io.solar.dto.MessageDto;
 import io.solar.entity.messenger.Message;
 import io.solar.service.MessageService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,14 +32,13 @@ public class WebSocketController {
 //    }
 
 
-    @MessageMapping("/roomId")
-    @SendTo("/room/{id}")
-    public Message processMessage(@Payload Message chatMessage) {
+    @MessageMapping("/{roomId}")
+    @SendTo("/room/{roomId}")
+    public MessageDto processMessage(@DestinationVariable("roomId")Long roomId, @Payload MessageDto message) {
+        message.setRoomId(roomId);
         System.out.println("I am in the controller!!!!!!!!!!!");
-
-                messagingTemplate.convertAndSendToUser(
-                1 + "","/queue/messages",
-                chatMessage);
-        return chatMessage;
+        System.out.println(roomId);
+        System.out.println(message);
+        return message;
     }
 }
