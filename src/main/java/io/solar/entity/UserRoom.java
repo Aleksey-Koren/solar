@@ -1,6 +1,7 @@
 package io.solar.entity;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -19,6 +20,9 @@ import java.time.Instant;
 @Data
 @IdClass(UserRoomPK.class)
 @Table(name = "users_rooms")
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class UserRoom {
 
     @Id
