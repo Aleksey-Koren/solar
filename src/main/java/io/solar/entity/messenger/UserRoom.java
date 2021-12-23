@@ -2,6 +2,7 @@ package io.solar.entity.messenger;
 
 import io.solar.entity.User;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -20,6 +21,9 @@ import java.time.Instant;
 @Data
 @IdClass(UserRoom.UserRoomPK.class)
 @Table(name = "users_rooms")
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class UserRoom {
 
     @Id

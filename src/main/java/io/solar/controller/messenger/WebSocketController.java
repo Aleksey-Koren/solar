@@ -24,7 +24,7 @@ public class WebSocketController {
 //        Message saved = messageService.save(chatMessage);
 //
 //        messagingTemplate.convertAndSendToUser(
-//                1,"/queue/messages",0
+//                1,"/queue/messages",
 //                chatMessage;
 //    }
 

@@ -4,6 +4,7 @@ import io.solar.entity.messenger.Room;
 import io.solar.entity.messenger.UserRoom;
 import io.solar.entity.objects.BasicObject;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -20,6 +21,7 @@ import static java.util.stream.Collectors.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Builder
 @Table(name = "users")
 public class User {
     @Id
@@ -51,7 +53,7 @@ public class User {
     )
     private List<Room> rooms;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<UserRoom> userRooms;
 
     public static UserDetails retrieveUserDetails(User user) {

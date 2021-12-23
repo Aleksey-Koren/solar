@@ -1,7 +1,10 @@
 package io.solar.entity.messenger;
 
 import io.solar.entity.User;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -17,6 +20,9 @@ import java.time.Instant;
 @Entity
 @Table(name = "messages")
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class Message {
 
     @Id
