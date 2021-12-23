@@ -19,7 +19,7 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
             "    LEFT JOIN messages m on r.id = m.room_id " +
             "WHERE ((m.created_at >= ur.last_seen_at) AND ur.user_id = :user_id) " +
             "group by r.id)" +
-            "SELECT users_rooms.room_id as id, r2.title as title, inner_table.unread_message as count " +
+            "SELECT users_rooms.room_id as id, r2.title as title, inner_table.unread_message as amount " +
             "FROM users_rooms " +
             "    JOIN rooms r2 on users_rooms.room_id = r2.id " +
             "    LEFT JOIN inner_table ON users_rooms.room_id = inner_table.room_id " +
