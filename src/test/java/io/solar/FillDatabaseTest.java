@@ -1,22 +1,22 @@
 package io.solar;
 
-import io.solar.entity.Message;
-import io.solar.entity.Room;
+
 import io.solar.entity.User;
-import io.solar.entity.UserRoom;
-import io.solar.repository.BasicObjectRepository;
-import io.solar.repository.MessageRepository;
-import io.solar.repository.RoomRepository;
+
+import io.solar.entity.messenger.Message;
+import io.solar.entity.messenger.Room;
+import io.solar.entity.messenger.UserRoom;
+
 import io.solar.repository.UserRepository;
+import io.solar.repository.messenger.MessageRepository;
+import io.solar.repository.messenger.RoomRepository;
 import net.bytebuddy.utility.RandomString;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.RepeatedTest;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.Instant;
@@ -30,20 +30,24 @@ import java.util.UUID;
 @SpringBootTest(classes = Start.class)
 @AutoConfigureMockMvc
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@Disabled
 public class FillDatabaseTest {
 
     private final UserRepository userRepository;
     private final RoomRepository roomRepository;
     private final MessageRepository messageRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public FillDatabaseTest(UserRepository userRepository,
                             RoomRepository roomRepository,
-                            MessageRepository messageRepository) {
+                            MessageRepository messageRepository,
+                            PasswordEncoder passwordEncoder) {
 
         this.userRepository = userRepository;
         this.roomRepository = roomRepository;
         this.messageRepository = messageRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Order(1)
@@ -52,7 +56,7 @@ public class FillDatabaseTest {
 
         User user = User.builder()
                 .login(UUID.randomUUID().toString())
-                .password(Base64.getEncoder().encodeToString("pass".getBytes()))
+                .password(passwordEncoder.encode("pass"))
                 .money(1000L)
                 .hackAttempts(0)
                 .build();

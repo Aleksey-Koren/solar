@@ -11,5 +11,5 @@ import java.util.List;
 @Repository
 public interface MessageRepository extends JpaRepository<Message, Long> {
 
-    List<Message> findByRoomAndCreatedAtAfterOrderByCreatedAt(Room room, Instant subscribedAt);
+    List<Message> findByRoomAndCreatedAtGreaterThanEqualOrderByCreatedAt(Room room, Instant subscribedAt);
 }
