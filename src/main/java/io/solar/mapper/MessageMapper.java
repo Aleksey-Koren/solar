@@ -5,9 +5,9 @@ import io.solar.entity.messenger.Message;
 import io.solar.repository.messenger.MessageRepository;
 import io.solar.repository.messenger.RoomRepository;
 import io.solar.repository.UserRepository;
-import io.solar.utils.server.beans.Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
