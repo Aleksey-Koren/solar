@@ -32,9 +32,9 @@ public class ChatController {
     public Message processMessage(@Payload Message chatMessage) {
         System.out.println("I am in the controller!!!!!!!!!!!");
 
-                messagingTemplate.convertAndSendToUser(
-                1,"/queue/messages",
-                chatMessage;
+//                messagingTemplate.convertAndSendToUser(
+//                1,"/queue/messages",
+//                chatMessage);
         return chatMessage;
     }
 }
