@@ -6,7 +6,6 @@ import io.solar.entity.User;
 import io.solar.entity.messenger.Message;
 import io.solar.entity.messenger.Room;
 import io.solar.entity.messenger.UserRoom;
-
 import io.solar.repository.UserRepository;
 import io.solar.repository.messenger.MessageRepository;
 import io.solar.repository.messenger.RoomRepository;
@@ -21,7 +20,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Base64;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -30,7 +28,6 @@ import java.util.UUID;
 @SpringBootTest(classes = Start.class)
 @AutoConfigureMockMvc
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@Disabled
 public class FillDatabaseTest {
 
     private final UserRepository userRepository;

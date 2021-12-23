@@ -1,6 +1,5 @@
 package io.solar.dto;
 
-import io.solar.entity.Planet;
 import io.solar.entity.objects.BasicObject;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -27,5 +26,5 @@ public class UserDto {
     private Integer hackAttempts;
     private String avatar;
     private Set<PermissionDto> permissions;
-    private List<RoomDto> rooms;
+    private List<RoomDtoImpl> rooms;
 }

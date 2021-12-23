@@ -5,17 +5,23 @@ import io.solar.entity.Course;
 import io.solar.entity.User;
 import io.solar.entity.objects.BasicObject;
 import io.solar.facade.CourseFacade;
-import io.solar.repository.StarShipRepository;
 import io.solar.service.CourseService;
 import io.solar.service.NavigatorService;
 import io.solar.service.UserService;
+import io.solar.service.scheduler.ObjectCoordinatesService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import io.solar.service.scheduler.ObjectCoordinatesService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
@@ -34,7 +40,6 @@ public class NavigatorController {
 
     @PostMapping("/dock")
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
-    @ResponseStatus
     public void dockShip(@RequestParam Long stationId,
                          @RequestParam Long shipId) {
 
@@ -55,7 +60,7 @@ public class NavigatorController {
     public void layCourse(@RequestBody CourseDto dto, Principal principal) {
         User authUser = userService.findByLogin(principal.getName());
 
-        if(!userService.isUserLocatedInObject(authUser, dto.getObjectId())) {
+        if (!userService.isUserLocatedInObject(authUser, dto.getObjectId())) {
             userCantException(authUser.getLocation().getId(), dto.getObjectId());
         }
 
@@ -71,7 +76,7 @@ public class NavigatorController {
         BasicObject object = course.getObject();
         User authUser = userService.findByLogin(principal.getName());
 
-        if(!userService.isUserLocatedInObject(authUser, object.getId())) {
+        if (!userService.isUserLocatedInObject(authUser, object.getId())) {
             userCantException(authUser.getLocation().getId(), object.getId());
         }
 
