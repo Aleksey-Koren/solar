@@ -1,5 +1,6 @@
-package io.solar.entity;
+package io.solar.entity.messenger;
 
+import io.solar.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,7 +18,7 @@ import java.time.Instant;
 
 @Entity
 @Data
-@IdClass(UserRoomPK.class)
+@IdClass(UserRoom.UserRoomPK.class)
 @Table(name = "users_rooms")
 public class UserRoom {
 
@@ -36,12 +37,14 @@ public class UserRoom {
 
     @Column(name = "last_seen_at")
     private Instant lastSeenAt;
+
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class UserRoomPK implements Serializable {
+        private User user;
+        private Room room;
+    }
 }
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-class UserRoomPK implements Serializable {
-    private User user;
-    private Room room;
-}

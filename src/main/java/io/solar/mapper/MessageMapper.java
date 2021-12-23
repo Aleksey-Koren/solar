@@ -1,9 +1,9 @@
 package io.solar.mapper;
 
 import io.solar.dto.MessageDto;
-import io.solar.entity.Message;
-import io.solar.repository.MessageRepository;
-import io.solar.repository.RoomRepository;
+import io.solar.entity.messenger.Message;
+import io.solar.repository.messenger.MessageRepository;
+import io.solar.repository.messenger.RoomRepository;
 import io.solar.repository.UserRepository;
 import io.solar.utils.server.beans.Service;
 import lombok.RequiredArgsConstructor;

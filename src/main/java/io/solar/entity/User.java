@@ -1,5 +1,7 @@
 package io.solar.entity;
 
+import io.solar.entity.messenger.Room;
+import io.solar.entity.messenger.UserRoom;
 import io.solar.entity.objects.BasicObject;
 import lombok.AllArgsConstructor;
 import lombok.Data;
