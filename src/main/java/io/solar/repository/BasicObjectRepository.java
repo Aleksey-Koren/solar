@@ -42,7 +42,7 @@ public interface BasicObjectRepository extends JpaRepository<BasicObject, Long>,
     @Query(value = "SELECT bs FROM BasicObject bs WHERE bs.status = 'IN_SPACE' " +
             "AND bs.objectTypeDescription.type IN :shipOrStationTypes " +
             "AND bs.objectTypeDescription.subType <> 'STATIC' " +
-            "AND bs.positionIteration < :positionIteration")
+            "AND bs.positionIteration <= :positionIteration")
     List<BasicObject> findObjectsToUpdateCoordinates(@Param("shipOrStationTypes") List<ObjectType> types,
                                                      @Param("positionIteration") Long positionIteration,
                                                      Pageable pageable);
