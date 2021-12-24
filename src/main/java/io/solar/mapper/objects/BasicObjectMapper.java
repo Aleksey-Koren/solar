@@ -76,6 +76,7 @@ public class BasicObjectMapper implements EntityDtoMapper<BasicObject, BasicObje
                 .userId(entity.getUserId())
                 .attachedObjects(attachedObjects)
                 .socketList(socketList)
+                .positionIterationTs(entity.getPositionIterationTs())
                 .build();
     }
 
@@ -99,7 +100,7 @@ public class BasicObjectMapper implements EntityDtoMapper<BasicObject, BasicObje
     }
 
 
-    private void fillBasicObjectFields(BasicObject basicObject, BasicObjectDto dto) {
+    private void fillBasicObjectFields(BasicObject entity, BasicObjectDto dto) {
 
         ObjectTypeDescription objectTypeDescription = objectTypeDescriptionRepository.findById(dto.getHullId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
@@ -118,27 +119,28 @@ public class BasicObjectMapper implements EntityDtoMapper<BasicObject, BasicObje
                     );
         }
 
-        basicObject.setPopulation(dto.getPopulation());
-        basicObject.setAccelerationX(dto.getAccelerationX());
-        basicObject.setAccelerationY(dto.getAccelerationY());
-        basicObject.setActive(dto.getActive());
-        basicObject.setAphelion(dto.getAphelion());
-        basicObject.setAngle(dto.getAngle());
-        basicObject.setRotationAngle(dto.getRotationAngle());
-        basicObject.setAttachedToShip(attachedToShip);
-        basicObject.setAttachedToSocket(dto.getAttachedToSocket());
-        basicObject.setDurability(dto.getDurability());
-        basicObject.setFraction(dto.getFraction());
-        basicObject.setObjectTypeDescription(objectTypeDescription);
-        basicObject.setOrbitalPeriod(dto.getOrbitalPeriod());
-        basicObject.setPlanet(planet);
-        basicObject.setX(dto.getX());
-        basicObject.setY(dto.getY());
-        basicObject.setSpeedX(dto.getSpeedX());
-        basicObject.setSpeedY(dto.getSpeedY());
-        basicObject.setStatus(dto.getStatus());
-        basicObject.setPopulation(dto.getPopulation());
-        basicObject.setTitle(dto.getTitle());
-        basicObject.setUserId(dto.getUserId());
+        entity.setPopulation(dto.getPopulation());
+        entity.setAccelerationX(dto.getAccelerationX());
+        entity.setAccelerationY(dto.getAccelerationY());
+        entity.setActive(dto.getActive());
+        entity.setAphelion(dto.getAphelion());
+        entity.setAngle(dto.getAngle());
+        entity.setRotationAngle(dto.getRotationAngle());
+        entity.setAttachedToShip(attachedToShip);
+        entity.setAttachedToSocket(dto.getAttachedToSocket());
+        entity.setDurability(dto.getDurability());
+        entity.setFraction(dto.getFraction());
+        entity.setObjectTypeDescription(objectTypeDescription);
+        entity.setOrbitalPeriod(dto.getOrbitalPeriod());
+        entity.setPlanet(planet);
+        entity.setX(dto.getX());
+        entity.setY(dto.getY());
+        entity.setSpeedX(dto.getSpeedX());
+        entity.setSpeedY(dto.getSpeedY());
+        entity.setStatus(dto.getStatus());
+        entity.setPopulation(dto.getPopulation());
+        entity.setTitle(dto.getTitle());
+        entity.setUserId(dto.getUserId());
+        entity.setPositionIterationTs(dto.getPositionIterationTs());
     }
 }

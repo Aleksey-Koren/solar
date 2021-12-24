@@ -25,7 +25,6 @@ public class ChatController {
     @GetMapping("messages/{roomId}")
     public List<MessageDto> getMessageHistory(@PathVariable("roomId") Long roomId, Principal principal) {
         User user = userService.findByLogin(principal.getName());
-
         return chatService.getMessageHistory(roomId, user);
     }
 
