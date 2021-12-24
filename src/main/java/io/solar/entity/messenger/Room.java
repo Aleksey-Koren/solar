@@ -1,6 +1,10 @@
-package io.solar.entity;
+package io.solar.entity.messenger;
 
+import io.solar.entity.User;
+
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -16,6 +20,8 @@ import java.time.Instant;
 @Entity
 @Table(name = "rooms")
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Room {
 
     @Id

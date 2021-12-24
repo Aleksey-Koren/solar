@@ -8,14 +8,13 @@ import lombok.NoArgsConstructor;
 import java.time.Instant;
 
 @Data
-@Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class MessageDto {
-
+@NoArgsConstructor
+@Builder
+public class RoomDtoImpl implements RoomDto{
     private Long id;
-    private Long senderId;
-    private Long roomId;
-    private String message;
+    private String title;
     private Instant createdAt;
+    private Long ownerId;
+    private Long amount;
 }

@@ -3,10 +3,11 @@ package io.solar.service;
 import io.solar.entity.objects.StarShip;
 import io.solar.entity.objects.Station;
 import io.solar.service.exception.ServiceException;
-import io.solar.service.exception.ShipDockException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import static java.lang.Math.pow;
 
@@ -33,7 +34,7 @@ public class NavigatorService {
         if (isShipCanDockWithStation(starShip, station)) {
             starshipService.dockShip(starShip, station);
         } else {
-            throw new ShipDockException();
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Cannot dock ship to station");
         }
     }
 
@@ -54,5 +55,4 @@ public class NavigatorService {
 
         return Math.sqrt(pow(starShip.getX() - station.getX(), 2) + pow(starShip.getY() - station.getY(), 2));
     }
-
 }

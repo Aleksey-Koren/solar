@@ -1,13 +1,13 @@
 package io.solar.mapper;
 
 import io.solar.dto.MessageDto;
-import io.solar.entity.Message;
-import io.solar.repository.MessageRepository;
-import io.solar.repository.RoomRepository;
+import io.solar.entity.messenger.Message;
+import io.solar.repository.messenger.MessageRepository;
+import io.solar.repository.messenger.RoomRepository;
 import io.solar.repository.UserRepository;
-import io.solar.utils.server.beans.Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
@@ -28,8 +28,12 @@ public class MessageMapper implements EntityDtoMapper<Message, MessageDto> {
         }else{
             entity = new Message();
         }
-        entity.setSender(userRepository.findById(dto.getSenderId()).get());
-        entity.setRoom(roomRepository.findById(dto.getRoomId()).get());
+        entity.setSender(userRepository.findById(dto.getSenderId()).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "There is no such user id = " + dto.getSenderId() + " in database")
+                    ));
+        entity.setRoom(roomRepository.findById(dto.getRoomId()).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "There is no such room id = " + dto.getRoomId() + " in database")
+        ));
         return entity;
     }
 

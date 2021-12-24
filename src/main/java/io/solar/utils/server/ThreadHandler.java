@@ -42,10 +42,10 @@ public class ThreadHandler extends Thread {
                 } else {
                     exchange.sendResponseHeaders(response.getCode(), 0);
                 }
-            } else if(resources.equals(path[0]) || "public/assets/favicon.ico".equals(path[0]) || "/".equals(path[0]) || "public/assets/1.html".equals(path[0])) {
+            } else if(resources.equals(path[0]) || "public/assets/favicon.ico".equals(path[0]) || "/".equals(path[0]) || "public/assets/index.html".equals(path[0])) {
                 InputStream in;
                 if("/".equals(path[0])) {
-                    in = getClass().getResourceAsStream("/public/assets/1.html");
+                    in = getClass().getResourceAsStream("/public/assets/index.html");
                 } else {
                     in = getClass().getResourceAsStream(exchange.getRequestURI().toString());
                 }

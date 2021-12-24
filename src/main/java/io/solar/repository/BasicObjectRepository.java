@@ -28,22 +28,16 @@ public interface BasicObjectRepository extends JpaRepository<BasicObject, Long>,
 
 
     @Query("select o from BasicObject o " +
-            "where o.status = 'IN_SPACE'" +
-            "and" +
-            "((o.x <= :x + :distance) and (o.x >= :x - :distance))" +
-            "and" +
-            "((o.y <= :y + :distance) and (o.y >= :y - :distance))")
+            "where " +
+            "o.status = 'IN_SPACE'" +
+            "and " +
+            "(o.objectTypeDescription.subType <> 'STATIC')" +
+            "and " +
+            "(o.x between (:x - :distance) and (:x + :distance))" +
+            "and " +
+            "(o.y between (:y - :distance) and (:y + :distance))")
     List<BasicObject> findAllInViewDistance(@Param("x") Float x, @Param("y") Float y, @Param("distance") Float distance);
 
-
-    @Query("select o from BasicObject o " +
-            "where o.objectTypeDescription.title = 'Planet'" +
-            "and" +
-            "((o.x <= :x + :distance) and (o.x >= :x - :distance))" +
-            "and" +
-            "((o.y <= :y + :distance) and (o.y >= :y - :distance))" +
-            "or o.x = :x and o.y = :y and o.status = 'IN_SPACE'")
-    List<BasicObject> findAllWithZeroViewDistance(@Param("x") Float x, @Param("y") Float y, @Param("distance") Float defaultDistance);
 
     @Query(value = "SELECT bs FROM BasicObject bs WHERE bs.status = 'IN_SPACE' " +
             "AND bs.objectTypeDescription.type IN :shipOrStationTypes " +
