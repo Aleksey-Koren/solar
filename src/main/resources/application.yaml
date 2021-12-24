@@ -40,6 +40,7 @@ app:
     admin_not_exists: "yes"
     goods_generation_delay_minutes: 60
     goods_initial_delay_minutes: 60
+    view_distance_without_radar: 5
     images:
         path: src/main/resources/images
         width: 300
