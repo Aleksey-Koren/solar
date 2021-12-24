@@ -3,18 +3,15 @@ package io.solar.service.scheduler;
 import io.solar.entity.objects.BasicObject;
 import io.solar.entity.objects.ObjectType;
 import io.solar.repository.BasicObjectRepository;
-import io.solar.repository.UtilityRepository;
 import io.solar.service.UtilityService;
-import io.solar.service.exception.ServiceException;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 
-import java.util.Collection;
-import java.util.Collections;
+import java.time.Instant;
 import java.util.List;
 
 @Service
@@ -54,16 +51,31 @@ public class ObjectCoordinatesService {
 
     private void updateObjects(List<BasicObject> objects, long currentIteration) {
         long now = System.currentTimeMillis();
+        Point zero = new Point(0f, 0f);
         objects.forEach(object -> {
-            long time = now - object.getPositionIterationTs();
-            object.setX(determinePosition(object.getX(), object.getSpeedX(), time));
-            object.setY(determinePosition(object.getY(), object.getSpeedY(), time));
+            if(object.getPlanet() != null && object.getAphelion() != null && object.getAngle() != null && object.getOrbitalPeriod() != null) {
+                Instant epoch = Instant.parse("2019, 11, 12, 0, 0, 0, 0");
+                        Double delta = Math.PI * 2 * (now - epoch.toEpochMilli()) / (1000 * 60 * 60 * 24);
 
-            object.setSpeedX(calculateSpeed(object.getSpeedX(), object.getAccelerationX(), time));
-            object.setSpeedY(calculateSpeed(object.getSpeedY(), object.getAccelerationY(), time));
+                double da = delta / object.getOrbitalPeriod();
+                object.setAngle(object.getAngle() + (float) da);
 
-            object.setPositionIterationTs(now);
-            object.setPositionIteration(currentIteration + 1);
+                var absX = Math.cos(object.getAngle()) * object.getAphelion() + zero.x;
+                var absY = Math.sin(object.getAngle()) * object.getAphelion() + zero.y;
+                object.setX((float)absX);
+                object.setY((float)absY);
+
+            }else{
+                long time = now - object.getPositionIterationTs();
+                object.setX(determinePosition(object.getX(), object.getSpeedX(), time));
+                object.setY(determinePosition(object.getY(), object.getSpeedY(), time));
+
+                object.setSpeedX(calculateSpeed(object.getSpeedX(), object.getAccelerationX(), time));
+                object.setSpeedY(calculateSpeed(object.getSpeedY(), object.getAccelerationY(), time));
+
+                object.setPositionIterationTs(now);
+                object.setPositionIteration(currentIteration + 1);
+            }
         });
     }
 
@@ -73,5 +85,11 @@ public class ObjectCoordinatesService {
 
     private Float calculateSpeed(Float speed, Float acceleration, long time) {
         return speed + (acceleration * time / 3_600_000);
+    }
+
+    @AllArgsConstructor
+    class Point {
+        private Float x;
+        private Float y;
     }
 }
