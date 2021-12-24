@@ -1,11 +1,9 @@
 package io.solar.service.object;
 
-
 import io.solar.entity.objects.BasicObject;
 import io.solar.repository.BasicObjectRepository;
 import io.solar.specification.BasicObjectSpecification;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
