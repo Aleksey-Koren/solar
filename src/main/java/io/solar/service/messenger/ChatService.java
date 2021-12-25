@@ -1,7 +1,6 @@
 package io.solar.service.messenger;
 
 import io.solar.dto.MessageDto;
-import io.solar.dto.RoomDto;
 import io.solar.dto.RoomDtoImpl;
 import io.solar.entity.User;
 import io.solar.entity.messenger.Room;
@@ -38,7 +37,7 @@ public class ChatService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST
                         , String.format("User with id = %d isn't subscribed on room id = %d", user.getId(), roomId)));
 
-        return messageRepository.findByRoomAndCreatedAtGreaterThanEqualOrderByCreatedAt(room, userRoom.getSubscribedAt()).stream()
+        return messageRepository.findByRoomAndCreatedAtGreaterThanEqualOrderByCreatedAtDesc(room, userRoom.getSubscribedAt()).stream()
                 .map(messageMapper::toDto)
                 .collect(toList());
     }

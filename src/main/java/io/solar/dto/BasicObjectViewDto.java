@@ -34,4 +34,5 @@ public class BasicObjectViewDto {
     private Float speedY;
     private Float accelerationX;
     private Float accelerationY;
+    private Long positionIterationTs;
 }
