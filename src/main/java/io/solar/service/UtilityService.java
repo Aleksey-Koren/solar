@@ -4,7 +4,6 @@ import io.solar.entity.Utility;
 import io.solar.repository.UtilityRepository;
 import io.solar.service.exception.ServiceException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;

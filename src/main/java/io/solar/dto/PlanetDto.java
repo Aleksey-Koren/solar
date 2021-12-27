@@ -13,7 +13,7 @@ public class PlanetDto {
 
     private Long id;
     private Float aldebo;
-    private Float aphelion; //TODO it was Long.  Might be that it will bring some troubles at frontend)))
+    private Float aphelion;
     private String axialTilt;
     private String eccentricity;
     private String escapeVelocity;
@@ -32,4 +32,5 @@ public class PlanetDto {
     private Long parent;
     private Float angle;
     private String type;
+    private Long positionIterationTs;
 }
