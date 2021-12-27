@@ -37,4 +37,15 @@ public class StarShipService {
 
         return starShipRepository.save(starShip);
     }
+
+    public Integer calculateMass(StarShip starship) {
+        int starshipMass = starship.getObjectTypeDescription().getMass();
+
+        int attachedObjectsMass = starship.getAttachedObjects()
+                .stream()
+                .mapToInt(object -> object.getObjectTypeDescription().getMass())
+                .sum();
+
+        return starshipMass + attachedObjectsMass;
+    }
 }
