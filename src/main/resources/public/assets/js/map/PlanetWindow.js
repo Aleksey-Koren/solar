@@ -1,11 +1,11 @@
 function PlanetWindow(context) {
     this.container = Dom.el('div', {class: 'planet-window'});
     this.context = context;
-    this.planet = null;
+    this.object = null;
     this.stack = [];
 }
 
-PlanetWindow.prototype.show = function(planet, keepLink) {
+PlanetWindow.prototype.show = function(object, keepLink) {
     if(keepLink) {
         if(this.planet) {
             this.stack.push(this.planet);
@@ -14,33 +14,50 @@ PlanetWindow.prototype.show = function(planet, keepLink) {
         this.stack = [];
     }
     var me = this;
-    this.planet = planet;
+    this.object = object;
     Dom.append(this.context.body, this.container);
     Dom.clear(this.container);
     var type;
-    switch (planet.type) {
+    var planetoid;
+    var real = object.obj;
+    switch (object.type) {
         case 'planet':
-            type = 'Planet: ' + planet.title;
+            type = 'Planet: ' + real.title;
+            planetoid = true;
             break;
         case 'moon':
-            type = 'Moon: ' + planet.title;
+            type = 'Moon: ' + real.title;
+            planetoid = true;
             break;
         case 'star':
             type = 'Sun';
+            planetoid = true;
+            break;
+        case 'ship':
+            type = 'Starship: ' + real.title;
+            planetoid = false;
+            break;
+        case 'station':
+            type = 'Station: ' + real.title;
+            planetoid = false;
             break;
         default:
             type = '';
     }
     var content = [
         Dom.el('div', null, type),
-        new CollapsibleWindow('Orbital information', this.orbitalInformation(), true).container,
-        new CollapsibleWindow('Surface information', this.surfaceInformation()).container,
-        planet.moons && planet.moons.length ? new CollapsibleWindow("Satellites", this.moonsInformation()) : null,
-        this.stack.length ? Dom.el('a', {
+        planetoid && new CollapsibleWindow('Orbital information', this.orbitalInformation(), true).container,
+        planetoid && new CollapsibleWindow('Surface information', this.surfaceInformation()).container,
+        planetoid && real.moons && real.moons.length ? new CollapsibleWindow("Satellites", this.moonsInformation()) : null,
+        planetoid && this.stack.length ? Dom.el('a', {
             'href': '#',
             class: 'planet-window-back',
             click: function(e){e.preventDefault(); me.planet = null; me.show(me.stack.pop(), true)}},
-            ['Back to ', this.stack[this.stack.length - 1].title]) : null
+            ['Back to ', this.stack[this.stack.length - 1].title]) : null,
+        object.type === 'ship' && new CollapsibleWindow('Spacecraft information', JSON.stringify(real), false),
+        object.type === 'station' && new CollapsibleWindow('Fraction: ', JSON.stringify(real), true),
+        object.type === 'station' && new CollapsibleWindow('Marketplace information', JSON.stringify(real), false),
+        object.type === 'station' && new CollapsibleWindow('Technical information', JSON.stringify(real), false),
     ];
 
     Dom.append(this.container, content);
@@ -49,7 +66,7 @@ PlanetWindow.prototype.show = function(planet, keepLink) {
 
 PlanetWindow.prototype.moonsInformation = function() {
     var me = this;
-    var moons = [].concat(this.planet.moons);
+    var moons = [].concat(this.object.obj.moons);
     moons.sort(function(m1, m2) {
         return m1.title.localeCompare(m2.title);
     })
@@ -61,7 +78,7 @@ PlanetWindow.prototype.moonsInformation = function() {
     }))
 }
 PlanetWindow.prototype.surfaceInformation = function() {
-    var p = this.planet;
+    var p = this.object.obj;
     return Dom.el('div', null, [
         Dom.el('div', null, ["Mass: ", p.mass]),
         Dom.el('div', null, ["Volume: ", p.volume]),
@@ -72,7 +89,7 @@ PlanetWindow.prototype.surfaceInformation = function() {
     ])
 }
 PlanetWindow.prototype.orbitalInformation = function() {
-    var p = this.planet;
+    var p = this.object.obj;
     return Dom.el('div', null, [
         Dom.el('div', null, ["Aldebo: ", p.aldebo]),
         Dom.el('div', null, ["Aphelion: ", p.aphelion]),

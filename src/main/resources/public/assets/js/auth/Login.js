@@ -66,6 +66,7 @@ Login.prototype.onSubmit = function () {
         if (response.data) {
             Ajax.addStaticHeader('auth_token', response.data);
             me.context.loginStorage.setItem('token', response.data);
+            me.context.stores.userStore.processToken(response.data);
             me.context.menu.runApp('dashboard', function(){
                 return new DashboardManagement(me.context);
             });

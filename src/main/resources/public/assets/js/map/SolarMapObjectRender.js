@@ -18,9 +18,9 @@ var SolarMapObjectRender = {
             return;
         }
         var type = me.types[object.hullId];
-        if(!type) {
+       /* if(!type) {
             return;
-        }
+        }*/
         type = type === 'SHIP' ? 'ship' : (type === 'STATION' ? 'station' : 'unknown')
 
         ctx.strokeStyle = object.userId === user.user_id ? '#ff1b1b' : '#4fb169';
@@ -29,11 +29,19 @@ var SolarMapObjectRender = {
 
         var bound1 = absWindow[0].a
         var bound2 = absWindow[2].a;
+        var rel;
         if(object.x < bound1.x || object.x > bound2.x || object.y < bound1.y || object.y > bound2.y) {
-            console.log('out of bounds')
+            rel = me.getRelPoint(object.x, object.y);
+            me.objects.push({
+                type: type,
+                obj: object,
+                x: rel.x,
+                y: rel.y,
+                r: radius
+            })
             return;
         }
-        var rel = me.getRelPoint(object.x, object.y);
+        rel = me.getRelPoint(object.x, object.y);
 
         me.objects.push({
             type: type,

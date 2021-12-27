@@ -1,9 +1,16 @@
+/**
+ * @param context {AppContext}
+ * @param types
+ * @constructor
+ */
 function SolarMap(context, types) {
     this.context = context;
     this.zoom = 1;
     this.objects = [];
     this.canvas = Dom.el('canvas', {});
     this.ctx = this.canvas.getContext('2d');
+    this.kkmDisplay = Dom.el('div', 'kkm-display');
+    Dom.append(document.body, this.kkmDisplay);
     this.types = types;
     var realFillText = this.ctx.fillText;
     var me = this;
@@ -97,15 +104,32 @@ function SolarMap(context, types) {
         }
     });
     me.objectWindow = null;
+    window.oncontextmenu =function(e){
+        return false;
+    }
+
     this.canvas.addEventListener('click', function(e){
         var obj = me.overObject(me.selectedObject, e);
         if(obj) {
             if(!me.objectWindow) {
                 me.objectWindow = new PlanetWindow(me.context);
             }
-            me.objectWindow.show(obj.obj, false);
+            me.objectWindow.show(obj, false);
         }
     });
+    this.canvas.addEventListener('mouseup', function(e){
+        var isRightMB = false;
+        e = e || window.event;
+        if ("which" in e) { // Gecko (Firefox), WebKit (Safari/Chrome) & Opera
+            isRightMB = e.which === 3;
+        } else if ("button" in e) {
+            isRightMB = e.button === 2;
+        }
+        if(isRightMB) {
+            NavigationUtils.layCourse(me, e)
+        }
+    });
+    new SolarMapControls(context, this).render();
 }
 
 SolarMap.MAX_RADIUS_KKM = 15000000;
@@ -154,12 +178,12 @@ SolarMap.prototype.render = function (planets, objects) {
     ctx.font = "14px Arial";
     ctx.clearRect(0, 0, this.window.width, this.window.height);
     ctx.beginPath();
-    ctx.strokeStyle = '#4fb169';
+    /*ctx.strokeStyle = '#4fb169';
     ctx.strokeText("Mouse: " + this.mx + "/" + this.my, 10, 70, {color: '#4fb169'});
     var ap = this.getAbsPoint(this.mx, this.my);
     var az = this.getAbsPoint(0, 0);
     ctx.strokeText("Zero: " + drawInt(az.x) + "/" + drawInt(az.y), 10, 110, {color: '#4fb169'});
-    ctx.strokeText("Point: " + drawInt(ap.x) + "/" + drawInt(ap.y), 10, 90, {color: '#4fb169'});
+    ctx.strokeText("Point: " + drawInt(ap.x) + "/" + drawInt(ap.y), 10, 90, {color: '#4fb169'});*/
     this.drawKmPerPixel();
     ctx.stroke();
     ctx.save();
@@ -180,6 +204,9 @@ SolarMap.prototype.render = function (planets, objects) {
     if (planets.length) {
         me.drawPlanet(ctx, planets[0], absWindow, zero);
     }
+    if(this.staticObjects) {
+        objects = objects.concat(this.staticObjects)
+    }
     if (objects.length) {
         objects.forEach(function(obj) {
             me.drawObject(ctx, obj, absWindow, zero);
@@ -189,14 +216,15 @@ SolarMap.prototype.render = function (planets, objects) {
 };
 
 SolarMap.prototype.drawKmPerPixel = function () {
-    var ctx = this.ctx;
+    var label;
     if(this.kkmPerPixel > 1.5) {
-        ctx.strokeText("KM per pixel: " + Math.floor(this.kkmPerPixel * 1000), 10, 130, {color: '#4fb169'});
+        label = ("KM per pixel: " + Math.floor(this.kkmPerPixel * 1000));
     } else if(this.kkmPerPixel > 0.001) {
-        ctx.strokeText("KM per pixel: " + Math.floor(this.kkmPerPixel * 10000) / 10, 10, 130, {color: '#4fb169'});
+        label = ("KM per pixel: " + Math.floor(this.kkmPerPixel * 10000) / 10);
     } else {
-        ctx.strokeText("M per pixel: " + Math.floor(this.kkmPerPixel * 1000000) , 10, 130, {color: '#4fb169'});
+        label = ("M per pixel: " + Math.floor(this.kkmPerPixel * 1000000));
     }
+    this.kkmDisplay.innerText = label;
 }
 SolarMap.prototype.drawPlanet = function (ctx, planet, absWindow, zero) {
     SolarMapPlanetRender.drawPlanet(this, ctx, planet, absWindow, zero);
@@ -266,6 +294,12 @@ SolarMap.prototype.init = function () {
 };
 SolarMap.prototype.changeZoom = function (zoom, relX, relY) {
     SolarMapZoom.changeZoom(this, zoom, relX, relY);
+};
+
+SolarMap.prototype.centerMap = function (relPoint) {
+    var screen = this.screenSize();
+    this.window.x = this.window.x + (relPoint.x - (screen.w / 2));
+    this.window.y = this.window.y + (relPoint.y - (screen.h / 2));
 };
 
 
