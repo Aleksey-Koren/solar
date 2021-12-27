@@ -18,9 +18,9 @@ var SolarMapObjectRender = {
             return;
         }
         var type = me.types[object.hullId];
-        if(!type) {
+       /* if(!type) {
             return;
-        }
+        }*/
         type = type === 'SHIP' ? 'ship' : (type === 'STATION' ? 'station' : 'unknown')
 
         ctx.strokeStyle = object.userId === user.user_id ? '#ff1b1b' : '#4fb169';

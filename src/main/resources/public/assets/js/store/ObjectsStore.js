@@ -1,6 +1,7 @@
 function ObjectsStore() {
     AbstractStore.call(this);
     this.objects = [];
+    this.ship = null;
     this.name = "objects"
 }
 ObjectsStore.prototype = Object.create(AbstractStore.prototype);

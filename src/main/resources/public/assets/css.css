@@ -90,7 +90,7 @@ input, select, textarea {
 }
 .notification-container {
     position: fixed;
-    top: 80px;
+    bottom: 10px;
     right: 10px;
     z-index: 100000;
 }
@@ -172,7 +172,7 @@ tr, td, th {
     border: 1px solid #ffc562;
     padding: 5px;
     position: absolute;
-    right: 70px;
+    right: 10px;
     top: 70px;
     z-index: 100;
 }
@@ -231,7 +231,16 @@ a.disabled {
     background: #2b2b2b;
     border: 1px solid #ffc562;
     padding: 5px;
-    right: 10px;
+    left: 10px;
     top: 70px;
     z-index: 100;
+}
+
+.kkm-display {
+    position: absolute;
+    width: 250px;
+    margin-left: -125px;
+    left: 50%;
+    bottom: 10px;
+    text-align: center;
 }

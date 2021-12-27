@@ -15,5 +15,6 @@ function AppContext() {
     };
     this.loginStorage = localStorage.getItem('rememberLogin') === '1' ? localStorage : sessionStorage;
     this.menu = null;
+    this.spaceShip = null;
     window.appContext = this;
 }

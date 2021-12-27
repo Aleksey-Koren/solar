@@ -1,7 +1,8 @@
+/**
+ * @param context {AppContext}
+ * @constructor
+ */
 function SolarWrapper(context) {
-    /**
-     * @var context AppContext
-     */
     this.context = context;
     this.planets = [];
     this.radar = [];
@@ -9,7 +10,7 @@ function SolarWrapper(context) {
     var me = this;
     this.map = new SolarMap(context, this.types);
     this.container = Dom.el('div', {class: 'solar-wrapper'}, this.map.canvas);
-    requestAnimationFrame(function(){me.draw()})
+    this.animationFrame = requestAnimationFrame(function(){me.draw()})
     this.radarInterval = null;
 }
 
@@ -17,7 +18,8 @@ SolarWrapper.prototype.unmount = function() {
     this.map.unmount();
     this.context.stores.planets.remove(this)
     this.context.stores.objects.remove(this)
-    clearInterval(this.radarInterval)
+    clearInterval(this.radarInterval);
+    cancelAnimationFrame(this.animationFrame);
 };
 
 SolarWrapper.prototype.render = function() {
@@ -33,7 +35,7 @@ SolarWrapper.prototype.render = function() {
     if(!objectsStore.isLoaded) {
         objectsStore.update();
     } else {
-        this.radar = objectsStore.radar;
+        this.radar = objectsStore.objects;
     }
 
     this.radarInterval = setInterval(function(){
@@ -55,11 +57,13 @@ SolarWrapper.prototype.render = function() {
 SolarWrapper.prototype.draw = function() {
     this.map.render(this.planets, this.radar);
     var me = this;
-    requestAnimationFrame(function(){me.draw()});
+    this.animationFrame = requestAnimationFrame(function(){me.draw()});
 };
 
-SolarWrapper.prototype.onStoreChange = function() {
+SolarWrapper.prototype.unmount = function() {
     this.context.stores.planets.remove(this)
+    this.context.stores.objects.remove(this)
+    this.context.stores.inventory.remove(this)
 };
 
 SolarWrapper.prototype.defineTypes = function() {
@@ -77,6 +81,12 @@ SolarWrapper.prototype.onStoreChange = function(obj, storeName) {
         this.planets = obj.list;
     } else if (storeName === this.context.stores.objects.name) {
         this.radar = obj.objects;
+        for(var i = 0; i < obj.objects.length; i++) {
+            if(obj.objects[i].userId === this.context.stores.userStore.user.user_id) {
+                this.context.spaceShip = obj.objects[i];
+                break;
+            }
+        }
     } else if(storeName === this.context.stores.inventory.name) {
         this.defineTypes()
     }

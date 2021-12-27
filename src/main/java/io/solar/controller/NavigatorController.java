@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -56,14 +57,14 @@ public class NavigatorController {
     @PostMapping("/course")
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
     @Transactional
-    public void layCourse(@RequestBody CourseDto dto, Principal principal) {
+    public void layCourse(@RequestBody List<CourseDto> list, Principal principal) {
         User authUser = userService.findByLogin(principal.getName());
-
-        if (!userService.isUserLocatedInObject(authUser, dto.getObjectId())) {
-            userCantException(authUser.getLocation().getId(), dto.getObjectId());
+        for(CourseDto dto : list) {
+            if (!userService.isUserLocatedInObject(authUser, dto.getObjectId())) {
+                userCantException(authUser.getLocation().getId(), dto.getObjectId());
+            }
+            courseFacade.updateCourseChain(dto);
         }
-
-        courseFacade.updateCourseChain(dto);
     }
 
     @DeleteMapping("/course/{id}")

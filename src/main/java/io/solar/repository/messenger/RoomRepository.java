@@ -12,18 +12,26 @@ import java.util.List;
 
 @Repository
 public interface RoomRepository extends JpaRepository<Room, Long> {
+/*
+    SELECT rooms.id, rooms.title, count(messages.id) as amount
+    from rooms
+    inner join users_rooms on user_rooms.room_id = rooms.id
+    left join messages on messages.sender_id = users_rooms.user_id and message.created_at > users_rooms.last_seen_at
+    where user_rooms.user_id = 2
+    group by rooms.id, rooms.title*/
 
-    @Query(value = "WITH inner_table as (SELECT r.id as room_id, count(r.id) as unread_message " +
-            "FROM users_rooms ur" +
-            "    LEFT JOIN rooms r on r.id = ur.room_id" +
-            "    LEFT JOIN messages m on r.id = m.room_id " +
-            "WHERE ((m.created_at >= ur.last_seen_at) AND ur.user_id = :user_id) " +
-            "group by r.id)" +
 
-
-            "SELECT users_rooms.room_id as id, r2.title as title, inner_table.unread_message as amount " +
+    @Query(value = "WITH inner_table as (SELECT rooms.id as room_id, count(rooms.id) as unread_message " +
             "FROM users_rooms " +
-            "    JOIN rooms r2 on users_rooms.room_id = r2.id " +
+            "    LEFT JOIN rooms on rooms.id = users_rooms.room_id" +
+            "    LEFT JOIN messages on rooms.id = messages.room_id " +
+            "WHERE ((messages.created_at >= users_rooms.last_seen_at) AND users_rooms.user_id = :user_id) " +
+            "group by rooms.id)" +
+
+
+            "SELECT users_rooms.room_id as id, rooms.title as title, inner_table.unread_message as amount " +
+            "FROM users_rooms " +
+            "    JOIN rooms on users_rooms.room_id = rooms.id " +
             "    LEFT JOIN inner_table ON users_rooms.room_id = inner_table.room_id " +
             "WHERE users_rooms.user_id = :user_id", nativeQuery = true)
     List<RoomDto> findAllUserRoomsWithUnreadMessages(@Param("user_id") Long userId);
