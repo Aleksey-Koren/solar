@@ -6,6 +6,7 @@ import io.solar.entity.objects.ObjectType;
 import io.solar.repository.BasicObjectRepository;
 import io.solar.service.PlanetService;
 import io.solar.service.UtilityService;
+import io.solar.service.object.BasicObjectService;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -35,24 +37,78 @@ public class ObjectCoordinatesService {
     private final BasicObjectRepository basicObjectRepository;
     private final PlanetService planetService;
 
-    private final Map<Long, Planet> PLANETS = new HashMap<>();
-
     @Transactional
     public void update() {
         String positionIteration = utilityService.getValue(POSITION_ITERATION_UTILITY_KEY, "1");
         long currentIteration = Long.parseLong(positionIteration);
+        long now = System.currentTimeMillis();
         List<BasicObject> objects;
 
-        updatePlanets(planetService.findAll());
+        updatePlanets(now);
 
         while (!(objects = retrieveObjectsForUpdate(currentIteration)).isEmpty()) {
 
-            updateObjects(objects, currentIteration);
+            updateObjects(objects, currentIteration, now);
             basicObjectRepository.saveAllAndFlush(objects);
         }
 
         utilityService.updateValueByKey(POSITION_ITERATION_UTILITY_KEY, String.valueOf(currentIteration + 1));
-        PLANETS.clear();
+    }
+
+    private void updatePlanets(long now) {
+        List<Planet> planets = planetService.findAll();
+        List<Planet> moons = new ArrayList<>();
+        Planet sun = planetService.findSun();
+
+        planets.stream()
+                .filter(planet -> planet.getPlanet() != null)
+                .forEach(planet -> {
+                    if (sun.equals(planet.getPlanet())) {
+                        updateOrbitalObject(planet, now);
+                    } else {
+                        moons.add(planet);
+                    }
+                });
+
+        moons.forEach(moon -> updateOrbitalObject(moon, now));
+
+        planetService.saveAll(planets);
+    }
+
+
+    //todo: if statement need refactor -> maybe add field 'isOnOrbit'
+    private void updateObjects(List<BasicObject> objects, long currentIteration, long now) {
+        objects.forEach(object -> {
+            if (object.getPlanet() != null && object.getAphelion() != null
+                    && object.getAngle() != null && object.getOrbitalPeriod() != null) {
+
+                updateOrbitalObject(object, now);
+            } else {
+
+                updateUnattachedObject(object, now, currentIteration);
+            }
+        });
+    }
+
+    private void updateOrbitalObject(BasicObject object, Long now) {
+        double da = calculateDelta(now) / object.getOrbitalPeriod();
+        object.setAngle(object.getAngle() + (float) da);
+
+        object.setX(calculateAbsoluteCoordinate(object.getAngle(), object.getAphelion(), object.getPlanet().getX()));
+        object.setY(calculateAbsoluteCoordinate(object.getAngle(), object.getAphelion(), object.getPlanet().getY()));
+    }
+
+    private void updateUnattachedObject(BasicObject object, Long currentTimeMills, Long currentIteration) {
+        long time = currentTimeMills - object.getPositionIterationTs();
+
+        object.setX(determinePosition(object.getX(), object.getSpeedX(), time));
+        object.setY(determinePosition(object.getY(), object.getSpeedY(), time));
+
+        object.setSpeedX(calculateSpeed(object.getSpeedX(), object.getAccelerationX(), time));
+        object.setSpeedY(calculateSpeed(object.getSpeedY(), object.getAccelerationY(), time));
+
+        object.setPositionIterationTs(currentTimeMills);
+        object.setPositionIteration(currentIteration + 1);
     }
 
     private List<BasicObject> retrieveObjectsForUpdate(long currentIteration) {
@@ -62,64 +118,6 @@ public class ObjectCoordinatesService {
                 currentIteration,
                 Pageable.ofSize(amountReceivedObjects)
         );
-    }
-
-    //TODO: need to refactor the code
-    private void updatePlanets(List<Planet> planets) {
-        Planet sun = planetService.findSun();
-        List<Planet> moons = new ArrayList<>();
-        long now = System.currentTimeMillis();
-
-        planets.stream()
-                .filter(planet -> planet.getParent() != null)
-                .forEach(planet -> {
-                    if (planet.getParent().equals(sun.getId())) {
-                        updateOrbitalObject(planet, now);
-                        PLANETS.put(planet.getId(), planet);
-                    } else {
-                        moons.add(planet);
-                    }
-                });
-
-        moons.forEach(moon -> updateOrbitalObject(moon, now));
-        moons.addAll(PLANETS.values());
-
-        planetService.saveAll(moons);
-    }
-
-    private void updateObjects(List<BasicObject> objects, long currentIteration) {
-        long now = System.currentTimeMillis();
-
-        objects.forEach(object -> {
-            if (object.getPlanet() != null && object.getAphelion() != null
-                    && object.getAngle() != null && object.getOrbitalPeriod() != null) {
-                updateOrbitalObject(object, now);
-            } else {
-                updateUnattachedObject(object, now, currentIteration);
-            }
-        });
-    }
-
-    private void updateOrbitalObject(BasicObject object, Long now) {
-        Double delta = calculateDelta(now);
-        double da = delta / object.getOrbitalPeriod();
-        object.setAngle(object.getAngle() + (float) da);
-
-//        Planet parentPlanet = PLANETS.get(object.getId()).getParent();
-//        object.setX(calculateAbsoluteCoordinate(object.getAngle(), object.getAphelion(), parentPlanet.getX()));
-//        object.setY(calculateAbsoluteCoordinate(object.getAngle(), object.getAphelion(), parentPlanet.getY()));
-    }
-
-    private void updateUnattachedObject(BasicObject object, Long currentTimeMills, Long currentIteration) {
-        long time = currentTimeMills - object.getPositionIterationTs();
-        object.setX(determinePosition(object.getX(), object.getSpeedX(), time));
-        object.setY(determinePosition(object.getY(), object.getSpeedY(), time));
-
-        object.setSpeedX(calculateSpeed(object.getSpeedX(), object.getAccelerationX(), time));
-        object.setSpeedY(calculateSpeed(object.getSpeedY(), object.getAccelerationY(), time));
-
-        object.setPositionIterationTs(currentTimeMills);
-        object.setPositionIteration(currentIteration + 1);
     }
 
     private Double calculateDelta(Long currentTimeMills) {

@@ -1,5 +1,6 @@
 package io.solar.service.object;
 
+import io.solar.entity.inventory.InventoryType;
 import io.solar.entity.objects.BasicObject;
 import io.solar.repository.BasicObjectRepository;
 import io.solar.specification.BasicObjectSpecification;
