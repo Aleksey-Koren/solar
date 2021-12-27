@@ -16,7 +16,7 @@ public class Course {
     private Long id;
 
     @ToString.Exclude
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "object_id")
     private BasicObject object;
 
@@ -34,6 +34,7 @@ public class Course {
     @JoinColumn(name = "next")
     private Course next;
 
+    private Long time;
     private Instant createdAt;
     private Instant expireAt;
 }

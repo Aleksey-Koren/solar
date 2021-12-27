@@ -1,6 +1,5 @@
 package io.solar.dto;
 
-import io.solar.entity.Course;
 import lombok.Data;
 
 import java.time.Instant;
@@ -15,6 +14,7 @@ public class CourseDto {
     private Float accelerationX;
     private Float accelerationY;
     private Long nextId;
+    private Long time;
     private Instant createdAt;
     private Instant expireAt;
 }

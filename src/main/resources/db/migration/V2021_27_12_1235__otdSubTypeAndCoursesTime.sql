@@ -7,3 +7,6 @@ WHERE (description LIKE '%immobile%' AND type = 'STATION') OR title = 'Planet';
 UPDATE object_type_description
 SET sub_type = 'DYNAMIC'
 WHERE sub_type IS NULL;
+
+ALTER TABLE courses
+    ADD COLUMN time BIGINT NULL;
