@@ -7,4 +7,5 @@ public enum ObjectSubType {
     SCIENCE,
     PRODUCTION,
     ASYLUM,
+    DYNAMIC
 }

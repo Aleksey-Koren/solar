@@ -35,10 +35,9 @@ public class CourseMapper {
         }
         course.setObject(basicObjectRepository.findById(dto.getObjectId())
                                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "There is no object with such id in database")));
-        course.setX(dto.getX());
-        course.setY(dto.getY());
         course.setAccelerationX(dto.getAccelerationX());
         course.setAccelerationY(dto.getAccelerationY());
+        course.setTime(dto.getTime());
         course.setNext(dto.getNextId() != null ? courseRepository.findById(dto.getNextId())
                                                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "There is no course with such id in database"))
                                                : null);
