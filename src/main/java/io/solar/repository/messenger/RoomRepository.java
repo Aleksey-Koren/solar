@@ -16,7 +16,7 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
     SELECT rooms.id, rooms.title, count(messages.id) as amount
     from rooms
     inner join users_rooms on user_rooms.room_id = rooms.id
-    left join messages on messages.sender_id = users_rooms.user_id and message.created_at > users_rooms.last_seen_at
+    left join messages on users_rooms.room_id = messages.room_id and messages.sender_id <> users_rooms.user_id and message.created_at > users_rooms.last_seen_at
     where user_rooms.user_id = 2
     group by rooms.id, rooms.title*/
 
