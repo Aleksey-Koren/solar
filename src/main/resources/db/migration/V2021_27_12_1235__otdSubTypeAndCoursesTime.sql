@@ -9,4 +9,6 @@ SET sub_type = 'DYNAMIC'
 WHERE sub_type IS NULL;
 
 ALTER TABLE courses
-    ADD COLUMN time BIGINT NULL;
+    ADD COLUMN duration BIGINT NULL,
+    DROP COLUMN x,
+    DROP COLUMN y;

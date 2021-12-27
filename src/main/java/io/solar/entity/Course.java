@@ -11,6 +11,7 @@ import java.time.Instant;
 @Entity
 @Table(name = "courses")
 public class Course {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -20,8 +21,8 @@ public class Course {
     @JoinColumn(name = "object_id")
     private BasicObject object;
 
-    private Float x;
-    private Float y;
+    @Column(name = "duration")
+    private Long time;
 
     @Column(name = "acceleration_x")
     private Float accelerationX;
@@ -34,7 +35,6 @@ public class Course {
     @JoinColumn(name = "next")
     private Course next;
 
-    private Long time;
     private Instant createdAt;
     private Instant expireAt;
 }
