@@ -6,7 +6,7 @@ CREATE TABLE courses
     y FLOAT NOT NULL,
     acceleration_x FLOAT NOT NULL,
     acceleration_y FLOAT NOT NULL,
-    next BIGINT REFERENCES courses(id),
+    `next` BIGINT REFERENCES courses(id),
     created_at TIMESTAMP,
     expire_at TIMESTAMP
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;

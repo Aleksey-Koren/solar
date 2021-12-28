@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -34,10 +35,15 @@ public class CourseFacade {
         List<Course> courses = last.getObject().getCourses();
         if (courses.size() > 0) {
             Course previousLast = findLastCourse(courses);
+            last.setPrevious(previousLast);
+            last.setExpireAt(previousLast.getExpireAt().plusMillis(last.getTime()));
             courseService.save(last);
             previousLast.setNext(last);
             courseService.save(previousLast);
         }
+        Instant now = Instant.now();
+        last.setCreatedAt(now);
+        last.setExpireAt(now.minusMillis(last.getTime()));
         courseService.save(last);
     }
 
@@ -59,20 +65,38 @@ public class CourseFacade {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("There is no course with such id in database. id = %d", dto.getNextId()))));
         if(previousOptional.isPresent()) {
             Course previous = previousOptional.get();
+            Course next = newCourse.getNext();
+            newCourse.setPrevious(previous);
             courseService.save(newCourse);
             previous.setNext(newCourse);
             courseService.save(previous);
+            next.setPrevious(newCourse);
+            courseService.save(next);
         }else{
             courseService.save(newCourse);
         }
+
+        recalculateExpirationsFrom(newCourse);
+    }
+
+    private void recalculateExpirationsFrom(Course course) {
+        Course current = course;
+        do{
+            current.setExpireAt(current.getPrevious().getExpireAt().plusMillis(current.getTime()));
+            current = current.getNext();
+        }while(current != null);
     }
 
     public void deleteCourse(Course course) {
-        Optional<Course> previousOptional = courseService.findByNext(course);
-        if(previousOptional.isPresent()) {
-            Course previous = previousOptional.get();
+        Course previous = course.getPrevious();
+        Course next = course.getNext();
+        if(previous != null) {
             previous.setNext(course.getNext());
             courseService.save(previous);
+        }
+        if(next != null) {
+            next.setPrevious(previous);
+            recalculateExpirationsFrom(next);
         }
 
         courseService.deleteById(course.getId());

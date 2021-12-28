@@ -10,5 +10,6 @@ WHERE sub_type IS NULL;
 
 ALTER TABLE courses
     ADD COLUMN duration BIGINT NULL,
+    ADD COLUMN previous BIGINT REFERENCES courses(id),
     DROP COLUMN x,
     DROP COLUMN y;

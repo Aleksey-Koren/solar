@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -23,6 +25,8 @@ public class ChatController {
     private final ChatService chatService;
 
     @GetMapping("messages/{roomId}")
+    @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
+    @Transactional
     public Page<MessageDto> getMessageHistory(@PathVariable("roomId") Long roomId
                                                                     , Principal principal
                                                                     , @PageableDefault(size = 2) Pageable pageable) {
@@ -31,6 +35,8 @@ public class ChatController {
     }
 
     @GetMapping("rooms")
+    @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
+    @Transactional
     public List<RoomDtoImpl> getRooms(Principal principal) {
         User user = userService.findByLogin(principal.getName());
 
@@ -38,6 +44,8 @@ public class ChatController {
     }
 
     @PostMapping("/invite")
+    @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
+    @Transactional
     public void inviteToRoom(@RequestParam Long inviterId,
                              @RequestParam Long invitedId,
                              @RequestParam Long roomId) {
