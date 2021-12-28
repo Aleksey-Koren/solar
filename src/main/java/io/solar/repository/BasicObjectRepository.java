@@ -33,7 +33,7 @@ public interface BasicObjectRepository extends JpaRepository<BasicObject, Long>,
             "where " +
             "o.status = 'IN_SPACE'" +
             "and " +
-            "(o.objectTypeDescription.subType <> 'STATIC')" +
+            "(o.objectTypeDescription.subType <> 'STATIC' or o.objectTypeDescription.subType is null)" +
             "and " +
             "(o.x between (:x - :distance) and (:x + :distance))" +
             "and " +

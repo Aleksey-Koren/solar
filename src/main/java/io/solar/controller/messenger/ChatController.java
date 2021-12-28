@@ -6,6 +6,9 @@ import io.solar.entity.User;
 import io.solar.service.UserService;
 import io.solar.service.messenger.ChatService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,9 +26,11 @@ public class ChatController {
     private final ChatService chatService;
 
     @GetMapping("messages/{roomId}")
-    public List<MessageDto> getMessageHistory(@PathVariable("roomId") Long roomId, Principal principal) {
+    public Page<MessageDto> getMessageHistory(@PathVariable("roomId") Long roomId
+                                                                    , Principal principal
+                                                                    , @PageableDefault(size = 2) Pageable pageable) {
         User user = userService.findByLogin(principal.getName());
-        return chatService.getMessageHistory(roomId, user);
+        return chatService.getMessageHistory(roomId, user, pageable);
     }
 
     @GetMapping("rooms")

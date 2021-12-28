@@ -11,17 +11,18 @@ import java.time.Instant;
 @Entity
 @Table(name = "courses")
 public class Course {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ToString.Exclude
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "object_id")
     private BasicObject object;
 
-    private Float x;
-    private Float y;
+    @Column(name = "duration")
+    private Long time;
 
     @Column(name = "acceleration_x")
     private Float accelerationX;

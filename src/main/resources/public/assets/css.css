@@ -90,7 +90,7 @@ input, select, textarea {
 }
 .notification-container {
     position: fixed;
-    top: 80px;
+    bottom: 10px;
     right: 10px;
     z-index: 100000;
 }
@@ -224,4 +224,23 @@ tr, td, th {
 a.disabled {
     color: #F5F5F5;
     cursor: not-allowed;
+}
+.solar-map-controls {
+    position: fixed;
+    width: 50px;
+    background: #2b2b2b;
+    border: 1px solid #ffc562;
+    padding: 5px;
+    left: 10px;
+    top: 70px;
+    z-index: 100;
+}
+
+.kkm-display {
+    position: absolute;
+    width: 250px;
+    margin-left: -125px;
+    left: 50%;
+    bottom: 10px;
+    text-align: center;
 }

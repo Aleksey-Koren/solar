@@ -43,6 +43,9 @@ DashboardShop.prototype.unmount = function () {
     if(this.mounted) {
         this.mounted.unmount();
     }
+    this.goods.unmount();
+    this.ships.unmount();
+    this.inventory.unmount();
 };
 
 DashboardShop.prototype.mount = function (element) {

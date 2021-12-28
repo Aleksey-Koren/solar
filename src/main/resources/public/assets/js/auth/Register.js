@@ -49,6 +49,7 @@ Register.prototype.onSubmit = function() {
             me.context.menu.runApp('dashboard', function(){
                 return new DashboardManagement(me.context);
             });
+            me.context.stores.userStore.processToken(response.token);
         } else {
             me.errors.innerHTML = response.error;
         }

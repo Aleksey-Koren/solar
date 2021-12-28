@@ -11,6 +11,8 @@ import io.solar.repository.messenger.MessageRepository;
 import io.solar.repository.messenger.RoomRepository;
 import io.solar.repository.messenger.UserRoomRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -29,7 +31,7 @@ public class ChatService {
     private final MessageMapper messageMapper;
     private final RoomMapper roomMapper;
 
-    public List<MessageDto> getMessageHistory(Long roomId, User user) {
+    public Page<MessageDto> getMessageHistory(Long roomId, User user, Pageable pageable) {
         Room room = roomRepository.findById(roomId).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST
                 , "There is no room with such id = " + roomId + " . Can't fetch message history"));
 
@@ -37,9 +39,9 @@ public class ChatService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST
                         , String.format("User with id = %d isn't subscribed on room id = %d", user.getId(), roomId)));
 
-        return messageRepository.findByRoomAndCreatedAtGreaterThanEqualOrderByCreatedAtDesc(room, userRoom.getSubscribedAt()).stream()
-                .map(messageMapper::toDto)
-                .collect(toList());
+        return messageRepository
+                .findByRoomAndCreatedAtGreaterThanEqualOrderByCreatedAtDesc(room, userRoom.getSubscribedAt(), pageable)
+                .map(messageMapper::toDto);
     }
 
     public List<RoomDtoImpl> getUserRooms(Long userId) {
