@@ -7,6 +7,7 @@ import io.solar.repository.CourseRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.Optional;
 
 @Service
@@ -31,8 +32,8 @@ public class CourseService {
         courseRepository.deleteById(id);
     }
 
-    public Course findLastCompletedCourse(BasicObject object) {
+    public Course findActiveCourse(BasicObject object, Instant now) {
 
-        return courseRepository.findTopByObjectAndExpireAtIsNotNullOrderByCreatedAtDesc(object);
+        return courseRepository.findTopByObjectAndExpireAtAfterOrderByExpireAt(object, now);
     }
 }

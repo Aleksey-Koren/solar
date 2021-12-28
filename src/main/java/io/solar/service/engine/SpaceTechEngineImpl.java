@@ -34,4 +34,17 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
                 .orElse(0);
         return (float) distance;
     }
+
+    public Integer calculateMass(SpaceTech spaceTech) {
+        BasicObject spaceTechObject = (BasicObject) spaceTech;
+
+        int starshipMass = spaceTechObject.getObjectTypeDescription().getMass();
+
+        int attachedObjectsMass = spaceTechObject.getAttachedObjects()
+                .stream()
+                .mapToInt(object -> object.getObjectTypeDescription().getMass())
+                .sum();
+
+        return starshipMass + attachedObjectsMass;
+    }
 }
