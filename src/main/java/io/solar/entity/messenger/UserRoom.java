@@ -42,6 +42,12 @@ public class UserRoom {
     @Column(name = "last_seen_at")
     private Instant lastSeenAt;
 
+    public UserRoom(User user, Room room) {
+        this.user = user;
+        this.room = room;
+        this.subscribedAt = Instant.now();
+    }
+
 
     @Data
     @AllArgsConstructor

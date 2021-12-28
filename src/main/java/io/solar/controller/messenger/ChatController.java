@@ -9,10 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
@@ -38,5 +35,13 @@ public class ChatController {
         User user = userService.findByLogin(principal.getName());
 
         return chatService.getUserRooms(user.getId());
+    }
+
+    @PostMapping("/invite")
+    public void inviteToRoom(@RequestParam Long inviterId,
+                             @RequestParam Long invitedId,
+                             @RequestParam Long roomId) {
+
+        chatService.inviteUserToRoom(inviterId, invitedId, roomId);
     }
 }
