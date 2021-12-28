@@ -30,9 +30,6 @@ public class Planet extends BasicObject {
     private String surfaceGravity;
     private String surfacePressure;
     private String volume;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent")
-    private Planet parent;
     private String type;
 
     @OneToMany(mappedBy = "planet")

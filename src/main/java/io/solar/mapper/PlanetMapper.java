@@ -49,9 +49,6 @@ public class PlanetMapper {
         entity.setSurfaceGravity(dto.getSurfaceGravity());
         entity.setSurfacePressure(dto.getSurfacePressure());
         entity.setVolume(dto.getVolume());
-        entity.setParent(planetRepository.findById(dto.getParent()).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                        String.format("There is no planet with id = %d in database", dto.getParent())
-                )));
         entity.setAngle(dto.getAngle());
         entity.setType(dto.getType());
         entity.setPositionIterationTs(dto.getPositionIterationTs());
@@ -80,7 +77,6 @@ public class PlanetMapper {
                 .surfaceGravity(entity.getSurfaceGravity())
                 .surfacePressure(entity.getSurfacePressure())
                 .volume(entity.getVolume())
-                .parent(entity.getParent() != null ? entity.getParent().getId() : null)
                 .angle(entity.getAngle())
                 .type(entity.getType())
                 .positionIterationTs(entity.getPositionIterationTs())
