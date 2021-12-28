@@ -1,9 +1,11 @@
 package io.solar.service.scheduler;
 
+import io.solar.entity.Course;
 import io.solar.entity.Planet;
 import io.solar.entity.objects.BasicObject;
 import io.solar.entity.objects.ObjectType;
 import io.solar.repository.BasicObjectRepository;
+import io.solar.service.CourseService;
 import io.solar.service.PlanetService;
 import io.solar.service.UtilityService;
 import io.solar.service.object.BasicObjectService;
@@ -36,6 +38,7 @@ public class ObjectCoordinatesService {
     private final UtilityService utilityService;
     private final BasicObjectRepository basicObjectRepository;
     private final PlanetService planetService;
+    private final CourseService courseService;
 
     @Transactional
     public void update() {
@@ -100,7 +103,49 @@ public class ObjectCoordinatesService {
 
     private void updateUnattachedObject(BasicObject object, Long currentTimeMills, Long currentIteration) {
         long time = currentTimeMills - object.getPositionIterationTs();
-
+//        Float speedX = object.getSpeedX();
+//        Float speedY = object.getSpeedY();
+//        Float x = object.getX();
+//        Float y = object.getY();
+//        Course lastCompletedCourse = courseService.findLastCompletedCourse(object);
+//
+//        if (object.getPositionIteration() > lastCompletedCourse.getExpireAt().toEpochMilli()) {
+//            Course actualCourse = lastCompletedCourse.getNext();
+//            if (actualCourse != null) {
+//                long executionTime = object.getPositionIteration() - lastCompletedCourse.getExpireAt().toEpochMilli();
+//
+//                Float updatedX = determinePosition(x, speedX, executionTime);
+//                Float updatedY = determinePosition(y, speedY, executionTime);
+//
+//                Float updatedSpeedX = calculateSpeed(speedX, actualCourse.getAccelerationX(), executionTime);
+//                Float updatedSpeedY = calculateSpeed(speedY, actualCourse.getAccelerationY(), executionTime);
+//
+//                object.setX(updatedX);
+//                object.setY(updatedY);
+//                object.setSpeedX(updatedSpeedX);
+//                object.setSpeedY(updatedSpeedY);
+//                object.setPositionIteration(currentTimeMills);
+//                object.setPositionIterationTs(currentIteration + 1);
+//            }
+//        } else {
+//            Course course = findCourse(lastCompletedCourse, object.getPositionIteration());
+//            if (course != null) {
+//                Float updatedX = x;
+//                Float updatedY = y;
+//                Float updatedSpeedX = speedX;
+//                Float updatedSpeedY = speedY;
+//                while (course != null) {
+//                    Course previousCourse = courseService.findByNext(course).get();
+//                    updatedX = determinePosition(updatedX, speedX, null);
+//                    updatedY = determinePosition(updatedY, speedY, null);
+//
+//                    updatedSpeedX = calculateSpeed(updatedSpeedX, course.getAccelerationX(), course.getExpireAt().toEpochMilli() - object.getPositionIteration());
+//                    updatedSpeedY = calculateSpeed(updatedSpeedY, course.getAccelerationY(), course.getExpireAt().toEpochMilli() - object.getPositionIteration());
+//
+//                    course = course.getNext();
+//                }
+//            }
+//        }
         object.setX(determinePosition(object.getX(), object.getSpeedX(), time));
         object.setY(determinePosition(object.getY(), object.getSpeedY(), time));
 
@@ -109,6 +154,15 @@ public class ObjectCoordinatesService {
 
         object.setPositionIterationTs(currentTimeMills);
         object.setPositionIteration(currentIteration + 1);
+    }
+
+    private Course findCourse(Course course, Long positionIteration) {
+
+        if (course == null || course.getExpireAt().toEpochMilli() < positionIteration) {
+            return course;
+        }
+
+        return findCourse(courseService.findByNext(course).get(), positionIteration);
     }
 
     private List<BasicObject> retrieveObjectsForUpdate(long currentIteration) {
