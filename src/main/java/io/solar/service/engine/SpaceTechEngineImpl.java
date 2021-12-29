@@ -35,6 +35,7 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
         return (float) distance;
     }
 
+    @Override
     public Integer calculateMass(SpaceTech spaceTech) {
         BasicObject spaceTechObject = (BasicObject) spaceTech;
 
@@ -48,10 +49,12 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
         return starshipMass + attachedObjectsMass;
     }
 
+    @Override
     public float calculateMaxAcceleration(SpaceTech spaceTech) {
         return calculateMaxThrust(spaceTech) / calculateMass(spaceTech);
     }
 
+    @Override
     public float calculateMaxThrust(SpaceTech spaceTech) {
         BasicObject spaceTechAsObject = (BasicObject) spaceTech;
         List<BasicObject> engines = basicObjectRepository.getObjectsInSlotsByType(spaceTechAsObject.getId(), objectTypeRepository.findByTitle("engine")
