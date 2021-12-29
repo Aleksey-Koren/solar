@@ -49,8 +49,7 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
     }
 
     public float calculateMaxAcceleration(SpaceTech spaceTech) {
-
-        return 0f;
+        return calculateMaxThrust(spaceTech) / calculateMass(spaceTech);
     }
 
     public float calculateMaxThrust(SpaceTech spaceTech) {
@@ -67,5 +66,4 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
                 .mapToDouble(s -> (double) s.getObjectTypeDescription().getPowerMax())
                 .sum();
     }
-
 }
