@@ -116,10 +116,10 @@ public class ObjectCoordinatesService {
         long courseDuration = 0;
         while (activeCourse != null && courseDuration < schedulerInterval) {
 
-            if (calculateAcceleration(activeCourse.getAccelerationX(), activeCourse.getAccelerationY()) > spaceTechEngine.calculateMaxAcceleration(object)) {
-                //todo: add log.error()
-                throw new ServiceException(String.format("Starship/Station with id = %d acceleration > maxAcceleration", object.getId()));
-            }
+//            if (calculateAcceleration(activeCourse.getAccelerationX(), activeCourse.getAccelerationY()) > spaceTechEngine.calculateMaxAcceleration(object)) {
+//                //todo: add log.error()
+//                throw new ServiceException(String.format("Starship/Station with id = %d acceleration > maxAcceleration", object.getId()));
+//            }
 
             courseDuration = defineCourseDuration(activeCourse, previousSchedulerTimeInstant, schedulerInterval);
 
