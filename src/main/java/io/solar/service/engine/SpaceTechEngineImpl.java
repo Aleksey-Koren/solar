@@ -24,7 +24,7 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
     public Float retrieveViewDistance(SpaceTech spaceTech) {
         BasicObject spaceTechAsObject = (BasicObject) spaceTech;
 
-        List<BasicObject> radars = basicObjectRepository.getObjectsInSlotsByTypeId(spaceTechAsObject.getId(), objectTypeRepository.findByTitle("radar")
+        List<BasicObject> radars = basicObjectRepository.getObjectsInSlotsByType(spaceTechAsObject.getId(), objectTypeRepository.findByTitle("radar")
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, String.format("Can't find type with title [%s]", "radar"))));
 
         double distance = radars.stream()
@@ -47,4 +47,25 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
 
         return starshipMass + attachedObjectsMass;
     }
+
+    public float calculateMaxAcceleration(SpaceTech spaceTech) {
+
+        return 0f;
+    }
+
+    public float calculateMaxThrust(SpaceTech spaceTech) {
+        BasicObject spaceTechAsObject = (BasicObject) spaceTech;
+        List<BasicObject> engines = basicObjectRepository.getObjectsInSlotsByType(spaceTechAsObject.getId(), objectTypeRepository.findByTitle("engine")
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, String.format("Can't find type with title [%s]", "engine")))
+        );
+
+        engines.addAll(basicObjectRepository.getObjectsInSlotsByType(spaceTechAsObject.getId(), objectTypeRepository.findByTitle("huge_engine")
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, String.format("Can't find type with title [%s]", "huge_engine")))
+        ));
+
+        return (float) engines.stream()
+                .mapToDouble(s -> (double) s.getObjectTypeDescription().getPowerMax())
+                .sum();
+    }
+
 }
