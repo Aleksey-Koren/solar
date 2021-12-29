@@ -105,35 +105,40 @@ public class ObjectCoordinatesService {
 
     private void updateUnattachedObject(BasicObject object, Long currentTimeMills, Long currentIteration, Long previousSchedulerTime) {
 
-        if (calculateAcceleration(object.getAccelerationX(), object.getAccelerationY()) > object.getMaxAcceleration()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    String.format("Starship with id = %d acceleration > maxAcceleration", object.getId()));
-        }
+        //TODO: replace object.getAccelerationX/Y -> course.getAccelerationX/Y
+//        if (calculateAcceleration(object.getAccelerationX(), object.getAccelerationY()) > object.getMaxAcceleration()) {
+//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+//                    String.format("Starship with id = %d acceleration > maxAcceleration", object.getId()));
+//        }
 
         long time = currentTimeMills - object.getPositionIterationTs();
 
-//        Float speedX = object.getSpeedX();
-//        Float speedY = object.getSpeedY();
-//        Float x = object.getX();
-//        Float y = object.getY();
+        Float speedX = object.getSpeedX();
+        Float speedY = object.getSpeedY();
+        Float x = object.getX();
+        Float y = object.getY();
+
+        Course activeCourse = courseService.findActiveCourse(object, Instant.ofEpochMilli(previousSchedulerTime));
+        Instant delta = Instant.ofEpochMilli(currentTimeMills - previousSchedulerTime);
+        long schedulerInterval = Duration.parse(schedulerDelaySeconds).toMillis();
+
+
+//        while (activeCourse != null) {
 //
-//        Course activeCourse = courseService.findActiveCourse(object, Instant.ofEpochMilli(previousSchedulerTime));
-//        Instant delta = Instant.ofEpochMilli(currentTimeMills - previousSchedulerTime);
-//        long schedulerInterval = Duration.parse(schedulerDelaySeconds).toMillis();
+//            long executionTime = activeCourse.getTime();
 //
-//        if (activeCourse != null) {
-//            long currentTime = previousSchedulerTime;
-//            while (activeCourse != null && activeCourse.getExpireAt().toEpochMilli() <= delta.toEpochMilli() + schedulerInterval + currentTimeMills) {
-//                long executionTime = object.getPositionIteration() - activeCourse.getExpireAt().toEpochMilli();
-//
-//                Float updatedX = determinePosition(x, speedX, executionTime);
-//                Float updatedY = determinePosition(y, speedY, executionTime);
-//
-//                Float updatedSpeedX = calculateSpeed(speedX, activeCourse.getAccelerationX(), executionTime);
-//                Float updatedSpeedY = calculateSpeed(speedY, activeCourse.getAccelerationY(), executionTime);
-//
-//                activeCourse = activeCourse.getNext();
+//            if (executionTime > (delta.toEpochMilli() + schedulerInterval + currentTimeMills)) {
+//                executionTime = (delta.toEpochMilli() + schedulerInterval + currentTimeMills) - activeCourse.getPrevious().getExpireAt().toEpochMilli();
+//                //todo: update speed and coordinates and break cycle
 //            }
+//
+//            Float updatedX = determinePosition(x, speedX, executionTime);
+//            Float updatedY = determinePosition(y, speedY, executionTime);
+//
+//            Float updatedSpeedX = calculateSpeed(speedX, activeCourse.getAccelerationX(), executionTime);
+//            Float updatedSpeedY = calculateSpeed(speedY, activeCourse.getAccelerationY(), executionTime);
+//
+//            activeCourse = activeCourse.getNext();
 //        }
 
         object.setX(determinePosition(object.getX(), object.getSpeedX(), time));
