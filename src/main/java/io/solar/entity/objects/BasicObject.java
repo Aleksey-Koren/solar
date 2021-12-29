@@ -4,8 +4,6 @@ import io.solar.entity.Course;
 import io.solar.entity.Planet;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -86,10 +84,5 @@ public class BasicObject implements Serializable {
     @Transient
     public Double getAcceleration() {
         return Math.sqrt(Math.pow(this.accelerationX, 2) + Math.pow(this.accelerationY, 2));
-    }
-
-    @Transient
-    public Double getMaxAcceleration() {
-        return 100.0;
     }
 }

@@ -13,4 +13,3 @@ public interface InventoryTypeRepository extends JpaRepository<InventoryType, Lo
     @Cacheable("inventoryTypes")
     Optional<InventoryType> findByTitle(String type);
 }
-
