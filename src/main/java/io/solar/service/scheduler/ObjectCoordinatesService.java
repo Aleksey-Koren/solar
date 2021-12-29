@@ -2,6 +2,7 @@ package io.solar.service.scheduler;
 
 import io.solar.entity.Course;
 import io.solar.entity.Planet;
+import io.solar.entity.interfaces.SpaceTech;
 import io.solar.entity.objects.BasicObject;
 import io.solar.entity.objects.ObjectType;
 import io.solar.repository.BasicObjectRepository;
@@ -116,24 +117,44 @@ public class ObjectCoordinatesService {
         long courseDuration = 0;
         while (activeCourse != null && courseDuration < schedulerInterval) {
 
-//            if (calculateAcceleration(activeCourse.getAccelerationX(), activeCourse.getAccelerationY()) > spaceTechEngine.calculateMaxAcceleration(object)) {
-//                //todo: add log.error()
-//                throw new ServiceException(String.format("Starship/Station with id = %d acceleration > maxAcceleration", object.getId()));
-//            }
+            if (calculateAcceleration(activeCourse.getAccelerationX(), activeCourse.getAccelerationY()) > spaceTechEngine.calculateMaxAcceleration((SpaceTech) object)) {
+                //todo: add log.error()
+                throw new ServiceException(String.format("Starship/Station with id = %d acceleration > maxAcceleration", object.getId()));
+            }
 
             courseDuration = defineCourseDuration(activeCourse, previousSchedulerTimeInstant, schedulerInterval);
 
             speedX = calculateSpeed(speedX, activeCourse.getAccelerationX(), courseDuration);
             speedY = calculateSpeed(speedY, activeCourse.getAccelerationY(), courseDuration);
 
-            x = determinePosition(x, speedX, courseDuration);
-            y = determinePosition(y, speedY, courseDuration);
+            x = determinePosition(x, object.getSpeedX(), courseDuration, activeCourse.getAccelerationX());
+            y = determinePosition(y, object.getSpeedY(), courseDuration, activeCourse.getAccelerationY());
 
             activeCourse = activeCourse.getNext();
         }
 
+        if(activeCourse == null && (object.getSpeedX() != 0 || object.getSpeedY() != 0)) {
+            //TODO Implement this method
+//            Course last = courseService.findLastCourse(object);
+            Course last = new Course();
+
+            long duration = last.getExpireAt().compareTo(previousSchedulerTimeInstant) <= 0
+                    ? schedulerInterval
+                    : previousSchedulerTime + schedulerInterval - last.getExpireAt().toEpochMilli();
+
+//            long duration = 0;
+//            if (last.getExpireAt().compareTo(previousSchedulerTimeInstant) <= 0) {
+//                duration = schedulerInterval;
+//            } else {
+//                duration = previousSchedulerTime + schedulerInterval - last.getExpireAt().toEpochMilli();
+//            }
+
+            x = determinePosition(x, object.getSpeedX(), duration, 0f);
+            y = determinePosition(y, object.getSpeedY(), duration, 0f);
+        }
+
         object.setX(x);
-        object.setSpeedY(y);
+        object.setY(y);
         object.setSpeedX(speedX);
         object.setSpeedY(speedY);
     }
@@ -148,10 +169,15 @@ public class ObjectCoordinatesService {
     }
 
     private Long defineCourseDuration(Course activeCourse, Instant previousSchedulerTime, Long schedulerInterval) {
+        long courseDuration = 0L;
+        if (activeCourse.getPrevious() == null) {
+            courseDuration = activeCourse.getTime();
+        } else {
+            courseDuration = activeCourse.getPrevious().getExpireAt().isAfter(previousSchedulerTime)
+                    ? activeCourse.getTime()
+                    : Duration.between(previousSchedulerTime, activeCourse.getExpireAt()).toMillis();
+        }
 
-        long courseDuration = activeCourse.getPrevious().getExpireAt().isAfter(previousSchedulerTime)
-                ? Duration.between(activeCourse.getPrevious().getExpireAt(), activeCourse.getExpireAt()).toMillis()
-                : Duration.between(previousSchedulerTime, activeCourse.getExpireAt()).toMillis();
 
         courseDuration = courseDuration > schedulerInterval
                 ? schedulerInterval
@@ -184,10 +210,12 @@ public class ObjectCoordinatesService {
         return (float) Math.cos(angle) * aphelion + parentPosition;
     }
 
-    private Float determinePosition(Float coordinate, Float speed, Long time) {
-
-        return coordinate + (speed * time / 3_600_000);
+    private Float determinePosition(Float coordinate, Float speed, Long time, Float acceleration) {
+        time = time/ 3_600_000;
+        double distance = speed * time + (acceleration * Math.pow(time, 2))/2;
+        return coordinate + (float) distance;
     }
+
 
     private Float calculateSpeed(Float speed, Float acceleration, long time) {
 

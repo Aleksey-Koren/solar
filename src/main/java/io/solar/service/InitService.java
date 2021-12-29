@@ -63,6 +63,9 @@ public class InitService {
         adminStarShip.setTitle("Admin Starship");
         adminStarShip.setX(10f);
         adminStarShip.setY(10f);
+        adminStarShip.setSpeedX(0f);
+        adminStarShip.setSpeedY(0f);
+        adminStarShip.setPositionIteration(0L);
         adminStarShip.setUserId(admin.getId());
         adminStarShip.setObjectTypeDescription(objectTypeDescriptionRepository.findById(66L)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Couldn't find ObjectTypeDescription with such id")));
@@ -71,7 +74,17 @@ public class InitService {
         BasicObject radar = createDefaultRadar();
         radar.setAttachedToSocket(1109L);
         radar.setAttachedToShip(adminStarShip);
+        BasicObject engine = createDefaultEngine();
+        engine.setAttachedToShip(adminStarShip);
+        engine.setAttachedToSocket(1089L);
         admin.setLocation(adminStarShip);
+    }
+
+    private BasicObject createDefaultEngine() {
+        BasicObject engine = new BasicObject();
+        engine.setObjectTypeDescription(objectTypeDescriptionRepository.findById(33L)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Couldn't find ObjectTypeDescription with such id")));
+        return basicObjectRepository.save(engine);
     }
 
     private BasicObject createDefaultRadar() {

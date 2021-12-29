@@ -36,14 +36,19 @@ public class CourseFacade {
         if (courses.size() > 0) {
             Course previousLast = findLastCourse(courses);
             last.setPrevious(previousLast);
-            last.setExpireAt(previousLast.getExpireAt().plusMillis(last.getTime()));
+//            last.setExpireAt(previousLast.getExpireAt().plusMillis(last.getTime()));
+            last.setExpireAt(previousLast.getExpireAt().isAfter(Instant.now())
+                    ? previousLast.getExpireAt().plusMillis(last.getTime())
+                    : Instant.now().plusMillis(last.getTime()));
             courseService.save(last);
             previousLast.setNext(last);
             courseService.save(previousLast);
+        }else{
+            Instant now = Instant.now();
+            last.setCreatedAt(now);
+            last.setExpireAt(now.plusMillis(last.getTime()));
         }
-        Instant now = Instant.now();
-        last.setCreatedAt(now);
-        last.setExpireAt(now.minusMillis(last.getTime()));
+
         courseService.save(last);
     }
 

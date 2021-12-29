@@ -46,7 +46,8 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
                 .mapToInt(object -> object.getObjectTypeDescription().getMass())
                 .sum();
 
-        return starshipMass + attachedObjectsMass;
+//        return starshipMass + attachedObjectsMass;
+        return 100;
     }
 
     @Override
