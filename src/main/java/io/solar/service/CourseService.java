@@ -36,4 +36,9 @@ public class CourseService {
 
         return courseRepository.findTopByObjectAndExpireAtAfterOrderByExpireAt(object, now);
     }
+
+    public Course findLastCourse(BasicObject object) {
+
+        return courseRepository.findByObjectAndNextIsNull(object);
+    }
 }

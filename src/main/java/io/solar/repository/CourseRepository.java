@@ -14,4 +14,6 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     Optional<Course> findByNext(Course next);
 
     Course findTopByObjectAndExpireAtAfterOrderByExpireAt(BasicObject object, Instant now);
+
+    Course findByObjectAndNextIsNull(BasicObject object);
 }
