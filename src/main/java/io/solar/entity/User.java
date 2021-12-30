@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import javax.persistence.*;
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -71,11 +72,5 @@ public class User {
                         .map(permission -> new SimpleGrantedAuthority(permission.getTitle()))
                         .collect(toSet())
         );
-    }
-
-    public List<MessageType> getMessageTypesToEmail() {
-        return Arrays.stream(MessageType.values())
-                .filter(s -> (this.emailNotifications & s.getIndex()) == s.getIndex())
-                .collect(toList());
     }
 }

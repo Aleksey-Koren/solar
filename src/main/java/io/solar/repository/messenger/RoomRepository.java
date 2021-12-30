@@ -35,5 +35,4 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
             "    LEFT JOIN inner_table ON users_rooms.room_id = inner_table.room_id " +
             "WHERE users_rooms.user_id = :user_id", nativeQuery = true)
     List<RoomDto> findAllUserRoomsWithUnreadMessages(@Param("user_id") Long userId);
-
 }

@@ -1,10 +1,7 @@
 package io.solar.dto;
 
 import io.solar.entity.objects.BasicObject;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.Instant;
 import java.util.List;
@@ -14,6 +11,7 @@ import java.util.Set;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class UserDto {
 
     private Long id;
@@ -25,6 +23,7 @@ public class UserDto {
     private Instant hackBlock;
     private Integer hackAttempts;
     private String avatar;
+    private Short emailNotifications;
     private Set<PermissionDto> permissions;
     private List<RoomDtoImpl> rooms;
 }

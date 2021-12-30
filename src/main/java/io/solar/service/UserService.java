@@ -1,6 +1,7 @@
 package io.solar.service;
 
 import io.solar.dto.UserDto;
+import io.solar.entity.MessageType;
 import io.solar.specification.filter.UserFilter;
 import io.solar.entity.Permission;
 import io.solar.entity.User;
@@ -25,8 +26,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static java.util.stream.Collectors.*;
 
@@ -136,5 +136,14 @@ public class UserService implements UserDetailsService {
             user.setLogin("");
         }
         return user;
+    }
+
+    public List<MessageType> getMessageTypesToEmail(User user) {
+        if (user.getEmailNotifications() == null) {
+            return Collections.emptyList();
+        }
+        return Arrays.stream(MessageType.values())
+                .filter(s -> (!s.equals(MessageType.CHAT) && (user.getEmailNotifications() & s.getIndex()) == s.getIndex()))
+                .collect(toList());
     }
 }
