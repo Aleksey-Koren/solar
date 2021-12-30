@@ -1,0 +1,3 @@
+-- alter table courses alter column created_at set default null;
+--
+-- alter table courses alter column expire_at set default null;
