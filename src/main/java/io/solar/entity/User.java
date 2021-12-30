@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -31,12 +32,16 @@ public class User {
     private String login;
     private String password;
     private Long money;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "location")
     private BasicObject location;
+
     private Instant hackBlock;
     private Integer hackAttempts;
     private String avatar;
+    private Short emailNotifications;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "users_permissions",
@@ -56,6 +61,8 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<UserRoom> userRooms;
 
+
+
     public static UserDetails retrieveUserDetails(User user) {
         return new org.springframework.security.core.userdetails.User(
                 user.getLogin(), user.getPassword(),
@@ -64,5 +71,11 @@ public class User {
                         .map(permission -> new SimpleGrantedAuthority(permission.getTitle()))
                         .collect(toSet())
         );
+    }
+
+    public List<MessageType> getMessageTypesToEmail() {
+        return Arrays.stream(MessageType.values())
+                .filter(s -> (this.emailNotifications & s.getIndex()) == s.getIndex())
+                .collect(toList());
     }
 }
