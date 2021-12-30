@@ -117,7 +117,7 @@ public class ObjectCoordinatesService {
     }
 
     private void staticObjectMotion(BasicObject object, Long schedulerDuration, Long previousSchedulerTime) {
-        Course lastCourse = courseService.findLastCourse(object).get();
+        Course lastCourse = courseService.findLastCourse(object).orElseThrow();
 
         // is before or equals
         long motionDuration = lastCourse.getExpireAt().compareTo(Instant.ofEpochMilli(previousSchedulerTime)) <= 0
