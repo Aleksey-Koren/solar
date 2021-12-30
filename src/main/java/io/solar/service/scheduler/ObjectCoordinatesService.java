@@ -111,7 +111,7 @@ public class ObjectCoordinatesService {
 
         activeCourse = completeObjectCourses(activeCourse, schedulerDuration, object, previousSchedulerTimeInstant);
 
-        if (activeCourse == null && (object.getSpeedX() > 0 || object.getSpeedY() > 0)) {
+        if (activeCourse == null && (object.getSpeed()) > 0) {
             staticObjectMotion(object, schedulerDuration, previousSchedulerTime);
         }
     }
