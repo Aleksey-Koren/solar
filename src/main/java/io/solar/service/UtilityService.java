@@ -39,12 +39,12 @@ public class UtilityService {
         utilityRepository.deleteById(utilKey);
     }
 
-    public Utility updateValueByKey(String utilKey, String value) {
+    public void updateValueByKey(String utilKey, String value) {
         Utility utility = utilityRepository.findByUtilKey(utilKey)
-                .orElseThrow(() -> new ServiceException(String.format("Cannot find util key = %s", utilKey)));
+                .orElse(Utility.builder().utilKey(utilKey).build());
 
         utility.setUtilValue(value);
 
-        return save(utility);
+        save(utility);
     }
 }

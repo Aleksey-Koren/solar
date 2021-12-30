@@ -21,10 +21,12 @@ public interface BasicObjectRepository extends JpaRepository<BasicObject, Long>,
 
     List<BasicObject> findAllByAttachedToShipId(Long attachedToShipId);
 
+    BasicObject findByPlanetIsNullAndObjectTypeDescription_InventoryType(InventoryType inventoryType);
+
     @Query("select o from BasicObject as o " +
             "join o.objectTypeDescription as otd " +
             "where o.attachedToShip.id = :objectId and o.attachedToSocket is not null and otd.inventoryType = :type")
-    List<BasicObject> getObjectsInSlotsByTypeId(@Param("objectId") Long objectId, @Param("type")InventoryType type);
+    List<BasicObject> getObjectsInSlotsByType(@Param("objectId") Long objectId, @Param("type") InventoryType type);
 
 
     @Query("select o from BasicObject o " +

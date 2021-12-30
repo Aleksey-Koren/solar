@@ -32,9 +32,22 @@ public class Course {
 
     @ToString.Exclude
     @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "previous")
+    private Course previous;
+
+    @ToString.Exclude
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "next")
     private Course next;
 
     private Instant createdAt;
     private Instant expireAt;
+
+    public boolean hasNext() {
+        return this.next != null;
+    }
+
+    public boolean hasPrevious() {
+        return  this.previous != null;
+    }
 }

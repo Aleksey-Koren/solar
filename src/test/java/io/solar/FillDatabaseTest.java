@@ -6,6 +6,8 @@ import io.solar.entity.User;
 import io.solar.entity.messenger.Message;
 import io.solar.entity.messenger.Room;
 import io.solar.entity.messenger.UserRoom;
+import io.solar.entity.objects.BasicObject;
+import io.solar.repository.BasicObjectRepository;
 import io.solar.repository.UserRepository;
 import io.solar.repository.messenger.MessageRepository;
 import io.solar.repository.messenger.RoomRepository;
@@ -32,17 +34,20 @@ public class FillDatabaseTest {
 
     private final UserRepository userRepository;
     private final RoomRepository roomRepository;
+    private final BasicObjectRepository basicObjectRepository;
     private final MessageRepository messageRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public FillDatabaseTest(UserRepository userRepository,
                             RoomRepository roomRepository,
+                            BasicObjectRepository basicObjectRepository,
                             MessageRepository messageRepository,
                             PasswordEncoder passwordEncoder) {
 
         this.userRepository = userRepository;
         this.roomRepository = roomRepository;
+        this.basicObjectRepository = basicObjectRepository;
         this.messageRepository = messageRepository;
         this.passwordEncoder = passwordEncoder;
     }
@@ -64,7 +69,7 @@ public class FillDatabaseTest {
     @Order(2)
     @RepeatedTest(100)
     public void createRooms() {
-        Room room = new Room(null, UUID.randomUUID().toString(), Instant.now(), findRandomUser());
+        Room room = new Room(null, UUID.randomUUID().toString(), Instant.now(), findRandomUser(), null);
 
         roomRepository.save(room);
     }

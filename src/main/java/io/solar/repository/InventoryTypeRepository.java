@@ -11,6 +11,5 @@ import java.util.Optional;
 public interface InventoryTypeRepository extends JpaRepository<InventoryType, Long> {
 
     @Cacheable("inventoryTypes")
-    Optional<InventoryType> findByTitle(String radar);
+    Optional<InventoryType> findByTitle(String type);
 }
-

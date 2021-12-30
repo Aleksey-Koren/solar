@@ -1,6 +1,7 @@
 package io.solar.service;
 
 import io.solar.entity.Planet;
+import io.solar.entity.objects.BasicObject;
 import io.solar.repository.PlanetRepository;
 import io.solar.specification.PlanetSpecification;
 import io.solar.specification.filter.PlanetFilter;
@@ -12,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,7 +40,18 @@ public class PlanetService {
         return planetRepository.save(planet);
     }
 
+    public List<Planet> saveAll(List<Planet> planets) {
+
+        return planetRepository.saveAllAndFlush(planets);
+    }
+
     public List<Planet> findAll() {
+
         return planetRepository.findAll();
+    }
+
+    public Planet findSun() {
+
+        return planetRepository.findByPlanetIsNull();
     }
 }

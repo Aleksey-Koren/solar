@@ -24,7 +24,7 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
     public Float retrieveViewDistance(SpaceTech spaceTech) {
         BasicObject spaceTechAsObject = (BasicObject) spaceTech;
 
-        List<BasicObject> radars = basicObjectRepository.getObjectsInSlotsByTypeId(spaceTechAsObject.getId(), objectTypeRepository.findByTitle("radar")
+        List<BasicObject> radars = basicObjectRepository.getObjectsInSlotsByType(spaceTechAsObject.getId(), objectTypeRepository.findByTitle("radar")
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, String.format("Can't find type with title [%s]", "radar"))));
 
         double distance = radars.stream()
@@ -33,5 +33,41 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
                 .max()
                 .orElse(0);
         return (float) distance;
+    }
+
+    @Override
+    public Integer calculateMass(SpaceTech spaceTech) {
+        BasicObject spaceTechObject = (BasicObject) spaceTech;
+
+        int starshipMass = spaceTechObject.getObjectTypeDescription().getMass();
+
+        int attachedObjectsMass = spaceTechObject.getAttachedObjects()
+                .stream()
+                .mapToInt(object -> object.getObjectTypeDescription().getMass())
+                .sum();
+
+//        return starshipMass + attachedObjectsMass;
+        return 100;
+    }
+
+    @Override
+    public float calculateMaxAcceleration(SpaceTech spaceTech) {
+        return calculateMaxThrust(spaceTech) / calculateMass(spaceTech);
+    }
+
+    @Override
+    public float calculateMaxThrust(SpaceTech spaceTech) {
+        BasicObject spaceTechAsObject = (BasicObject) spaceTech;
+        List<BasicObject> engines = basicObjectRepository.getObjectsInSlotsByType(spaceTechAsObject.getId(), objectTypeRepository.findByTitle("engine")
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, String.format("Can't find type with title [%s]", "engine")))
+        );
+
+        engines.addAll(basicObjectRepository.getObjectsInSlotsByType(spaceTechAsObject.getId(), objectTypeRepository.findByTitle("huge_engine")
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, String.format("Can't find type with title [%s]", "huge_engine")))
+        ));
+
+        return (float) engines.stream()
+                .mapToDouble(s -> (double) s.getObjectTypeDescription().getPowerMax())
+                .sum();
     }
 }

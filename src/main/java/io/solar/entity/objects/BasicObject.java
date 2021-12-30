@@ -4,8 +4,6 @@ import io.solar.entity.Course;
 import io.solar.entity.Planet;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.io.Serializable;
