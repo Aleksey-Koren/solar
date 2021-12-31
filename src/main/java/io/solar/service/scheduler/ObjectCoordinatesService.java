@@ -17,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -44,20 +45,20 @@ public class ObjectCoordinatesService {
 
     @Transactional
     public void update() {
-        long currentIteration = Long.parseLong(utilityService.getValue(POSITION_ITERATION_UTILITY_KEY, "1"));
-        long schedulerTime = Long.parseLong(utilityService.getValue(SCHEDULER_TIME_UTILITY_KEY, "0"));
         long now = System.currentTimeMillis();
+        long schedulerDuration = Duration.parse(schedulerDelaySeconds).toMillis();
+        long currentIteration = Long.parseLong(utilityService.getValue(POSITION_ITERATION_UTILITY_KEY, "1"));
         List<BasicObject> objects;
 
         updatePlanets(now);
 
         while (!(objects = retrieveObjectsForUpdate(currentIteration)).isEmpty()) {
-            updateObjects(objects, currentIteration, now, schedulerTime);
+            updateObjects(objects, currentIteration, now, schedulerDuration);
             basicObjectRepository.saveAllAndFlush(objects);
         }
 
-        utilityService.updateValueByKey(SCHEDULER_TIME_UTILITY_KEY, String.valueOf(System.currentTimeMillis()));
         utilityService.updateValueByKey(POSITION_ITERATION_UTILITY_KEY, String.valueOf(currentIteration + 1));
+        //todo: save scheduler time
     }
 
     private void updatePlanets(long now) {
@@ -80,9 +81,7 @@ public class ObjectCoordinatesService {
         planetService.saveAll(planets);
     }
 
-    private void updateObjects(List<BasicObject> objects, long currentIteration, long now, long previousSchedulerTime) {
-        Long schedulerDuration = calculateSchedulerDuration(now, Instant.ofEpochMilli(previousSchedulerTime));
-
+    private void updateObjects(List<BasicObject> objects, long currentIteration, long now, long schedulerDuration) {
         objects.forEach(object -> {
             if (object.getPlanet() != null && object.getAphelion() != null
                     && object.getAngle() != null && object.getOrbitalPeriod() != null) {
@@ -90,7 +89,7 @@ public class ObjectCoordinatesService {
                 updateOrbitalObject(object, now);
             } else {
 
-                updateUnattachedObject(object, previousSchedulerTime, schedulerDuration);
+                updateUnattachedObject(object, now, schedulerDuration);
                 object.setPositionIterationTs(now);
                 object.setPositionIteration(currentIteration + 1);
             }
@@ -105,30 +104,31 @@ public class ObjectCoordinatesService {
         object.setY(calculateAbsoluteCoordinate(object.getAngle(), object.getAphelion(), object.getPlanet().getY()));
     }
 
-    private void updateUnattachedObject(BasicObject object, Long previousSchedulerTime, Long schedulerDuration) {
-        Instant previousSchedulerTimeInstant = Instant.ofEpochMilli(previousSchedulerTime);
-        Course activeCourse = courseService.findActiveCourse(object, previousSchedulerTimeInstant);
+    private void updateUnattachedObject(BasicObject object, Long currentTimeMills, Long schedulerDuration) {
 
-        activeCourse = completeObjectCourses(activeCourse, schedulerDuration, object, previousSchedulerTimeInstant);
+        Course activeCourse = courseService.findActiveCourse(object, Instant.ofEpochMilli(currentTimeMills));
 
-        if (activeCourse == null && (object.getSpeed()) > 0) {
-            staticObjectMotion(object, schedulerDuration, previousSchedulerTime);
+        activeCourse = completeObjectCourses(activeCourse, object, currentTimeMills, schedulerDuration);
+
+        if (activeCourse == null && object.getSpeed() > 0) {
+            staticObjectMotion(object, currentTimeMills, schedulerDuration);
         }
+
     }
 
-    private void staticObjectMotion(BasicObject object, Long schedulerDuration, Long previousSchedulerTime) {
+    private void staticObjectMotion(BasicObject object, Long currentTimeMillis, Long schedulerDuration) {
         Course lastCourse = courseService.findLastCourse(object).orElseThrow();
 
         // is before or equals
-        long motionDuration = lastCourse.getExpireAt().compareTo(Instant.ofEpochMilli(previousSchedulerTime)) <= 0
+        long motionDuration = lastCourse.getExpireAt().compareTo(Instant.ofEpochMilli(currentTimeMillis)) <= 0
                 ? schedulerDuration
-                : previousSchedulerTime + schedulerDuration - lastCourse.getExpireAt().toEpochMilli();
+                : lastCourse.getExpireAt().toEpochMilli() - currentTimeMillis;
 
         object.setX(determinePosition(object.getX(), object.getSpeedX(), motionDuration, 0f));
         object.setY(determinePosition(object.getY(), object.getSpeedY(), motionDuration, 0f));
     }
 
-    private Course completeObjectCourses(Course activeCourse, Long schedulerDuration, BasicObject object, Instant previousSchedulerTimeInstant) {
+    private Course completeObjectCourses(Course activeCourse, BasicObject object, Long currentTimeMillis, Long schedulerDuration) {
         long courseDuration = 0;
         while (activeCourse != null && courseDuration < schedulerDuration) {
 
@@ -138,13 +138,18 @@ public class ObjectCoordinatesService {
                 );
             }
 
-            courseDuration = calculateCourseDuration(activeCourse, previousSchedulerTimeInstant, schedulerDuration);
+            courseDuration = calculateCourseDuration(activeCourse, schedulerDuration, Instant.ofEpochMilli(currentTimeMillis));
 
             object.setX(determinePosition(object.getX(), object.getSpeedX(), courseDuration, activeCourse.getAccelerationX()));
             object.setY(determinePosition(object.getY(), object.getSpeedY(), courseDuration, activeCourse.getAccelerationY()));
 
             object.setSpeedX(calculateSpeed(object.getSpeedX(), activeCourse.getAccelerationX(), courseDuration));
             object.setSpeedY(calculateSpeed(object.getSpeedY(), activeCourse.getAccelerationY(), courseDuration));
+
+            object.setAccelerationX(activeCourse.getAccelerationX());
+            object.setAccelerationY(activeCourse.getAccelerationY());
+
+            activeCourse.setExpireAt(null);
 
             activeCourse = activeCourse.getNext();
         }
@@ -161,25 +166,29 @@ public class ObjectCoordinatesService {
         );
     }
 
-    private Long calculateCourseDuration(Course activeCourse, Instant previousSchedulerTime, Long schedulerInterval) {
+    private Long calculateCourseDuration(Course activeCourse, Long schedulerInterval, Instant currentTime) {
+        Instant endSchedulerInstant = Instant.ofEpochMilli(currentTime.toEpochMilli() + schedulerInterval);
         long courseDuration;
 
-        if (activeCourse.getPrevious() == null || activeCourse.getPrevious().getExpireAt().isAfter(previousSchedulerTime)) {
+        if (activeCourse.getPrevious() == null) {
             courseDuration = activeCourse.getTime();
+        } else if (activeCourse.getPrevious().getExpireAt().isAfter(currentTime)) {
+
+            long timeBetweenCourseAndEndScheduler = Duration.between(activeCourse.getPrevious().getExpireAt(), endSchedulerInstant).toMillis();
+
+            if (timeBetweenCourseAndEndScheduler > activeCourse.getTime()) {
+                courseDuration = activeCourse.getTime();
+            } else {
+                courseDuration = timeBetweenCourseAndEndScheduler;
+            }
+
         } else {
-            courseDuration = Duration.between(previousSchedulerTime, activeCourse.getExpireAt()).toMillis();
+            courseDuration = Duration.between(currentTime, activeCourse.getExpireAt()).toMillis();
         }
 
         return courseDuration > schedulerInterval
                 ? schedulerInterval
                 : courseDuration;
-    }
-
-    private Long calculateSchedulerDuration(Long currentTimeMills, Instant previousSchedulerTime) {
-        long timeBetweenPreviousSchedulerAndNow = Duration.between(previousSchedulerTime, Instant.ofEpochMilli(currentTimeMills)).toMillis();
-        long schedulerDelay = Duration.parse(schedulerDelaySeconds).toMillis();
-
-        return timeBetweenPreviousSchedulerAndNow + schedulerDelay;
     }
 
     private Double calculateDelta(Long currentTimeMills) {
@@ -190,8 +199,8 @@ public class ObjectCoordinatesService {
     }
 
     private Float determinePosition(Float coordinate, Float speed, Long time, Float acceleration) {
-        time = time / 3_600_000;
-        float distanceCovered = (float) (speed * time + (acceleration * Math.pow(time, 2)) / 2);
+        double dividedTime = time / 3_600_000d;
+        float distanceCovered = (float) (speed * dividedTime + (acceleration * Math.pow(dividedTime, 2)) / 2);
 
         return coordinate + distanceCovered;
     }
