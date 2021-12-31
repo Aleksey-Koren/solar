@@ -28,8 +28,8 @@ public class ChatController {
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
     @Transactional
     public Page<MessageDto> getMessageHistory(@PathVariable("roomId") Long roomId
-                                                                    , Principal principal
-                                                                    , @PageableDefault(size = 2) Pageable pageable) {
+            , Principal principal
+            , @PageableDefault(size = 2) Pageable pageable) {
         User user = userService.findByLogin(principal.getName());
         return chatService.getMessageHistory(roomId, user, pageable);
     }
@@ -51,5 +51,14 @@ public class ChatController {
                              @RequestParam Long roomId) {
 
         chatService.inviteUserToRoom(inviterId, invitedId, roomId);
+    }
+
+    @PostMapping("/email")
+    @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
+    @Transactional
+    //TODO implement this method;
+    public void saveEmailNotifications(Principal principal ) {
+        User user = userService.findByLogin(principal.getName());
+//        userService.saveEmailNotifications(user);
     }
 }

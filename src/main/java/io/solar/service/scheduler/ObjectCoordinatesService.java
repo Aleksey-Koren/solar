@@ -130,7 +130,7 @@ public class ObjectCoordinatesService {
 
     private Course completeObjectCourses(Course activeCourse, BasicObject object, Long currentTimeMillis, Long schedulerDuration) {
         long courseDuration = 0;
-        while (activeCourse != null && courseDuration < schedulerDuration) {
+        while (activeCourse != null) {
 
             if (isAccelerationInvalid(object, activeCourse)) {
                 throw new ServiceException(
@@ -139,6 +139,7 @@ public class ObjectCoordinatesService {
             }
 
             courseDuration = calculateCourseDuration(activeCourse, schedulerDuration, Instant.ofEpochMilli(currentTimeMillis));
+
 
             object.setX(determinePosition(object.getX(), object.getSpeedX(), courseDuration, activeCourse.getAccelerationX()));
             object.setY(determinePosition(object.getY(), object.getSpeedY(), courseDuration, activeCourse.getAccelerationY()));
@@ -149,12 +150,47 @@ public class ObjectCoordinatesService {
             object.setAccelerationX(activeCourse.getAccelerationX());
             object.setAccelerationY(activeCourse.getAccelerationY());
 
-            activeCourse.setExpireAt(null);
+            if (activeCourse.hasNext() && activeCourse.getExpireAt().isBefore(Instant.ofEpochMilli(currentTimeMillis + schedulerDuration))) {
+                activeCourse.getNext().setExpireAt(activeCourse.getExpireAt().plusMillis(activeCourse.getNext().getTime()));
+                activeCourse = activeCourse.getNext();
+            } else {
+                if (activeCourse.getExpireAt().isBefore(Instant.ofEpochMilli(currentTimeMillis + schedulerDuration))) {
+                    staticObjectMotion();
+                }
+                    activeCourse = null;
+            }
 
-            activeCourse = activeCourse.getNext();
         }
 
         return activeCourse;
+
+
+//        long courseDuration = 0;
+//        while (activeCourse != null && courseDuration < schedulerDuration) {
+//
+//            if (isAccelerationInvalid(object, activeCourse)) {
+//                throw new ServiceException(
+//                        String.format("Starship/Station with id = %d acceleration > maxAcceleration", object.getId())
+//                );
+//            }
+//
+//            courseDuration = calculateCourseDuration(activeCourse, schedulerDuration, Instant.ofEpochMilli(currentTimeMillis));
+//
+//            object.setX(determinePosition(object.getX(), object.getSpeedX(), courseDuration, activeCourse.getAccelerationX()));
+//            object.setY(determinePosition(object.getY(), object.getSpeedY(), courseDuration, activeCourse.getAccelerationY()));
+//
+//            object.setSpeedX(calculateSpeed(object.getSpeedX(), activeCourse.getAccelerationX(), courseDuration));
+//            object.setSpeedY(calculateSpeed(object.getSpeedY(), activeCourse.getAccelerationY(), courseDuration));
+//
+//            object.setAccelerationX(activeCourse.getAccelerationX());
+//            object.setAccelerationY(activeCourse.getAccelerationY());
+//
+//            activeCourse.setExpireAt(null);
+//
+//            activeCourse = activeCourse.getNext();
+//        }
+//
+//        return activeCourse;
     }
 
     private List<BasicObject> retrieveObjectsForUpdate(long currentIteration) {
@@ -171,8 +207,8 @@ public class ObjectCoordinatesService {
         long courseDuration;
 
         if (activeCourse.getPrevious() == null) {
-            courseDuration = activeCourse.getTime();
-        } else if (activeCourse.getPrevious().getExpireAt().isAfter(currentTime)) {
+            courseDuration = Duration.between(currentTime, activeCourse.getExpireAt()).toMillis();
+        } else {
 
             long timeBetweenCourseAndEndScheduler = Duration.between(activeCourse.getPrevious().getExpireAt(), endSchedulerInstant).toMillis();
 
@@ -181,14 +217,9 @@ public class ObjectCoordinatesService {
             } else {
                 courseDuration = timeBetweenCourseAndEndScheduler;
             }
-
-        } else {
-            courseDuration = Duration.between(currentTime, activeCourse.getExpireAt()).toMillis();
         }
 
-        return courseDuration > schedulerInterval
-                ? schedulerInterval
-                : courseDuration;
+        return courseDuration;
     }
 
     private Double calculateDelta(Long currentTimeMills) {
