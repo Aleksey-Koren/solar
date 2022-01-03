@@ -27,6 +27,17 @@ spring:
                 ddl-auto: validate
         open-in-view: false
 
+    mail:
+        host: smtp.gmail.com
+        port: 587
+        username: solar.super.game@gmail.com
+        password: verystrongpass
+        properties:
+            mail:
+                smtp:
+                    auth: true
+                    starttls:
+                        enable: true
 server:
     port: 8081
     servlet:

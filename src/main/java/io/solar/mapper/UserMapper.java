@@ -3,15 +3,14 @@ package io.solar.mapper;
 import io.solar.dto.UserDto;
 import io.solar.entity.User;
 import io.solar.repository.UserRepository;
+import io.solar.repository.messenger.RoomRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.stream.Collectors;
-
-import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 
 @Service
 @RequiredArgsConstructor
@@ -20,36 +19,48 @@ public class UserMapper {
     private final UserRepository userRepository;
     private final PermissionMapper permissionMapper;
     private final RoomMapper roomMapper;
+    private final RoomRepository roomRepository;
 
     public User toEntity(UserDto dto) {
+
         User user;
         if (dto.getId() != null) {
             user = userRepository.findById(dto.getId())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Couldn't found user with such id"));
-            user.setTitle(dto.getTitle());
-            user.setLogin(dto.getLogin());
-            user.setPassword(dto.getPassword());
-            user.setMoney(dto.getMoney());
-            user.setLocation(dto.getLocation());
-            user.setHackBlock(dto.getHackBlock());
-            user.setHackAttempts(dto.getHackAttempts());
-            user.setAvatar(dto.getAvatar());
-            user.setPermissions(dto.getPermissions() == null ? null : dto.getPermissions().stream().map(permissionMapper::toEntity).collect(toSet()));
         } else {
-            user = new User(null, dto.getTitle(), dto.getLogin(), dto.getPassword(), dto.getMoney(),
-                    dto.getLocation(), dto.getHackBlock(), dto.getHackAttempts(), dto.getAvatar(),
-                    dto.getPermissions() == null ? null : dto.getPermissions().stream().map(permissionMapper::toEntity).collect(toSet()),
-                    dto.getRooms() == null ? null : dto.getRooms().stream().map(roomMapper::toEntity).toList(),
-                    null);
+            user = new User();
         }
+
+        user.setTitle(dto.getTitle());
+        user.setLogin(dto.getLogin());
+        user.setPassword(dto.getPassword());
+        user.setMoney(dto.getMoney());
+        user.setLocation(dto.getLocation());
+        user.setHackBlock(dto.getHackBlock());
+        user.setHackAttempts(dto.getHackAttempts());
+        user.setAvatar(dto.getAvatar());
+        user.setEmailNotifications(dto.getEmailNotifications());
+        user.setPermissions(dto.getPermissions() == null ? null : dto.getPermissions().stream().map(permissionMapper::toEntity).collect(toSet()));
+        user.setRooms(dto.getRooms() == null ? null : dto.getRooms().stream().map(roomMapper::toEntity).toList());
+
         return user;
     }
 
     public UserDto toDto(User user) {
 
-        return new UserDto(user.getId(), user.getTitle(), user.getLogin(), null, user.getMoney(),
-                user.getLocation(), user.getHackBlock(), user.getHackAttempts(), user.getAvatar(),
-                user.getPermissions().stream().map(permissionMapper::toDto).collect(Collectors.toSet()),
-                user.getRooms().stream().map(roomMapper::toDto).toList());
+        return UserDto.builder()
+                .id(user.getId())
+                .title(user.getTitle())
+                .login(user.getLogin())
+                .money(user.getMoney())
+                .location(user.getLocation())
+                .hackBlock(user.getHackBlock())
+                .hackAttempts(user.getHackAttempts())
+                .avatar(user.getAvatar())
+                .emailNotifications(user.getEmailNotifications())
+                .permissions(user.getPermissions().stream().map(permissionMapper::toDto).collect(toSet()))
+                .rooms(user.getRooms().stream().map(roomMapper::toDto).collect(toList()))
+                .build();
+
     }
 }
