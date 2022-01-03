@@ -16,6 +16,7 @@ public class MessageDto {
     private Long id;
     private Long senderId;
     private Long roomId;
+    private String title;
     private String message;
     private Instant createdAt;
     private String messageType;

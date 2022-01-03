@@ -27,6 +27,7 @@ public class MessageMapper implements EntityDtoMapper<Message, MessageDto> {
         if(dto.getId() != null) {
             entity = messageRepository.findById(dto.getId()).orElseThrow(
                     () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "There is no such id in database"));
+            entity.setCreatedAt(dto.getCreatedAt());
         }else{
             entity = new Message();
         }
@@ -39,6 +40,9 @@ public class MessageMapper implements EntityDtoMapper<Message, MessageDto> {
                 () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "There is no such room id = " + dto.getRoomId() + " in database")
         ));
 
+        entity.setTitle(dto.getTitle());
+        entity.setMessage(dto.getMessage());
+
         entity.setMessageType(dto.getMessageType() != null ? MessageType.valueOf(dto.getMessageType()) : null);
 
         return entity;
@@ -50,6 +54,7 @@ public class MessageMapper implements EntityDtoMapper<Message, MessageDto> {
                 .id(entity.getId())
                 .senderId(entity.getSender().getId())
                 .roomId(entity.getRoom().getId())
+                .title(entity.getTitle())
                 .message(entity.getMessage())
                 .createdAt(entity.getCreatedAt())
                 .messageType(entity.getMessageType() != null ? entity.getMessageType().toString() : null)

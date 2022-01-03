@@ -30,10 +30,8 @@ public class Message {
     @JoinColumn(name = "room_id")
     private Room room;
 
-    @Column(name = "message")
+    private String title;
     private String message;
-
-    @Column(name = "created_at")
     private Instant createdAt;
 
     @Enumerated(EnumType.STRING)
