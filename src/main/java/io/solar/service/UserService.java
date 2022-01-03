@@ -27,6 +27,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
+import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.*;
 
@@ -146,4 +147,16 @@ public class UserService implements UserDetailsService {
                 .filter(s -> (!s.equals(MessageType.CHAT) && (user.getEmailNotifications() & s.getIndex()) == s.getIndex()))
                 .collect(toList());
     }
+
+    public void saveEmailNotifications(User user, List<MessageType> messageTypes) {
+        user.setEmailNotifications(calculateEmailNotifications(messageTypes));
+        userRepository.save(user);
+    }
+
+    private Integer calculateEmailNotifications(List<MessageType> messageTypes) {
+        return messageTypes.stream()
+                .mapToInt(MessageType::getIndex)
+                .sum();
+    }
+
 }

@@ -1,7 +1,9 @@
-package io.solar.mapper;
+package io.solar.mapper.messanger;
 
 import io.solar.dto.MessageDto;
+import io.solar.entity.MessageType;
 import io.solar.entity.messenger.Message;
+import io.solar.mapper.EntityDtoMapper;
 import io.solar.repository.messenger.MessageRepository;
 import io.solar.repository.messenger.RoomRepository;
 import io.solar.repository.UserRepository;
@@ -25,15 +27,24 @@ public class MessageMapper implements EntityDtoMapper<Message, MessageDto> {
         if(dto.getId() != null) {
             entity = messageRepository.findById(dto.getId()).orElseThrow(
                     () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "There is no such id in database"));
+            entity.setCreatedAt(dto.getCreatedAt());
         }else{
             entity = new Message();
         }
+
         entity.setSender(userRepository.findById(dto.getSenderId()).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "There is no such user id = " + dto.getSenderId() + " in database")
                     ));
+
         entity.setRoom(roomRepository.findById(dto.getRoomId()).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "There is no such room id = " + dto.getRoomId() + " in database")
         ));
+
+        entity.setTitle(dto.getTitle());
+        entity.setMessage(dto.getMessage());
+
+        entity.setMessageType(dto.getMessageType() != null ? MessageType.valueOf(dto.getMessageType()) : null);
+
         return entity;
     }
 
@@ -43,8 +54,10 @@ public class MessageMapper implements EntityDtoMapper<Message, MessageDto> {
                 .id(entity.getId())
                 .senderId(entity.getSender().getId())
                 .roomId(entity.getRoom().getId())
+                .title(entity.getTitle())
                 .message(entity.getMessage())
                 .createdAt(entity.getCreatedAt())
+                .messageType(entity.getMessageType() != null ? entity.getMessageType().toString() : null)
                 .build();
     }
 }

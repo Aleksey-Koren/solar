@@ -1,20 +1,13 @@
 package io.solar.entity.messenger;
 
+import io.solar.entity.MessageType;
 import io.solar.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.Instant;
 
 @Entity
@@ -37,9 +30,10 @@ public class Message {
     @JoinColumn(name = "room_id")
     private Room room;
 
-    @Column(name = "message")
+    private String title;
     private String message;
-
-    @Column(name = "created_at")
     private Instant createdAt;
+
+    @Enumerated(EnumType.STRING)
+    private MessageType messageType;
 }

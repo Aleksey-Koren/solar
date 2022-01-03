@@ -2,6 +2,7 @@ package io.solar.controller.messenger;
 
 import io.solar.dto.MessageDto;
 import io.solar.dto.RoomDtoImpl;
+import io.solar.entity.MessageType;
 import io.solar.entity.User;
 import io.solar.service.UserService;
 import io.solar.service.messenger.ChatService;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/app/chat")
@@ -57,8 +59,11 @@ public class ChatController {
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
     @Transactional
     //TODO implement this method;
-    public void saveEmailNotifications(Principal principal ) {
+    public void saveEmailNotifications(Principal principal, @RequestBody List<String> messageTypes) {
+        List<MessageType> mappedMessageTypes = messageTypes.stream()
+                .map(MessageType::valueOf)
+                .collect(Collectors.toList());
         User user = userService.findByLogin(principal.getName());
-//        userService.saveEmailNotifications(user);
+        userService.saveEmailNotifications(user, mappedMessageTypes);
     }
 }

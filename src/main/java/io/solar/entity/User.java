@@ -41,7 +41,7 @@ public class User {
     private Instant hackBlock;
     private Integer hackAttempts;
     private String avatar;
-    private Short emailNotifications;
+    private Integer emailNotifications;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(

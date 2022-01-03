@@ -23,7 +23,7 @@ public class UserDto {
     private Instant hackBlock;
     private Integer hackAttempts;
     private String avatar;
-    private Short emailNotifications;
+    private Integer emailNotifications;
     private Set<PermissionDto> permissions;
     private List<RoomDtoImpl> rooms;
 }

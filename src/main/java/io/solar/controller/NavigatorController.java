@@ -67,17 +67,6 @@ public class NavigatorController {
         }
     }
 
-//    @PostMapping("/course")
-//    @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
-//    @Transactional
-//    public void layCourse(@RequestBody CourseDto dto, Principal principal) {
-//        User authUser = userService.findByLogin(principal.getName());
-//            if (!userService.isUserLocatedInObject(authUser, dto.getObjectId())) {
-//                userCantException(authUser.getLocation().getId(), dto.getObjectId());
-//            }
-//            courseFacade.updateCourseChain(dto);
-//    }
-
     @DeleteMapping("/course/{id}")
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
     @Transactional

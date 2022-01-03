@@ -6,7 +6,7 @@ import io.solar.entity.User;
 import io.solar.entity.messenger.Room;
 import io.solar.entity.messenger.RoomType;
 import io.solar.entity.messenger.UserRoom;
-import io.solar.mapper.MessageMapper;
+import io.solar.mapper.messanger.MessageMapper;
 import io.solar.mapper.RoomMapper;
 import io.solar.repository.UserRepository;
 import io.solar.repository.messenger.MessageRepository;
