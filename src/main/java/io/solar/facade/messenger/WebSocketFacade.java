@@ -7,6 +7,7 @@ import io.solar.entity.messenger.Message;
 import io.solar.mapper.messanger.MessageMapper;
 import io.solar.repository.messenger.RoomRepository;
 import io.solar.service.MessageService;
+import io.solar.service.mail.EmailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
