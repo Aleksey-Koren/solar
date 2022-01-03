@@ -30,10 +30,9 @@ public class WebSocketFacade {
         if (MessageType.CHAT.equals(message.getMessageType())) {
             processChatMessage(message);
         }else{
-
             List<User> usersInRoom = roomRepository.findById(message.getRoom().getId())
                     .orElseThrow(
-                            () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("There is no room with id = %d in database"
+                            () -> new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("There is no room with id = %d in database"
                                     , message.getRoom().getId())))
                     .getUsers();
 

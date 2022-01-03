@@ -80,6 +80,9 @@ public class PlanetMapper {
                 .angle(entity.getAngle())
                 .type(entity.getType())
                 .positionIterationTs(entity.getPositionIterationTs())
+                .x(entity.getX())
+                .y(entity.getY())
+                .parent(entity.getPlanet() != null ?  entity.getPlanet().getId() : null)
                 .build();
     }
 }

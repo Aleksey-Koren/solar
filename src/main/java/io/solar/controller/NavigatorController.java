@@ -14,13 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
@@ -70,16 +64,15 @@ public class NavigatorController {
     @DeleteMapping("/course/{id}")
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
     @Transactional
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCourse(@PathVariable("id") Long id, Principal principal) {
-        Course course = courseService.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                String.format("There is no course with such id in database. Course id = %d", id)));
+        Course course = courseService.findById(id).get();
         BasicObject object = course.getObject();
         User authUser = userService.findByLogin(principal.getName());
 
         if (!userService.isUserLocatedInObject(authUser, object.getId())) {
             userCantException(authUser.getLocation().getId(), object.getId());
         }
-
         courseFacade.deleteCourse(course);
     }
 

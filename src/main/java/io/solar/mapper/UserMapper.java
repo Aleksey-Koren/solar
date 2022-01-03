@@ -61,6 +61,5 @@ public class UserMapper {
                 .permissions(user.getPermissions().stream().map(permissionMapper::toDto).collect(toSet()))
                 .rooms(user.getRooms().stream().map(roomMapper::toDto).collect(toList()))
                 .build();
-
     }
 }

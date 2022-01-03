@@ -33,4 +33,6 @@ public class PlanetDto {
     private Float angle;
     private String type;
     private Long positionIterationTs;
+    private Float x;
+    private Float y;
 }

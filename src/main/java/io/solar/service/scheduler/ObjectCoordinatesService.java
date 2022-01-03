@@ -51,19 +51,20 @@ public class ObjectCoordinatesService {
 
         updatePlanets(now);
 
-        while (!(objects = retrieveObjectsForUpdate(currentIteration)).isEmpty()) {
-            updateObjects(objects, currentIteration, now, schedulerDuration);
-            basicObjectRepository.saveAllAndFlush(objects);
-        }
+//        while (!(objects = retrieveObjectsForUpdate(currentIteration)).isEmpty()) {
+//            updateObjects(objects, currentIteration, now, schedulerDuration);
+//            basicObjectRepository.saveAllAndFlush(objects);
+//        }
 
+        courseService.deleteAllExpiredCourses(Instant.ofEpochMilli(now));
         utilityService.updateValueByKey(POSITION_ITERATION_UTILITY_KEY, String.valueOf(currentIteration + 1));
         utilityService.updateValueByKey(SCHEDULER_TIME_UTILITY_KEY, String.valueOf(System.currentTimeMillis() - now));
     }
-
     private void updatePlanets(long now) {
         List<Planet> planets = planetService.findAll();
         List<Planet> moons = new ArrayList<>();
         Planet sun = planetService.findSun();
+
 
         planets.stream()
                 .filter(planet -> planet.getPlanet() != null)
@@ -97,10 +98,12 @@ public class ObjectCoordinatesService {
 
     private void updateOrbitalObject(BasicObject object, Long now) {
         double da = calculateDelta(now) / object.getOrbitalPeriod();
-        object.setAngle(object.getAngle() + (float) da);
+//        object.setAngle(object.getAngle() + (float) da);
 
-        object.setX(calculateAbsoluteCoordinate(object.getAngle(), object.getAphelion(), object.getPlanet().getX()));
-        object.setY(calculateAbsoluteCoordinate(object.getAngle(), object.getAphelion(), object.getPlanet().getY()));
+
+
+        object.setX((float) Math.cos(object.getAngle() + da) * object.getAphelion()  + object.getPlanet().getX());
+        object.setY((float) Math.sin(object.getAngle() + da) * object.getAphelion()  + object.getPlanet().getY());
     }
 
     private void updateUnattachedObject(BasicObject object, Long currentTimeMills, Long schedulerDuration) {
