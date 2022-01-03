@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.Instant;
+import java.util.List;
 
 @Entity
 @Table(name = "rooms")
@@ -32,4 +33,7 @@ public class Room {
 
     @Enumerated(EnumType.STRING)
     private RoomType type;
+
+    @ManyToMany(mappedBy = "rooms")
+    private List<User> users;
 }
