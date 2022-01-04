@@ -43,7 +43,7 @@ public class UserService implements UserDetailsService {
     @Value("${app.hack_block_time_min}")
     private Integer HACK_BLOCK_TIME_MIN;
 
-    public Optional<User> findById (Long id) {
+    public Optional<User> findById(Long id) {
         return userRepository.findById(id);
     }
 
@@ -57,15 +57,19 @@ public class UserService implements UserDetailsService {
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         resetHackAttempts(user);
+
         Set<Permission> permissions = role.getPermissions().stream()
-                                                                .map(s -> permissionRepository.findByTitle(s))
-                                                                .collect(toSet());
+                .map(permissionRepository::findByTitle)
+                .collect(toSet());
+
         user.setPermissions(permissions);
+        user.setEmail(receiveEmailFromLogin(user));
+
         return userRepository.save(user);
     }
 
     public User update(User user) {
-       return userRepository.save(user);
+        return userRepository.save(user);
     }
 
     public void delete(User user) {
@@ -84,11 +88,11 @@ public class UserService implements UserDetailsService {
         }
         userRepository.save(user);
     }
-    
+
     public void resetHackAttempts(User user) {
         user.setHackAttempts(0);
-            user.setHackBlock(LocalDateTime.of(2010, 1, 1, 0, 0, 0)
-                    .toInstant(ZoneOffset.ofTotalSeconds(0)));
+        user.setHackBlock(LocalDateTime.of(2010, 1, 1, 0, 0, 0)
+                .toInstant(ZoneOffset.ofTotalSeconds(0)));
     }
 
     public boolean matchPasswords(User user, User userFromDb) {
@@ -96,7 +100,7 @@ public class UserService implements UserDetailsService {
     }
 
     public Page<UserDto> getAllUsers(Pageable pageable, UserFilter filter, boolean canEdit) {
-        if(!canEdit) {
+        if (!canEdit) {
             filter.setLogin("");
         }
 
@@ -137,6 +141,13 @@ public class UserService implements UserDetailsService {
             user.setLogin("");
         }
         return user;
+    }
+
+    private String receiveEmailFromLogin(User user) {
+
+        return user.getLogin().contains("@")
+                ? user.getLogin()
+                : null;
     }
 
     public List<MessageType> getMessageTypesToEmail(User user) {

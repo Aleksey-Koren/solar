@@ -40,6 +40,7 @@ public class UserMapper {
         user.setHackAttempts(dto.getHackAttempts());
         user.setAvatar(dto.getAvatar());
         user.setEmailNotifications(dto.getEmailNotifications());
+        user.setEmail(dto.getEmail());
         user.setPermissions(dto.getPermissions() == null ? null : dto.getPermissions().stream().map(permissionMapper::toEntity).collect(toSet()));
         user.setRooms(dto.getRooms() == null ? null : dto.getRooms().stream().map(roomMapper::toEntity).toList());
 
@@ -52,6 +53,7 @@ public class UserMapper {
                 .id(user.getId())
                 .title(user.getTitle())
                 .login(user.getLogin())
+                .email(user.getEmail())
                 .money(user.getMoney())
                 .location(user.getLocation())
                 .hackBlock(user.getHackBlock())

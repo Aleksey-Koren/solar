@@ -17,6 +17,7 @@ public class UserDto {
     private Long id;
     private String title;
     private String login;
+    private String email;
     private String password;
     private Long money;
     private BasicObject location;

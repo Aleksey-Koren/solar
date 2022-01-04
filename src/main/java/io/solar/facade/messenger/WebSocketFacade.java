@@ -29,7 +29,7 @@ public class WebSocketFacade {
 
         if (MessageType.CHAT.equals(message.getMessageType())) {
             processChatMessage(message);
-        }else{
+        } else {
             List<User> usersInRoom = roomRepository.findById(message.getRoom().getId())
                     .orElseThrow(
                             () -> new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("There is no room with id = %d in database"
@@ -47,7 +47,7 @@ public class WebSocketFacade {
     private void processNonChatMessage(Message message, List<User> usersInRoom) {
         messageService.saveNew(message);
         usersInRoom.stream()
-                .filter(s -> (s.getEmailNotifications() & message.getMessageType().getIndex()) == message.getMessageType().getIndex())
-                .forEach(s -> emailService.sendSimpleEmail(s.getId(), message.getTitle(), message.getMessage()));
+                .filter(user -> (user.getEmailNotifications() & message.getMessageType().getIndex()) == message.getMessageType().getIndex())
+                .forEach(user -> emailService.sendSimpleEmail(user, message.getTitle(), message.getMessage()));
     }
 }
