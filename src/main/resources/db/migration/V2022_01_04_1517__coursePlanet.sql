@@ -1,0 +1,2 @@
+ALTER TABLE courses
+    ADD COLUMN planet INT REFERENCES planets (id) ON DELETE SET NULL;

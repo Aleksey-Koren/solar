@@ -43,6 +43,10 @@ public class Course {
     private Instant createdAt;
     private Instant expireAt;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "planet")
+    private Planet planet;
+
     public boolean hasNext() {
         return this.next != null;
     }

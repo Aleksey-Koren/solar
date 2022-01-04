@@ -1,5 +1,7 @@
 package io.solar.service;
 
+import io.solar.entity.Course;
+import io.solar.entity.objects.BasicObject;
 import io.solar.entity.objects.StarShip;
 import io.solar.entity.objects.Station;
 import io.solar.service.exception.ServiceException;
@@ -20,6 +22,8 @@ public class NavigatorService {
 
     @Value("${app.navigator.max_speed}")
     private Float maxSpeed;
+
+    private static final Float HARDCODED_ORBITAL_PERIOD = 1f;
 
     private final StationService stationService;
     private final StarShipService starshipService;
@@ -46,13 +50,26 @@ public class NavigatorService {
     }
 
     private boolean isShipCanDockWithStation(StarShip starship, Station station) {
-        Double distance = calcDistance(station, starship);
+        double distance = calcDistance(station, starship);
 
         return starship.getSpeed() < maxSpeed && distance < maxDistance;
     }
 
-    private Double calcDistance(Station station, StarShip starShip) {
-
+    private double calcDistance(BasicObject station, BasicObject starShip) {
         return Math.sqrt(pow(starShip.getX() - station.getX(), 2) + pow(starShip.getY() - station.getY(), 2));
+    }
+
+    public void SetOrbitParameters(BasicObject object, Course activeCourse) {
+        object.setAngle((float) calcAngle(object, activeCourse.getPlanet()));
+        object.setAphelion((float) calcDistance(activeCourse.getPlanet(), object));
+        object.setPlanet(activeCourse.getPlanet());
+        object.setOrbitalPeriod(HARDCODED_ORBITAL_PERIOD);
+    }
+
+    private double calcAngle(BasicObject orbital, BasicObject center) {
+        float relativeX = orbital.getX() - center.getPlanet().getX();
+        float relativeY = orbital.getY() - center.getPlanet().getY();
+        double angle = Math.atan2(relativeY, relativeX);
+        return angle >= 0 ? angle : Math.PI * 2 + angle;
     }
 }
