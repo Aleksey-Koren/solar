@@ -69,7 +69,6 @@ public class ObjectCoordinatesService {
         List<Planet> moons = new ArrayList<>();
         Planet sun = planetService.findSun();
 
-
         planets.stream()
                 .filter(planet -> planet.getPlanet() != null)
                 .forEach(planet -> {
@@ -100,13 +99,6 @@ public class ObjectCoordinatesService {
         });
     }
 
-    private void updateOrbitalObject(BasicObject object, Double delta) {
-        double da = delta / object.getOrbitalPeriod();
-
-        object.setX((float) Math.cos(object.getAngle() + da) * object.getAphelion() + object.getPlanet().getX());
-        object.setY((float) Math.sin(object.getAngle() + da) * object.getAphelion() + object.getPlanet().getY());
-    }
-
     private void updateUnattachedObject(BasicObject object, Long currentTimeMills, Long schedulerDuration) {
         Course activeCourse = courseService.findActiveCourse(object);
 
@@ -117,6 +109,13 @@ public class ObjectCoordinatesService {
         }
     }
 
+    private void updateOrbitalObject(BasicObject object, Double delta) {
+        double da = delta / object.getOrbitalPeriod();
+
+        object.setX((float) Math.cos(object.getAngle() + da) * object.getAphelion() + object.getPlanet().getX());
+        object.setY((float) Math.sin(object.getAngle() + da) * object.getAphelion() + object.getPlanet().getY());
+    }
+
     private void staticObjectMotion(BasicObject object, Long staticMotionLength) {
         object.setX(determinePosition(object.getX(), object.getSpeedX(), staticMotionLength, 0f));
         object.setY(determinePosition(object.getY(), object.getSpeedY(), staticMotionLength, 0f));
@@ -125,33 +124,25 @@ public class ObjectCoordinatesService {
     private void completeObjectCourses(Course activeCourse, BasicObject object, Long schedulerStartTime, Long schedulerDuration) {
         Instant endSchedulerInstant = Instant.ofEpochMilli(schedulerStartTime + schedulerDuration);
         long courseDuration;
-        while (true) {
 
+        while (true) {
             if (isAccelerationInvalid(object, activeCourse)) {
                 throw new ServiceException(
                         String.format("Starship/Station with id = %d acceleration > maxAcceleration", object.getId())
                 );
             }
-
             courseDuration = calculateCourseDuration(activeCourse, schedulerDuration, Instant.ofEpochMilli(schedulerStartTime));
 
-            object.setX(determinePosition(object.getX(), object.getSpeedX(), courseDuration, activeCourse.getAccelerationX()));
-            object.setY(determinePosition(object.getY(), object.getSpeedY(), courseDuration, activeCourse.getAccelerationY()));
-
-            object.setSpeedX(calculateSpeed(object.getSpeedX(), activeCourse.getAccelerationX(), courseDuration));
-            object.setSpeedY(calculateSpeed(object.getSpeedY(), activeCourse.getAccelerationY(), courseDuration));
-
-            object.setAccelerationX(activeCourse.getAccelerationX());
-            object.setAccelerationY(activeCourse.getAccelerationY());
+            updateObjectFields(object, activeCourse, courseDuration);
 
             if (activeCourse.hasNext() && activeCourse.getExpireAt().isBefore(endSchedulerInstant)) {
                 activeCourse = activeCourse.getNext();
                 activeCourse.setExpireAt(activeCourse.getPrevious().getExpireAt().plusMillis(activeCourse.getTime()));
+
             } else {
                 if (activeCourse.getExpireAt().isBefore(endSchedulerInstant)) {
-
-                    long staticMotionLength = Duration.between(activeCourse.getExpireAt(), endSchedulerInstant).toMillis();
-                    staticObjectMotion(object, staticMotionLength);
+                    long staticMotionDuration = Duration.between(activeCourse.getExpireAt(), endSchedulerInstant).toMillis();
+                    staticObjectMotion(object, staticMotionDuration);
                 }
                 break;
             }
@@ -159,32 +150,42 @@ public class ObjectCoordinatesService {
     }
 
     private Long calculateCourseDuration(Course activeCourse, Long schedulerInterval, Instant schedulerStartTime) {
-        Instant endSchedulerInstant = Instant.ofEpochMilli(schedulerStartTime.toEpochMilli() + schedulerInterval);
+        Instant endSchedulerInstant = schedulerStartTime.plusMillis(schedulerInterval);
         long courseDuration;
 
-        if (activeCourse.getPrevious() == null && activeCourse.getExpireAt() == null) {
-            courseDuration = activeCourse.getTime();
+        if (activeCourse.getPrevious() == null) {
 
-            courseDuration = courseDuration > schedulerInterval
-                    ? schedulerInterval
-                    : courseDuration;
+            if (activeCourse.getExpireAt() == null) {
+                courseDuration = activeCourse.getTime() > schedulerInterval
+                        ? schedulerInterval
+                        : activeCourse.getTime();
 
-            activeCourse.setExpireAt(schedulerStartTime.plusMillis(activeCourse.getTime()));
-        } else {
+                activeCourse.setExpireAt(schedulerStartTime.plusMillis(activeCourse.getTime()));
 
-            if (activeCourse.getPrevious() == null && activeCourse.getExpireAt() != null) {
-                courseDuration = Duration.between(schedulerStartTime, activeCourse.getExpireAt()).toMillis();
             } else {
-
-                long timeBetweenCourseAndEndScheduler = Duration.between(activeCourse.getPrevious().getExpireAt(), endSchedulerInstant).toMillis();
-
-                courseDuration = timeBetweenCourseAndEndScheduler > activeCourse.getTime()
-                        ? activeCourse.getTime()
-                        : timeBetweenCourseAndEndScheduler;
+                courseDuration = Duration.between(schedulerStartTime, activeCourse.getExpireAt()).toMillis();
             }
+
+        } else {
+            long timeBetweenCourseAndEndScheduler = Duration.between(activeCourse.getPrevious().getExpireAt(), endSchedulerInstant).toMillis();
+
+            courseDuration = timeBetweenCourseAndEndScheduler > activeCourse.getTime()
+                    ? activeCourse.getTime()
+                    : timeBetweenCourseAndEndScheduler;
         }
 
         return courseDuration;
+    }
+
+    private void updateObjectFields(BasicObject object, Course activeCourse, Long courseDuration) {
+        object.setX(determinePosition(object.getX(), object.getSpeedX(), courseDuration, activeCourse.getAccelerationX()));
+        object.setY(determinePosition(object.getY(), object.getSpeedY(), courseDuration, activeCourse.getAccelerationY()));
+
+        object.setSpeedX(calculateSpeed(object.getSpeedX(), activeCourse.getAccelerationX(), courseDuration));
+        object.setSpeedY(calculateSpeed(object.getSpeedY(), activeCourse.getAccelerationY(), courseDuration));
+
+        object.setAccelerationX(activeCourse.getAccelerationX());
+        object.setAccelerationY(activeCourse.getAccelerationY());
     }
 
     private List<BasicObject> retrieveObjectsForUpdate(long currentIteration) {
