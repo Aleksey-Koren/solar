@@ -7,6 +7,7 @@ import io.solar.entity.objects.BasicObject;
 import io.solar.entity.objects.ObjectType;
 import io.solar.repository.BasicObjectRepository;
 import io.solar.service.CourseService;
+import io.solar.service.NavigatorService;
 import io.solar.service.PlanetService;
 import io.solar.service.UtilityService;
 import io.solar.service.engine.interfaces.SpaceTechEngine;
@@ -43,13 +44,14 @@ public class ObjectCoordinatesService {
     private final PlanetService planetService;
     private final CourseService courseService;
     private final SpaceTechEngine spaceTechEngine;
+    private final NavigatorService navigatorService;
 
     @Transactional
     public void update() {
         long now = System.currentTimeMillis();
         long schedulerDuration = Duration.parse(schedulerDelaySeconds).toMillis();
         long currentIteration = Long.parseLong(utilityService.getValue(POSITION_ITERATION_UTILITY_KEY, "1"));
-        double delta = calculateDelta(now);
+        double delta = calculateDelta(now + schedulerDuration);
         List<BasicObject> objects;
 
         updatePlanets(delta);
@@ -113,8 +115,17 @@ public class ObjectCoordinatesService {
         if (activeCourse == null) {
             staticObjectMotion(object, schedulerDuration);
         } else {
+            if (activeCourse.getPlanet() != null) {
+                attachObjectToOrbit(object, activeCourse , schedulerDuration, currentTimeMills);
+            }
             completeObjectCourses(activeCourse, object, currentTimeMills, schedulerDuration);
         }
+    }
+
+    private void attachObjectToOrbit(BasicObject object, Course activeCourse, Long schedulerDuration, Long schedulerStartTime) {
+        navigatorService.attachToOrbit(object, activeCourse);
+        //TODO updateOrbitalObject();
+//        updateOrbitalObject(object, delta);
     }
 
     private void staticObjectMotion(BasicObject object, Long staticMotionLength) {

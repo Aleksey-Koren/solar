@@ -55,20 +55,25 @@ public class NavigatorService {
         return starship.getSpeed() < maxSpeed && distance < maxDistance;
     }
 
-    private double calcDistance(BasicObject station, BasicObject starShip) {
-        return Math.sqrt(pow(starShip.getX() - station.getX(), 2) + pow(starShip.getY() - station.getY(), 2));
+    private double calcDistance(BasicObject objectA, BasicObject objectB) {
+        return Math.sqrt(pow(objectB.getX() - objectA.getX(), 2) + pow(objectB.getY() - objectA.getY(), 2));
     }
 
-    public void SetOrbitParameters(BasicObject object, Course activeCourse) {
+    public void attachToOrbit(BasicObject object, Course activeCourse) {
         object.setAngle((float) calcAngle(object, activeCourse.getPlanet()));
         object.setAphelion((float) calcDistance(activeCourse.getPlanet(), object));
         object.setPlanet(activeCourse.getPlanet());
         object.setOrbitalPeriod(HARDCODED_ORBITAL_PERIOD);
+        object.setAccelerationX(0f);
+        object.setAccelerationY(0f);
+        object.setSpeedX(0f);
+        object.setSpeedY(0f);
     }
 
-    private double calcAngle(BasicObject orbital, BasicObject center) {
-        float relativeX = orbital.getX() - center.getPlanet().getX();
-        float relativeY = orbital.getY() - center.getPlanet().getY();
+    private double calcAngle(BasicObject atOrbit, BasicObject atCenter) {
+        float relativeX = atOrbit.getX() - atCenter.getX();
+        float relativeY = atOrbit.getY() - atCenter.getY();
+
         double angle = Math.atan2(relativeY, relativeX);
         return angle >= 0 ? angle : Math.PI * 2 + angle;
     }
