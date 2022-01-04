@@ -59,7 +59,7 @@ public class ObjectCoordinatesService {
             basicObjectRepository.saveAllAndFlush(objects);
         }
 
-        courseService.deleteAllExpiredCourses(Instant.ofEpochMilli(now));
+        courseService.deleteAllExpiredCourses(Instant.ofEpochMilli(now + schedulerDuration));
         utilityService.updateValueByKey(POSITION_ITERATION_UTILITY_KEY, String.valueOf(currentIteration + 1));
         utilityService.updateValueByKey(SCHEDULER_TIME_UTILITY_KEY, String.valueOf(System.currentTimeMillis() - now));
     }
@@ -94,15 +94,14 @@ public class ObjectCoordinatesService {
             } else {
 
                 updateUnattachedObject(object, now, schedulerDuration);
-                object.setPositionIterationTs(now);
-                object.setPositionIteration(currentIteration + 1);
             }
+            object.setPositionIterationTs(now);
+            object.setPositionIteration(currentIteration + 1);
         });
     }
 
     private void updateOrbitalObject(BasicObject object, Double delta) {
         double da = delta / object.getOrbitalPeriod();
-//        object.setAngle(object.getAngle() + (float) da);
 
         object.setX((float) Math.cos(object.getAngle() + da) * object.getAphelion() + object.getPlanet().getX());
         object.setY((float) Math.sin(object.getAngle() + da) * object.getAphelion() + object.getPlanet().getY());
@@ -123,8 +122,8 @@ public class ObjectCoordinatesService {
         object.setY(determinePosition(object.getY(), object.getSpeedY(), staticMotionLength, 0f));
     }
 
-    private void completeObjectCourses(Course activeCourse, BasicObject object, Long currentTimeMillis, Long schedulerDuration) {
-        Instant endSchedulerInstant = Instant.ofEpochMilli(currentTimeMillis + schedulerDuration);
+    private void completeObjectCourses(Course activeCourse, BasicObject object, Long schedulerStartTime, Long schedulerDuration) {
+        Instant endSchedulerInstant = Instant.ofEpochMilli(schedulerStartTime + schedulerDuration);
         long courseDuration;
         while (true) {
 
@@ -134,7 +133,7 @@ public class ObjectCoordinatesService {
                 );
             }
 
-            courseDuration = calculateCourseDuration(activeCourse, schedulerDuration, Instant.ofEpochMilli(currentTimeMillis));
+            courseDuration = calculateCourseDuration(activeCourse, schedulerDuration, Instant.ofEpochMilli(schedulerStartTime));
 
             object.setX(determinePosition(object.getX(), object.getSpeedX(), courseDuration, activeCourse.getAccelerationX()));
             object.setY(determinePosition(object.getY(), object.getSpeedY(), courseDuration, activeCourse.getAccelerationY()));
@@ -159,24 +158,33 @@ public class ObjectCoordinatesService {
         }
     }
 
-    private Long calculateCourseDuration(Course activeCourse, Long schedulerInterval, Instant currentTime) {
-        Instant endSchedulerInstant = Instant.ofEpochMilli(currentTime.toEpochMilli() + schedulerInterval);
+    private Long calculateCourseDuration(Course activeCourse, Long schedulerInterval, Instant schedulerStartTime) {
+        Instant endSchedulerInstant = Instant.ofEpochMilli(schedulerStartTime.toEpochMilli() + schedulerInterval);
         long courseDuration;
 
-        if (activeCourse.getPrevious() == null) {
-            courseDuration = Duration.between(currentTime, activeCourse.getExpireAt()).toMillis();
+        if (activeCourse.getPrevious() == null && activeCourse.getExpireAt() == null) {
+            courseDuration = activeCourse.getTime();
+
+            courseDuration = courseDuration > schedulerInterval
+                    ? schedulerInterval
+                    : courseDuration;
+
+            activeCourse.setExpireAt(schedulerStartTime.plusMillis(activeCourse.getTime()));
         } else {
 
-            long timeBetweenCourseAndEndScheduler = Duration.between(activeCourse.getPrevious().getExpireAt(), endSchedulerInstant).toMillis();
+            if (activeCourse.getPrevious() == null && activeCourse.getExpireAt() != null) {
+                courseDuration = Duration.between(schedulerStartTime, activeCourse.getExpireAt()).toMillis();
+            } else {
 
-            courseDuration = timeBetweenCourseAndEndScheduler > activeCourse.getTime()
-                    ? activeCourse.getTime()
-                    : timeBetweenCourseAndEndScheduler;
+                long timeBetweenCourseAndEndScheduler = Duration.between(activeCourse.getPrevious().getExpireAt(), endSchedulerInstant).toMillis();
+
+                courseDuration = timeBetweenCourseAndEndScheduler > activeCourse.getTime()
+                        ? activeCourse.getTime()
+                        : timeBetweenCourseAndEndScheduler;
+            }
         }
 
-        return courseDuration > schedulerInterval
-                ? schedulerInterval
-                : courseDuration;
+        return courseDuration;
     }
 
     private List<BasicObject> retrieveObjectsForUpdate(long currentIteration) {

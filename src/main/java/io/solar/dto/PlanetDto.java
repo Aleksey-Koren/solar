@@ -12,6 +12,10 @@ import lombok.NoArgsConstructor;
 public class PlanetDto {
 
     private Long id;
+    private Float x;
+    private Float y;
+    private Long population;
+    private Long parent;
     private Float aldebo;
     private Float aphelion;
     private String axialTilt;
@@ -29,10 +33,6 @@ public class PlanetDto {
     private String surfaceGravity;
     private String surfacePressure;
     private String volume;
-    private Long parent;
     private Float angle;
     private String type;
-    private Long positionIterationTs;
-    private Float x;
-    private Float y;
 }

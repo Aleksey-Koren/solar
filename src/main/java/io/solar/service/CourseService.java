@@ -34,7 +34,7 @@ public class CourseService {
 
     public Course findActiveCourse(BasicObject object) {
 
-        return courseRepository.findTopByObjectOrderByExpireAtDesc(object);
+        return courseRepository.findTopByObjectAndPreviousIsNullOrderByExpireAtDesc(object);
     }
 
     public Optional<Course> findLastCourse(BasicObject object) {
