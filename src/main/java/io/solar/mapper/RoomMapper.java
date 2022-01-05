@@ -36,6 +36,8 @@ public class RoomMapper implements EntityDtoMapper<Room, RoomDtoImpl> {
                 .title(entity.getTitle())
                 .createdAt(entity.getCreatedAt())
                 .ownerId(entity.getOwner().getId())
+                .roomType(entity.getType())
+                .isPrivate(entity.isPrivate())
                 .build();
     }
 
@@ -64,7 +66,8 @@ public class RoomMapper implements EntityDtoMapper<Room, RoomDtoImpl> {
         room.setTitle(dto.getTitle());
         room.setCreatedAt(dto.getCreatedAt());
         room.setOwner(user);
-
+        room.setType(dto.getRoomType() != null ? dto.getRoomType() : null);
+        room.setPrivate(dto.isPrivate());
         return room;
     }
 }

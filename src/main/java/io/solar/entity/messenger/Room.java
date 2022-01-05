@@ -34,6 +34,10 @@ public class Room {
     @Enumerated(EnumType.STRING)
     private RoomType type;
 
+    private boolean isPrivate;
+
+
+
     @ManyToMany(mappedBy = "rooms")
     private List<User> users;
 }
