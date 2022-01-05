@@ -1,6 +1,7 @@
 package io.solar;
 
 
+import io.solar.entity.MessageType;
 import io.solar.entity.User;
 
 import io.solar.entity.messenger.Message;
@@ -83,6 +84,7 @@ public class FillDatabaseTest {
                 .sender(findRandomUser())
                 .room(findRandomRoom())
                 .createdAt(Instant.now().minus(new Random().nextInt(1000), ChronoUnit.DAYS))
+                .messageType(MessageType.CHAT)
                 .build();
 
         messageRepository.save(message);
