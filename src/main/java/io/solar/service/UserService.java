@@ -1,7 +1,7 @@
 package io.solar.service;
 
 import io.solar.dto.UserDto;
-import io.solar.entity.MessageType;
+import io.solar.entity.messenger.MessageType;
 import io.solar.specification.filter.UserFilter;
 import io.solar.entity.Permission;
 import io.solar.entity.User;
@@ -27,7 +27,6 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
-import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.*;
 

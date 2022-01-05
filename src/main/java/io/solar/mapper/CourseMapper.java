@@ -2,6 +2,7 @@ package io.solar.mapper;
 
 import io.solar.dto.CourseDto;
 import io.solar.entity.Course;
+import io.solar.entity.CourseType;
 import io.solar.repository.BasicObjectRepository;
 import io.solar.repository.CourseRepository;
 import io.solar.repository.PlanetRepository;
@@ -52,6 +53,8 @@ public class CourseMapper {
                                                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                                                             String.format("There is no planet with id = %d in database", dto.getPlanetId())))
                                                 : null);
+
+        course.setCourseType(dto.getCourseType() != null ? CourseType.valueOf(dto.getCourseType()) : null);
         return course;
     }
 }

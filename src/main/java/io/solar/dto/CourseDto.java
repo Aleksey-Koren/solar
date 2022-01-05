@@ -18,4 +18,5 @@ public class CourseDto {
     private Instant createdAt;
     private Instant expireAt;
     private Long planetId;
+    private String courseType;
 }

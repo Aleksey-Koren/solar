@@ -1,7 +1,7 @@
 package io.solar.facade.messenger;
 
 import io.solar.dto.MessageDto;
-import io.solar.entity.MessageType;
+import io.solar.entity.messenger.MessageType;
 import io.solar.entity.User;
 import io.solar.entity.messenger.Message;
 import io.solar.mapper.messanger.MessageMapper;

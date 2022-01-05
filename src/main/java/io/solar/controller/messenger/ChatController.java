@@ -2,7 +2,7 @@ package io.solar.controller.messenger;
 
 import io.solar.dto.MessageDto;
 import io.solar.dto.RoomDtoImpl;
-import io.solar.entity.MessageType;
+import io.solar.entity.messenger.MessageType;
 import io.solar.entity.User;
 import io.solar.service.UserService;
 import io.solar.service.messenger.ChatService;

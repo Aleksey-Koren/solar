@@ -84,10 +84,9 @@ public class NavigatorService {
         object.setAphelion(null);
         object.setPlanet(null);
         object.setOrbitalPeriod(null);
-        setLeavingOrbitSpeed(object);
-    }
-
-    private void setLeavingOrbitSpeed(BasicObject object) {
-
+        object.setSpeedX(0f);
+        object.setSpeedY(0f);
+        object.setAccelerationX(0f);
+        object.setAccelerationY(0f);
     }
 }

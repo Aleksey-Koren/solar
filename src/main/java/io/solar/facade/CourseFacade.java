@@ -2,6 +2,7 @@ package io.solar.facade;
 
 import io.solar.dto.CourseDto;
 import io.solar.entity.Course;
+import io.solar.entity.CourseType;
 import io.solar.mapper.CourseMapper;
 import io.solar.service.CourseService;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,9 @@ public class CourseFacade {
 
     private void extendCourseChain(CourseDto dto) {
         Course last = courseMapper.toEntity(dto);
+        if (last.getCourseType().equals(CourseType.ATTACH_TO_ORBIT)) {
+            last.setTime(0L);
+        }
         Optional<Course> previousLast = courseService.findLastCourse(last.getObject());
         if (previousLast.isPresent()) {
             Course previous = previousLast.get();
@@ -45,6 +49,10 @@ public class CourseFacade {
 
     private void adjustCourseChain(CourseDto dto) {
         Course newCourse = courseMapper.toEntity(dto);
+
+        if (newCourse.getCourseType().equals(CourseType.ATTACH_TO_ORBIT)) {
+            newCourse.setTime(0L);
+        }
 
         Optional<Course> previousOptional = courseService.findByNext(courseService.findById(dto.getNextId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("There is no course with such id in database. id = %d", dto.getNextId()))));

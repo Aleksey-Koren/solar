@@ -47,6 +47,9 @@ public class Course {
     @JoinColumn(name = "planet")
     private Planet planet;
 
+    @Enumerated(EnumType.STRING)
+    private CourseType courseType;
+
     public boolean hasNext() {
         return this.next != null;
     }

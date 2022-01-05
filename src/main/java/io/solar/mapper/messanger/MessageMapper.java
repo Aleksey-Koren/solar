@@ -1,7 +1,7 @@
 package io.solar.mapper.messanger;
 
 import io.solar.dto.MessageDto;
-import io.solar.entity.MessageType;
+import io.solar.entity.messenger.MessageType;
 import io.solar.entity.messenger.Message;
 import io.solar.mapper.EntityDtoMapper;
 import io.solar.repository.messenger.MessageRepository;
@@ -24,17 +24,17 @@ public class MessageMapper implements EntityDtoMapper<Message, MessageDto> {
     public Message toEntity(MessageDto dto) {
         Message entity;
 
-        if(dto.getId() != null) {
+        if (dto.getId() != null) {
             entity = messageRepository.findById(dto.getId()).orElseThrow(
                     () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "There is no such id in database"));
             entity.setCreatedAt(dto.getCreatedAt());
-        }else{
+        } else {
             entity = new Message();
         }
 
         entity.setSender(userRepository.findById(dto.getSenderId()).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "There is no such user id = " + dto.getSenderId() + " in database")
-                    ));
+        ));
 
         entity.setRoom(roomRepository.findById(dto.getRoomId()).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "There is no such room id = " + dto.getRoomId() + " in database")
@@ -42,15 +42,13 @@ public class MessageMapper implements EntityDtoMapper<Message, MessageDto> {
 
         entity.setTitle(dto.getTitle());
         entity.setMessage(dto.getMessage());
-
         entity.setMessageType(dto.getMessageType() != null ? MessageType.valueOf(dto.getMessageType()) : null);
-
         return entity;
     }
 
     @Override
     public MessageDto toDto(Message entity) {
-        return   MessageDto.builder()
+        return MessageDto.builder()
                 .id(entity.getId())
                 .senderId(entity.getSender().getId())
                 .roomId(entity.getRoom().getId())
