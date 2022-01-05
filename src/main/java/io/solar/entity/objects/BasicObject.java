@@ -68,6 +68,9 @@ public class BasicObject implements Serializable {
     @Column(name = "position_iteration_ts")
     protected Long positionIterationTs;
 
+    @Column(name = "clockwise_rotation")
+    protected Boolean clockwiseRotation;
+
     @OneToMany(mappedBy = "attachedToShip")
     @EqualsAndHashCode.Exclude
     protected List<BasicObject> attachedObjects;

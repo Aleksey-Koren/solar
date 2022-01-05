@@ -73,7 +73,7 @@ public class ChatService {
 
         if (RoomType.SYSTEM.equals(room.getType())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    String.format("Room with id = %d is SYSTEM. It is impossible to invite somebody to this room"));
+                    String.format("Room with id = %d is SYSTEM. It is impossible to invite somebody to this room", room.getId()));
         }
 
         User invited = userRepository.findById(invitedId).orElseThrow(

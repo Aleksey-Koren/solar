@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -30,8 +31,6 @@ import java.util.List;
 public class ObjectCoordinatesService {
     private final String POSITION_ITERATION_UTILITY_KEY = "position_iteration";
     private final String SCHEDULER_TIME_UTILITY_KEY = "scheduler_time";
-    private final Long EPOCH = LocalDateTime.of(2019, 11, 12, 0, 0)
-            .toInstant(ZoneOffset.UTC).toEpochMilli();
 
     @Value("${app.navigator.num_update_object}")
     private Integer amountReceivedObjects;
@@ -51,7 +50,7 @@ public class ObjectCoordinatesService {
         long now = System.currentTimeMillis();
         long schedulerDuration = Duration.parse(schedulerDelaySeconds).toMillis();
         long currentIteration = Long.parseLong(utilityService.getValue(POSITION_ITERATION_UTILITY_KEY, "1"));
-        double delta = calculateDelta(now + schedulerDuration);
+        double delta = calculateDelta(now);
         List<BasicObject> objects;
 
         updatePlanets(delta);
@@ -102,10 +101,15 @@ public class ObjectCoordinatesService {
     }
 
     private void updateOrbitalObject(BasicObject object, Double delta) {
-        double da = delta / object.getOrbitalPeriod();
+        double deltaAngleRadians = delta / object.getOrbitalPeriod();
 
-        object.setX((float) Math.cos(object.getAngle() + da) * object.getAphelion() + object.getPlanet().getX());
-        object.setY((float) Math.sin(object.getAngle() + da) * object.getAphelion() + object.getPlanet().getY());
+        double objectAngle = object.getClockwiseRotation()
+                ? object.getAngle() - deltaAngleRadians
+                : object.getAngle() + deltaAngleRadians;
+
+        object.setX((float) Math.cos(objectAngle) * object.getAphelion() + object.getPlanet().getX());
+        object.setY((float) Math.sin(objectAngle) * object.getAphelion() + object.getPlanet().getY());
+        object.setAngle((float) objectAngle);
     }
 
     private void updateUnattachedObject(BasicObject object, Long currentTimeMills, Long schedulerDuration) {
@@ -115,7 +119,7 @@ public class ObjectCoordinatesService {
             staticObjectMotion(object, schedulerDuration);
         } else {
             if (activeCourse.getPlanet() != null) {
-                attachObjectToOrbit(object, activeCourse , schedulerDuration, currentTimeMills);
+                attachObjectToOrbit(object, activeCourse, schedulerDuration, currentTimeMills);
             }
             completeObjectCourses(activeCourse, object, currentTimeMills, schedulerDuration);
         }
@@ -221,9 +225,9 @@ public class ObjectCoordinatesService {
         return courseAcceleration > spaceTechEngine.calculateMaxAcceleration((SpaceTech) object);
     }
 
-    private Double calculateDelta(Long currentTimeMills) {
+    private Double calculateDelta(Long schedulerDuration) {
 
-        return Math.PI * 2 * (currentTimeMills - EPOCH) / (1000 * 60 * 60 * 24);
+        return Math.PI * 2 * schedulerDuration / (1000 * 60 * 60 * 24);
     }
 
     private Double calculateAcceleration(Float accelerationX, Float accelerationY) {

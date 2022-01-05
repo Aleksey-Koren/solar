@@ -55,6 +55,7 @@ public class BasicObjectViewMapper implements EntityDtoMapper<BasicObject, Basic
                 .speedY(entity.getSpeedY())
                 .accelerationX(entity.getAccelerationX())
                 .accelerationY(entity.getAccelerationY())
+                .clockwiseRotation(entity.getClockwiseRotation())
                 .build();
     }
 
@@ -115,5 +116,6 @@ public class BasicObjectViewMapper implements EntityDtoMapper<BasicObject, Basic
         basicObject.setAttachedToSocket(dto.getAttachedToSocket());
         basicObject.setObjectTypeDescription(objectTypeDescription);
         basicObject.setAttachedToShip(attachedToShip);
+        basicObject.setClockwiseRotation(dto.getClockwiseRotation() != null ? dto.getClockwiseRotation() : basicObject.getClockwiseRotation());
     }
 }
