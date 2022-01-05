@@ -1,9 +1,10 @@
-package io.solar.mapper;
+package io.solar.mapper.messanger;
 
-import io.solar.dto.RoomDto;
-import io.solar.dto.RoomDtoImpl;
+import io.solar.dto.messenger.RoomDto;
+import io.solar.dto.messenger.RoomDtoImpl;
 import io.solar.entity.messenger.Room;
 import io.solar.entity.User;
+import io.solar.mapper.EntityDtoMapper;
 import io.solar.repository.messenger.RoomRepository;
 import io.solar.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +38,6 @@ public class RoomMapper implements EntityDtoMapper<Room, RoomDtoImpl> {
                 .createdAt(entity.getCreatedAt())
                 .ownerId(entity.getOwner().getId())
                 .roomType(entity.getType())
-                .isPrivate(entity.isPrivate())
                 .build();
     }
 
@@ -52,7 +52,7 @@ public class RoomMapper implements EntityDtoMapper<Room, RoomDtoImpl> {
 
     private Room findRoom(RoomDtoImpl dto) {
         Room room = roomRepository.findById(dto.getId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         String.format("Cannot find room with id = %d", dto.getId())));
 
         return fillRoomFields(room, dto);
@@ -60,14 +60,13 @@ public class RoomMapper implements EntityDtoMapper<Room, RoomDtoImpl> {
 
     private Room fillRoomFields(Room room, RoomDtoImpl dto) {
         User user = userRepository.findById(dto.getOwnerId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         String.format("Cannot find user with id = %d", dto.getOwnerId())));
 
         room.setTitle(dto.getTitle());
         room.setCreatedAt(dto.getCreatedAt());
         room.setOwner(user);
         room.setType(dto.getRoomType() != null ? dto.getRoomType() : null);
-        room.setPrivate(dto.isPrivate());
         return room;
     }
 }

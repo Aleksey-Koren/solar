@@ -1,6 +1,6 @@
 package io.solar.controller.messenger;
 
-import io.solar.dto.MessageDto;
+import io.solar.dto.messenger.MessageDto;
 import io.solar.facade.messenger.WebSocketFacade;
 import io.solar.service.MessageService;
 import lombok.RequiredArgsConstructor;

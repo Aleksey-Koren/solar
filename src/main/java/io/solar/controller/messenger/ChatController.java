@@ -1,7 +1,8 @@
 package io.solar.controller.messenger;
 
-import io.solar.dto.MessageDto;
-import io.solar.dto.RoomDtoImpl;
+import io.solar.dto.messenger.CreateRoomDto;
+import io.solar.dto.messenger.MessageDto;
+import io.solar.dto.messenger.RoomDtoImpl;
 import io.solar.entity.messenger.MessageType;
 import io.solar.entity.User;
 import io.solar.service.UserService;
@@ -10,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -65,5 +68,18 @@ public class ChatController {
                 .collect(Collectors.toList());
         User user = userService.findByLogin(principal.getName());
         userService.saveEmailNotifications(user, mappedMessageTypes);
+    }
+
+    @PostMapping("/room")
+    @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
+    @Transactional
+    public ResponseEntity createRoom(@RequestBody CreateRoomDto dto, Principal principal) {
+        User user = userService.findByLogin(principal.getName());
+        if (dto.isPrivate()) {
+            chatService.createPrivateRoom(dto, user);
+        }else{
+            //TODO........
+        }
+        return null;
     }
 }

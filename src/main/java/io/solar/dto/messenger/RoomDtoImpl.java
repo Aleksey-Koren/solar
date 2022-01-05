@@ -1,4 +1,4 @@
-package io.solar.dto;
+package io.solar.dto.messenger;
 
 import io.solar.entity.messenger.RoomType;
 import lombok.AllArgsConstructor;
@@ -19,5 +19,4 @@ public class RoomDtoImpl implements RoomDto{
     private Long ownerId;
     private Long amount;
     private RoomType roomType;
-    private boolean isPrivate;
 }
