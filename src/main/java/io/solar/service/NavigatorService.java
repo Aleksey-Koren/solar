@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import static java.lang.Math.*;
 import static java.lang.Math.pow;
 
 @Service
@@ -56,7 +57,7 @@ public class NavigatorService {
     }
 
     private double calcDistance(BasicObject objectA, BasicObject objectB) {
-        return Math.sqrt(pow(objectB.getX() - objectA.getX(), 2) + pow(objectB.getY() - objectA.getY(), 2));
+        return sqrt(pow(objectB.getX() - objectA.getX(), 2) + pow(objectB.getY() - objectA.getY(), 2));
     }
 
     public void attachToOrbit(BasicObject object, Course activeCourse) {
@@ -74,7 +75,19 @@ public class NavigatorService {
         float relativeX = atOrbit.getX() - atCenter.getX();
         float relativeY = atOrbit.getY() - atCenter.getY();
 
-        double angle = Math.atan2(relativeY, relativeX);
-        return angle >= 0 ? angle : Math.PI * 2 + angle;
+        double angle = atan2(relativeY, relativeX);
+        return angle >= 0 ? angle : PI * 2 + angle;
+    }
+
+    public void leaveOrbit(BasicObject object) {
+        object.setAngle(null);
+        object.setAphelion(null);
+        object.setPlanet(null);
+        object.setOrbitalPeriod(null);
+        setLeavingOrbitSpeed(object);
+    }
+
+    private void setLeavingOrbitSpeed(BasicObject object) {
+
     }
 }

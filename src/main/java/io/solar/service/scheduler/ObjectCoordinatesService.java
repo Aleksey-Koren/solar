@@ -91,7 +91,7 @@ public class ObjectCoordinatesService {
             if (object.getPlanet() != null && object.getAphelion() != null
                     && object.getAngle() != null && object.getOrbitalPeriod() != null) {
 
-                updateOrbitalObject(object, delta);
+                updateOrbitalObject(object, delta, now, schedulerDuration);
             } else {
 
                 updateUnattachedObject(object, now, schedulerDuration);
@@ -101,7 +101,16 @@ public class ObjectCoordinatesService {
         });
     }
 
-    private void updateOrbitalObject(BasicObject object, Double delta) {
+    private void updateOrbitalObject(BasicObject object, Double delta, Long currentTimeMills, Long schedulerDuration) {
+        Course activeCourse = courseService.findActiveCourse(object);
+        if (activeCourse == null) {
+
+        }else{
+            navigatorService.leaveOrbit(object);
+            courseService.deleteById(activeCourse.getId());
+            updateUnattachedObject(object, currentTimeMills, schedulerDuration);
+        }
+
         double da = delta / object.getOrbitalPeriod();
 
         object.setX((float) Math.cos(object.getAngle() + da) * object.getAphelion() + object.getPlanet().getX());
@@ -114,9 +123,7 @@ public class ObjectCoordinatesService {
         if (activeCourse == null) {
             staticObjectMotion(object, schedulerDuration);
         } else {
-            if (activeCourse.getPlanet() != null) {
-                attachObjectToOrbit(object, activeCourse , schedulerDuration, currentTimeMills);
-            }
+
             completeObjectCourses(activeCourse, object, currentTimeMills, schedulerDuration);
         }
     }
