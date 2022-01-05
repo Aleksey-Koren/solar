@@ -30,7 +30,7 @@ public class CourseFacade {
 
     private void extendCourseChain(CourseDto dto) {
         Course last = courseMapper.toEntity(dto);
-        if (last.getCourseType().equals(CourseType.ATTACH_TO_ORBIT)) {
+        if (CourseType.ATTACH_TO_ORBIT.equals(last.getCourseType())) {
             last.setTime(0L);
         }
         Optional<Course> previousLast = courseService.findLastCourse(last.getObject());
@@ -50,7 +50,7 @@ public class CourseFacade {
     private void adjustCourseChain(CourseDto dto) {
         Course newCourse = courseMapper.toEntity(dto);
 
-        if (newCourse.getCourseType().equals(CourseType.ATTACH_TO_ORBIT)) {
+        if (CourseType.ATTACH_TO_ORBIT.equals(newCourse.getCourseType())) {
             newCourse.setTime(0L);
         }
 
