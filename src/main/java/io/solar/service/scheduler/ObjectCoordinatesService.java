@@ -20,8 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -73,13 +71,13 @@ public class ObjectCoordinatesService {
                 .filter(planet -> planet.getPlanet() != null)
                 .forEach(planet -> {
                     if (sun.equals(planet.getPlanet())) {
-                        updateOrbitalObject(planet, delta);
+                        updateOrbitalObjectLocation(planet, delta);
                     } else {
                         moons.add(planet);
                     }
                 });
 
-        moons.forEach(moon -> updateOrbitalObject(moon, delta));
+        moons.forEach(moon -> updateOrbitalObjectLocation(moon, delta));
 
         planetService.saveAll(planets);
     }
@@ -89,7 +87,7 @@ public class ObjectCoordinatesService {
             if (object.getPlanet() != null && object.getAphelion() != null
                     && object.getAngle() != null && object.getOrbitalPeriod() != null) {
 
-                updateOrbitalObject(object, delta);
+                updateOrbitalObject(object, delta, now, schedulerDuration);
             } else {
 
                 updateUnattachedObject(object, now, schedulerDuration);
@@ -99,19 +97,19 @@ public class ObjectCoordinatesService {
         });
     }
 
-    private void updateOrbitalObject(BasicObject object, Double delta) {
-        double deltaAngleRadians = delta / object.getOrbitalPeriod();
-
+    private void updateOrbitalObject(BasicObject object, Double delta, Long currentTimeMills, Long schedulerDuration) {
         Course activeCourse = courseService.findActiveCourse(object);
         if (activeCourse == null) {
-
-        }else{
+            updateOrbitalObjectLocation(object, delta);
+        } else {
             navigatorService.leaveOrbit(object);
             courseService.deleteById(activeCourse.getId());
             updateUnattachedObject(object, currentTimeMills, schedulerDuration);
         }
+    }
 
-        double da = delta / object.getOrbitalPeriod();
+    private void updateOrbitalObjectLocation(BasicObject object, Double delta) {
+        double deltaAngleRadians = delta / object.getOrbitalPeriod();
 
         double objectAngle = object.getClockwiseRotation()
                 ? object.getAngle() - deltaAngleRadians
@@ -128,7 +126,6 @@ public class ObjectCoordinatesService {
         if (activeCourse == null) {
             staticObjectMotion(object, schedulerDuration);
         } else {
-
             completeObjectCourses(activeCourse, object, currentTimeMills, schedulerDuration);
         }
     }
@@ -143,6 +140,18 @@ public class ObjectCoordinatesService {
         long courseDuration;
 
         while (true) {
+
+            if (activeCourse.getPlanet() != null) {
+                navigatorService.attachToOrbit(object, activeCourse);
+
+                long flyDuration = activeCourse.getPrevious() == null
+                        ? schedulerDuration
+                        : Duration.between(activeCourse.getPrevious().getExpireAt(), endSchedulerInstant).toMillis();
+
+                updateOrbitalObject(object, calculateDelta(flyDuration), schedulerStartTime, schedulerDuration);
+                break;
+            }
+
             if (isAccelerationInvalid(object, activeCourse)) {
                 throw new ServiceException(
                         String.format("Starship/Station with id = %d acceleration > maxAcceleration", object.getId())
