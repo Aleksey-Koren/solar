@@ -1,0 +1,6 @@
+ALTER TABLE courses
+    ADD COLUMN course_type VARCHAR(36) NOT NULL;
+
+ALTER TABLE messages
+    ADD COLUMN message_type VARCHAR(36) NOT NULL,
+    ADD COLUMN title VARCHAR(36);

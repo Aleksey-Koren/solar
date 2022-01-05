@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -103,6 +102,17 @@ public class ObjectCoordinatesService {
     private void updateOrbitalObject(BasicObject object, Double delta) {
         double deltaAngleRadians = delta / object.getOrbitalPeriod();
 
+        Course activeCourse = courseService.findActiveCourse(object);
+        if (activeCourse == null) {
+
+        }else{
+            navigatorService.leaveOrbit(object);
+            courseService.deleteById(activeCourse.getId());
+            updateUnattachedObject(object, currentTimeMills, schedulerDuration);
+        }
+
+        double da = delta / object.getOrbitalPeriod();
+
         double objectAngle = object.getClockwiseRotation()
                 ? object.getAngle() - deltaAngleRadians
                 : object.getAngle() + deltaAngleRadians;
@@ -118,17 +128,9 @@ public class ObjectCoordinatesService {
         if (activeCourse == null) {
             staticObjectMotion(object, schedulerDuration);
         } else {
-            if (activeCourse.getPlanet() != null) {
-                attachObjectToOrbit(object, activeCourse, schedulerDuration, currentTimeMills);
-            }
+
             completeObjectCourses(activeCourse, object, currentTimeMills, schedulerDuration);
         }
-    }
-
-    private void attachObjectToOrbit(BasicObject object, Course activeCourse, Long schedulerDuration, Long schedulerStartTime) {
-        navigatorService.attachToOrbit(object, activeCourse);
-        //TODO updateOrbitalObject();
-//        updateOrbitalObject(object, delta);
     }
 
     private void staticObjectMotion(BasicObject object, Long staticMotionLength) {
