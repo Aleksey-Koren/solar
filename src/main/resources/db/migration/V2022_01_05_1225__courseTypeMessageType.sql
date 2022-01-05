@@ -1,5 +1,5 @@
 ALTER TABLE courses
-    ADD COLUMN course_type VARCHAR(36) NOT NULL;
+    ADD COLUMN course_type VARCHAR(36) DEFAULT 'MOVEMENT';
 
 ALTER TABLE messages
     ADD COLUMN message_type VARCHAR(36) NOT NULL,
