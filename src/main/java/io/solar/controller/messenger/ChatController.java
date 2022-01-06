@@ -1,6 +1,7 @@
 package io.solar.controller.messenger;
 
-import io.solar.dto.MessageDto;
+import io.solar.dto.messenger.CreateRoomDto;
+import io.solar.dto.messenger.MessageDto;
 import io.solar.dto.messenger.RoomDtoImpl;
 import io.solar.entity.User;
 import io.solar.entity.messenger.MessageType;
@@ -67,11 +68,11 @@ public class ChatController {
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
     @Transactional
     public List<RoomDtoImpl> findRoomsBySearch(Principal principal,
-                                               @RequestParam Boolean isPrivate,
+                                               @RequestParam String roomType,
                                                @RequestParam String login) {
         User user = userService.findByLogin(principal.getName());
 
-        return chatFacade.findRoomsBySearch(user, isPrivate, login);
+        return chatFacade.findRoomsBySearch(user, roomType, login);
     }
 
     @PostMapping("/email")

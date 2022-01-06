@@ -42,8 +42,8 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
             "     inner join users_rooms not_my_rooms on my_rooms.room_id = not_my_rooms.room_id " +
             "         and not_my_rooms.user_id != :user_id " +
             "     inner join users u on not_my_rooms.user_id = u.id " +
-            "WHERE is_private = :is_private AND u.login like :login_like", nativeQuery = true)
+            "WHERE rooms.type = :room_type AND u.login like :login_like", nativeQuery = true)
     List<RoomDto> findAllRoomsBySearch(@Param("user_id") Long userId,
-                                       @Param("is_private") Boolean isPrivate,
+                                       @Param("room_type") String roomType,
                                        @Param("login_like") String loginLike);
 }

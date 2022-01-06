@@ -66,7 +66,7 @@ public class FillDatabaseTest {
     @Order(2)
     @RepeatedTest(100)
     public void createRooms() {
-        Room room = new Room(null, UUID.randomUUID().toString(), Instant.now(), RoomType.PUBLIC, findRandomUser(), null);
+        Room room = new Room(null, UUID.randomUUID().toString(), Instant.now(), RoomType.PRIVATE, findRandomUser(), null);
 
         roomRepository.save(room);
     }

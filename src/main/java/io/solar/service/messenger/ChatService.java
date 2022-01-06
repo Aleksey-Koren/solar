@@ -2,6 +2,7 @@ package io.solar.service.messenger;
 
 import io.solar.dto.messenger.CreateRoomDto;
 import io.solar.dto.messenger.MessageDto;
+import io.solar.dto.messenger.RoomDto;
 import io.solar.dto.messenger.RoomDtoImpl;
 import io.solar.entity.User;
 import io.solar.entity.messenger.Room;
@@ -48,9 +49,9 @@ public class ChatService {
                 .map(messageMapper::toDto);
     }
 
-    public List<RoomDto> findUserRoomsByLoginAndIsPrivate(Long userId, Boolean isPrivate, String login) {
+    public List<RoomDto> findUserRoomsByLoginAndIsPrivate(Long userId, String roomType, String login) {
 
-        return roomRepository.findAllRoomsBySearch(userId, isPrivate, login.concat("%"));
+        return roomRepository.findAllRoomsBySearch(userId, roomType, login.concat("%"));
     }
 
     public List<RoomDtoImpl> getUserRooms(Long userId) {
