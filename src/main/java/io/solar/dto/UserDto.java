@@ -1,5 +1,6 @@
 package io.solar.dto;
 
+import io.solar.dto.messenger.RoomDtoImpl;
 import io.solar.entity.objects.BasicObject;
 import lombok.*;
 

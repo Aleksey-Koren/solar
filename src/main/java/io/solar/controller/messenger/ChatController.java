@@ -1,15 +1,12 @@
 package io.solar.controller.messenger;
 
 import io.solar.dto.MessageDto;
-import io.solar.dto.RoomDtoImpl;
+import io.solar.dto.messenger.RoomDtoImpl;
 import io.solar.entity.User;
 import io.solar.entity.messenger.MessageType;
-import io.solar.repository.messenger.RoomRepository;
-import io.solar.repository.messenger.UserRoomRepository;
+import io.solar.facade.messenger.ChatFacade;
 import io.solar.service.UserService;
 import io.solar.service.messenger.ChatService;
-import io.solar.specification.RoomSpecification;
-import io.solar.specification.filter.RoomFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -35,7 +32,7 @@ public class ChatController {
 
     private final UserService userService;
     private final ChatService chatService;
-    private final UserRoomRepository userRoomRepository;
+    private final ChatFacade chatFacade;
 
     @GetMapping("messages/{roomId}")
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
@@ -56,15 +53,6 @@ public class ChatController {
         return chatService.getUserRooms(user.getId());
     }
 
-    @GetMapping("/room")
-    @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
-    @Transactional
-    public void findRoomsByFilter(Principal principal, RoomFilter roomFilter) {
-
-//        System.out.println(roomRepository.findAll(new RoomSpecification(roomFilter)));
-        System.out.println(userRoomRepository.findAll(new RoomSpecification(roomFilter)));
-    }
-
     @PostMapping("/invite")
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
     @Transactional
@@ -73,6 +61,17 @@ public class ChatController {
                              @RequestParam Long roomId) {
 
         chatService.inviteUserToRoom(inviterId, invitedId, roomId);
+    }
+
+    @GetMapping("/room")
+    @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
+    @Transactional
+    public List<RoomDtoImpl> findRoomsBySearch(Principal principal,
+                                               @RequestParam Boolean isPrivate,
+                                               @RequestParam String login) {
+        User user = userService.findByLogin(principal.getName());
+
+        return chatFacade.findRoomsBySearch(user, isPrivate, login);
     }
 
     @PostMapping("/email")

@@ -1,4 +1,4 @@
-package io.solar.dto;
+package io.solar.dto.messenger;
 
 import io.solar.entity.messenger.RoomType;
 import lombok.AllArgsConstructor;

@@ -1,7 +1,7 @@
 package io.solar.mapper;
 
-import io.solar.dto.RoomDto;
-import io.solar.dto.RoomDtoImpl;
+import io.solar.dto.messenger.RoomDto;
+import io.solar.dto.messenger.RoomDtoImpl;
 import io.solar.entity.messenger.Room;
 import io.solar.entity.User;
 import io.solar.repository.messenger.RoomRepository;
