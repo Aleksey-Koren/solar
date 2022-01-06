@@ -5,14 +5,17 @@ import io.solar.dto.messenger.MessageDto;
 import io.solar.dto.messenger.RoomDtoImpl;
 import io.solar.entity.messenger.MessageType;
 import io.solar.entity.User;
+import io.solar.entity.messenger.MessageType;
+import io.solar.repository.messenger.RoomRepository;
+import io.solar.repository.messenger.UserRoomRepository;
 import io.solar.service.UserService;
 import io.solar.service.messenger.ChatService;
+import io.solar.specification.RoomSpecification;
+import io.solar.specification.filter.RoomFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -22,12 +25,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/app/chat")
+@RequestMapping("/api/chat")
 @RequiredArgsConstructor
 public class ChatController {
 
     private final UserService userService;
     private final ChatService chatService;
+    private final UserRoomRepository userRoomRepository;
 
     @GetMapping("messages/{roomId}")
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
@@ -39,13 +43,22 @@ public class ChatController {
         return chatService.getMessageHistory(roomId, user, pageable);
     }
 
-    @GetMapping("rooms")
+    @GetMapping("user/room")
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
     @Transactional
     public List<RoomDtoImpl> getRooms(Principal principal) {
         User user = userService.findByLogin(principal.getName());
 
         return chatService.getUserRooms(user.getId());
+    }
+
+    @GetMapping("/room")
+    @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
+    @Transactional
+    public void findRoomsByFilter(Principal principal, RoomFilter roomFilter) {
+
+//        System.out.println(roomRepository.findAll(new RoomSpecification(roomFilter)));
+        System.out.println(userRoomRepository.findAll(new RoomSpecification(roomFilter)));
     }
 
     @PostMapping("/invite")
