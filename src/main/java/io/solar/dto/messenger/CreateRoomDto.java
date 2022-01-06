@@ -8,5 +8,5 @@ import java.util.List;
 public class CreateRoomDto {
 
     private List<Long> userId;
-    private boolean isPrivate;
+    private Boolean isPrivate;
 }

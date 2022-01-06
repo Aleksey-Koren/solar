@@ -89,7 +89,7 @@ public class ChatController {
     @Transactional
     public void createRoom(@RequestBody CreateRoomDto dto, Principal principal) {
         User user = userService.findByLogin(principal.getName());
-        if (dto.isPrivate()) {
+        if (dto.getIsPrivate()) {
             chatService.createPrivateRoom(dto, user);
         }else{
             chatService.createPublicRoom(dto, user);

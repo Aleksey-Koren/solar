@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -34,6 +35,7 @@ public class ChatService {
     private final MessageMapper messageMapper;
     private final RoomMapper roomMapper;
     private final UserRepository userRepository;
+    private final SimpMessagingTemplate simpMessagingTemplate;
 
     public Page<MessageDto> getMessageHistory(Long roomId, User user, Pageable pageable) {
         Room room = roomRepository.findById(roomId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND
@@ -89,7 +91,8 @@ public class ChatService {
 
     private void addUserToRoom(User user, Room room) {
         UserRoom userRoom = new UserRoom(user, room);
-        userRoomRepository.save(userRoom);
+        user.getUserRooms().add(userRoom);
+        userRepository.save(user);
     }
 
     public void createPrivateRoom(CreateRoomDto dto, User owner) {
@@ -121,5 +124,9 @@ public class ChatService {
         roomRepository.save(room);
         List<User> users = userRepository.findAllById(dto.getUserId());
         users.forEach(s -> addUserToRoom(s, room));
+    }
+
+    public void sendInviteNotification(User user, Room room) {
+        simpMessagingTemplate.convertAndSendToUser(user.getLogin(), "/aaa", "Message!!!!");
     }
 }
