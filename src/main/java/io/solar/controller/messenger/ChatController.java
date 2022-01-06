@@ -73,13 +73,12 @@ public class ChatController {
     @PostMapping("/room")
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
     @Transactional
-    public ResponseEntity createRoom(@RequestBody CreateRoomDto dto, Principal principal) {
+    public void createRoom(@RequestBody CreateRoomDto dto, Principal principal) {
         User user = userService.findByLogin(principal.getName());
         if (dto.isPrivate()) {
             chatService.createPrivateRoom(dto, user);
         }else{
-            //TODO........
+            chatService.createPublicRoom(dto, user);
         }
-        return null;
     }
 }

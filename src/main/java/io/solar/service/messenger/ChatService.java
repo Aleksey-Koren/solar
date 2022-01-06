@@ -15,7 +15,6 @@ import io.solar.repository.messenger.RoomRepository;
 import io.solar.repository.messenger.UserRoomRepository;
 import io.solar.service.exception.ServiceException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -24,7 +23,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -94,7 +92,7 @@ public class ChatService {
         userRoomRepository.save(userRoom);
     }
 
-    public boolean createPrivateRoom(CreateRoomDto dto, User owner) {
+    public void createPrivateRoom(CreateRoomDto dto, User owner) {
         if (dto.getUserId().size() != 1) {
             throw new ServiceException(String
                     .format("Private room. userId size must be exactly 1. userId size is not 1. It is %d", dto.getUserId().size()));
@@ -105,14 +103,23 @@ public class ChatService {
         room.setCreatedAt(Instant.now());
         room.setType(RoomType.PRIVATE);
         roomRepository.save(room);
-        return inviteToPrivateRoom(room, owner, dto.getUserId().get(0));
+        inviteToPrivateRoom(room, owner, dto.getUserId().get(0));
     }
 
-    private boolean inviteToPrivateRoom(Room room, User owner, Long interlocutorId) {
+    private void inviteToPrivateRoom(Room room, User owner, Long interlocutorId) {
         User interlocutor = userRepository.findById(interlocutorId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         String.format("There is no user with id = %d in database", interlocutorId)));
-        //TODO........
-        return false;
+        addUserToRoom(interlocutor, room);
+    }
+
+    public void createPublicRoom(CreateRoomDto dto, User owner) {
+        Room room = new Room();
+        room.setOwner(owner);
+        room.setCreatedAt(Instant.now());
+        room.setType(RoomType.PUBLIC);
+        roomRepository.save(room);
+        List<User> users = userRepository.findAllById(dto.getUserId());
+        users.forEach(s -> addUserToRoom(s, room));
     }
 }

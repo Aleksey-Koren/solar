@@ -2,5 +2,6 @@ package io.solar.entity.messenger;
 
 public enum RoomType {
     SYSTEM,
-    PRIVATE
+    PRIVATE,
+    PUBLIC
 }
