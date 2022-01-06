@@ -32,6 +32,7 @@ public class ChatController {
     private final UserService userService;
     private final ChatService chatService;
     private final UserRoomRepository userRoomRepository;
+    private final RoomRepository roomRepository;
 
     @GetMapping("messages/{roomId}")
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
@@ -58,7 +59,7 @@ public class ChatController {
     public void findRoomsByFilter(Principal principal, RoomFilter roomFilter) {
 
 //        System.out.println(roomRepository.findAll(new RoomSpecification(roomFilter)));
-        System.out.println(userRoomRepository.findAll(new RoomSpecification(roomFilter)));
+        System.out.println(roomRepository.findAll(new RoomSpecification(roomFilter)));
     }
 
     @PostMapping("/invite")
