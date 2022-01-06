@@ -5,6 +5,7 @@ import io.solar.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.time.Instant;
@@ -36,8 +37,7 @@ public class Room {
 
     private boolean isPrivate;
 
-
-
     @ManyToMany(mappedBy = "rooms")
+    @ToString.Exclude
     private List<User> users;
 }

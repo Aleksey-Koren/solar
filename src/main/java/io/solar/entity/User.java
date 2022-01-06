@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -48,6 +49,7 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "permission_id")
     )
+    @ToString.Exclude
     private Set<Permission> permissions;
 
     @ManyToMany
@@ -56,9 +58,11 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "room_id")
     )
+    @ToString.Exclude
     private List<Room> rooms;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @ToString.Exclude
     private List<UserRoom> userRooms;
 
 
