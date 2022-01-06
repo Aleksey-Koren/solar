@@ -84,4 +84,16 @@ public class ChatController {
         User user = userService.findByLogin(principal.getName());
         userService.saveEmailNotifications(user, mappedMessageTypes);
     }
+
+    @PostMapping("/room")
+    @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
+    @Transactional
+    public void createRoom(@RequestBody CreateRoomDto dto, Principal principal) {
+        User user = userService.findByLogin(principal.getName());
+        if (dto.isPrivate()) {
+            chatService.createPrivateRoom(dto, user);
+        }else{
+            chatService.createPublicRoom(dto, user);
+        }
+    }
 }

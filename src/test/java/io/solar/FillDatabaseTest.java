@@ -1,12 +1,9 @@
 package io.solar;
 
 
-import io.solar.entity.messenger.MessageType;
+import io.solar.entity.messenger.*;
 import io.solar.entity.User;
 
-import io.solar.entity.messenger.Message;
-import io.solar.entity.messenger.Room;
-import io.solar.entity.messenger.UserRoom;
 import io.solar.repository.BasicObjectRepository;
 import io.solar.repository.UserRepository;
 import io.solar.repository.messenger.MessageRepository;
@@ -69,7 +66,7 @@ public class FillDatabaseTest {
     @Order(2)
     @RepeatedTest(100)
     public void createRooms() {
-        Room room = new Room(null, UUID.randomUUID().toString(), Instant.now(), findRandomUser(), null, new Random().nextBoolean(), null);
+        Room room = new Room(null, UUID.randomUUID().toString(), Instant.now(), RoomType.PUBLIC, findRandomUser(), null);
 
         roomRepository.save(room);
     }

@@ -5,7 +5,6 @@ import io.solar.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 import javax.persistence.*;
 import java.time.Instant;
@@ -28,16 +27,13 @@ public class Room {
     @Column(name = "created_at")
     private Instant createdAt;
 
+    @Enumerated(EnumType.STRING)
+    private RoomType type;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id")
     private User owner;
 
-    @Enumerated(EnumType.STRING)
-    private RoomType type;
-
-    private boolean isPrivate;
-
     @ManyToMany(mappedBy = "rooms")
-    @ToString.Exclude
     private List<User> users;
 }

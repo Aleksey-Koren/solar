@@ -19,5 +19,4 @@ public class RoomDtoImpl implements RoomDto{
     private Long ownerId;
     private Long amount;
     private RoomType roomType;
-    private boolean isPrivate;
 }

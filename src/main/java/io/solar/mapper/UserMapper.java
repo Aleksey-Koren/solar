@@ -2,6 +2,7 @@ package io.solar.mapper;
 
 import io.solar.dto.UserDto;
 import io.solar.entity.User;
+import io.solar.mapper.messanger.RoomMapper;
 import io.solar.repository.UserRepository;
 import io.solar.repository.messenger.RoomRepository;
 import lombok.RequiredArgsConstructor;

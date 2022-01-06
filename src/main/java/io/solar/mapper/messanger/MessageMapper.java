@@ -1,6 +1,6 @@
 package io.solar.mapper.messanger;
 
-import io.solar.dto.MessageDto;
+import io.solar.dto.messenger.MessageDto;
 import io.solar.entity.messenger.MessageType;
 import io.solar.entity.messenger.Message;
 import io.solar.mapper.EntityDtoMapper;
