@@ -35,4 +35,5 @@ public class BasicObjectViewDto {
     private Float accelerationX;
     private Float accelerationY;
     private Long positionIterationTs;
+    private Boolean clockwiseRotation;
 }

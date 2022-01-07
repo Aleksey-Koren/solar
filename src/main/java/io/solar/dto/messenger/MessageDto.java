@@ -1,4 +1,4 @@
-package io.solar.dto;
+package io.solar.dto.messenger;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,13 +8,16 @@ import lombok.NoArgsConstructor;
 import java.time.Instant;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Builder
-public class RoomDtoImpl implements RoomDto{
+@NoArgsConstructor
+@AllArgsConstructor
+public class MessageDto {
+
     private Long id;
+    private Long senderId;
+    private Long roomId;
     private String title;
+    private String message;
     private Instant createdAt;
-    private Long ownerId;
-    private Long amount;
+    private String messageType;
 }

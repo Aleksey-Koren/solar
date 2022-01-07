@@ -4,6 +4,7 @@ import io.solar.entity.inventory.InventorySocket;
 import io.solar.entity.inventory.InventoryType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.util.List;
@@ -63,5 +64,6 @@ public class ObjectTypeDescription {
 
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
     @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private List<InventorySocket> socketList;
 }

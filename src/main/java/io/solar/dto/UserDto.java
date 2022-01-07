@@ -1,5 +1,6 @@
 package io.solar.dto;
 
+import io.solar.dto.messenger.RoomDtoImpl;
 import io.solar.entity.objects.BasicObject;
 import lombok.*;
 
@@ -17,6 +18,7 @@ public class UserDto {
     private Long id;
     private String title;
     private String login;
+    private String email;
     private String password;
     private Long money;
     private BasicObject location;

@@ -1,0 +1,2 @@
+ALTER TABLE users
+    ADD email VARCHAR(256) NULL AFTER title;

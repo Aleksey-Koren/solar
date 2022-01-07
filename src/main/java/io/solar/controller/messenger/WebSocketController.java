@@ -1,8 +1,6 @@
 package io.solar.controller.messenger;
 
-import io.solar.dto.MessageDto;
-import io.solar.entity.MessageType;
-import io.solar.entity.messenger.Message;
+import io.solar.dto.messenger.MessageDto;
 import io.solar.facade.messenger.WebSocketFacade;
 import io.solar.service.MessageService;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +9,6 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 

@@ -27,12 +27,12 @@ public class Room {
     @Column(name = "created_at")
     private Instant createdAt;
 
+    @Enumerated(EnumType.STRING)
+    private RoomType type;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id")
     private User owner;
-
-    @Enumerated(EnumType.STRING)
-    private RoomType type;
 
     @ManyToMany(mappedBy = "rooms")
     private List<User> users;

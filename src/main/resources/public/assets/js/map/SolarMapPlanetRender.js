@@ -58,8 +58,9 @@ var SolarMapPlanetRender = {
             ctx.strokeStyle = 'rgba(151,151,151,0.58)';
         }
         var angle = SolarTimer.angle(planet);
-        var absX = Math.cos(angle) * planet.aphelion + zero.x;
-        var absY = Math.sin(angle) * planet.aphelion + zero.y;
+        var absX = planet.x; /*Math.cos(angle) * planet.aphelion + zero.x;*/
+        var absY = planet.y;
+        // Math.sin(angle) * planet.aphelion + zero.y;
 
 
         ctx.beginPath();

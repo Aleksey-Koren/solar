@@ -1,6 +1,5 @@
 package io.solar.entity.messenger;
 
-import io.solar.entity.MessageType;
 import io.solar.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -2,6 +2,7 @@ package io.solar.mapper;
 
 import io.solar.dto.UserDto;
 import io.solar.entity.User;
+import io.solar.mapper.messanger.RoomMapper;
 import io.solar.repository.UserRepository;
 import io.solar.repository.messenger.RoomRepository;
 import lombok.RequiredArgsConstructor;
@@ -40,6 +41,7 @@ public class UserMapper {
         user.setHackAttempts(dto.getHackAttempts());
         user.setAvatar(dto.getAvatar());
         user.setEmailNotifications(dto.getEmailNotifications());
+        user.setEmail(dto.getEmail());
         user.setPermissions(dto.getPermissions() == null ? null : dto.getPermissions().stream().map(permissionMapper::toEntity).collect(toSet()));
         user.setRooms(dto.getRooms() == null ? null : dto.getRooms().stream().map(roomMapper::toEntity).toList());
 
@@ -52,6 +54,7 @@ public class UserMapper {
                 .id(user.getId())
                 .title(user.getTitle())
                 .login(user.getLogin())
+                .email(user.getEmail())
                 .money(user.getMoney())
                 .location(user.getLocation())
                 .hackBlock(user.getHackBlock())
@@ -61,6 +64,5 @@ public class UserMapper {
                 .permissions(user.getPermissions().stream().map(permissionMapper::toDto).collect(toSet()))
                 .rooms(user.getRooms().stream().map(roomMapper::toDto).collect(toList()))
                 .build();
-
     }
 }

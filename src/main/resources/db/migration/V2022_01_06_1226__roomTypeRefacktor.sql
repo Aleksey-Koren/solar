@@ -1,0 +1,1 @@
+alter table rooms modify type enum('SYSTEM', 'PRIVATE', 'PUBLIC') null;

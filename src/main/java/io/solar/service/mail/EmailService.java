@@ -1,7 +1,6 @@
 package io.solar.service.mail;
 
 import io.solar.entity.User;
-import io.solar.service.UserService;
 import io.solar.service.exception.ServiceException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.SimpleMailMessage;
@@ -14,6 +13,7 @@ import org.thymeleaf.context.Context;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -21,14 +21,16 @@ public class EmailService {
 
     private final JavaMailSender emailSender;
     private final TemplateEngine templateEngine;
-    private final UserService userService;
 
-    public void sendSimpleEmail(Long userId, String title, String message) {
-        SimpleMailMessage mailMessage = new SimpleMailMessage();
-        mailMessage.setTo(receiveEmailFromLogin(userId));
-        mailMessage.setSubject(title);
-        mailMessage.setText(message);
-        emailSender.send(mailMessage);
+    public void sendSimpleEmail(User user, String title, String message) {
+        if (Objects.nonNull(user.getEmail())) {
+
+            SimpleMailMessage mailMessage = new SimpleMailMessage();
+            mailMessage.setTo(user.getEmail());
+            mailMessage.setSubject(title);
+            mailMessage.setText(message);
+            emailSender.send(mailMessage);
+        }
     }
 
     public void sendTemplateEmail(TemplateEmail templateEmail) {
@@ -56,16 +58,4 @@ public class EmailService {
             throw new ServiceException(String.format("Cannot send email to %s", templateEmail.getSendAddress()));
         }
     }
-
-    private String receiveEmailFromLogin(Long userId) {
-        User user = userService.findById(userId)
-                .orElseThrow(() -> new ServiceException(String.format("Cannot find user with id = %d for send email", userId)));
-
-        if (user.getLogin().contains("@")) {
-            return user.getLogin();
-        } else {
-            throw new ServiceException(String.format("User with id = %d does not contain email", userId));
-        }
-    }
-
 }

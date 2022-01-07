@@ -1,11 +1,17 @@
 package io.solar.controller.messenger;
 
-import io.solar.dto.MessageDto;
-import io.solar.dto.RoomDtoImpl;
-import io.solar.entity.MessageType;
+import io.solar.dto.messenger.CreateRoomDto;
+import io.solar.dto.messenger.MessageDto;
+import io.solar.dto.messenger.RoomDtoImpl;
+import io.solar.entity.messenger.MessageType;
 import io.solar.entity.User;
+import io.solar.entity.messenger.MessageType;
+import io.solar.repository.messenger.RoomRepository;
+import io.solar.repository.messenger.UserRoomRepository;
 import io.solar.service.UserService;
 import io.solar.service.messenger.ChatService;
+import io.solar.specification.RoomSpecification;
+import io.solar.specification.filter.RoomFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,6 +32,8 @@ public class ChatController {
 
     private final UserService userService;
     private final ChatService chatService;
+    private final UserRoomRepository userRoomRepository;
+    private final RoomRepository roomRepository;
 
     @GetMapping("room/{roomId}/messages")
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
@@ -37,13 +45,22 @@ public class ChatController {
         return chatService.getMessageHistory(roomId, user, pageable);
     }
 
-    @GetMapping("rooms")
+    @GetMapping("user/room")
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
     @Transactional
     public List<RoomDtoImpl> getRooms(Principal principal) {
         User user = userService.findByLogin(principal.getName());
 
         return chatService.getUserRooms(user.getId());
+    }
+
+    @GetMapping("/room")
+    @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
+    @Transactional
+    public void findRoomsByFilter(Principal principal, RoomFilter roomFilter) {
+
+//        System.out.println(roomRepository.findAll(new RoomSpecification(roomFilter)));
+        System.out.println(roomRepository.findAll(new RoomSpecification(roomFilter)));
     }
 
     @PatchMapping("room/{roomId}/participants")
@@ -66,5 +83,17 @@ public class ChatController {
                 .collect(Collectors.toList());
         User user = userService.findByLogin(principal.getName());
         userService.saveEmailNotifications(user, mappedMessageTypes);
+    }
+
+    @PostMapping("/room")
+    @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
+    @Transactional
+    public void createRoom(@RequestBody CreateRoomDto dto, Principal principal) {
+        User user = userService.findByLogin(principal.getName());
+        if (dto.getIsPrivate()) {
+            chatService.createPrivateRoom(dto, user);
+        }else{
+            chatService.createPublicRoom(dto, user);
+        }
     }
 }

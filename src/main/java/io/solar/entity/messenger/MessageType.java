@@ -1,4 +1,4 @@
-package io.solar.entity;
+package io.solar.entity.messenger;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -23,7 +23,7 @@
             stompClient.connect({}, function(frame) {
                 setConnected(true);
                 console.log('Connected: ' + frame);
-                stompClient.subscribe('/room/6', function(messageOutput) {
+                stompClient.subscribe('/user/aaa', function(messageOutput) {
                     showMessageOutput(JSON.parse(messageOutput.body));
                 });
             });
