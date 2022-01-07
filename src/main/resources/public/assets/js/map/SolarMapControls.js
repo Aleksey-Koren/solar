@@ -12,5 +12,6 @@ function SolarMapControls(context, solarMap) {
 SolarMapControls.prototype.render = function () {
     Dom.append(document.body, this.container);
     this.container.append(new SolarMapCenterShip(this.solarMap).container);
+    this.container.append(new SolarMapChatButton(this.solarMap).container);
 };
 

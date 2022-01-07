@@ -80,6 +80,9 @@ Rest.doPut = function (url, data, headers, responseType) {
 Rest.doDelete = function (url, data, headers, responseType) {
     return Rest._onRequest(url, 'delete', data, headers, responseType)
 };
+Rest.doPatch = function (url, data, headers, responseType) {
+    return Rest._onRequest(url, 'patch', data, headers, responseType)
+};
 Rest._onRequest = function (url, type, data, headers, responseType) {
     if (Rest.host !== null) {
         url = Rest.host + url;

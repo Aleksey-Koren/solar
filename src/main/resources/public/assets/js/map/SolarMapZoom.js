@@ -54,6 +54,7 @@ var SolarMapZoom = {
         var absBefore = zoomInfo.absBefore;
         var absZeroBefore = zoomInfo.absZeroBefore;
         me.kkmPerPixel = zoomInfo.kkm * zoom;
+        me.updateKkm = true;
         var absZeroAfter = me.getAbsPoint(0, 0);
         var dx = absZeroBefore.x - absZeroAfter.x;
         var dy = absZeroBefore.y - absZeroAfter.y;

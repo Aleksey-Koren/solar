@@ -32,6 +32,7 @@ function SolarMap(context, types) {
     this.ctx.strokeText = this.ctx.fillText;
 
     this.kkmPerPixel = 0;
+    this.updateKkm = true;
 
     this.window = {
         dx: 0,
@@ -216,6 +217,10 @@ SolarMap.prototype.render = function (planets, objects) {
 };
 
 SolarMap.prototype.drawKmPerPixel = function () {
+    if(!this.updateKkm) {
+        return
+    }
+    this.updateKkm = false;
     var label;
     if(this.kkmPerPixel > 1.5) {
         label = ("KM per pixel: " + Math.floor(this.kkmPerPixel * 1000));

@@ -14,19 +14,20 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import javax.websocket.server.PathParam;
 import java.security.Principal;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/app/chat")
+@RequestMapping("/api/chat")
 @RequiredArgsConstructor
 public class ChatController {
 
     private final UserService userService;
     private final ChatService chatService;
 
-    @GetMapping("messages/{roomId}")
+    @GetMapping("room/{roomId}/messages")
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
     @Transactional
     public Page<MessageDto> getMessageHistory(@PathVariable("roomId") Long roomId
@@ -45,12 +46,12 @@ public class ChatController {
         return chatService.getUserRooms(user.getId());
     }
 
-    @PostMapping("/invite")
+    @PatchMapping("room/{roomId}/participants")
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
     @Transactional
     public void inviteToRoom(@RequestParam Long inviterId,
                              @RequestParam Long invitedId,
-                             @RequestParam Long roomId) {
+                             @PathVariable("roomId") Long roomId) {
 
         chatService.inviteUserToRoom(inviterId, invitedId, roomId);
     }
