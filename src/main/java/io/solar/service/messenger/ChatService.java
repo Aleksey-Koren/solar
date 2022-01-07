@@ -25,6 +25,8 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.Instant;
 import java.util.List;
 
+import static java.util.stream.Collectors.joining;
+
 @Service
 @RequiredArgsConstructor
 public class ChatService {
@@ -105,8 +107,20 @@ public class ChatService {
         room.setOwner(owner);
         room.setCreatedAt(Instant.now());
         room.setType(RoomType.PRIVATE);
+        room.setTitle(dto.getUserId().size() != 0 ? composeRoomTitle(dto, owner) : createTitlePartFromUser(owner));
         roomRepository.save(room);
         inviteToPrivateRoom(room, owner, dto.getUserId().get(0));
+    }
+
+    private String composeRoomTitle(CreateRoomDto dto, User owner) {
+        return createTitlePartFromUser(owner) +
+                userRepository.findAllById(dto.getUserId()).stream()
+                        .map(this::createTitlePartFromUser)
+                        .collect(joining(" , "));
+    }
+
+    private String createTitlePartFromUser(User user) {
+        return user.getTitle() != null ? user.getTitle() : "user[id = " + user.getId() + " ] ";
     }
 
     private void inviteToPrivateRoom(Room room, User owner, Long interlocutorId) {

@@ -21,14 +21,14 @@ public class GoodsGeneration {
 
     public void generateOnStations() {
         List<Station> stations = stationRepository.findAll();
-        for(Station station : stations) {
+        for (Station station : stations) {
             generateGoods(station);
         }
     }
 
     private void generateGoods(Station station) {
         List<Goods> goods = new ArrayList<>();
-        for(Production production : station.getProduction()) {
+        for (Production production : station.getProduction()) {
             Product product = production.getProduct();
             Long amount = (long) (production.getPower() * retrieveRandomModifier() + 10);
             Float price = product.getPrice() * retrievePriceModifier(0.3, 1.7);
@@ -49,8 +49,8 @@ public class GoodsGeneration {
     }
 
     private Float retrieveRandomInRange(double from, double to) {
-        double f = Math.random()/Math.nextDown(1.0);
-        double x = from*(1.0 - f) + to*f;
+        double f = Math.random() / Math.nextDown(1.0);
+        double x = from * (1.0 - f) + to * f;
         return (float) x;
     }
 }
