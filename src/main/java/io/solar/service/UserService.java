@@ -21,6 +21,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
@@ -61,6 +62,10 @@ public class UserService implements UserDetailsService {
                 .map(permissionRepository::findByTitle)
                 .collect(toSet());
 
+        if (user.getTitle() == null || user.getTitle().equals("")) {
+            int index = user.getLogin().indexOf("@");
+            user.setTitle(index > 3 ? user.getLogin().substring(0, user.getLogin().indexOf("@")) : user.getLogin());
+        }
         user.setPermissions(permissions);
         user.setEmail(receiveEmailFromLogin(user));
 
@@ -130,11 +135,6 @@ public class UserService implements UserDetailsService {
     }
 
     private User mapUser(User user, boolean canEdit) {
-        if (user.getTitle() == null || user.getTitle().equals("")) {
-            String log = user.getLogin();
-            int index = log.indexOf("@");
-            user.setTitle(index > -1 ? log.substring(0, user.getLogin().indexOf("@")) : log);
-        }
         user.setPassword("");
         if (!canEdit) {
             user.setLogin("");

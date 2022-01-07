@@ -130,7 +130,8 @@ function SolarMap(context, types) {
             NavigationUtils.layCourse(me, e)
         }
     });
-    new SolarMapControls(context, this).render();
+    this.solarMapControls = new SolarMapControls(context, this);
+    this.solarMapControls.render();
 }
 
 SolarMap.MAX_RADIUS_KKM = 15000000;
@@ -268,6 +269,8 @@ function drawInt(v) {
 
 SolarMap.prototype.unmount = function () {
     window.removeEventListener('resize', this.resizeRef);
+    this.solarMapControls.unmount();
+    this.kkmDisplay.parentNode.removeChild(this.kkmDisplay);
 };
 
 

@@ -17,6 +17,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Optional;
 
 import static io.solar.controller.AuthController.hasPermissions;
 
@@ -67,5 +68,15 @@ public class UsersController {
         }else {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new UserDto());
         }
+    }
+
+
+    @DeleteMapping("{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable("id") Long id) {
+        if(!hasPermissions(List.of("EDIT_USER", "DELETE_USER"))) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        userService.findById(id).ifPresent(userService::delete);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -15,3 +15,8 @@ SolarMapControls.prototype.render = function () {
     this.container.append(new SolarMapChatButton(this.solarMap).container);
 };
 
+
+SolarMapControls.prototype.unmount = function () {
+    this.container.parentNode.removeChild(this.container);
+};
+
