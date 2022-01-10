@@ -141,7 +141,7 @@ public class ChatService {
     }
 
     public void sendInviteNotification(User user, Room room) {
-        simpMessagingTemplate.convertAndSendToUser("test",
+        simpMessagingTemplate.convertAndSendToUser("admin",
                 "/notifications",
                 new NotificationDto<RoomDto>(NotificationType.INVITED_TO_ROOM.toString(), roomMapper.toDto(room)));
     }
