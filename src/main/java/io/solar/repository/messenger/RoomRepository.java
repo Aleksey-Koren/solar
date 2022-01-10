@@ -2,10 +2,7 @@ package io.solar.repository.messenger;
 
 import io.solar.dto.messenger.RoomDto;
 import io.solar.entity.messenger.Room;
-import io.solar.entity.messenger.UserRoom;
-import io.solar.entity.objects.Station;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -13,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface RoomRepository extends JpaRepository<Room, Long>, JpaSpecificationExecutor<Room> {
+public interface RoomRepository extends JpaRepository<Room, Long> {
 /*
     SELECT rooms.id, rooms.title, count(messages.id) as amount
     from rooms
@@ -37,4 +34,16 @@ public interface RoomRepository extends JpaRepository<Room, Long>, JpaSpecificat
             "    LEFT JOIN inner_table ON users_rooms.room_id = inner_table.room_id " +
             "WHERE users_rooms.user_id = :user_id", nativeQuery = true)
     List<RoomDto> findAllUserRoomsWithUnreadMessages(@Param("user_id") Long userId);
+
+
+    @Query(value = "select not_my_rooms.room_id as id, rooms.title as title " +
+            "from rooms " +
+            "     inner join users_rooms my_rooms on my_rooms.room_id = rooms.id and my_rooms.user_id = :user_id " +
+            "     inner join users_rooms not_my_rooms on my_rooms.room_id = not_my_rooms.room_id " +
+            "         and not_my_rooms.user_id != :user_id " +
+            "     inner join users u on not_my_rooms.user_id = u.id " +
+            "WHERE rooms.type = :room_type AND u.login like :login_like", nativeQuery = true)
+    List<RoomDto> findAllRoomsBySearch(@Param("user_id") Long userId,
+                                       @Param("room_type") String roomType,
+                                       @Param("login_like") String loginLike);
 }

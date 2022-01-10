@@ -5,19 +5,23 @@ import io.solar.dto.messenger.MessageDto;
 import io.solar.dto.messenger.RoomDtoImpl;
 import io.solar.entity.User;
 import io.solar.entity.messenger.MessageType;
-import io.solar.repository.messenger.RoomRepository;
-import io.solar.repository.messenger.UserRoomRepository;
+import io.solar.facade.messenger.ChatFacade;
 import io.solar.service.UserService;
 import io.solar.service.messenger.ChatService;
-import io.solar.specification.RoomSpecification;
-import io.solar.specification.filter.RoomFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
 import java.util.List;
@@ -30,10 +34,9 @@ public class ChatController {
 
     private final UserService userService;
     private final ChatService chatService;
-    private final UserRoomRepository userRoomRepository;
-    private final RoomRepository roomRepository;
+    private final ChatFacade chatFacade;
 
-    @GetMapping("messages/{roomId}")
+    @GetMapping("room/{roomId}/messages")
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
     @Transactional
     public Page<MessageDto> getMessageHistory(@PathVariable("roomId") Long roomId
@@ -52,16 +55,7 @@ public class ChatController {
         return chatService.getUserRooms(user.getId());
     }
 
-    @GetMapping("/room")
-    @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
-    @Transactional
-    public void findRoomsByFilter(Principal principal, RoomFilter roomFilter) {
-
-//        System.out.println(roomRepository.findAll(new RoomSpecification(roomFilter)));
-        System.out.println(roomRepository.findAll(new RoomSpecification(roomFilter)));
-    }
-
-    @PostMapping("/invite")
+    @PatchMapping("room/{roomId}/participants")
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
     @Transactional
     public void inviteToRoom(@RequestParam Long inviterId,
@@ -71,10 +65,20 @@ public class ChatController {
         chatService.inviteUserToRoom(inviterId, invitedId, roomId);
     }
 
+    @GetMapping("/room")
+    @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
+    @Transactional
+    public List<RoomDtoImpl> findRoomsBySearch(Principal principal,
+                                               @RequestParam String roomType,
+                                               @RequestParam String login) {
+        User user = userService.findByLogin(principal.getName());
+
+        return chatFacade.findRoomsBySearch(user, roomType, login);
+    }
+
     @PostMapping("/email")
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
     @Transactional
-    //TODO implement this method;
     public void saveEmailNotifications(Principal principal, @RequestBody List<String> messageTypes) {
         List<MessageType> mappedMessageTypes = messageTypes.stream()
                 .map(MessageType::valueOf)
@@ -90,7 +94,7 @@ public class ChatController {
         User user = userService.findByLogin(principal.getName());
         if (dto.getIsPrivate()) {
             chatService.createPrivateRoom(dto, user);
-        }else{
+        } else {
             chatService.createPublicRoom(dto, user);
         }
     }
