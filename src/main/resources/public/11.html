@@ -20,10 +20,10 @@
         function connect(options) {
             var socket = new SockJS('/api/ws');
             stompClient = Stomp.over(socket);
-            stompClient.connect({name: 'test'}, function(frame) {
+            stompClient.connect({login: 'test'}, function(frame) {
                 setConnected(true);
                 console.log('Connected: ' + frame);
-                stompClient.subscribe('/user/room/aaa')
+                stompClient.subscribe('/user/notifications-test')
             });
         }
 

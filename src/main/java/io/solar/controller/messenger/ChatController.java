@@ -3,7 +3,6 @@ package io.solar.controller.messenger;
 import io.solar.dto.messenger.CreateRoomDto;
 import io.solar.dto.messenger.MessageDto;
 import io.solar.dto.messenger.RoomDtoImpl;
-import io.solar.entity.messenger.MessageType;
 import io.solar.entity.User;
 import io.solar.entity.messenger.MessageType;
 import io.solar.repository.messenger.RoomRepository;

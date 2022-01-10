@@ -103,25 +103,22 @@ public class ChatService {
     }
 
     public void createPrivateRoom(CreateRoomDto dto, User owner) {
-        if (dto.getUserId().size() != 1) {
-            throw new ServiceException(String
-                    .format("Private room. userId size must be exactly 1. userId size is not 1. It is %d", dto.getUserId().size()));
-        }
 
         Room room = new Room();
         room.setOwner(owner);
         room.setCreatedAt(Instant.now());
-        room.setType(RoomType.PRIVATE);
-        room.setTitle(dto.getUserId().size() != 0 ? composeRoomTitle(dto, owner) : createTitlePartFromUser(owner));
+        room.setType(dto.getIsPrivate() ? RoomType.PRIVATE : RoomType.PUBLIC);
+        room.setTitle(composeRoomTitle(dto, owner));
         roomRepository.save(room);
-        inviteToPrivateRoom(room, owner, dto.getUserId().get(0));
+        inviteToPrivateRoom(room, owner, dto.getUserId());
     }
 
     private String composeRoomTitle(CreateRoomDto dto, User owner) {
-        return createTitlePartFromUser(owner) +
-                userRepository.findAllById(dto.getUserId()).stream()
-                        .map(this::createTitlePartFromUser)
-                        .collect(joining(" , "));
+        return createTitlePartFromUser(owner) + ", " +
+                createTitlePartFromUser(userRepository.findById(dto.getUserId()).orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                String.format("There is no user with id = %d in database", dto.getUserId())))
+                );
     }
 
     private String createTitlePartFromUser(User user) {
@@ -136,20 +133,17 @@ public class ChatService {
         sendInviteNotification(interlocutor, room);
     }
 
-    public void createPublicRoom(CreateRoomDto dto, User owner) {
-        Room room = new Room();
-        room.setOwner(owner);
-        room.setCreatedAt(Instant.now());
-        room.setType(RoomType.PUBLIC);
-        roomRepository.save(room);
-        List<User> users = userRepository.findAllById(dto.getUserId());
-        users.forEach(s -> addUserToRoom(s, room));
-    }
+//    public void createPublicRoom(CreateRoomDto dto, User owner) {
+//        Room room = new Room();
+//        room.setOwner(owner);
+//        room.setCreatedAt(Instant.now());
+//        room.setType(RoomType.PUBLIC);
+//        roomRepository.save(room);
+//        User users = userRepository.findById(dto.getUserId()).get();
+//        users.forEach(s -> addUserToRoom(s, room));
+//    }
 
     public void sendInviteNotification(User user, Room room) {
-        user.setLogin("test1");
-        Set<SimpUser> users = simpUserRegistry.getUsers();
-        SimpUser simpUser = simpUserRegistry.getUser("test");
-        simpMessagingTemplate.convertAndSendToUser("test1", "/room/aaa", Message.builder().message("Message!!!!").build());
+        simpMessagingTemplate.convertAndSendToUser("test", "/notifications", "Notification");
     }
 }

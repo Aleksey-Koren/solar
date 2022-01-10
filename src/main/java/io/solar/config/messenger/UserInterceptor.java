@@ -27,11 +27,11 @@ public class UserInterceptor implements ChannelInterceptor {
                     .getHeaders()
                     .get(SimpMessageHeaderAccessor.NATIVE_HEADERS);
 
-            if (raw instanceof Map) {
-                Object name = ((Map) raw).get("name");
+            if (raw instanceof Map castedRaw) {
+                Object login = (castedRaw).get("login");
 
-                if (name instanceof ArrayList) {
-                    accessor.setUser(new WebSocketUser(((ArrayList) name).get(0).toString()));
+                if (login instanceof ArrayList castedLogin) {
+                    accessor.setUser(new WebSocketUser(( castedLogin).get(0).toString()));
                 }
             }
         }
