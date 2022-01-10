@@ -1,4 +1,4 @@
-package io.solar.config;
+package io.solar.config.messenger;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

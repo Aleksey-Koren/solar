@@ -4,6 +4,7 @@ import io.solar.dto.messenger.CreateRoomDto;
 import io.solar.dto.messenger.MessageDto;
 import io.solar.dto.messenger.RoomDtoImpl;
 import io.solar.entity.User;
+import io.solar.entity.messenger.Message;
 import io.solar.entity.messenger.Room;
 import io.solar.entity.messenger.RoomType;
 import io.solar.entity.messenger.UserRoom;
@@ -19,11 +20,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.simp.user.SimpUser;
+import org.springframework.messaging.simp.user.SimpUserRegistry;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Set;
 
 import static java.util.stream.Collectors.joining;
 
@@ -38,6 +42,7 @@ public class ChatService {
     private final RoomMapper roomMapper;
     private final UserRepository userRepository;
     private final SimpMessagingTemplate simpMessagingTemplate;
+    private final SimpUserRegistry simpUserRegistry;
 
     public Page<MessageDto> getMessageHistory(Long roomId, User user, Pageable pageable) {
         Room room = roomRepository.findById(roomId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND
@@ -128,6 +133,7 @@ public class ChatService {
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         String.format("There is no user with id = %d in database", interlocutorId)));
         addUserToRoom(interlocutor, room);
+        sendInviteNotification(interlocutor, room);
     }
 
     public void createPublicRoom(CreateRoomDto dto, User owner) {
@@ -141,6 +147,9 @@ public class ChatService {
     }
 
     public void sendInviteNotification(User user, Room room) {
-        simpMessagingTemplate.convertAndSendToUser(user.getLogin(), "/aaa", "Message!!!!");
+        user.setLogin("test1");
+        Set<SimpUser> users = simpUserRegistry.getUsers();
+        SimpUser simpUser = simpUserRegistry.getUser("test");
+        simpMessagingTemplate.convertAndSendToUser("test1", "/room/aaa", Message.builder().message("Message!!!!").build());
     }
 }

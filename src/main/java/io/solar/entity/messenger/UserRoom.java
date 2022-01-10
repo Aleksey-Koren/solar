@@ -41,7 +41,6 @@ public class UserRoom {
         this.subscribedAt = Instant.now();
     }
 
-
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
@@ -50,4 +49,3 @@ public class UserRoom {
         private Room room;
     }
 }
-

@@ -17,15 +17,13 @@
             document.getElementById('response').innerHTML = '';
         }
 
-        function connect() {
+        function connect(options) {
             var socket = new SockJS('/api/ws');
             stompClient = Stomp.over(socket);
-            stompClient.connect({}, function(frame) {
+            stompClient.connect({name: 'test'}, function(frame) {
                 setConnected(true);
                 console.log('Connected: ' + frame);
-                stompClient.subscribe('/user/aaa', function(messageOutput) {
-                    showMessageOutput(JSON.parse(messageOutput.body));
-                });
+                stompClient.subscribe('/user/room/aaa')
             });
         }
 
