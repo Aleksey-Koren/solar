@@ -54,7 +54,7 @@ public class NavigatorController {
     public void layCourse(@RequestBody List<CourseDto> list, Principal principal) {
         User authUser = userService.findByLogin(principal.getName());
         for(CourseDto dto : list) {
-            if (!userService.isUserLocatedInObject(authUser, dto.getObjectId())) {
+            if (userService.isUserNotLocatedInObject(authUser, dto.getObjectId())) {
                 userCantException(authUser.getLocation().getId(), dto.getObjectId());
             }
             courseFacade.updateCourseChain(dto);
@@ -70,7 +70,7 @@ public class NavigatorController {
         BasicObject object = course.getObject();
         User authUser = userService.findByLogin(principal.getName());
 
-        if (!userService.isUserLocatedInObject(authUser, object.getId())) {
+        if (userService.isUserNotLocatedInObject(authUser, object.getId())) {
             userCantException(authUser.getLocation().getId(), object.getId());
         }
         courseFacade.deleteCourse(course);

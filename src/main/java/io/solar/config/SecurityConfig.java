@@ -1,11 +1,13 @@
 package io.solar.config;
 
 
+import com.fasterxml.jackson.datatype.hibernate5.Hibernate5Module;
 import io.solar.security.JwtFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -36,7 +38,6 @@ import org.springframework.security.web.authentication.session.SessionAuthentica
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
-
 
 
 @Configuration
@@ -72,16 +73,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder(12);
     }
 
-//    @Bean
-//    public WebMvcConfigurer corsConfigurer() {
-//        return new WebMvcConfigurer() {
-//            @Override
-//            public void addCorsMappings(CorsRegistry registry) {
-//                registry.addMapping("/**").allowedOrigins("http://localhost:8081").allowCredentials(false);
-//            }
-//        };
-//    }
-
     @Bean
     public CorsFilter corsFilter() {
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -93,5 +84,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 Arrays.stream(HttpMethod.values()).map(HttpMethod::name).collect(Collectors.toList()));
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
+    }
+
+    @Bean
+    public Jackson2ObjectMapperBuilder configureObjectMapper() {
+        return new Jackson2ObjectMapperBuilder()
+                .modulesToInstall(Hibernate5Module.class);
     }
 }
