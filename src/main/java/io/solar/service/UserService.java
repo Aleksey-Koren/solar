@@ -42,12 +42,9 @@ public class UserService implements UserDetailsService {
     @Value("${app.hack_block_time_min}")
     private Integer HACK_BLOCK_TIME_MIN;
 
-    public Optional<User> findById(Long id) {
-        return userRepository.findById(id);
-    }
-
-    public User findByLogin(String login) {
-        return userRepository.findByLogin(login);
+    @Override
+    public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
+        return User.retrieveUserDetails(userRepository.findByLogin(login));
     }
 
     public User registerNewUser(User user, Role role) {
@@ -67,17 +64,13 @@ public class UserService implements UserDetailsService {
         return userRepository.save(user);
     }
 
-    public User update(User user) {
-        return userRepository.save(user);
-    }
-
-    public void delete(User user) {
-        userRepository.delete(user);
-    }
-
-    @Override
-    public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
-        return User.retrieveUserDetails(userRepository.findByLogin(login));
+    public List<MessageType> getMessageTypesToEmail(User user) {
+        if (user.getEmailNotifications() == null) {
+            return Collections.emptyList();
+        }
+        return Arrays.stream(MessageType.values())
+                .filter(s -> (!s.equals(MessageType.CHAT) && (user.getEmailNotifications() & s.getIndex()) == s.getIndex()))
+                .collect(toList());
     }
 
     public void registerHackAttempt(User user) {
@@ -94,52 +87,19 @@ public class UserService implements UserDetailsService {
                 .toInstant(ZoneOffset.ofTotalSeconds(0)));
     }
 
-    public boolean matchPasswords(User user, User userFromDb) {
-        return passwordEncoder.matches(user.getPassword(), userFromDb.getPassword());
-    }
-
-    public Page<UserDto> getAllUsers(Pageable pageable, UserFilter filter, boolean canEdit) {
-        if (!canEdit) {
-            filter.setLogin("");
-        }
-
+    public Page<UserDto> getAllUsers(Pageable pageable, UserFilter filter) {
         Page<User> users = userRepository.findAll(new UserSpecification(filter), pageable);
-        users.map(u -> mapUser(u, canEdit));
+
         return users.map(userMapper::toDto);
     }
 
-    public User getUserById(Long id, boolean canEdit) {
-        Optional<User> user = userRepository.findById(id);
+    public UserDto getUserById(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        String.format("No user with id = %d", userId))
+                );
 
-        return mapUser(
-                user.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No user with such id")),
-                canEdit);
-    }
-
-    public boolean isUserLocatedInObject(User user, Long objectId) {
-        return user.getLocation().getId().equals(objectId);
-    }
-
-    public User updateUserTitle(Long id, String title) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No user with such id"));
-
-        user.setTitle(title);
-        user = userRepository.save(user);
-        return mapUser(user, true);
-    }
-
-    private User mapUser(User user, boolean canEdit) {
-        if (user.getTitle() == null || user.getTitle().equals("")) {
-            String log = user.getLogin();
-            int index = log.indexOf("@");
-            user.setTitle(index > -1 ? log.substring(0, user.getLogin().indexOf("@")) : log);
-        }
-        user.setPassword("");
-        if (!canEdit) {
-            user.setLogin("");
-        }
-        return user;
+        return userMapper.toDto(user);
     }
 
     private String receiveEmailFromLogin(User user) {
@@ -149,24 +109,39 @@ public class UserService implements UserDetailsService {
                 : null;
     }
 
-    public List<MessageType> getMessageTypesToEmail(User user) {
-        if (user.getEmailNotifications() == null) {
-            return Collections.emptyList();
-        }
-        return Arrays.stream(MessageType.values())
-                .filter(s -> (!s.equals(MessageType.CHAT) && (user.getEmailNotifications() & s.getIndex()) == s.getIndex()))
-                .collect(toList());
-    }
-
     public void saveEmailNotifications(User user, List<MessageType> messageTypes) {
         user.setEmailNotifications(calculateEmailNotifications(messageTypes));
         userRepository.save(user);
     }
 
     private Integer calculateEmailNotifications(List<MessageType> messageTypes) {
+
         return messageTypes.stream()
                 .mapToInt(MessageType::getIndex)
                 .sum();
     }
 
+    public Optional<User> findById(Long id) {
+        return userRepository.findById(id);
+    }
+
+    public User findByLogin(String login) {
+        return userRepository.findByLogin(login);
+    }
+
+    public User update(User user) {
+        return userRepository.save(user);
+    }
+
+    public void delete(User user) {
+        userRepository.delete(user);
+    }
+
+    public boolean matchPasswords(User user, User userFromDb) {
+        return passwordEncoder.matches(user.getPassword(), userFromDb.getPassword());
+    }
+
+    public boolean isUserNotLocatedInObject(User user, Long objectId) {
+        return !user.getLocation().getId().equals(objectId);
+    }
 }

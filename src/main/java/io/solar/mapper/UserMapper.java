@@ -3,6 +3,7 @@ package io.solar.mapper;
 import io.solar.dto.UserDto;
 import io.solar.entity.User;
 import io.solar.mapper.messanger.RoomMapper;
+import io.solar.mapper.objects.BasicObjectViewMapper;
 import io.solar.repository.UserRepository;
 import io.solar.repository.messenger.RoomRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +21,7 @@ public class UserMapper {
     private final UserRepository userRepository;
     private final PermissionMapper permissionMapper;
     private final RoomMapper roomMapper;
-    private final RoomRepository roomRepository;
+    private final BasicObjectViewMapper basicObjectViewMapper;
 
     public User toEntity(UserDto dto) {
 
@@ -36,7 +37,7 @@ public class UserMapper {
         user.setLogin(dto.getLogin());
         user.setPassword(dto.getPassword());
         user.setMoney(dto.getMoney());
-        user.setLocation(dto.getLocation());
+        user.setLocation(dto.getLocation() == null ? null : basicObjectViewMapper.toEntity(dto.getLocation()));
         user.setHackBlock(dto.getHackBlock());
         user.setHackAttempts(dto.getHackAttempts());
         user.setAvatar(dto.getAvatar());
@@ -56,7 +57,7 @@ public class UserMapper {
                 .login(user.getLogin())
                 .email(user.getEmail())
                 .money(user.getMoney())
-                .location(user.getLocation())
+                .location(user.getLocation() == null ? null : basicObjectViewMapper.toDto(user.getLocation()))
                 .hackBlock(user.getHackBlock())
                 .hackAttempts(user.getHackAttempts())
                 .avatar(user.getAvatar())

@@ -21,7 +21,7 @@ public class UserDto {
     private String email;
     private String password;
     private Long money;
-    private BasicObject location;
+    private BasicObjectViewDto location;
     private Instant hackBlock;
     private Integer hackAttempts;
     private String avatar;
