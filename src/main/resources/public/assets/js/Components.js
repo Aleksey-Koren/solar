@@ -146,6 +146,7 @@ GridPagination.prototype.hide = function () {
  *     context: object,
  *     content: object,
  *     title: object,
+ *     onClose?: () => void,
  *     noControls?: boolean
  * }}
  * @constructor
@@ -174,6 +175,7 @@ function Popup(params) {
         {class: "overlay"},
         this.window
     );
+    this.onClose = params.onClose;
     this.hideWrapper = null;
 }
 Popup.prototype.setContent = function (content) {
@@ -194,4 +196,56 @@ Popup.prototype.hide = function () {
         this.context.escListener.remove(this.hideWrapper);
     }
     this.container.parentElement && this.container.parentElement.removeChild(this.container);
+    this.onClose && this.onClose();
 };
+
+/**
+ *
+ * @param params {{
+ *     context: object,
+ *     content: object,
+ *     onClose: (boolean) => void,
+ *     title: object,
+ *     noButton?: any,
+ *     yesButton?: any,
+ *     noControls?: boolean
+ * }}
+ * @constructor
+ */
+function Confirm(params) {
+    this.closed = false;
+    var me = this;
+    this.onClose = params.onClose;
+    this.popup = new Popup({
+        context: params.context,
+        onClose: function() {
+            if(!me.closed) {
+                me.closed = true;
+                params.onClose(false);
+            }
+        },
+        content: Dom.el('div', null, [
+            params.content,
+            Dom.el('div', null, [
+                Dom.el('button', {onclick: function() {
+                    me.hide(false);
+                }}, params.noButton || 'No'),
+                Dom.el('button', {onclick: function() {
+                    me.hide(true);
+                }}, params.yesButton || 'Yes')
+            ])
+        ])
+    })
+    this.container = this.popup.container;
+}
+
+Confirm.prototype.hide = function(value) {
+    this.closed = true;
+    this.popup.hide();
+    this.onClose(value || false)
+}
+
+Confirm.prototype.show = function() {
+    this.closed = false;
+    this.popup.show();
+}

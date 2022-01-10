@@ -7,6 +7,12 @@ function UserForm(context, user, openGrid) {
         w('permissions', this.grid.container),
         w(' ', Dom.el('div', {}, [
             Dom.el('input', {
+                type: 'button', value: 'DELETE', onclick: function () {
+                    me.deleteUser();
+                }
+            }),
+            ' ',
+            Dom.el('input', {
                 type: 'button', value: 'Back', onclick: function () {
                     openGrid();
                 }
@@ -42,6 +48,17 @@ function UserForm(context, user, openGrid) {
     }
 }
 
+UserForm.prototype.deleteUser = function () {
+    new Confirm({
+        context: this.context,
+        content: "Are you sure to delete " + (this.user.title || "this user") + "? Action can not be undone.",
+        onClose: function(response) {
+            if(response) {
+                Rest.doDelete("/api/users/" + this.user.id)
+            }
+        }
+    }).show();
+}
 UserForm.prototype.updateDropdown = function (store) {
     this.permissionsDropdown.innerHTML = '';
     Dom.append(this.permissionsDropdown, Dom.el('option', {value: ''}, ''));
@@ -140,7 +157,7 @@ UserForm.prototype.back = function () {
 UserForm.prototype.loadUserPermissions = function () {
     if (this.user.id) {
         var me = this;
-        Rest.doGet('/api/permissions/user/' + this.user.id).then(function (response) {
+        Rest.doGet('/api/users/' + this.user.id).then(function (response) {
             me.userPermissions = response;
             me.grid.data = response;
             me.grid.render();

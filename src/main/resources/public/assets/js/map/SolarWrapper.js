@@ -14,14 +14,6 @@ function SolarWrapper(context) {
     this.radarInterval = null;
 }
 
-SolarWrapper.prototype.unmount = function() {
-    this.map.unmount();
-    this.context.stores.planets.remove(this)
-    this.context.stores.objects.remove(this)
-    clearInterval(this.radarInterval);
-    cancelAnimationFrame(this.animationFrame);
-};
-
 SolarWrapper.prototype.render = function() {
     var planetsStore = this.context.stores.planets;
     planetsStore.listen(this);
@@ -64,6 +56,11 @@ SolarWrapper.prototype.unmount = function() {
     this.context.stores.planets.remove(this)
     this.context.stores.objects.remove(this)
     this.context.stores.inventory.remove(this)
+
+    this.map.unmount();
+    clearInterval(this.radarInterval);
+    cancelAnimationFrame(this.animationFrame);
+
 };
 
 SolarWrapper.prototype.defineTypes = function() {

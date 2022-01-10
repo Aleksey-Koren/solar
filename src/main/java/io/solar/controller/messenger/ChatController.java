@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.websocket.server.PathParam;
 import java.security.Principal;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,7 +36,7 @@ public class ChatController {
     private final ChatService chatService;
     private final ChatFacade chatFacade;
 
-    @GetMapping("messages/{roomId}")
+    @GetMapping("room/{roomId}/messages")
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
     @Transactional
     public Page<MessageDto> getMessageHistory(@PathVariable("roomId") Long roomId
@@ -54,7 +55,16 @@ public class ChatController {
         return chatService.getUserRooms(user.getId());
     }
 
-    @PostMapping("/invite")
+    @GetMapping("/room")
+    @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
+    @Transactional
+    public void findRoomsByFilter(Principal principal, RoomFilter roomFilter) {
+
+//        System.out.println(roomRepository.findAll(new RoomSpecification(roomFilter)));
+        System.out.println(roomRepository.findAll(new RoomSpecification(roomFilter)));
+    }
+
+    @PatchMapping("room/{roomId}/participants")
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
     @Transactional
     public void inviteToRoom(@RequestParam Long inviterId,
@@ -78,6 +88,7 @@ public class ChatController {
     @PostMapping("/email")
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
     @Transactional
+    //TODO implement this method;
     public void saveEmailNotifications(Principal principal, @RequestBody List<String> messageTypes) {
         List<MessageType> mappedMessageTypes = messageTypes.stream()
                 .map(MessageType::valueOf)
@@ -91,7 +102,7 @@ public class ChatController {
     @Transactional
     public void createRoom(@RequestBody CreateRoomDto dto, Principal principal) {
         User user = userService.findByLogin(principal.getName());
-        if (dto.isPrivate()) {
+        if (dto.getIsPrivate()) {
             chatService.createPrivateRoom(dto, user);
         }else{
             chatService.createPublicRoom(dto, user);

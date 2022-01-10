@@ -32,6 +32,7 @@ function SolarMap(context, types) {
     this.ctx.strokeText = this.ctx.fillText;
 
     this.kkmPerPixel = 0;
+    this.updateKkm = true;
 
     this.window = {
         dx: 0,
@@ -129,7 +130,8 @@ function SolarMap(context, types) {
             NavigationUtils.layCourse(me, e)
         }
     });
-    new SolarMapControls(context, this).render();
+    this.solarMapControls = new SolarMapControls(context, this);
+    this.solarMapControls.render();
 }
 
 SolarMap.MAX_RADIUS_KKM = 15000000;
@@ -216,6 +218,10 @@ SolarMap.prototype.render = function (planets, objects) {
 };
 
 SolarMap.prototype.drawKmPerPixel = function () {
+    if(!this.updateKkm) {
+        return
+    }
+    this.updateKkm = false;
     var label;
     if(this.kkmPerPixel > 1.5) {
         label = ("KM per pixel: " + Math.floor(this.kkmPerPixel * 1000));
@@ -263,6 +269,8 @@ function drawInt(v) {
 
 SolarMap.prototype.unmount = function () {
     window.removeEventListener('resize', this.resizeRef);
+    this.solarMapControls.unmount();
+    this.kkmDisplay.parentNode.removeChild(this.kkmDisplay);
 };
 
 
