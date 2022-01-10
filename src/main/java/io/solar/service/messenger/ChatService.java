@@ -1,11 +1,8 @@
 package io.solar.service.messenger;
 
-import io.solar.dto.messenger.CreateRoomDto;
-import io.solar.dto.messenger.MessageDto;
-import io.solar.dto.messenger.RoomDto;
-import io.solar.dto.messenger.RoomDtoImpl;
+import io.solar.dto.messenger.*;
 import io.solar.entity.User;
-import io.solar.entity.messenger.Message;
+import io.solar.entity.messenger.NotificationType;
 import io.solar.entity.messenger.Room;
 import io.solar.entity.messenger.RoomType;
 import io.solar.entity.messenger.UserRoom;
@@ -15,22 +12,17 @@ import io.solar.repository.UserRepository;
 import io.solar.repository.messenger.MessageRepository;
 import io.solar.repository.messenger.RoomRepository;
 import io.solar.repository.messenger.UserRoomRepository;
-import io.solar.service.exception.ServiceException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.messaging.simp.user.SimpUser;
-import org.springframework.messaging.simp.user.SimpUserRegistry;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Set;
-
-import static java.util.stream.Collectors.joining;
 
 @Service
 @RequiredArgsConstructor
@@ -43,7 +35,6 @@ public class ChatService {
     private final RoomMapper roomMapper;
     private final UserRepository userRepository;
     private final SimpMessagingTemplate simpMessagingTemplate;
-    private final SimpUserRegistry simpUserRegistry;
 
     public Page<MessageDto> getMessageHistory(Long roomId, User user, Pageable pageable) {
         Room room = roomRepository.findById(roomId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND
@@ -108,15 +99,25 @@ public class ChatService {
         userRepository.save(user);
     }
 
-    public void createPrivateRoom(CreateRoomDto dto, User owner) {
-
+    public ResponseEntity createRoom(CreateRoomDto dto, User owner) {
+        if (dto.getIsPrivate()) {
+            if (ifPrivateRoomAlreadyExists(dto.getUserId(), owner.getId())) {
+                return new ResponseEntity(HttpStatus.BAD_REQUEST);
+            }
+        }
         Room room = new Room();
         room.setOwner(owner);
         room.setCreatedAt(Instant.now());
         room.setType(dto.getIsPrivate() ? RoomType.PRIVATE : RoomType.PUBLIC);
         room.setTitle(composeRoomTitle(dto, owner));
         roomRepository.save(room);
+        addUserToRoom(owner, room);
         inviteToPrivateRoom(room, owner, dto.getUserId());
+        return new ResponseEntity(HttpStatus.OK);
+    }
+
+    private boolean ifPrivateRoomAlreadyExists(Long user1Id, Long user2Id) {
+        return roomRepository.findPrivateRoomWithTwoUsers(user1Id, user2Id).size() > 0;
     }
 
     private String composeRoomTitle(CreateRoomDto dto, User owner) {
@@ -128,7 +129,7 @@ public class ChatService {
     }
 
     private String createTitlePartFromUser(User user) {
-        return user.getTitle() != null ? user.getTitle() : "user[id = " + user.getId() + " ] ";
+        return user.getTitle() != null ? user.getTitle() : "user[id = " + user.getId() + "]";
     }
 
     private void inviteToPrivateRoom(Room room, User owner, Long interlocutorId) {
@@ -139,17 +140,9 @@ public class ChatService {
         sendInviteNotification(interlocutor, room);
     }
 
-//    public void createPublicRoom(CreateRoomDto dto, User owner) {
-//        Room room = new Room();
-//        room.setOwner(owner);
-//        room.setCreatedAt(Instant.now());
-//        room.setType(RoomType.PUBLIC);
-//        roomRepository.save(room);
-//        User users = userRepository.findById(dto.getUserId()).get();
-//        users.forEach(s -> addUserToRoom(s, room));
-//    }
-
     public void sendInviteNotification(User user, Room room) {
-        simpMessagingTemplate.convertAndSendToUser("test", "/notifications", "Notification");
+        simpMessagingTemplate.convertAndSendToUser("test",
+                "/notifications",
+                new NotificationDto<RoomDto>(NotificationType.INVITED_TO_ROOM.toString(), roomMapper.toDto(room)));
     }
 }

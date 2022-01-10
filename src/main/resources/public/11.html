@@ -23,7 +23,7 @@
             stompClient.connect({login: 'test'}, function(frame) {
                 setConnected(true);
                 console.log('Connected: ' + frame);
-                stompClient.subscribe('/user/notifications-test')
+                stompClient.subscribe('/user/notifications')
             });
         }
 

@@ -2,12 +2,14 @@ package io.solar.repository.messenger;
 
 import io.solar.dto.messenger.RoomDto;
 import io.solar.entity.messenger.Room;
+import io.solar.entity.messenger.RoomType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface RoomRepository extends JpaRepository<Room, Long> {
@@ -46,4 +48,14 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
     List<RoomDto> findAllRoomsBySearch(@Param("user_id") Long userId,
                                        @Param("room_type") String roomType,
                                        @Param("login_like") String loginLike);
+
+
+    @Query(value = "SELECT g1.room_id as id, count FROM " +
+            "          (SELECT rooms.id AS room_id, count(rooms.id) AS count FROM rooms " +
+            "              INNER JOIN users_rooms ur ON rooms.id = ur.room_id " +
+            "                  INNER JOIN users ON ur.user_id = users.id " +
+            "          WHERE (users.id =:user1Id OR users.id =:user2Id) AND type = 'PRIVATE' " +
+            "          GROUP BY rooms.id)g1 " +
+            "       WHERE count > 1", nativeQuery = true)
+    List<RoomDto> findPrivateRoomWithTwoUsers(@Param("user1Id")Long user1Id, @Param("user2Id")Long user2Id);
 }
