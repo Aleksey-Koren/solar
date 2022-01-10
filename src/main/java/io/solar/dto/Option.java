@@ -1,4 +1,4 @@
-package io.solar.utils;
+package io.solar.dto;
 
 import lombok.Getter;
 

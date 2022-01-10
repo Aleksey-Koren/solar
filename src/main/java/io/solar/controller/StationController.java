@@ -1,17 +1,11 @@
 package io.solar.controller;
 
-import io.solar.dto.Marketplace;
+import io.solar.dto.Option;
 import io.solar.dto.StationDto;
-import io.solar.entity.User;
-import io.solar.entity.objects.StarShip;
 import io.solar.facade.StationFacade;
 import io.solar.service.StationService;
 import io.solar.service.scheduler.GoodsGeneration;
 import io.solar.specification.filter.StationFilter;
-import io.solar.utils.Option;
-import io.solar.utils.context.AuthData;
-import io.solar.utils.db.Query;
-import io.solar.utils.db.Transaction;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -68,7 +62,7 @@ public class StationController {
     }
 
     @GetMapping("utils/dropdown")
-    public List<Option> dropdown(Transaction transaction) {
+    public List<Option> dropdown() {
         return stationService.findAll()
                 .stream()
                 .map(v -> new Option(v.getId(), v.getTitle()))
@@ -81,44 +75,5 @@ public class StationController {
     @Transactional
     public void generateGoods() {
         goodsGeneration.generateOnStations();
-    }
-
-
-
-
-
-
-
-
-
-    //TODO Methods below aren't refactored
-
-    @RequestMapping("user/marketplace")
-    public Marketplace getMarketplace(@AuthData User user, Transaction transaction) {
-        Long planetId = definePlanetId(user, transaction);
-        Query query = transaction.query("select * from ");
-        return new Marketplace(null, null, null);
-    }
-
-    private Long definePlanetId(User user, StarShip starShip) {
-        Long planetId = user.getLocation().getId();
-        if(planetId != null) {
-            return planetId;
-        }
-        if(starShip != null) {
-//            return starShip.getPlanet();
-            return null;
-        } else {
-            return 4L;//earth id
-        }
-    }
-    private Long definePlanetId(User user, Transaction transaction) {
-        Long planetId = user.getLocation().getId();
-        if(planetId != null) {
-            return planetId;
-        }
-//        Optional<StarShip> starShip = starShipService.getActiveShip(user, transaction);
-        Optional<StarShip> starShip = null;
-        return definePlanetId(user, starShip.get());
     }
 }

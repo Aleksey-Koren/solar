@@ -3,7 +3,7 @@ package io.solar.controller;
 import io.solar.dto.ProductDto;
 import io.solar.facade.ProductFacade;
 import io.solar.service.ProductService;
-import io.solar.utils.Option;
+import io.solar.dto.Option;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
