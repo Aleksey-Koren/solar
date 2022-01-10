@@ -49,9 +49,10 @@ public class ChatService {
                 .map(messageMapper::toDto);
     }
 
-    public List<RoomDto> findUserRoomsByLoginAndIsPrivate(Long userId, String roomType, String login) {
+    public List<RoomDto> findUserRoomsByLoginAndIsPrivate(Long userId, String roomType, String title) {
 
-        return roomRepository.findAllRoomsBySearch(userId, roomType, login.concat("%"));
+        return roomRepository.findAllRoomsBySearch(userId, roomType, title.concat("%"));
+       // return roomRepository.findAllRoomsBySearch(userId, roomType, login.concat("%"));
     }
 
     public List<RoomDtoImpl> getUserRooms(Long userId) {

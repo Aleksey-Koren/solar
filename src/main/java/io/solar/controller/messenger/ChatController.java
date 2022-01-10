@@ -70,11 +70,11 @@ public class ChatController {
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
     @Transactional
     public List<RoomDtoImpl> findRoomsBySearch(Principal principal,
-                                               @RequestParam String roomType,
-                                               @RequestParam String login) {
+                                               @RequestParam(required = false) String roomType,
+                                               @RequestParam String title) {
         User user = userService.findByLogin(principal.getName());
 
-        return chatFacade.findRoomsBySearch(user, roomType, login);
+        return chatFacade.findRoomsBySearch(user, roomType, title);
     }
 
     @PostMapping("/email")
@@ -91,7 +91,7 @@ public class ChatController {
     @PostMapping("/room")
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
     @Transactional
-    public ResponseEntity createRoom(@RequestBody CreateRoomDto dto, Principal principal) {
+    public ResponseEntity<Void> createRoom(@RequestBody CreateRoomDto dto, Principal principal) {
         User user = userService.findByLogin(principal.getName());
         return chatService.createRoom(dto, user);
     }

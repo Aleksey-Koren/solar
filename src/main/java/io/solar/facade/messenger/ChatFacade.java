@@ -15,9 +15,9 @@ public class ChatFacade {
     private final ChatService chatService;
     private final RoomMapper roomMapper;
 
-    public List<RoomDtoImpl> findRoomsBySearch(User user, String roomType, String login) {
+    public List<RoomDtoImpl> findRoomsBySearch(User user, String roomType, String title) {
 
-        return chatService.findUserRoomsByLoginAndIsPrivate(user.getId(), roomType, login)
+        return chatService.findUserRoomsByLoginAndIsPrivate(user.getId(), roomType, title)
                 .stream()
                 .map(roomMapper::toDtoListFromInterface)
                 .toList();
