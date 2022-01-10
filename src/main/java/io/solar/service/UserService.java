@@ -1,16 +1,16 @@
 package io.solar.service;
 
 import io.solar.dto.UserDto;
-import io.solar.entity.messenger.MessageType;
-import io.solar.specification.filter.UserFilter;
 import io.solar.entity.Permission;
 import io.solar.entity.User;
+import io.solar.entity.messenger.MessageType;
 import io.solar.mapper.UserMapper;
 import io.solar.repository.PermissionRepository;
 import io.solar.repository.UserRepository;
 import io.solar.security.Role;
 import io.solar.service.exception.ServiceException;
 import io.solar.specification.UserSpecification;
+import io.solar.specification.filter.UserFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -21,15 +21,19 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
-import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 
 @Service
 @RequiredArgsConstructor
@@ -105,14 +109,6 @@ public class UserService implements UserDetailsService {
                 );
 
         return userMapper.toDto(user);
-    }
-
-    private User mapUser(User user, boolean canEdit) {
-        user.setPassword("");
-        if (!canEdit) {
-            user.setLogin("");
-        }
-        return user;
     }
 
     private String receiveEmailFromLogin(User user) {

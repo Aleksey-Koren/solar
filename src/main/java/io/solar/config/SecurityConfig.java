@@ -85,10 +85,4 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
     }
-
-    @Bean
-    public Jackson2ObjectMapperBuilder configureObjectMapper() {
-        return new Jackson2ObjectMapperBuilder()
-                .modulesToInstall(Hibernate5Module.class);
-    }
 }
