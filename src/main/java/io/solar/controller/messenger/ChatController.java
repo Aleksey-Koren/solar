@@ -93,6 +93,6 @@ public class ChatController {
     @Transactional
     public ResponseEntity createRoom(@RequestBody CreateRoomDto dto, Principal principal) {
         User user = userService.findByLogin(principal.getName());
-            return chatService.createRoom(dto, user);
+        return chatService.createRoom(dto, user);
     }
 }

@@ -1,5 +1,8 @@
 package io.solar.config.messenger;
 
+import io.solar.entity.User;
+import io.solar.security.JwtProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
@@ -7,14 +10,16 @@ import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageHeaderAccessor;
+import org.springframework.stereotype.Service;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.Map;
 
+@Service
 public class UserInterceptor implements ChannelInterceptor {
 
+    @Autowired
+    private JwtProvider jwtProvider;
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
@@ -28,14 +33,15 @@ public class UserInterceptor implements ChannelInterceptor {
                     .get(SimpMessageHeaderAccessor.NATIVE_HEADERS);
 
             if (raw instanceof Map castedRaw) {
-                Object login = (castedRaw).get("login");
+                Object token = castedRaw.get("auth_token");
 
-                if (login instanceof ArrayList castedLogin) {
-                    accessor.setUser(new WebSocketUser(( castedLogin).get(0).toString()));
+                if (token instanceof ArrayList castedToken) {
+                    User user =  jwtProvider.verifyToken(castedToken.get(0).toString()).orElseThrow();
+                    System.out.println(user.getLogin());
+                    accessor.setUser(new WebSocketUser(user.getLogin()));
                 }
             }
         }
         return message;
     }
-
 }
