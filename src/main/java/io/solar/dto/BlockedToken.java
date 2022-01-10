@@ -1,6 +1,5 @@
-package io.solar.utils;
+package io.solar.dto;
 
-import io.solar.dto.Token;
 import lombok.Getter;
 
 @Getter

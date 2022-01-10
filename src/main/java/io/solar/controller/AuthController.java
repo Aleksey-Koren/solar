@@ -1,18 +1,16 @@
 package io.solar.controller;
 
 
-import io.solar.dto.UserDto;
-import io.solar.mapper.UserMapper;
-import io.solar.security.JwtProvider;
+import io.solar.dto.BlockedToken;
 import io.solar.dto.Register;
 import io.solar.dto.Token;
+import io.solar.dto.UserDto;
 import io.solar.entity.User;
+import io.solar.mapper.UserMapper;
+import io.solar.security.JwtProvider;
 import io.solar.security.Role;
 import io.solar.service.UserService;
-import io.solar.utils.BlockedToken;
-import io.solar.utils.db.Transaction;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -96,23 +94,4 @@ public class AuthController {
 
         return authorities.containsAll(permissions);
     }
-
-    public static boolean userCan(User user, String permission, Transaction transaction) {
-//        if(user == null) {
-//            return false;
-//        }
-//        Map<String, Permission> permissions = user.getPermissions();
-//        if (permissions == null) {
-//            Query query = transaction.query("select permission.id, permission.user_id, permission.permission_type, permission_type.title" +
-//                    " from permission" +
-//                    " inner join permission_type on permission.permission_type = permission_type.id" +
-//                    " where user_id = :userId");
-//            query.setLong("userId", user.getId());
-//            user.setPermissions(query.executeQuery(new PermissionMapper()).stream().collect(Collectors.toMap(Permission::getTitle, p -> p)));
-//            permissions = user.getPermissions();
-//        }
-//        return permissions.containsKey(permission);
-        return true;
-    }
-
 }

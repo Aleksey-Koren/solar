@@ -4,7 +4,7 @@ import io.solar.dto.PlanetDto;
 import io.solar.mapper.PlanetMapper;
 import io.solar.service.PlanetService;
 import io.solar.specification.filter.PlanetFilter;
-import io.solar.utils.Option;
+import io.solar.dto.Option;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;

@@ -6,14 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.IdClass;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.time.Instant;
 
@@ -27,12 +20,12 @@ import java.time.Instant;
 public class UserRoom {
 
     @Id
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
     @Id
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "room_id")
     private Room room;
 
@@ -48,7 +41,6 @@ public class UserRoom {
         this.subscribedAt = Instant.now();
     }
 
-
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
@@ -57,4 +49,3 @@ public class UserRoom {
         private Room room;
     }
 }
-
