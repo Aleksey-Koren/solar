@@ -3,7 +3,6 @@ package io.solar.controller;
 import io.solar.dto.PermissionDto;
 import io.solar.facade.PermissionFacade;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
