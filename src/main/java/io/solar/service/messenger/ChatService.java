@@ -13,7 +13,6 @@ import io.solar.repository.messenger.MessageRepository;
 import io.solar.repository.messenger.RoomRepository;
 import io.solar.repository.messenger.UserRoomRepository;
 import io.solar.specification.RoomSpecification;
-import io.solar.specification.filter.UserFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -52,7 +51,6 @@ public class ChatService {
     }
 
     public List<Room> findAll(RoomSpecification roomSpecification) {
-
         return roomRepository.findAll(roomSpecification);
     }
 
@@ -64,22 +62,22 @@ public class ChatService {
                 .toList();
     }
 
-    public void inviteUserToRoom(Long inviterId, Long invitedId, Long roomId) {
+    public void inviteToExistingRoom(User inviter, Long invitedId, Long roomId) {
 
-        User inviter = userRepository.findById(inviterId).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        String.format("There is no user with id = %d in database", inviterId))
-        );
         Room room = roomRepository.findById(roomId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         String.format("There is no room with id = %d in database", roomId))
         );
 
+        if (RoomType.PRIVATE.equals(room.getType())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "It is impossible to invite somebody else to existing private room");
+        }
+
         boolean inviterIsInRoom = userRoomRepository.existsById(new UserRoom.UserRoomPK(inviter, room));
 
         if (!inviterIsInRoom) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    String.format("User id = %d is not in room id = %d. He can't invite anybody to this room", inviterId, roomId));
+                    String.format("User id = %d is not in room id = %d. He can't invite anybody to this room", inviter.getId(), roomId));
         }
 
         if (RoomType.SYSTEM.equals(room.getType())) {
@@ -89,7 +87,7 @@ public class ChatService {
 
         User invited = userRepository.findById(invitedId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        String.format("There is no user with id = %d in database", inviterId))
+                        String.format("There is no user with id = %d in database", invitedId))
         );
 
         addUserToRoom(invited, room);
@@ -114,7 +112,7 @@ public class ChatService {
         room.setTitle(composeRoomTitle(dto, owner));
         roomRepository.save(room);
         addUserToRoom(owner, room);
-        inviteToPrivateRoom(room, owner, dto.getUserId());
+        inviteToRoomAtCreation(room, dto.getUserId());
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
@@ -134,7 +132,7 @@ public class ChatService {
         return user.getTitle() != null ? user.getTitle() : "user[id = " + user.getId() + "]";
     }
 
-    private void inviteToPrivateRoom(Room room, User owner, Long interlocutorId) {
+    private void inviteToRoomAtCreation(Room room, Long interlocutorId) {
         User interlocutor = userRepository.findById(interlocutorId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         String.format("There is no user with id = %d in database", interlocutorId)));
