@@ -53,9 +53,11 @@ public class UserService implements UserDetailsService {
     }
 
     public User registerNewUser(User user, Role role) {
+
         if (findByLogin(user.getLogin()) != null) {
             throw new ServiceException("User with such login already exists");
         }
+
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         resetHackAttempts(user);
 
@@ -67,6 +69,7 @@ public class UserService implements UserDetailsService {
             int index = user.getLogin().indexOf("@");
             user.setTitle(index > 3 ? user.getLogin().substring(0, user.getLogin().indexOf("@")) : user.getLogin());
         }
+
         user.setPermissions(permissions);
         user.setEmail(receiveEmailFromLogin(user));
 
