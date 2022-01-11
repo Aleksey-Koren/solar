@@ -13,6 +13,7 @@ import io.solar.repository.messenger.MessageRepository;
 import io.solar.repository.messenger.RoomRepository;
 import io.solar.repository.messenger.UserRoomRepository;
 import io.solar.specification.RoomSpecification;
+import io.solar.specification.filter.UserFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -50,10 +51,9 @@ public class ChatService {
                 .map(messageMapper::toDto);
     }
 
-    public List<Room> findUserRoomsByLoginAndIsPrivate(RoomSpecification roomSpecification) {
+    public List<Room> findUserRoomsByTitleAndType(RoomSpecification roomSpecification) {
 
         return roomRepository.findAll(roomSpecification);
-       // return roomRepository.findAllRoomsBySearch(userId, roomType, login.concat("%"));
     }
 
     public List<RoomDtoImpl> getUserRooms(Long userId) {

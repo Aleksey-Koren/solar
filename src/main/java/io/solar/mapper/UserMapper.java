@@ -19,8 +19,6 @@ import static java.util.stream.Collectors.toSet;
 public class UserMapper {
 
     private final UserRepository userRepository;
-    private final PermissionMapper permissionMapper;
-    private final RoomMapper roomMapper;
     private final BasicObjectViewMapper basicObjectViewMapper;
 
     public User toEntity(UserDto dto) {
@@ -43,8 +41,6 @@ public class UserMapper {
         user.setAvatar(dto.getAvatar());
         user.setEmailNotifications(dto.getEmailNotifications());
         user.setEmail(dto.getEmail());
-        user.setPermissions(dto.getPermissions() == null ? null : dto.getPermissions().stream().map(permissionMapper::toEntity).collect(toSet()));
-        user.setRooms(dto.getRooms() == null ? null : dto.getRooms().stream().map(roomMapper::toEntity).toList());
 
         return user;
     }
@@ -62,8 +58,14 @@ public class UserMapper {
                 .hackAttempts(user.getHackAttempts())
                 .avatar(user.getAvatar())
                 .emailNotifications(user.getEmailNotifications())
-                .permissions(user.getPermissions().stream().map(permissionMapper::toDto).collect(toSet()))
-                .rooms(user.getRooms().stream().map(roomMapper::toDto).collect(toList()))
+                .build();
+    }
+
+    public UserDto toDtoWithIdAndTitle(User user) {
+
+        return UserDto.builder()
+                .id(user.getId())
+                .title(user.getTitle())
                 .build();
     }
 }

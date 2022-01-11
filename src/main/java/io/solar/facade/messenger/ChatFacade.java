@@ -1,9 +1,11 @@
 package io.solar.facade.messenger;
 
-import io.solar.dto.messenger.RoomDtoImpl;
+import io.solar.dto.messenger.SearchRoomDto;
+import io.solar.entity.User;
 import io.solar.mapper.messanger.RoomMapper;
 import io.solar.service.messenger.ChatService;
 import io.solar.specification.RoomSpecification;
+import io.solar.specification.filter.RoomFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -15,11 +17,12 @@ public class ChatFacade {
     private final ChatService chatService;
     private final RoomMapper roomMapper;
 
-    public List<RoomDtoImpl> findRoomsBySearch(RoomSpecification roomSpecification) {
+    public List<SearchRoomDto> findRoomsBySearch(User user, RoomFilter roomFilter) {
+        roomFilter.setUserId(user.getId());
 
-        return chatService.findUserRoomsByLoginAndIsPrivate(roomSpecification)
+        return chatService.findUserRoomsByTitleAndType(new RoomSpecification(roomFilter))
                 .stream()
-                .map(roomMapper::toDto)
+                .map(roomMapper::toSearchRoomDto)
                 .toList();
     }
 }

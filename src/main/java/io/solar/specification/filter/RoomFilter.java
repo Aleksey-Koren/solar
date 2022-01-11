@@ -1,12 +1,12 @@
 package io.solar.specification.filter;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
-@Builder
+@Getter
+@Setter
 public class RoomFilter {
-    private Long userId;
     private String roomType;
+    private Long userId;
     private String title;
 }
