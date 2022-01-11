@@ -2,9 +2,11 @@ package io.solar.mapper.messanger;
 
 import io.solar.dto.messenger.RoomDto;
 import io.solar.dto.messenger.RoomDtoImpl;
+import io.solar.dto.messenger.SearchRoomDto;
 import io.solar.entity.messenger.Room;
 import io.solar.entity.User;
 import io.solar.mapper.EntityDtoMapper;
+import io.solar.mapper.UserMapper;
 import io.solar.repository.messenger.RoomRepository;
 import io.solar.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,7 @@ public class RoomMapper implements EntityDtoMapper<Room, RoomDtoImpl> {
 
     private final RoomRepository roomRepository;
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
     @Override
     public Room toEntity(RoomDtoImpl dto) {
@@ -38,6 +41,18 @@ public class RoomMapper implements EntityDtoMapper<Room, RoomDtoImpl> {
                 .createdAt(entity.getCreatedAt())
                 .ownerId(entity.getOwner().getId())
                 .roomType(entity.getType())
+                .build();
+    }
+
+    public SearchRoomDto toSearchRoomDto(Room room) {
+
+        return SearchRoomDto.builder()
+                .id(room.getId())
+                .title(room.getTitle())
+                .createdAt(room.getCreatedAt())
+                .ownerId(room.getOwner().getId())
+                .roomType(room.getType())
+                .participants(room.getUsers().stream().map(userMapper::toDtoWithIdAndTitle).toList())
                 .build();
     }
 

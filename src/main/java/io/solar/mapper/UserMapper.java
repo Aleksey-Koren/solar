@@ -60,4 +60,12 @@ public class UserMapper {
                 .emailNotifications(user.getEmailNotifications())
                 .build();
     }
+
+    public UserDto toDtoWithIdAndTitle(User user) {
+
+        return UserDto.builder()
+                .id(user.getId())
+                .title(user.getTitle())
+                .build();
+    }
 }

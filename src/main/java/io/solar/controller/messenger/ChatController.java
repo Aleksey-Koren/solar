@@ -3,11 +3,16 @@ package io.solar.controller.messenger;
 import io.solar.dto.messenger.CreateRoomDto;
 import io.solar.dto.messenger.MessageDto;
 import io.solar.dto.messenger.RoomDtoImpl;
+import io.solar.dto.messenger.SearchRoomDto;
 import io.solar.entity.User;
 import io.solar.entity.messenger.MessageType;
 import io.solar.facade.messenger.ChatFacade;
+import io.solar.mapper.messanger.RoomMapper;
+import io.solar.repository.messenger.RoomRepository;
 import io.solar.service.UserService;
 import io.solar.service.messenger.ChatService;
+import io.solar.specification.RoomSpecification;
+import io.solar.specification.filter.RoomFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -36,6 +41,8 @@ public class ChatController {
     private final UserService userService;
     private final ChatService chatService;
     private final ChatFacade chatFacade;
+    private final RoomRepository roomRepository;
+    private final RoomMapper roomMapper;
 
     @GetMapping("room/{roomId}/messages")
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
@@ -69,12 +76,10 @@ public class ChatController {
     @GetMapping("/room")
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
     @Transactional
-    public List<RoomDtoImpl> findRoomsBySearch(Principal principal,
-                                               @RequestParam(required = false) String roomType,
-                                               @RequestParam String title) {
+    public List<SearchRoomDto> findRoomsBySearch(Principal principal, RoomFilter roomFilter) {
         User user = userService.findByLogin(principal.getName());
 
-        return chatFacade.findRoomsBySearch(user, roomType, title);
+        return chatFacade.findRoomsBySearch(user, roomFilter);
     }
 
     @PostMapping("/email")
