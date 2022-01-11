@@ -8,6 +8,8 @@ import io.solar.repository.BasicObjectRepository;
 import io.solar.repository.UserRepository;
 import io.solar.repository.messenger.MessageRepository;
 import io.solar.repository.messenger.RoomRepository;
+import io.solar.security.Role;
+import io.solar.service.UserService;
 import net.bytebuddy.utility.RandomString;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,20 +35,19 @@ public class FillDatabaseTest {
     private final RoomRepository roomRepository;
     private final BasicObjectRepository basicObjectRepository;
     private final MessageRepository messageRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final UserService userService;
 
     @Autowired
     public FillDatabaseTest(UserRepository userRepository,
                             RoomRepository roomRepository,
                             BasicObjectRepository basicObjectRepository,
                             MessageRepository messageRepository,
-                            PasswordEncoder passwordEncoder) {
-
+                            UserService userService) {
         this.userRepository = userRepository;
         this.roomRepository = roomRepository;
         this.basicObjectRepository = basicObjectRepository;
         this.messageRepository = messageRepository;
-        this.passwordEncoder = passwordEncoder;
+        this.userService = userService;
     }
 
     @Order(1)
@@ -55,18 +56,18 @@ public class FillDatabaseTest {
 
         User user = User.builder()
                 .login(UUID.randomUUID().toString())
-                .password(passwordEncoder.encode("pass"))
+                .password("pass")
                 .money(1000L)
                 .hackAttempts(0)
                 .build();
 
-        userRepository.save(user);
+        userService.registerNewUser(user, Role.USER);
     }
 
     @Order(2)
     @RepeatedTest(100)
     public void createRooms() {
-        Room room = new Room(null, UUID.randomUUID().toString(), Instant.now(), RoomType.PRIVATE, findRandomUser(), null);
+        Room room = new Room(null, UUID.randomUUID().toString(), Instant.now(), RoomType.PUBLIC, findRandomUser(), null);
 
         roomRepository.save(room);
     }
