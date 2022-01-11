@@ -8,6 +8,8 @@ import io.solar.entity.messenger.MessageType;
 import io.solar.facade.messenger.ChatFacade;
 import io.solar.service.UserService;
 import io.solar.service.messenger.ChatService;
+import io.solar.specification.RoomSpecification;
+import io.solar.specification.filter.RoomFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -74,7 +76,11 @@ public class ChatController {
                                                @RequestParam String title) {
         User user = userService.findByLogin(principal.getName());
 
-        return chatFacade.findRoomsBySearch(user, roomType, title);
+        return chatFacade.findRoomsBySearch(new RoomSpecification(RoomFilter.builder()
+                .roomType(roomType)
+                .title(title)
+                .userId(user.getId())
+                .build()));
     }
 
     @PostMapping("/email")

@@ -3,7 +3,10 @@ package io.solar.repository.messenger;
 import io.solar.dto.messenger.RoomDto;
 import io.solar.entity.messenger.Room;
 import io.solar.entity.messenger.RoomType;
+import io.solar.entity.objects.BasicObject;
+import io.solar.specification.RoomSpecification;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -12,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface RoomRepository extends JpaRepository<Room, Long> {
+public interface RoomRepository extends JpaRepository<Room, Long>, JpaSpecificationExecutor<Room> {
 /*
     SELECT rooms.id, rooms.title, count(messages.id) as amount
     from rooms
@@ -50,7 +53,6 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
     List<RoomDto> findAllRoomsBySearch(@Param("user_id") Long userId,
                                        @Param("room_type") String roomType,
                                        @Param("title") String title);
-
 
     @Query(value = "SELECT rooms.id AS room_id, count(room_id) as count " +
             "FROM rooms " +

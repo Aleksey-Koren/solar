@@ -12,6 +12,7 @@ import io.solar.repository.UserRepository;
 import io.solar.repository.messenger.MessageRepository;
 import io.solar.repository.messenger.RoomRepository;
 import io.solar.repository.messenger.UserRoomRepository;
+import io.solar.specification.RoomSpecification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -49,9 +50,9 @@ public class ChatService {
                 .map(messageMapper::toDto);
     }
 
-    public List<RoomDto> findUserRoomsByLoginAndIsPrivate(Long userId, String roomType, String title) {
+    public List<Room> findUserRoomsByLoginAndIsPrivate(RoomSpecification roomSpecification) {
 
-        return roomRepository.findAllRoomsBySearch(userId, roomType, title.concat("%"));
+        return roomRepository.findAll(roomSpecification);
        // return roomRepository.findAllRoomsBySearch(userId, roomType, login.concat("%"));
     }
 
@@ -100,10 +101,10 @@ public class ChatService {
         userRepository.save(user);
     }
 
-    public ResponseEntity createRoom(CreateRoomDto dto, User owner) {
+    public ResponseEntity<Void> createRoom(CreateRoomDto dto, User owner) {
         if (dto.getIsPrivate()) {
             if (ifPrivateRoomAlreadyExists(dto.getUserId(), owner.getId())) {
-                return new ResponseEntity(HttpStatus.BAD_REQUEST);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
             }
         }
         Room room = new Room();
@@ -114,7 +115,7 @@ public class ChatService {
         roomRepository.save(room);
         addUserToRoom(owner, room);
         inviteToPrivateRoom(room, owner, dto.getUserId());
-        return new ResponseEntity(HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     private boolean ifPrivateRoomAlreadyExists(Long user1Id, Long user2Id) {
