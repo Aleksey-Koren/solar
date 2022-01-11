@@ -31,7 +31,8 @@ SolarMapChatButton.prototype.createChatList = function() {
             return;
         }
         var searchResults = {};
-        Rest.doGet("/api/chat/room?participants=2" +
+        searchResults[me.solarMap.context.stores.userStore.user.user_id] = true;
+        return Rest.doGet("/api/chat/room?participants=2" +
             "&withParticipants=true" +
             "&title=" + encodeURIComponent(value) +
             "&userId=" + me.solarMap.context.stores.userStore.user.user_id
@@ -50,26 +51,26 @@ SolarMapChatButton.prototype.createChatList = function() {
                         me.openRoom(room);
                     }}, target[0].title)));
             })
+            return existingRooms;
         }).then(function() {
-            Rest.doGet("/api/users?title=" + encodeURIComponent(value)).then(function(users) {
-                Dom.append(chatInviteList, users.filter(function(user){
-                    return !searchResults[user.id];
-                }).map(function(user){
-                    return Dom.el('div', null, Dom.el('a', {href: '/#', onclick: function(e){
-                            e.preventDefault();
-                            Rest.doPost("/api/chat/room").then(room => {
-                                this.rooms.push(room);
-                                Rest.doPatch({
-                                    inviterId: me.solarMap.context.stores.userStore.user.user_id,
-                                    invitedId: user.id,
-                                    roomId: room.id
-                                }).then(function() {
-                                    me.openRoom(room);
-                                });
-                            })
-                        }}, JSON.encode(user)));
-                }))
-            })
+            return Rest.doGet("/api/users?page=0&size=50&title=" + encodeURIComponent(value))}
+        ).then(function(response) {
+            var users = response.content
+            Dom.append(chatInviteList, users.filter(function(user){
+                return !searchResults[user.id];
+            }).map(function(user){
+                return Dom.el('div', null, Dom.el('a', {href: '/#', onclick: function(e){
+                        e.preventDefault();
+                        Rest.doPost("/api/chat/room", {userId: user.id, isPrivate: true}).then(room => {
+                            me.rooms.push(room);
+                            me.openRoom(room);
+                        })
+                    }}, user.title || user.id));
+            }))
+            return response;
+        }).catch(function(e){
+            console.log(e)
+            Notification.error("Fail to load users")
         })
     }
     var chatInviteContainer = Dom.el('div', null, [
@@ -107,7 +108,10 @@ SolarMapChatButton.prototype.showChat = function() {
                 this.chatControls,
                 this.chatList
             ]),
-            this.chatBody
+            Dom.el('div', 'chat-main', [
+                this.chatBody,
+                this.chatBodyControls
+            ])
         ],
         title: "Chat"
     });
@@ -117,21 +121,27 @@ SolarMapChatButton.prototype.showChat = function() {
 
 SolarMapChatButton.prototype.loadChats = function() {
     var me = this;
-    Rest.doGet("/api/chat/rooms").then(function(value) {
+    Rest.doGet("/api/chat/user/room").then(function(value) {
         me.rooms = value;
         Dom.clear(me.chatList);
         Dom.append(me.chatList, me.createRooms())
+    }).catch(function(){
+        Notification.error("Fail to load chats")
     })
 }
 
 SolarMapChatButton.prototype.createRooms = function() {
     var me = this;
-    return this.rooms.map(function(room) {
+    var out = this.rooms.map(function(room) {
         return Dom.el('div', 'chat-room', Dom.el('a', {href: '/#', click: function(e) {
             e.preventDefault();
             me.openRoom(room);
         }}), room.title);
     })
+    if(out.length === 0) {
+        out.push(Dom.el("div", 'chat-room', "no chats"))
+    }
+    return out;
 }
 
 SolarMapChatButton.prototype.openRoom = function(room) {

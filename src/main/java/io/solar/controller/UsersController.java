@@ -31,19 +31,20 @@ public class UsersController {
     private final UserFacade userFacade;
 
     @GetMapping
-    @PreAuthorize("hasAuthority('EDIT_USER')")
+    @PreAuthorize("hasAnyAuthority('PLAY_THE_GAME','EDIT_USER')")
     @Transactional
     public Page<UserDto> getList(Pageable pageable, UserFilter userFilter) {
 
-        return userService.getAllUsers(pageable, userFilter);
+        return userService.getAllUsers(pageable, userFilter).map(u -> {u.setLogin(null);return u;});
     }
 
     @GetMapping("{id}")
-    @PreAuthorize("hasAuthority('EDIT_USER')")
+    @PreAuthorize("hasAnyAuthority('PLAY_THE_GAME', 'EDIT_USER')")
     @Transactional
     public ResponseEntity<UserDto> getOne(@PathVariable("id") long userId) {
-
-        return ResponseEntity.ok(userService.getUserById(userId));
+        UserDto out = userService.getUserById(userId);
+        out.setLogin(null);
+        return ResponseEntity.ok(out);
     }
 
     @PutMapping("{id}")

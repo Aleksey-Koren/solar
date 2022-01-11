@@ -8,6 +8,7 @@
 <!--    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@5.0.0/bundles/stomp.umd.min.js"></script>-->
     <script type="text/javascript">
         var stompClient = null;
+        var token = {'auth_token' : '0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoyLCJpc3MiOiJhdXRoMCIsImV4cCI6MTY0MTgyMzk0Nn0.IvKO9bY9t0DWCdP8AFUZiHdP070wlVBC5viyIBVoKfY'}
 
         function setConnected(connected) {
             document.getElementById('connect').disabled = connected;
@@ -20,10 +21,10 @@
         function connect(options) {
             var socket = new SockJS('/api/ws');
             stompClient = Stomp.over(socket);
-            stompClient.connect({login: 'test'}, function(frame) {
+            stompClient.connect(token, function(frame) {
                 setConnected(true);
                 console.log('Connected: ' + frame);
-                stompClient.subscribe('/user/notifications-test')
+                stompClient.subscribe('/user/notifications')
             });
         }
 

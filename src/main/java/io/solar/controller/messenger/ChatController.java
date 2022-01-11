@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -69,11 +70,11 @@ public class ChatController {
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
     @Transactional
     public List<RoomDtoImpl> findRoomsBySearch(Principal principal,
-                                               @RequestParam String roomType,
-                                               @RequestParam String login) {
+                                               @RequestParam(required = false) String roomType,
+                                               @RequestParam String title) {
         User user = userService.findByLogin(principal.getName());
 
-        return chatFacade.findRoomsBySearch(user, roomType, login);
+        return chatFacade.findRoomsBySearch(user, roomType, title);
     }
 
     @PostMapping("/email")
@@ -90,12 +91,8 @@ public class ChatController {
     @PostMapping("/room")
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
     @Transactional
-    public void createRoom(@RequestBody CreateRoomDto dto, Principal principal) {
+    public ResponseEntity<Void> createRoom(@RequestBody CreateRoomDto dto, Principal principal) {
         User user = userService.findByLogin(principal.getName());
-//        if (dto.getIsPrivate()) {
-//            chatService.createPrivateRoom(dto, user);
-//        } else {
-//            chatService.createPublicRoom(dto, user);
-//        }
+        return chatService.createRoom(dto, user);
     }
 }
