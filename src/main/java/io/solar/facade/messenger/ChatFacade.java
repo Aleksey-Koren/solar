@@ -17,10 +17,10 @@ public class ChatFacade {
     private final ChatService chatService;
     private final RoomMapper roomMapper;
 
-    public List<SearchRoomDto> findRoomsBySearch(User user, RoomFilter roomFilter) {
+    public List<SearchRoomDto> findAllRooms(User user, RoomFilter roomFilter) {
         roomFilter.setUserId(user.getId());
 
-        return chatService.findUserRoomsByTitleAndType(new RoomSpecification(roomFilter))
+        return chatService.findAll(new RoomSpecification(roomFilter))
                 .stream()
                 .map(roomMapper::toSearchRoomDto)
                 .toList();

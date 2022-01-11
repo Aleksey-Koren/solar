@@ -7,11 +7,8 @@ import io.solar.dto.messenger.SearchRoomDto;
 import io.solar.entity.User;
 import io.solar.entity.messenger.MessageType;
 import io.solar.facade.messenger.ChatFacade;
-import io.solar.mapper.messanger.RoomMapper;
-import io.solar.repository.messenger.RoomRepository;
 import io.solar.service.UserService;
 import io.solar.service.messenger.ChatService;
-import io.solar.specification.RoomSpecification;
 import io.solar.specification.filter.RoomFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -77,7 +74,7 @@ public class ChatController {
     public List<SearchRoomDto> findRoomsBySearch(Principal principal, RoomFilter roomFilter) {
         User user = userService.findByLogin(principal.getName());
 
-        return chatFacade.findRoomsBySearch(user, roomFilter);
+        return chatFacade.findAllRooms(user, roomFilter);
     }
 
     @PostMapping("/email")

@@ -51,7 +51,7 @@ public class ChatService {
                 .map(messageMapper::toDto);
     }
 
-    public List<Room> findUserRoomsByTitleAndType(RoomSpecification roomSpecification) {
+    public List<Room> findAll(RoomSpecification roomSpecification) {
 
         return roomRepository.findAll(roomSpecification);
     }
