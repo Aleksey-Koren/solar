@@ -51,10 +51,10 @@ public class ChatController {
         return chatService.getUserRooms(user.getId());
     }
 
-    @PutMapping("room/{roomId}/participants/{invitedId}")
+    @PatchMapping("room/{roomId}/participants")
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
     @Transactional
-    public void inviteToRoom(@PathVariable("invitedId") Long invitedId,
+    public void inviteToRoom(@RequestBody Long invitedId,
                              @PathVariable("roomId") Long roomId,
                              Principal principal) {
         User inviter = userService.findByLogin(principal.getName());
