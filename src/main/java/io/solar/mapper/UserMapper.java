@@ -50,7 +50,6 @@ public class UserMapper {
         return UserDto.builder()
                 .id(user.getId())
                 .title(user.getTitle())
-                .login(user.getLogin())
                 .email(user.getEmail())
                 .money(user.getMoney())
                 .location(user.getLocation() == null ? null : basicObjectViewMapper.toDto(user.getLocation()))

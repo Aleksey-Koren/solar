@@ -35,7 +35,7 @@ public class UsersController {
     @Transactional
     public Page<UserDto> getList(Pageable pageable, UserFilter userFilter) {
 
-        return userService.getAllUsers(pageable, userFilter).map(u -> {u.setLogin(null);return u;});
+        return userService.getAllUsers(pageable, userFilter);
     }
 
     @GetMapping("{id}")
@@ -43,7 +43,6 @@ public class UsersController {
     @Transactional
     public ResponseEntity<UserDto> getOne(@PathVariable("id") long userId) {
         UserDto out = userService.getUserById(userId);
-        out.setLogin(null);
         return ResponseEntity.ok(out);
     }
 
@@ -74,7 +73,7 @@ public class UsersController {
 
     @DeleteMapping("{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable("id") Long id) {
-        if(!hasPermissions(List.of("EDIT_USER", "DELETE_USER"))) {
+        if (!hasPermissions(List.of("EDIT_USER", "DELETE_USER"))) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
         userService.findById(id).ifPresent(userService::delete);
