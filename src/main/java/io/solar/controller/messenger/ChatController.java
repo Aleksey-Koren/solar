@@ -17,14 +17,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
@@ -58,14 +51,14 @@ public class ChatController {
         return chatService.getUserRooms(user.getId());
     }
 
-    @PatchMapping("room/{roomId}/participants")
+    @PutMapping("room/{roomId}/participants/{invitedId}")
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
     @Transactional
-    public void inviteToRoom(@RequestParam Long inviterId,
-                             @RequestParam Long invitedId,
-                             @RequestParam Long roomId) {
-
-        chatService.inviteUserToRoom(inviterId, invitedId, roomId);
+    public void inviteToRoom(@PathVariable("invitedId") Long invitedId,
+                             @PathVariable("roomId") Long roomId,
+                             Principal principal) {
+        User inviter = userService.findByLogin(principal.getName());
+        chatService.inviteToExistingRoom(inviter, invitedId, roomId);
     }
 
     @GetMapping("/room")

@@ -2,17 +2,12 @@ package io.solar.mapper;
 
 import io.solar.dto.UserDto;
 import io.solar.entity.User;
-import io.solar.mapper.messanger.RoomMapper;
 import io.solar.mapper.objects.BasicObjectViewMapper;
 import io.solar.repository.UserRepository;
-import io.solar.repository.messenger.RoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
 
 @Service
 @RequiredArgsConstructor
