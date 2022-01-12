@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import static io.solar.entity.messenger.MessageType.CHAT;
+
 @Service
 @RequiredArgsConstructor
 public class MessageMapper implements EntityDtoMapper<Message, MessageDto> {
@@ -42,7 +44,7 @@ public class MessageMapper implements EntityDtoMapper<Message, MessageDto> {
 
         entity.setTitle(dto.getTitle());
         entity.setMessage(dto.getMessage());
-        entity.setMessageType(dto.getMessageType() != null ? MessageType.valueOf(dto.getMessageType()) : null);
+        entity.setMessageType(dto.getMessageType() != null ? MessageType.valueOf(dto.getMessageType()) : CHAT);
         return entity;
     }
 

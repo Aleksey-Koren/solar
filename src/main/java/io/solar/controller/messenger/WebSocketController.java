@@ -35,13 +35,8 @@ public class WebSocketController {
     @MessageMapping("/{roomId}")
     @SendTo("/room/{roomId}")
     public MessageDto processMessage(@DestinationVariable("roomId") Long roomId, @Payload MessageDto message) {
-        webSocketFacade.processMessage(message);
-
-
         message.setRoomId(roomId);
-        System.out.println("I am in the controller!!!!!!!!!!!");
-        System.out.println(roomId);
-        System.out.println(message);
+        webSocketFacade.processMessage(message);
         return message;
     }
 }

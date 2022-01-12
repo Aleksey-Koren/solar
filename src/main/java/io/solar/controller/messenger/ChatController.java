@@ -37,7 +37,7 @@ public class ChatController {
     @Transactional
     public Page<MessageDto> getMessageHistory(@PathVariable("roomId") Long roomId
             , Principal principal
-            , @PageableDefault(size = 2) Pageable pageable) {
+            , @PageableDefault(size = 20) Pageable pageable) {
         User user = userService.findByLogin(principal.getName());
         return chatService.getMessageHistory(roomId, user, pageable);
     }

@@ -12,6 +12,13 @@ function SolarMapChatButton( solarMap) {
     this.chatControls = null;//chat controls container - invite to chat, search for particular chat, etc
     this.chatBody = null;//chat body container (messages from particular chat)
     this.chatBodyControls = null;//controls to post message
+
+    var socket = new SockJS('/api/ws');
+    this.stompClient = Stomp.over(socket);
+    this.stompClient.connect(solarMap.context.loginStorage.getItem('token'), function() {
+        stompClient.subscribe('/user/notifications')
+    });
+
     this.container = Dom.el('div', {class: 'solar-map-control', onclick: function(){
             me.showChat();
         }
@@ -22,8 +29,15 @@ function SolarMapChatButton( solarMap) {
 
 SolarMapChatButton.prototype.createChatList = function() {
     this.chatList = Dom.el('div', 'chat-list');
-    var chatInviteList = Dom.el('div');
+    var chatInviteList = Dom.el('div', 'chat-inv-list');
+    chatInviteList.style.display = 'none';
     var me = this;
+
+    function hideSearchResutl() {
+        Dom.clear(chatInviteList);
+        chatInviteList.style.display = 'none';
+    }
+
     function lookup(value) {
         value = (value || "").trim();
         Dom.clear(chatInviteList);
@@ -37,6 +51,7 @@ SolarMapChatButton.prototype.createChatList = function() {
             "&title=" + encodeURIComponent(value) +
             "&userId=" + me.solarMap.context.stores.userStore.user.user_id
         ).then(function(existingRooms) {
+            var added = false;
             existingRooms.forEach(function(room) {
                 var target = room.participants.filter(function(p) {
                     return p.id !== me.solarMap.context.stores.userStore.user.user_id && p.title.indexOf(value) > -1
@@ -44,10 +59,16 @@ SolarMapChatButton.prototype.createChatList = function() {
                 if(target.length !== 1) {
                     return;
                 }
+                if(!added) {
+                    added = true;
+                    Dom.append(chatInviteList, Dom.el('div', null, 'Existing chats:'))
+                    chatInviteList.style.display = 'block';
+                }
                 searchResults[target[0].id] = true;
                 Dom.append(chatInviteList, Dom.el('div', 'chat-search-result',
                     Dom.el('a', {href: '/#', onclick: function(e){
                         e.preventDefault();
+                        hideSearchResutl();
                         me.openRoom(room);
                     }}, target[0].title)));
             })
@@ -55,18 +76,26 @@ SolarMapChatButton.prototype.createChatList = function() {
         }).then(function() {
             return Rest.doGet("/api/users?page=0&size=50&title=" + encodeURIComponent(value))}
         ).then(function(response) {
-            var users = response.content
-            Dom.append(chatInviteList, users.filter(function(user){
+            var users = response.content.filter(function(user){
                 return !searchResults[user.id];
             }).map(function(user){
                 return Dom.el('div', null, Dom.el('a', {href: '/#', onclick: function(e){
                         e.preventDefault();
                         Rest.doPost("/api/chat/room", {userId: user.id, isPrivate: true}).then(room => {
                             me.rooms.push(room);
+                            hideSearchResutl();
                             me.openRoom(room);
                         })
                     }}, user.title || user.id));
-            }))
+            })
+
+            if(users.length) {
+                Dom.append(chatInviteList, Dom.el("div", null, 'Start new chat with:'));
+                chatInviteList.style.display = 'block';
+                Dom.append(chatInviteList, users)
+            } else {
+                Dom.append(chatInviteList, Dom.el('div', null, "No users with such search criteria"))
+            }
             return response;
         }).catch(function(e){
             console.log(e)
@@ -77,8 +106,8 @@ SolarMapChatButton.prototype.createChatList = function() {
         Dom.el('input', {class: 'chat-new-chat', placeholder: "Search", onblur: function(e){
                 lookup(e.target.value);
                 setTimeout(function() {
-                    Dom.clear(chatInviteList);
-                }, 5000)
+                    hideSearchResutl();
+                }, 50000)
             }, onkeyup(e) {
                 if (e.key === 'Enter' || e.keyCode === 13) {
                     lookup(e.target.value)
@@ -101,9 +130,10 @@ SolarMapChatButton.prototype.showChat = function() {
     }
     this.createChatList();
     this.createChatBody();
+    this.createChatBodyControls();
     this.chatPopup = new Popup({
         context: this.solarMap.context,
-        content: [
+        content: Dom.el('div', 'chat-content', [
             Dom.el('div', 'chat-sidebar', [
                 this.chatControls,
                 this.chatList
@@ -112,19 +142,36 @@ SolarMapChatButton.prototype.showChat = function() {
                 this.chatBody,
                 this.chatBodyControls
             ])
-        ],
+        ]),
         title: "Chat"
     });
     this.chatPopup.show();
     this.loadChats();
 }
 
+SolarMapChatButton.prototype.createChatBodyControls = function() {
+    var message = Dom.el('textarea');
+    var me = this;
+    var button = Dom.el('input', {type: 'button', value: "Send", onclick: function(){
+        var value = message.value.trim();
+        if(value) {
+            me.sendMessage(value);
+            message.value = '';
+        }
+    }})
+    this.chatBodyControls = Dom.el('div', 'chat-body-controls', [
+        message, button
+    ])
+}
 SolarMapChatButton.prototype.loadChats = function() {
     var me = this;
     Rest.doGet("/api/chat/user/room").then(function(value) {
         me.rooms = value;
         Dom.clear(me.chatList);
         Dom.append(me.chatList, me.createRooms())
+        if(me.rooms.length > 0) {
+            me.openRoom(me.rooms[0]);
+        }
     }).catch(function(){
         Notification.error("Fail to load chats")
     })
@@ -133,10 +180,32 @@ SolarMapChatButton.prototype.loadChats = function() {
 SolarMapChatButton.prototype.createRooms = function() {
     var me = this;
     var out = this.rooms.map(function(room) {
+        try {
+            me.stompClient.subscribe("/room/" + room.id, function(response) {
+                var message = JSON.parse(response.body);
+                me.appendMessage(message);
+                for(var i = 0; i < me.rooms.length; i++) {
+                    var room = me.rooms[i];
+                    if(room.id === message.roomId) {
+                        if(room.id !== me.room) {
+                            room.amount++;
+                            var unread = document.getElementById('chat-unread-' + room.id );
+                            if(unread) unread.innerHTML = "+" + room.amount;
+                        }
+                        room.messages.push(message)
+                        break;
+                    }
+                }
+            });
+        } catch (e) {
+            console.error(e);
+        }
+        var unread = Dom.el('sup', {class: 'chat-unread', id: 'chat-unread-' + room.id}, room.amount && room.amount !== '0' ? "+" + room.amount : null);
         return Dom.el('div', 'chat-room', Dom.el('a', {href: '/#', click: function(e) {
             e.preventDefault();
             me.openRoom(room);
-        }}), room.title);
+            Dom.clear(unread);
+        }}, [room.title || room.id, unread]));
     })
     if(out.length === 0) {
         out.push(Dom.el("div", 'chat-room', "no chats"))
@@ -144,17 +213,42 @@ SolarMapChatButton.prototype.createRooms = function() {
     return out;
 }
 
+SolarMapChatButton.prototype.sendMessage = function(message) {
+    this.stompClient.send("/chat/" + this.room, {}, JSON.stringify({
+        senderId: this.solarMap.context.stores.userStore.user.user_id,
+        message:message
+    }));
+}
+
 SolarMapChatButton.prototype.openRoom = function(room) {
     Dom.clear(this.chatBody);
     var me = this;
     me.room = room.id;
-    Rest.doGet("/api/chat/room/" + room.id + "/messages").then(function(messages) {
+    Rest.doGet("/api/chat/room/" + room.id + "/messages").then(function(page) {
         if(me.room !== room.id) {
             return;
         }
+        var messages = page.content.reverse();
         Dom.clear(me.chatBody);
-        Dom.append(me.chatBody, messages.map(function(message) {
-            Dom.el('div', 'chat-message', JSON.stringify(message))
-        }))
+        messages.map(function(message) {me.appendMessage(message)});
     });
+}
+
+
+
+SolarMapChatButton.prototype.appendMessage = function(message) {
+    if(message.roomId !== this.room) {
+        return;
+    }
+    var mes = Dom.el('div', 'chat-message', [
+        Dom.el('div', null, message.senderId + " " + message.createdAt),
+        Dom.el('div', null, message.message),
+    ]);
+    Dom.append(this.chatBody, mes)
+    mes.scrollIntoView({behavior: 'smooth'});
+}
+SolarMapChatButton.prototype.unmount = function() {
+    if(this.stompClient != null) {
+        this.stompClient.disconnect();
+    }
 }

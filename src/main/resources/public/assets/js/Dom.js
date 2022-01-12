@@ -11,7 +11,7 @@ if(typeof HTMLElement !== undefined) {
  * @param type string
  * @param attr object|null
  * @param content string|Element|Element[]
- * @returns {Element}
+ * @returns {HTMLElement}
  */
 Dom.el = function (type, attr, content) {
     var o = document.createElement(type);
