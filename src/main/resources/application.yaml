@@ -21,9 +21,9 @@ spring:
     jpa:
         properties:
             hibernate:
-                show_sql: true
+                show_sql: false
                 format_sql: true
-                use_sql_comments: true
+                use_sql_comments: false
                 ddl-auto: validate
         open-in-view: false
 
@@ -61,3 +61,23 @@ app:
         max_speed: 1000
         update_coordinates_delay: PT15M
         num_update_object: 100
+
+
+log4jdbc:
+    dump:
+        sql:
+            maxlinelength: 90
+            addsemicolon: true
+    trim:
+        sql:
+            extrablanklines: true
+
+logging:
+    level:
+        jdbc:
+            sqlonly: "INFO"
+            sqltiming: "OFF"
+            audit: "OFF"
+            resultset: "OFF"
+            resultsettable: "INFO"
+            connection: "OFF"
