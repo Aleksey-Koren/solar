@@ -12,6 +12,7 @@ function SolarMapChatButton( solarMap) {
     this.chatControls = null;//chat controls container - invite to chat, search for particular chat, etc
     this.chatBody = null;//chat body container (messages from particular chat)
     this.chatBodyControls = null;//controls to post message
+    this.chatTitle = null;//header in chat
 
     var socket = new SockJS('/api/ws');
     this.stompClient = Stomp.over(socket);
@@ -135,6 +136,7 @@ SolarMapChatButton.prototype.createChatList = function() {
 }
 SolarMapChatButton.prototype.createChatBody = function() {
     this.chatBody = Dom.el('div', 'chat-body');
+    this.chatTitle = Dom.el('h3', 'chat-title')
 }
 SolarMapChatButton.prototype.showChat = function() {
     if(this.chatPopup) {
@@ -153,6 +155,7 @@ SolarMapChatButton.prototype.showChat = function() {
                 this.chatList
             ]),
             Dom.el('div', 'chat-main', [
+                this.chatTitle,
                 this.chatBody,
                 this.chatBodyControls
             ])
@@ -243,6 +246,7 @@ SolarMapChatButton.prototype.openRoom = function(room) {
     Dom.clear(this.chatBody);
     var me = this;
     me.room = room.id;
+    me.chatTitle.innerHTML = room.title;
     Rest.doGet("/api/chat/room/" + room.id + "/messages").then(function(page) {
         if(me.room !== room.id) {
             return;

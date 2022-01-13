@@ -285,3 +285,6 @@ a.disabled {
 .chat-unread:empty {
     display: none;
 }
+.chat-title {
+    color: #ffc562;
+}
