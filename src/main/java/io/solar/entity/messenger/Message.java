@@ -32,6 +32,7 @@ public class Message {
     private String title;
     private String message;
     private Instant createdAt;
+    private Instant editedAt;
 
     @Enumerated(EnumType.STRING)
     private MessageType messageType;

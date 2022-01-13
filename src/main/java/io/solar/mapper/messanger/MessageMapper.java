@@ -45,6 +45,7 @@ public class MessageMapper implements EntityDtoMapper<Message, MessageDto> {
         entity.setTitle(dto.getTitle());
         entity.setMessage(dto.getMessage());
         entity.setMessageType(dto.getMessageType() != null ? MessageType.valueOf(dto.getMessageType()) : CHAT);
+        entity.setEditedAt(dto.getEditedAt() == null ? entity.getEditedAt() : dto.getEditedAt());
         return entity;
     }
 
@@ -58,6 +59,7 @@ public class MessageMapper implements EntityDtoMapper<Message, MessageDto> {
                 .message(entity.getMessage())
                 .createdAt(entity.getCreatedAt())
                 .messageType(entity.getMessageType() != null ? entity.getMessageType().toString() : null)
+                .editedAt(entity.getEditedAt())
                 .build();
     }
 }

@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.Instant;
 import java.util.List;
 
 @Service
@@ -26,9 +27,10 @@ public class WebSocketFacade {
 
     public void processMessage(MessageDto messageDto) {
         Message message = messageMapper.toEntity(messageDto);
+        Instant savedMessageTime;
 
         if (MessageType.CHAT.equals(message.getMessageType())) {
-            processChatMessage(message);
+            savedMessageTime = processChatMessage(message);
         } else {
             List<User> usersInRoom = roomRepository.findById(message.getRoom().getId())
                     .orElseThrow(
@@ -36,18 +38,25 @@ public class WebSocketFacade {
                                     , message.getRoom().getId())))
                     .getUsers();
 
-            processNonChatMessage(message, usersInRoom);
+            savedMessageTime = processNonChatMessage(message, usersInRoom);
         }
+
+        messageDto.setCreatedAt(savedMessageTime);
     }
 
-    private void processChatMessage(Message message) {
-        messageService.saveNew(message);
+    private Instant processChatMessage(Message message) {
+        Message savedMessage = messageService.saveNew(message);
+
+        return savedMessage.getCreatedAt();
     }
 
-    private void processNonChatMessage(Message message, List<User> usersInRoom) {
-        messageService.saveNew(message);
+    private Instant processNonChatMessage(Message message, List<User> usersInRoom) {
+        Message savedMessage = messageService.saveNew(message);
+
         usersInRoom.stream()
                 .filter(user -> (user.getEmailNotifications() & message.getMessageType().getIndex()) == message.getMessageType().getIndex())
                 .forEach(user -> emailService.sendSimpleEmail(user, message.getTitle(), message.getMessage()));
+
+        return savedMessage.getCreatedAt();
     }
 }

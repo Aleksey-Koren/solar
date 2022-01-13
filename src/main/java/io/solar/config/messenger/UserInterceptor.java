@@ -2,6 +2,7 @@ package io.solar.config.messenger;
 
 import io.solar.entity.User;
 import io.solar.security.JwtProvider;
+import io.solar.service.exception.UserInterceptorException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
@@ -35,9 +36,14 @@ public class UserInterceptor implements ChannelInterceptor {
             if (raw instanceof Map castedRaw) {
                 Object token = castedRaw.get("auth_token");
 
+                if (token == null) {
+                    throw new UserInterceptorException("Cannot find auth token");
+                }
+
                 if (token instanceof ArrayList castedToken) {
-                    User user =  jwtProvider.verifyToken(castedToken.get(0).toString()).orElseThrow();
-                    System.out.println(user.getLogin());
+                    User user = jwtProvider.verifyToken(castedToken.get(0).toString())
+                            .orElseThrow(() -> new UserInterceptorException("Invalid auth token"));
+
                     accessor.setUser(new WebSocketUser(user.getLogin()));
                 }
             }
