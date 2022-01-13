@@ -2,6 +2,7 @@ package io.solar.service.messenger;
 
 import io.solar.dto.messenger.*;
 import io.solar.entity.User;
+import io.solar.entity.messenger.Message;
 import io.solar.entity.messenger.NotificationType;
 import io.solar.entity.messenger.Room;
 import io.solar.entity.messenger.RoomType;
@@ -25,6 +26,8 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.Instant;
 import java.util.List;
 
+import static io.solar.entity.messenger.NotificationType.EDITED_MESSAGE;
+
 @Service
 @RequiredArgsConstructor
 public class ChatService {
@@ -36,31 +39,6 @@ public class ChatService {
     private final RoomMapper roomMapper;
     private final UserRepository userRepository;
     private final SimpMessagingTemplate simpMessagingTemplate;
-
-    public Page<MessageDto> getMessageHistory(Long roomId, User user, Pageable pageable) {
-        Room room = roomRepository.findById(roomId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND
-                , "There is no room with such id = " + roomId + " . Can't fetch message history"));
-
-        UserRoom userRoom = userRoomRepository.findById(new UserRoom.UserRoomPK(user, room))
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND
-                        , String.format("User with id = %d isn't subscribed on room id = %d", user.getId(), roomId)));
-
-        return messageRepository
-                .findByRoomAndCreatedAtGreaterThanEqualOrderByCreatedAtDesc(room, userRoom.getSubscribedAt(), pageable)
-                .map(messageMapper::toDto);
-    }
-
-    public List<Room> findAll(RoomSpecification roomSpecification) {
-        return roomRepository.findAll(roomSpecification);
-    }
-
-    public List<RoomDtoImpl> getUserRooms(Long userId) {
-
-        return roomRepository.findAllUserRoomsWithUnreadMessages(userId)
-                .stream()
-                .map(roomMapper::toDtoListFromInterface)
-                .toList();
-    }
 
     public void inviteToExistingRoom(User inviter, Long invitedId, Long roomId) {
 
@@ -93,10 +71,17 @@ public class ChatService {
         addUserToRoom(invited, room);
     }
 
-    private void addUserToRoom(User user, Room room) {
-        UserRoom userRoom = new UserRoom(user, room);
-        user.getUserRooms().add(userRoom);
-        userRepository.save(user);
+    public Page<MessageDto> getMessageHistory(Long roomId, User user, Pageable pageable) {
+        Room room = roomRepository.findById(roomId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND
+                , "There is no room with such id = " + roomId + " . Can't fetch message history"));
+
+        UserRoom userRoom = userRoomRepository.findById(new UserRoom.UserRoomPK(user, room))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND
+                        , String.format("User with id = %d isn't subscribed on room id = %d", user.getId(), roomId)));
+
+        return messageRepository
+                .findByRoomAndCreatedAtGreaterThanEqualOrderByCreatedAtDesc(room, userRoom.getSubscribedAt(), pageable)
+                .map(messageMapper::toDto);
     }
 
     public ResponseEntity<Void> createRoom(CreateRoomDto dto, User owner) {
@@ -114,6 +99,59 @@ public class ChatService {
         addUserToRoom(owner, room);
         inviteToRoomAtCreation(room, dto.getUserId());
         return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    public List<RoomDtoImpl> getUserRooms(Long userId) {
+
+        return roomRepository.findAllUserRoomsWithUnreadMessages(userId)
+                .stream()
+                .map(roomMapper::toDtoListFromInterface)
+                .toList();
+    }
+
+    public List<Room> findAll(RoomSpecification roomSpecification) {
+
+        return roomRepository.findAll(roomSpecification);
+    }
+
+    public void sendInviteNotification(User user, Room room) {
+        simpMessagingTemplate.convertAndSendToUser(user.getLogin(),
+                "/notifications",
+                new NotificationDto<RoomDto>(NotificationType.INVITED_TO_ROOM.toString(), roomMapper.toDto(room)));
+    }
+
+    public void editMessage(User user, String updatedText, Long messageId) {
+        Message message = messageRepository.findById(messageId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cannot find message with id = " + messageId));
+
+        if (!user.equals(message.getSender())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "It's forbidden to change other users messages");
+        }
+
+        message.setMessage(updatedText);
+        message.setEditedAt(Instant.now());
+        messageRepository.saveAndFlush(message);
+
+        sendEditMessageNotification(message);
+    }
+
+    public void deleteRoomsWithOneParticipantByUserRooms(User user) {
+        user.getRooms()
+                .stream()
+                .filter(room -> room.getUsers().size() == 1)
+                .forEach(room -> {
+                    messageRepository.deleteAllByRoom(room);
+                    roomRepository.delete(room);
+                });
+    }
+
+    private void sendEditMessageNotification(Message message) {
+        message.getRoom()
+                .getUsers()
+                .forEach(user -> simpMessagingTemplate.convertAndSendToUser(user.getLogin(),
+                        "/notifications",
+                        new NotificationDto<>(EDITED_MESSAGE.name(), messageMapper.toDto(message)))
+                );
     }
 
     private boolean ifPrivateRoomAlreadyExists(Long user1Id, Long user2Id) {
@@ -140,9 +178,9 @@ public class ChatService {
         sendInviteNotification(interlocutor, room);
     }
 
-    public void sendInviteNotification(User user, Room room) {
-        simpMessagingTemplate.convertAndSendToUser(user.getLogin(),
-                "/notifications",
-                new NotificationDto<RoomDto>(NotificationType.INVITED_TO_ROOM.toString(), roomMapper.toDto(room)));
+    private void addUserToRoom(User user, Room room) {
+        UserRoom userRoom = new UserRoom(user, room);
+        user.getUserRooms().add(userRoom);
+        userRepository.save(user);
     }
 }

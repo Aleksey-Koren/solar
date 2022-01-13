@@ -88,4 +88,16 @@ public class ChatController {
         User user = userService.findByLogin(principal.getName());
         return chatService.createRoom(dto, user);
     }
+
+    @PatchMapping("/room/messages/{messageId}")
+    @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
+    @Transactional
+    public void editMessage(@PathVariable Long messageId,
+                            @RequestBody String updatedText,
+                            Principal principal) {
+
+        User user = userService.findByLogin(principal.getName());
+
+        chatService.editMessage(user, updatedText, messageId);
+    }
 }

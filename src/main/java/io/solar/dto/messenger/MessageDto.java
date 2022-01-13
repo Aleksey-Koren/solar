@@ -19,5 +19,6 @@ public class MessageDto {
     private String title;
     private String message;
     private Instant createdAt;
+    private Instant editedAt;
     private String messageType;
 }

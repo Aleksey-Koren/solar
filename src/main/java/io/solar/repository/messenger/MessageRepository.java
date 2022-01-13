@@ -13,4 +13,6 @@ import java.time.Instant;
 public interface MessageRepository extends JpaRepository<Message, Long> {
 
     Page<Message> findByRoomAndCreatedAtGreaterThanEqualOrderByCreatedAtDesc(Room room, Instant subscribedAt, Pageable pageable);
+
+    void deleteAllByRoom(Room room);
 }

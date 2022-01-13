@@ -1,10 +1,10 @@
 package io.solar.controller;
 
 import io.solar.dto.UserDto;
-import io.solar.specification.filter.UserFilter;
 import io.solar.entity.User;
 import io.solar.facade.UserFacade;
 import io.solar.service.UserService;
+import io.solar.specification.filter.UserFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,12 +12,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
 import java.util.List;
-import java.util.Optional;
 
 import static io.solar.controller.AuthController.hasPermissions;
 
@@ -42,8 +48,8 @@ public class UsersController {
     @PreAuthorize("hasAnyAuthority('PLAY_THE_GAME', 'EDIT_USER')")
     @Transactional
     public ResponseEntity<UserDto> getOne(@PathVariable("id") long userId) {
-        UserDto out = userService.getUserById(userId);
-        return ResponseEntity.ok(out);
+
+        return ResponseEntity.ok(userService.getUserById(userId));
     }
 
     @PutMapping("{id}")
@@ -72,11 +78,11 @@ public class UsersController {
 
 
     @DeleteMapping("{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable("id") Long id) {
-        if (!hasPermissions(List.of("EDIT_USER", "DELETE_USER"))) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-        userService.findById(id).ifPresent(userService::delete);
-        return ResponseEntity.noContent().build();
+    @PreAuthorize("hasAnyAuthority('EDIT_USER')")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Transactional
+    public void deleteUser(@PathVariable("id") Long userId) {
+
+        userFacade.deleteUser(userId);
     }
 }

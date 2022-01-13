@@ -6,6 +6,7 @@ import io.solar.entity.objects.BasicObject;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -22,15 +23,20 @@ import static java.util.stream.Collectors.*;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Builder
 @Table(name = "users")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Long id;
     private String title;
+
+    @EqualsAndHashCode.Include
     private String login;
+
     private String email;
     private String password;
     private Long money;
@@ -62,10 +68,9 @@ public class User {
     @ToString.Exclude
     private List<Room> rooms;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.DETACH})
     @ToString.Exclude
     private List<UserRoom> userRooms;
-
 
 
     public static UserDetails retrieveUserDetails(User user) {
