@@ -84,21 +84,27 @@ public class ChatService {
                 .map(messageMapper::toDto);
     }
 
-    public ResponseEntity<Void> createRoom(CreateRoomDto dto, User owner) {
+    public RoomDtoImpl createRoom(CreateRoomDto dto, User owner) {
+
         if (dto.getIsPrivate()) {
-            if (ifPrivateRoomAlreadyExists(dto.getUserId(), owner.getId())) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            if (isPrivateRoomAlreadyExists(dto.getUserId(), owner.getId())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Such a private room already exists");
             }
         }
-        Room room = new Room();
-        room.setOwner(owner);
-        room.setCreatedAt(Instant.now());
-        room.setType(dto.getIsPrivate() ? RoomType.PRIVATE : RoomType.PUBLIC);
-        room.setTitle(composeRoomTitle(dto, owner));
-        roomRepository.save(room);
+
+        Room room = Room.builder()
+                .owner(owner)
+                .createdAt(Instant.now())
+                .type(dto.getIsPrivate() ? RoomType.PRIVATE : RoomType.PUBLIC)
+                .title(composeRoomTitle(dto, owner))
+                .build();
+
+        Room savedRoom = roomRepository.save(room);
+
         addUserToRoom(owner, room);
         inviteToRoomAtCreation(room, dto.getUserId());
-        return ResponseEntity.status(HttpStatus.OK).build();
+
+        return roomMapper.toDto(savedRoom);
     }
 
     public List<RoomDtoImpl> getUserRooms(Long userId) {
@@ -154,7 +160,7 @@ public class ChatService {
                 );
     }
 
-    private boolean ifPrivateRoomAlreadyExists(Long user1Id, Long user2Id) {
+    private boolean isPrivateRoomAlreadyExists(Long user1Id, Long user2Id) {
         return roomRepository.findPrivateRoomWithTwoUsers(user1Id, user2Id).size() > 0;
     }
 

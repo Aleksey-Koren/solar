@@ -84,9 +84,10 @@ public class ChatController {
     @PostMapping("/room")
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
     @Transactional
-    public ResponseEntity<Void> createRoom(@RequestBody CreateRoomDto dto, Principal principal) {
+    public ResponseEntity<RoomDtoImpl> createRoom(@RequestBody CreateRoomDto dto, Principal principal) {
         User user = userService.findByLogin(principal.getName());
-        return chatService.createRoom(dto, user);
+
+        return ResponseEntity.ok(chatService.createRoom(dto, user));
     }
 
     @PatchMapping("/room/messages/{messageId}")
