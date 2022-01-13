@@ -39,6 +39,7 @@ public class UserRoom {
         this.user = user;
         this.room = room;
         this.subscribedAt = Instant.now();
+        this.lastSeenAt = Instant.now();
     }
 
     @Data

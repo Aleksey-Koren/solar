@@ -86,10 +86,8 @@ public class ChatService {
 
     public RoomDtoImpl createRoom(CreateRoomDto dto, User owner) {
 
-        if (dto.getIsPrivate()) {
-            if (isPrivateRoomAlreadyExists(dto.getUserId(), owner.getId())) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Such a private room already exists");
-            }
+        if (dto.getIsPrivate() && isPrivateRoomAlreadyExists(dto.getUserId(), owner.getId())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Such a private room already exists");
         }
 
         Room room = Room.builder()
