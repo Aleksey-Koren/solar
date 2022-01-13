@@ -159,8 +159,7 @@ SolarMapChatButton.prototype.showChat = function() {
                 this.chatBody,
                 this.chatBodyControls
             ])
-        ]),
-        title: "Chat"
+        ])
     });
     this.chatPopup.show();
     this.loadChats();
