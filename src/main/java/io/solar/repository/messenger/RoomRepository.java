@@ -26,7 +26,7 @@ public interface RoomRepository extends JpaRepository<Room, Long>, JpaSpecificat
 
     @Query(value = "SELECT rooms.id AS room_id, count(room_id) as count " +
             "FROM rooms " +
-            "    INNER JOIN users_rooms ur ON rooms.id = ur.room_id and type = 'PRIVATE' and (user_id =: user1Id or user_id =: user2Id) " +
+            "    INNER JOIN users_rooms ur ON rooms.id = ur.room_id and type = 'PRIVATE' and (user_id = :user1Id or user_id = :user2Id) " +
             "GROUP BY (room_id) " +
             "HAVING count > 1;", nativeQuery = true)
     List<RoomDto> findPrivateRoomWithTwoUsers(@Param("user1Id") Long user1Id, @Param("user2Id") Long user2Id);

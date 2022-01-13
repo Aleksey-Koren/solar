@@ -15,8 +15,22 @@ function SolarMapChatButton( solarMap) {
 
     var socket = new SockJS('/api/ws');
     this.stompClient = Stomp.over(socket);
-    this.stompClient.connect(solarMap.context.loginStorage.getItem('token'), function() {
-        stompClient.subscribe('/user/notifications')
+    this.stompClient.connect({'auth_token': solarMap.context.loginStorage.getItem('token')}, function() {
+        me.stompClient.subscribe('/user/notifications', function(response) {
+            var object = JSON.parse(response.body);
+            switch (object.type) {
+                case "INVITED_TO_ROOM":
+                    me.rooms.push(object.payload);
+                    Dom.clear(me.chatList);
+                    Dom.append(me.chatList, me.createRooms())
+                    break;
+                default:
+                    console.error("unknown object type in user subscription: " + response.body);
+            }
+        });
+    }, function(response) {
+        Notification.error("Fail connect to chat socket");
+        console.error(response);
     });
 
     this.container = Dom.el('div', {class: 'solar-map-control', onclick: function(){
@@ -180,26 +194,7 @@ SolarMapChatButton.prototype.loadChats = function() {
 SolarMapChatButton.prototype.createRooms = function() {
     var me = this;
     var out = this.rooms.map(function(room) {
-        try {
-            me.stompClient.subscribe("/room/" + room.id, function(response) {
-                var message = JSON.parse(response.body);
-                me.appendMessage(message);
-                for(var i = 0; i < me.rooms.length; i++) {
-                    var room = me.rooms[i];
-                    if(room.id === message.roomId) {
-                        if(room.id !== me.room) {
-                            room.amount++;
-                            var unread = document.getElementById('chat-unread-' + room.id );
-                            if(unread) unread.innerHTML = "+" + room.amount;
-                        }
-                        room.messages.push(message)
-                        break;
-                    }
-                }
-            });
-        } catch (e) {
-            console.error(e);
-        }
+        me.subscribeToRoom(room);
         var unread = Dom.el('sup', {class: 'chat-unread', id: 'chat-unread-' + room.id}, room.amount && room.amount !== '0' ? "+" + room.amount : null);
         return Dom.el('div', 'chat-room', Dom.el('a', {href: '/#', click: function(e) {
             e.preventDefault();
@@ -213,6 +208,30 @@ SolarMapChatButton.prototype.createRooms = function() {
     return out;
 }
 
+SolarMapChatButton.prototype.subscribeToRoom = function(room) {
+    var me = this;
+    try {
+        me.stompClient.subscribe("/room/" + room.id, function(response) {
+            var message = JSON.parse(response.body);
+            me.appendMessage(message);
+            for(var i = 0; i < me.rooms.length; i++) {
+                var room = me.rooms[i];
+                if(room.id === message.roomId) {
+                    if(room.id !== me.room) {
+                        room.amount++;
+                        var unread = document.getElementById('chat-unread-' + room.id );
+                        if(unread) unread.innerHTML = "+" + room.amount;
+                    }
+                    break;
+                }
+            }
+        });
+    } catch (e) {
+        console.error(e);
+    }
+
+
+}
 SolarMapChatButton.prototype.sendMessage = function(message) {
     this.stompClient.send("/chat/" + this.room, {}, JSON.stringify({
         senderId: this.solarMap.context.stores.userStore.user.user_id,
