@@ -46,29 +46,35 @@ public class ChatService {
 
         Room room = roomRepository.findById(roomId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        String.format("There is no room with id = %d in database", roomId))
-        );
+                        String.format("There is no room with id = %d in database", roomId)
+                ));
+
+        User invited = userRepository.findById(invitedId).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        String.format("There is no user with id = %d in database", invitedId)
+                ));
 
         if (RoomType.PRIVATE.equals(room.getType())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "It is impossible to invite somebody else to existing private room");
         }
 
         boolean inviterIsInRoom = userRoomRepository.existsById(new UserRoom.UserRoomPK(inviter, room));
+        boolean invitedIsAlreadyInRoom = userRoomRepository.existsById(new UserRoom.UserRoomPK(invited, room));
 
         if (!inviterIsInRoom) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     String.format("User id = %d is not in room id = %d. He can't invite anybody to this room", inviter.getId(), roomId));
+        }
+
+        if (invitedIsAlreadyInRoom) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    String.format("User id = %d is already in room id = %d. He can't be invited to this room twice", invited.getId(), roomId));
         }
 
         if (RoomType.SYSTEM.equals(room.getType())) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,
                     String.format("Room with id = %d is SYSTEM. It is impossible to invite somebody to this room", room.getId()));
         }
-
-        User invited = userRepository.findById(invitedId).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        String.format("There is no user with id = %d in database", invitedId))
-        );
 
         addUserToRoom(invited, room);
     }
@@ -102,7 +108,7 @@ public class ChatService {
                 .type(dto.getIsPrivate() ? RoomType.PRIVATE : RoomType.PUBLIC)
                 .title(dto.getIsPrivate()
                         ? "[\"" + owner.getId() + ":%s\", \"" + dto.getUserId() + ":%s\"]"
-                        : composePublicRoomTitle(dto, owner))
+                        : null)
                 .build();
 
         Room savedRoom = roomRepository.save(room);
@@ -114,10 +120,11 @@ public class ChatService {
 
     public List<RoomDtoImpl> getUserRooms(Long userId) {
 
-        return roomRepository.findAllUserRoomsWithUnreadMessages(userId)
+        List<RoomDtoImpl> roomDTO = roomRepository.findAllUserRoomsWithUnreadMessages(userId)
                 .stream()
                 .map(roomMapper::toDtoListFromInterface)
                 .toList();
+        return roomDTO;
     }
 
     public List<Room> findAll(RoomSpecification roomSpecification) {
@@ -171,18 +178,6 @@ public class ChatService {
 
     private boolean isPrivateRoomAlreadyExists(Long user1Id, Long user2Id) {
         return roomRepository.findPrivateRoomWithTwoUsers(user1Id, user2Id).size() > 0;
-    }
-
-    private String composePublicRoomTitle(CreateRoomDto dto, User owner) {
-        return "Public room " + createTitlePartFromUser(owner) + ", " +
-                createTitlePartFromUser(userRepository.findById(dto.getUserId()).orElseThrow(
-                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                                String.format("There is no user with id = %d in database", dto.getUserId())))
-                );
-    }
-
-    private String createTitlePartFromUser(User user) {
-        return user.getTitle() != null ? user.getTitle() : "user[id = " + user.getId() + "]";
     }
 
     private void inviteToRoomAtCreation(Room room, User interlocutor) {
@@ -241,16 +236,3 @@ public class ChatService {
                 .build();
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

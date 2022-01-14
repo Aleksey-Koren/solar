@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -39,13 +40,19 @@ public class RoomMapper implements EntityDtoMapper<Room, RoomDtoImpl> {
 
         return RoomDtoImpl.builder()
                 .id(entity.getId())
-                .title(RoomType.PRIVATE.equals(entity.getType())
-                        ? mapPrivateTitle(entity)
-                        : entity.getTitle())
+                .title(mapTitle(entity))
                 .createdAt(entity.getCreatedAt())
                 .ownerId(entity.getOwner().getId())
                 .roomType(entity.getType())
                 .build();
+    }
+
+    private String mapTitle(Room entity) {
+        return RoomType.PRIVATE.equals(entity.getType())
+                ? mapPrivateTitle(entity)
+                : mapPublicTitle(entity);
+
+
     }
 
     private String mapPrivateTitle(Room room) {
@@ -54,14 +61,24 @@ public class RoomMapper implements EntityDtoMapper<Room, RoomDtoImpl> {
                 room.getUsers().stream()
                         .map(User::getTitle)
                         .filter(s -> !s.equals(room.getOwner().getTitle()))
-                        .findAny().orElseThrow(() ->  new ServiceException("Something wrong with titles of privatre room users. Room id = " + room.getId())));
+                        .findAny().orElseThrow(() ->  new ServiceException("Something wrong with titles of private room users. Room id = " + room.getId())));
     }
+
+    private String mapPublicTitle(Room entity) {
+        return entity.getTitle() != null
+                ? entity.getTitle()
+                    : entity.getUsers().stream()
+                                       .map(User::getTitle)
+                                       .collect(Collectors.joining("], [", "Room: [", "]"));
+    }
+
+
 
     public SearchRoomDto toSearchRoomDto(Room room) {
 
         return SearchRoomDto.builder()
                 .id(room.getId())
-                .title(room.getTitle())
+                .title(mapTitle(room))
                 .createdAt(room.getCreatedAt())
                 .ownerId(room.getOwner().getId())
                 .roomType(room.getType())
@@ -74,7 +91,7 @@ public class RoomMapper implements EntityDtoMapper<Room, RoomDtoImpl> {
         return RoomDtoImpl.builder()
                 .id(roomDto.getId())
                 .amount(roomDto.getAmount() == null ? 0 : roomDto.getAmount())
-                .title(roomDto.getTitle())
+                .title(mapTitle(roomRepository.getById(roomDto.getId())))
                 .build();
     }
 
