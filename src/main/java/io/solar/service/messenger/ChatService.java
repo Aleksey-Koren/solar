@@ -28,8 +28,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
-import static io.solar.entity.messenger.NotificationType.EDITED_MESSAGE;
-
 @Service
 @RequiredArgsConstructor
 public class ChatService {
@@ -139,7 +137,13 @@ public class ChatService {
         message.setEditedAt(Instant.now());
         messageRepository.saveAndFlush(message);
 
-        sendEditMessageNotification(message);
+        sendEditedMessage(message);
+    }
+
+    private void sendEditedMessage(Message message) {
+        Room room = message.getRoom();
+
+        simpMessagingTemplate.convertAndSend(String.format("/room/%d", room.getId()), messageMapper.toDto(message));
     }
 
     public void deleteRoomsWithOneParticipantByUserRooms(User user) {
@@ -152,14 +156,6 @@ public class ChatService {
                 });
     }
 
-    private void sendEditMessageNotification(Message message) {
-        message.getRoom()
-                .getUsers()
-                .forEach(user -> simpMessagingTemplate.convertAndSendToUser(user.getLogin(),
-                        "/notifications",
-                        new NotificationDto<>(EDITED_MESSAGE.name(), messageMapper.toDto(message)))
-                );
-    }
 
     public void sendInviteNotification(User user, Room room) {
         simpMessagingTemplate.convertAndSendToUser(user.getLogin(),
