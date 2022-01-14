@@ -18,15 +18,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.util.List;
-
-import static io.solar.entity.messenger.NotificationType.EDITED_MESSAGE;
 
 @Service
 @RequiredArgsConstructor
@@ -136,7 +133,13 @@ public class ChatService {
         message.setEditedAt(Instant.now());
         messageRepository.saveAndFlush(message);
 
-        sendEditMessageNotification(message);
+        sendEditedMessage(message);
+    }
+
+    private void sendEditedMessage(Message message) {
+        Room room = message.getRoom();
+
+        simpMessagingTemplate.convertAndSend(String.format("/room/%d", room.getId()), messageMapper.toDto(message));
     }
 
     public void deleteRoomsWithOneParticipantByUserRooms(User user) {
@@ -149,14 +152,6 @@ public class ChatService {
                 });
     }
 
-    private void sendEditMessageNotification(Message message) {
-        message.getRoom()
-                .getUsers()
-                .forEach(user -> simpMessagingTemplate.convertAndSendToUser(user.getLogin(),
-                        "/notifications",
-                        new NotificationDto<>(EDITED_MESSAGE.name(), messageMapper.toDto(message)))
-                );
-    }
 
     private boolean isPrivateRoomAlreadyExists(Long user1Id, Long user2Id) {
         return roomRepository.findPrivateRoomWithTwoUsers(user1Id, user2Id).size() > 0;
