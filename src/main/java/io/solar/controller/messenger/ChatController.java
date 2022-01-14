@@ -5,8 +5,10 @@ import io.solar.dto.messenger.MessageDto;
 import io.solar.dto.messenger.RoomDtoImpl;
 import io.solar.dto.messenger.SearchRoomDto;
 import io.solar.entity.User;
+import io.solar.entity.messenger.Message;
 import io.solar.entity.messenger.MessageType;
 import io.solar.facade.messenger.ChatFacade;
+import io.solar.facade.messenger.WebSocketFacade;
 import io.solar.service.UserService;
 import io.solar.service.messenger.ChatService;
 import io.solar.specification.filter.RoomFilter;
@@ -40,6 +42,14 @@ public class ChatController {
             , @PageableDefault(size = 20) Pageable pageable) {
         User user = userService.findByLogin(principal.getName());
         return chatService.getMessageHistory(roomId, user, pageable);
+    }
+
+    @PutMapping("room/{roomId}/lastSeenAt")
+    @Transactional
+    @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
+    public ResponseEntity<Void> updateLastSeenAt(@PathVariable("roomId") Long roomId, Principal principal) {
+        User user = userService.findByLogin(principal.getName());
+        return ResponseEntity.status(chatService.updateLastSeenAt(roomId, user)).build();
     }
 
     @GetMapping("user/room")
@@ -100,5 +110,13 @@ public class ChatController {
         User user = userService.findByLogin(principal.getName());
 
         chatService.editMessage(user, updatedText, messageId);
+    }
+
+    @PatchMapping("/room/{roomId}/title")
+    @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
+    @Transactional
+    public void updateRoomTitle(@PathVariable("roomId") Long roomId, @RequestBody String roomTitle, Principal principal) {
+        User user = userService.findByLogin(principal.getName());
+        chatService.updateRoomTitle(roomId, roomTitle, user);
     }
 }

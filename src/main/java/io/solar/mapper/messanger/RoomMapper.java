@@ -5,10 +5,12 @@ import io.solar.dto.messenger.RoomDtoImpl;
 import io.solar.dto.messenger.SearchRoomDto;
 import io.solar.entity.messenger.Room;
 import io.solar.entity.User;
+import io.solar.entity.messenger.RoomType;
 import io.solar.mapper.EntityDtoMapper;
 import io.solar.mapper.UserMapper;
 import io.solar.repository.messenger.RoomRepository;
 import io.solar.repository.UserRepository;
+import io.solar.service.exception.ServiceException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -37,11 +39,22 @@ public class RoomMapper implements EntityDtoMapper<Room, RoomDtoImpl> {
 
         return RoomDtoImpl.builder()
                 .id(entity.getId())
-                .title(entity.getTitle())
+                .title(RoomType.PRIVATE.equals(entity.getType())
+                        ? mapPrivateTitle(entity)
+                        : entity.getTitle())
                 .createdAt(entity.getCreatedAt())
                 .ownerId(entity.getOwner().getId())
                 .roomType(entity.getType())
                 .build();
+    }
+
+    private String mapPrivateTitle(Room room) {
+        return String.format(room.getTitle(),
+                room.getOwner().getTitle(),
+                room.getUsers().stream()
+                        .map(User::getTitle)
+                        .filter(s -> !s.equals(room.getOwner().getTitle()))
+                        .findAny().orElseThrow(() ->  new ServiceException("Something wrong with titles of privatre room users. Room id = " + room.getId())));
     }
 
     public SearchRoomDto toSearchRoomDto(Room room) {

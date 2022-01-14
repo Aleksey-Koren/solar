@@ -91,12 +91,13 @@ public class FillDatabaseTest {
     @RepeatedTest(100)
     public void createUserRooms() {
         User randomUser = findRandomUser();
+        Room randomRoom = findRandomRoom();
 
         System.out.println("id:" + randomUser.getId());
 
         randomUser.setUserRooms(List.of(UserRoom.builder()
                 .user(randomUser)
-                .room(findRandomRoom())
+                .room(randomRoom)
                 .subscribedAt(Instant.now().minus(new Random().nextInt(1000), ChronoUnit.DAYS))
                 .lastSeenAt(Instant.now())
                 .build()));

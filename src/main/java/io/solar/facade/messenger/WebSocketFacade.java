@@ -4,12 +4,14 @@ import io.solar.dto.messenger.MessageDto;
 import io.solar.entity.messenger.MessageType;
 import io.solar.entity.User;
 import io.solar.entity.messenger.Message;
+import io.solar.entity.messenger.Room;
 import io.solar.mapper.messanger.MessageMapper;
 import io.solar.repository.messenger.RoomRepository;
 import io.solar.service.MessageService;
 import io.solar.service.mail.EmailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -24,6 +26,7 @@ public class WebSocketFacade {
     private final RoomRepository roomRepository;
     private final MessageService messageService;
     private final EmailService emailService;
+    private final SimpMessagingTemplate messagingTemplate;
 
     public void processMessage(MessageDto messageDto) {
         Message message = messageMapper.toEntity(messageDto);
@@ -32,13 +35,7 @@ public class WebSocketFacade {
         if (MessageType.CHAT.equals(message.getMessageType())) {
             savedMessageTime = processChatMessage(message);
         } else {
-            List<User> usersInRoom = roomRepository.findById(message.getRoom().getId())
-                    .orElseThrow(
-                            () -> new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("There is no room with id = %d in database"
-                                    , message.getRoom().getId())))
-                    .getUsers();
-
-            savedMessageTime = processNonChatMessage(message, usersInRoom);
+            savedMessageTime = processNonChatMessage(message);
         }
 
         messageDto.setCreatedAt(savedMessageTime);
@@ -50,13 +47,21 @@ public class WebSocketFacade {
         return savedMessage.getCreatedAt();
     }
 
-    private Instant processNonChatMessage(Message message, List<User> usersInRoom) {
+    private Instant processNonChatMessage(Message message) {
         Message savedMessage = messageService.saveNew(message);
 
+        List<User> usersInRoom = message.getRoom().getUsers();
+
         usersInRoom.stream()
-                .filter(user -> (user.getEmailNotifications() & message.getMessageType().getIndex()) == message.getMessageType().getIndex())
+                .filter(user -> (user.getEmailNotifications() != null
+                        &&(user.getEmailNotifications() & message.getMessageType().getIndex()) == message.getMessageType().getIndex()))
                 .forEach(user -> emailService.sendSimpleEmail(user, message.getTitle(), message.getMessage()));
 
         return savedMessage.getCreatedAt();
+    }
+
+    public void sendSystemMessage(Message message) {
+        processNonChatMessage(message);
+        messagingTemplate.convertAndSend("/room/" + message.getRoom().getId(), messageMapper.toDto(message));
     }
 }
