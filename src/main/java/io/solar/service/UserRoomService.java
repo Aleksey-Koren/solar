@@ -5,8 +5,6 @@ import io.solar.repository.messenger.UserRoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
-
 @Service
 @RequiredArgsConstructor
 public class UserRoomService {

@@ -1,6 +1,7 @@
 package io.solar;
 
 
+import io.solar.dto.messenger.CreateRoomDto;
 import io.solar.entity.messenger.*;
 import io.solar.entity.User;
 
@@ -10,6 +11,7 @@ import io.solar.repository.messenger.MessageRepository;
 import io.solar.repository.messenger.RoomRepository;
 import io.solar.security.Role;
 import io.solar.service.UserService;
+import io.solar.service.messenger.ChatService;
 import net.bytebuddy.utility.RandomString;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,6 +20,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -33,21 +36,22 @@ public class FillDatabaseTest {
 
     private final UserRepository userRepository;
     private final RoomRepository roomRepository;
-    private final BasicObjectRepository basicObjectRepository;
     private final MessageRepository messageRepository;
     private final UserService userService;
+    private final ChatService chatService;
 
     @Autowired
     public FillDatabaseTest(UserRepository userRepository,
                             RoomRepository roomRepository,
                             BasicObjectRepository basicObjectRepository,
                             MessageRepository messageRepository,
-                            UserService userService) {
+                            UserService userService,
+                            ChatService chatService) {
         this.userRepository = userRepository;
         this.roomRepository = roomRepository;
-        this.basicObjectRepository = basicObjectRepository;
         this.messageRepository = messageRepository;
         this.userService = userService;
+        this.chatService = chatService;
     }
 
     @Order(1)
@@ -66,10 +70,12 @@ public class FillDatabaseTest {
 
     @Order(2)
     @RepeatedTest(100)
+    @Transactional
     public void createRooms() {
-        Room room = new Room(null, UUID.randomUUID().toString(), Instant.now(), RoomType.PUBLIC, findRandomUser(), null);
-
-        roomRepository.save(room);
+        chatService.createRoom(CreateRoomDto.builder()
+                .isPrivate(false)
+                .userId(findRandomUser().getId())
+                .build(), findRandomUser());
     }
 
     @Order(3)
