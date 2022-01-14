@@ -23,41 +23,35 @@ import java.util.List;
 public class WebSocketFacade {
 
     private final MessageMapper messageMapper;
-    private final RoomRepository roomRepository;
     private final MessageService messageService;
     private final EmailService emailService;
     private final SimpMessagingTemplate messagingTemplate;
 
     public void processMessage(MessageDto messageDto) {
         Message message = messageMapper.toEntity(messageDto);
-        Instant savedMessageTime;
 
         if (MessageType.CHAT.equals(message.getMessageType())) {
-            savedMessageTime = processChatMessage(message);
+            processChatMessage(message);
         } else {
-            savedMessageTime = processNonChatMessage(message);
+            processNonChatMessage(message);
         }
 
-        messageDto.setCreatedAt(savedMessageTime);
+        messageDto.setCreatedAt(message.getCreatedAt());
     }
 
-    private Instant processChatMessage(Message message) {
-        Message savedMessage = messageService.saveNew(message);
-
-        return savedMessage.getCreatedAt();
+    private void processChatMessage(Message message) {
+        messageService.saveNew(message);
     }
 
-    private Instant processNonChatMessage(Message message) {
-        Message savedMessage = messageService.saveNew(message);
+    private void processNonChatMessage(Message message) {
+        messageService.saveNew(message);
 
         List<User> usersInRoom = message.getRoom().getUsers();
 
         usersInRoom.stream()
                 .filter(user -> (user.getEmailNotifications() != null
-                        &&(user.getEmailNotifications() & message.getMessageType().getIndex()) == message.getMessageType().getIndex()))
+                        && (user.getEmailNotifications() & message.getMessageType().getIndex()) == message.getMessageType().getIndex()))
                 .forEach(user -> emailService.sendSimpleEmail(user, message.getTitle(), message.getMessage()));
-
-        return savedMessage.getCreatedAt();
     }
 
     public void sendSystemMessage(Message message) {
