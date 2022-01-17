@@ -2,7 +2,6 @@ package io.solar.dto.messenger;
 
 import io.solar.entity.messenger.RoomType;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;

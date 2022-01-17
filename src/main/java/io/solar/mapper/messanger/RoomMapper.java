@@ -62,17 +62,16 @@ public class RoomMapper implements EntityDtoMapper<Room, RoomDtoImpl> {
                 room.getUsers().stream()
                         .map(User::getTitle)
                         .filter(s -> !s.equals(room.getOwner().getTitle()))
-                        .findAny().orElseThrow(() ->  new ServiceException("Something wrong with titles of private room users. Room id = " + room.getId())));
+                        .findAny().orElseThrow(() -> new ServiceException("Something wrong with titles of private room users. Room id = " + room.getId())));
     }
 
     private String mapPublicTitle(Room entity) {
         return entity.getTitle() != null
                 ? entity.getTitle()
-                    : entity.getUsers().stream()
-                                       .map(User::getTitle)
-                                       .collect(Collectors.joining("], [", "Room: [", "]"));
+                : entity.getUsers().stream()
+                .map(User::getTitle)
+                .collect(Collectors.joining("], [", "Room: [", "]"));
     }
-
 
 
     public SearchRoomDto toSearchRoomDto(Room room) {
@@ -93,6 +92,9 @@ public class RoomMapper implements EntityDtoMapper<Room, RoomDtoImpl> {
                 .id(roomDto.getId())
                 .amount(roomDto.getAmount() == null ? 0 : roomDto.getAmount())
                 .title(mapTitle(roomRepository.getById(roomDto.getId())))
+                .ownerId(roomDto.getOwnerId())
+                .roomType(roomDto.getRoomType())
+                .createdAt(roomDto.getCreatedAt())
                 .build();
     }
 

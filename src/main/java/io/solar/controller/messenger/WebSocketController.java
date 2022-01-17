@@ -36,7 +36,13 @@ public class WebSocketController {
     @SendTo("/room/{roomId}")
     public MessageDto processMessage(@DestinationVariable("roomId") Long roomId, @Payload MessageDto message) {
         message.setRoomId(roomId);
-        webSocketFacade.processMessage(message);
+
+        if (message.getId() != null) {
+            messageService.editMessage(message);
+        } else {
+            webSocketFacade.processMessage(message);
+        }
+
         return message;
     }
 }

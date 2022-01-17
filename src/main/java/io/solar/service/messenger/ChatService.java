@@ -120,37 +120,15 @@ public class ChatService {
 
     public List<RoomDtoImpl> getUserRooms(Long userId) {
 
-        List<RoomDtoImpl> roomDTO = roomRepository.findAllUserRoomsWithUnreadMessages(userId)
+        return roomRepository.findAllUserRoomsWithUnreadMessages(userId)
                 .stream()
                 .map(roomMapper::toDtoListFromInterface)
                 .toList();
-        return roomDTO;
     }
 
     public List<Room> findAll(RoomSpecification roomSpecification) {
 
         return roomRepository.findAll(roomSpecification);
-    }
-
-    public void editMessage(User user, String updatedText, Long messageId) {
-        Message message = messageRepository.findById(messageId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cannot find message with id = " + messageId));
-
-        if (!user.equals(message.getSender())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "It's forbidden to change other users messages");
-        }
-
-        message.setMessage(updatedText);
-        message.setEditedAt(Instant.now());
-        messageRepository.saveAndFlush(message);
-
-        sendEditedMessage(message);
-    }
-
-    private void sendEditedMessage(Message message) {
-        Room room = message.getRoom();
-
-        simpMessagingTemplate.convertAndSend(String.format("/room/%d", room.getId()), messageMapper.toDto(message));
     }
 
     public void deleteRoomsWithOneParticipantByUserRooms(User user) {
