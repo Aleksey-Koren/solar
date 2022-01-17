@@ -290,3 +290,13 @@ a.disabled {
     margin-top: 0;
     color: #ffc562;
 }
+.edit-icon {
+    background-image: url(/assets/svgs/solid/pencil-alt.svg);
+}
+.edit-icon:hover, .edit-icon-selected, .edit-icon.edit-icon-selected {
+    background-image: url(/assets/svgs/solid/pencil-alt-selected.svg);
+}
+.chat-your-message {
+    text-align: right;
+    margin-right: 10px;
+}

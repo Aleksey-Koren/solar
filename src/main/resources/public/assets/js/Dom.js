@@ -73,6 +73,10 @@ Dom.update = function (el, attr) {
         } else {
             if(i === 'value') {
                 el.value = value;
+            } else if(i === 'style') {
+                for(var s in attr[i]) {
+                    el.style[s] = attr[i][s];
+                }
             } else {
                 el.setAttribute(i, value)
             }

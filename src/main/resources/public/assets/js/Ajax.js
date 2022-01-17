@@ -95,7 +95,7 @@ Rest._onRequest = function (url, type, data, headers, responseType) {
         Ajax.ajax({
             headers: headers,
             responseType: responseType ? responseType : 'json',
-            type: type,
+            type: type.toUpperCase(),
             url: url,
             data: typeof data === 'string' || typeof data === 'number' ? data : JSON.stringify(data)
         }, resolve, reject)

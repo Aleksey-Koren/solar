@@ -1,5 +1,6 @@
 package io.solar.mapper.messanger;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.solar.dto.messenger.RoomDto;
 import io.solar.dto.messenger.RoomDtoImpl;
 import io.solar.dto.messenger.SearchRoomDto;
