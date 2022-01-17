@@ -2,10 +2,7 @@ package io.solar.entity.messenger;
 
 import io.solar.entity.User;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.Instant;
@@ -36,6 +33,13 @@ public class Room {
     @JoinColumn(name = "owner_id")
     private User owner;
 
-    @ManyToMany(mappedBy = "rooms")
+    @ManyToMany
+    @JoinTable( name = "users_rooms",
+            joinColumns = @JoinColumn(name = "room_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    @ToString.Exclude
     private List<User> users;
+
+    private Boolean defaultTitle;
 }

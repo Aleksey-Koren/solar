@@ -13,7 +13,6 @@ import io.solar.repository.UserRepository;
 import io.solar.repository.messenger.MessageRepository;
 import io.solar.repository.messenger.RoomRepository;
 import io.solar.repository.messenger.UserRoomRepository;
-import io.solar.service.UserRoomService;
 import io.solar.service.exception.ServiceException;
 import io.solar.specification.RoomSpecification;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +26,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -76,7 +76,14 @@ public class ChatService {
                     String.format("Room with id = %d is SYSTEM. It is impossible to invite somebody to this room", room.getId()));
         }
 
-        addUserToRoom(invited, room);
+        if (room.getDefaultTitle()) {
+            room.getUsers().add(invited);
+            room.setTitle(generateDefaultPublicTitle(room.getUsers().stream()
+                    .map(User::getTitle)
+                    .collect(Collectors.toList())));
+        }
+
+        inviteToRoom(room, invited);
     }
 
     public Page<MessageDto> getMessageHistory(Long roomId, User user, Pageable pageable) {
@@ -107,24 +114,31 @@ public class ChatService {
                 .createdAt(Instant.now())
                 .type(dto.getIsPrivate() ? RoomType.PRIVATE : RoomType.PUBLIC)
                 .title(dto.getIsPrivate()
-                        ? "[\"" + owner.getId() + ":%s\", \"" + dto.getUserId() + ":%s\"]"
-                        : null)
+                        ? generatePrivateTitle(owner, interlocutor)
+                        : generateDefaultPublicTitle(List.of(owner.getTitle(), interlocutor.getTitle())))
+                .defaultTitle(true)
                 .build();
 
-        Room savedRoom = roomRepository.save(room);
-        savedRoom.setUsers(List.of(owner, interlocutor));
-        addUserToRoom(owner, savedRoom);
-        inviteToRoomAtCreation(savedRoom, interlocutor);
-        return roomMapper.toDto(savedRoom);
+        roomRepository.save(room);
+        inviteToRoom(room, owner);
+        inviteToRoom(room, interlocutor);
+        return roomMapper.toDto(room);
+    }
+
+    private String generateDefaultPublicTitle(List<String> titles) {
+        return titles.stream()
+                .collect(Collectors.joining("], [","[" , "]"));
+    }
+
+    private String generatePrivateTitle(User user1, User user2) {
+        return String.format("[\"%d:%s\",\"%d:%s\"]", user1.getId(), user1.getTitle(), user2.getId(), user2.getTitle());
     }
 
     public List<RoomDtoImpl> getUserRooms(Long userId) {
-
-        List<RoomDtoImpl> roomDTO = roomRepository.findAllUserRoomsWithUnreadMessages(userId)
+        return roomRepository.findAllUserRoomsWithUnreadMessages(userId)
                 .stream()
                 .map(roomMapper::toDtoListFromInterface)
                 .toList();
-        return roomDTO;
     }
 
     public List<Room> findAll(RoomSpecification roomSpecification) {
@@ -180,15 +194,16 @@ public class ChatService {
         return roomRepository.findPrivateRoomWithTwoUsers(user1Id, user2Id).size() > 0;
     }
 
-    private void inviteToRoomAtCreation(Room room, User interlocutor) {
-        addUserToRoom(interlocutor, room);
-        sendInviteNotification(interlocutor, room);
+    private void inviteToRoom(Room room, User user) {
+        addUserToRoom(user, room);
+        sendInviteNotification(user, room);
     }
 
     private void addUserToRoom(User user, Room room) {
         UserRoom userRoom = new UserRoom(user, room);
         user.getUserRooms().add(userRoom);
-        userRepository.saveAndFlush(user);
+        userRepository.save(user);
+//        userRoomService.save(userRoom);
     }
 
     public HttpStatus updateLastSeenAt(Long roomId, User user) {
@@ -221,6 +236,7 @@ public class ChatService {
         }
 
         room.setTitle(roomTitle);
+        room.setDefaultTitle(false);
         roomRepository.save(room);
 
         webSocketFacade.sendSystemMessage(createChangeTitleSystemMessage(room, user, roomTitle));

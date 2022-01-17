@@ -1,4 +1,4 @@
-package io.solar.service;
+package io.solar.service.messenger;
 
 import io.solar.entity.messenger.UserRoom;
 import io.solar.repository.messenger.UserRoomRepository;

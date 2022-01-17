@@ -41,45 +41,18 @@ public class RoomMapper implements EntityDtoMapper<Room, RoomDtoImpl> {
 
         return RoomDtoImpl.builder()
                 .id(entity.getId())
-                .title(mapTitle(entity))
+                .title(entity.getTitle())
                 .createdAt(entity.getCreatedAt())
                 .ownerId(entity.getOwner().getId())
                 .roomType(entity.getType())
                 .build();
     }
 
-    private String mapTitle(Room entity) {
-        return RoomType.PRIVATE.equals(entity.getType())
-                ? mapPrivateTitle(entity)
-                : mapPublicTitle(entity);
-
-
-    }
-
-    private String mapPrivateTitle(Room room) {
-        return String.format(room.getTitle(),
-                room.getOwner().getTitle(),
-                room.getUsers().stream()
-                        .map(User::getTitle)
-                        .filter(s -> !s.equals(room.getOwner().getTitle()))
-                        .findAny().orElseThrow(() ->  new ServiceException("Something wrong with titles of private room users. Room id = " + room.getId())));
-    }
-
-    private String mapPublicTitle(Room entity) {
-        return entity.getTitle() != null
-                ? entity.getTitle()
-                    : entity.getUsers().stream()
-                                       .map(User::getTitle)
-                                       .collect(Collectors.joining("], [", "Room: [", "]"));
-    }
-
-
-
     public SearchRoomDto toSearchRoomDto(Room room) {
 
         return SearchRoomDto.builder()
                 .id(room.getId())
-                .title(mapTitle(room))
+                .title(room.getTitle())
                 .createdAt(room.getCreatedAt())
                 .ownerId(room.getOwner().getId())
                 .roomType(room.getType())
@@ -92,7 +65,7 @@ public class RoomMapper implements EntityDtoMapper<Room, RoomDtoImpl> {
         return RoomDtoImpl.builder()
                 .id(roomDto.getId())
                 .amount(roomDto.getAmount() == null ? 0 : roomDto.getAmount())
-                .title(mapTitle(roomRepository.getById(roomDto.getId())))
+                .title(roomDto.getTitle())
                 .build();
     }
 

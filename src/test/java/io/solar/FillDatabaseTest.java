@@ -2,10 +2,10 @@ package io.solar;
 
 
 import io.solar.dto.messenger.CreateRoomDto;
-import io.solar.entity.messenger.*;
 import io.solar.entity.User;
-
-import io.solar.repository.BasicObjectRepository;
+import io.solar.entity.messenger.Message;
+import io.solar.entity.messenger.MessageType;
+import io.solar.entity.messenger.Room;
 import io.solar.repository.UserRepository;
 import io.solar.repository.messenger.MessageRepository;
 import io.solar.repository.messenger.RoomRepository;
@@ -13,14 +13,15 @@ import io.solar.security.Role;
 import io.solar.service.UserService;
 import io.solar.service.messenger.ChatService;
 import net.bytebuddy.utility.RandomString;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.RepeatedTest;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -43,7 +44,6 @@ public class FillDatabaseTest {
     @Autowired
     public FillDatabaseTest(UserRepository userRepository,
                             RoomRepository roomRepository,
-                            BasicObjectRepository basicObjectRepository,
                             MessageRepository messageRepository,
                             UserService userService,
                             ChatService chatService) {
@@ -70,12 +70,11 @@ public class FillDatabaseTest {
 
     @Order(2)
     @RepeatedTest(100)
-    @Transactional
     public void createRooms() {
-        chatService.createRoom(CreateRoomDto.builder()
-                .isPrivate(false)
-                .userId(findRandomUser().getId())
-                .build(), findRandomUser());
+            chatService.createRoom(CreateRoomDto.builder()
+                    .isPrivate(false)
+                    .userId(findRandomUser().getId())
+                    .build(), findRandomUser());
     }
 
     @Order(3)
@@ -92,25 +91,6 @@ public class FillDatabaseTest {
 
         messageRepository.save(message);
     }
-
-    @Order(4)
-    @RepeatedTest(100)
-    public void createUserRooms() {
-        User randomUser = findRandomUser();
-        Room randomRoom = findRandomRoom();
-
-        System.out.println("id:" + randomUser.getId());
-
-        randomUser.setUserRooms(List.of(UserRoom.builder()
-                .user(randomUser)
-                .room(randomRoom)
-                .subscribedAt(Instant.now().minus(new Random().nextInt(1000), ChronoUnit.DAYS))
-                .lastSeenAt(Instant.now())
-                .build()));
-
-        userRepository.save(randomUser);
-    }
-
 
     private User findRandomUser() {
         List<User> users = userRepository.findAll();
