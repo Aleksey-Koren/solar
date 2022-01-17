@@ -9,7 +9,6 @@ ObjectsStore.prototype = Object.create(AbstractStore.prototype);
 
 ObjectsStore.prototype.update = function() {
     var me = this;
-    if(true)return;
     Rest.doGet('/api/star_map/user/view').then(function (value) {
         me.isLoaded = true;
         me.objects = value;
