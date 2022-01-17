@@ -25,7 +25,7 @@ import java.security.Principal;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/chat")
+@RequestMapping("api/chat/room")
 @RequiredArgsConstructor
 public class RoomController {
 
@@ -33,35 +33,7 @@ public class RoomController {
     private final ChatService chatService;
     private final ChatFacade chatFacade;
 
-    @GetMapping("user/room")
-    @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
-    @Transactional
-    public List<RoomDtoImpl> getRoomsWithAmountUnreadMessages(Principal principal) {
-        User user = userService.findByLogin(principal.getName());
-
-        return chatService.getUserRooms(user.getId());
-    }
-
-    @PostMapping("/room")
-    @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
-    @Transactional
-    public ResponseEntity<RoomDtoImpl> createRoom(@RequestBody CreateRoomDto dto, Principal principal) {
-        User user = userService.findByLogin(principal.getName());
-
-        return ResponseEntity.ok(chatService.createRoom(dto, user));
-    }
-
-    @PatchMapping("room/{roomId}/participants")
-    @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
-    @Transactional
-    public void inviteToRoom(@RequestBody Long invitedId,
-                             @PathVariable("roomId") Long roomId,
-                             Principal principal) {
-        User inviter = userService.findByLogin(principal.getName());
-        chatService.inviteToExistingRoom(inviter, invitedId, roomId);
-    }
-
-    @GetMapping("/room")
+    @GetMapping
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
     @Transactional
     public List<SearchRoomDto> findRoomsWithSpecificUser(Principal principal, RoomFilter roomFilter) {
@@ -70,19 +42,51 @@ public class RoomController {
         return chatFacade.findAllRooms(user, roomFilter);
     }
 
-    @PatchMapping("/room/{roomId}/title")
+    @PostMapping
+    @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
+    @Transactional
+    public ResponseEntity<RoomDtoImpl> createRoom(@RequestBody CreateRoomDto dto, Principal principal) {
+        User user = userService.findByLogin(principal.getName());
+
+        return ResponseEntity.ok(chatService.createRoom(dto, user));
+    }
+
+    @GetMapping("/user")
+    @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
+    @Transactional
+    public List<RoomDtoImpl> getRoomsWithAmountUnreadMessages(Principal principal) {
+        User user = userService.findByLogin(principal.getName());
+
+        return chatService.getUserRooms(user.getId());
+    }
+
+    @PatchMapping("/{roomId}/participants")
+    @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
+    @Transactional
+    public void inviteToRoom(@RequestBody Long invitedId,
+                             @PathVariable("roomId") Long roomId,
+                             Principal principal) {
+
+        User inviter = userService.findByLogin(principal.getName());
+
+        chatService.inviteToExistingRoom(inviter, invitedId, roomId);
+    }
+
+    @PatchMapping("/{roomId}/title")
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
     @Transactional
     public void updateRoomTitle(@PathVariable("roomId") Long roomId, @RequestBody String roomTitle, Principal principal) {
         User user = userService.findByLogin(principal.getName());
+
         chatService.updateRoomTitle(roomId, roomTitle, user);
     }
 
-    @PutMapping("room/{roomId}/lastSeenAt")
+    @PutMapping("/{roomId}/lastSeenAt")
     @Transactional
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
     public ResponseEntity<Void> updateLastSeenAt(@PathVariable("roomId") Long roomId, Principal principal) {
         User user = userService.findByLogin(principal.getName());
+
         return ResponseEntity.status(chatService.updateLastSeenAt(roomId, user)).build();
     }
 }
