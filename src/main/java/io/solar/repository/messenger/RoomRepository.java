@@ -1,6 +1,7 @@
 package io.solar.repository.messenger;
 
 import io.solar.dto.messenger.RoomDto;
+import io.solar.dto.messenger.RoomDtoImpl;
 import io.solar.entity.messenger.Room;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -13,7 +14,8 @@ import java.util.List;
 @Repository
 public interface RoomRepository extends JpaRepository<Room, Long>, JpaSpecificationExecutor<Room> {
 
-    @Query(value = "SELECT rooms.id as id, rooms.title as title, count(messages.id) as amount " +
+    @Query(value = "SELECT rooms.id as id, rooms.title as title, count(messages.id) as amount, " +
+            "rooms.type as roomType, rooms.owner_id as ownerId, rooms.created_at as createdAt " +
             "from rooms " +
             "         inner join users_rooms on users_rooms.room_id = rooms.id " +
             "         left join messages on users_rooms.room_id = messages.room_id " +

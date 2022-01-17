@@ -1,24 +1,20 @@
 package io.solar.mapper.messanger;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.solar.dto.messenger.RoomDto;
 import io.solar.dto.messenger.RoomDtoImpl;
 import io.solar.dto.messenger.SearchRoomDto;
-import io.solar.entity.messenger.Room;
 import io.solar.entity.User;
-import io.solar.entity.messenger.RoomType;
+import io.solar.entity.messenger.Room;
 import io.solar.mapper.EntityDtoMapper;
 import io.solar.mapper.UserMapper;
-import io.solar.repository.messenger.RoomRepository;
 import io.solar.repository.UserRepository;
-import io.solar.service.exception.ServiceException;
+import io.solar.repository.messenger.RoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -41,7 +37,7 @@ public class RoomMapper implements EntityDtoMapper<Room, RoomDtoImpl> {
 
         return RoomDtoImpl.builder()
                 .id(entity.getId())
-                .title(entity.getTitle())
+                .title(mapTitle(entity))
                 .createdAt(entity.getCreatedAt())
                 .ownerId(entity.getOwner().getId())
                 .roomType(entity.getType())
@@ -66,6 +62,9 @@ public class RoomMapper implements EntityDtoMapper<Room, RoomDtoImpl> {
                 .id(roomDto.getId())
                 .amount(roomDto.getAmount() == null ? 0 : roomDto.getAmount())
                 .title(roomDto.getTitle())
+                .ownerId(roomDto.getOwnerId())
+                .roomType(roomDto.getRoomType())
+                .createdAt(roomDto.getCreatedAt())
                 .build();
     }
 

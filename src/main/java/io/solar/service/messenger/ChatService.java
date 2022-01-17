@@ -26,7 +26,8 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.joining;
 
 @Service
 @RequiredArgsConstructor
@@ -76,14 +77,7 @@ public class ChatService {
                     String.format("Room with id = %d is SYSTEM. It is impossible to invite somebody to this room", room.getId()));
         }
 
-        if (room.getDefaultTitle()) {
-            room.getUsers().add(invited);
-            room.setTitle(generateDefaultPublicTitle(room.getUsers().stream()
-                    .map(User::getTitle)
-                    .collect(Collectors.toList())));
-        }
-
-        inviteToRoom(room, invited);
+        addUserToRoom(invited, room);
     }
 
     public Page<MessageDto> getMessageHistory(Long roomId, User user, Pageable pageable) {
@@ -127,7 +121,7 @@ public class ChatService {
 
     private String generateDefaultPublicTitle(List<String> titles) {
         return titles.stream()
-                .collect(Collectors.joining("], [","[" , "]"));
+                .collect(joining("], [","[" , "]"));
     }
 
     private String generatePrivateTitle(User user1, User user2) {
@@ -144,27 +138,6 @@ public class ChatService {
     public List<Room> findAll(RoomSpecification roomSpecification) {
 
         return roomRepository.findAll(roomSpecification);
-    }
-
-    public void editMessage(User user, String updatedText, Long messageId) {
-        Message message = messageRepository.findById(messageId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cannot find message with id = " + messageId));
-
-        if (!user.equals(message.getSender())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "It's forbidden to change other users messages");
-        }
-
-        message.setMessage(updatedText);
-        message.setEditedAt(Instant.now());
-        messageRepository.saveAndFlush(message);
-
-        sendEditedMessage(message);
-    }
-
-    private void sendEditedMessage(Message message) {
-        Room room = message.getRoom();
-
-        simpMessagingTemplate.convertAndSend(String.format("/room/%d", room.getId()), messageMapper.toDto(message));
     }
 
     public void deleteRoomsWithOneParticipantByUserRooms(User user) {
@@ -203,7 +176,6 @@ public class ChatService {
         UserRoom userRoom = new UserRoom(user, room);
         user.getUserRooms().add(userRoom);
         userRepository.save(user);
-//        userRoomService.save(userRoom);
     }
 
     public HttpStatus updateLastSeenAt(Long roomId, User user) {
