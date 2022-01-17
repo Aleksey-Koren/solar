@@ -258,16 +258,22 @@ ChatMain.prototype.openRoom = function(room) {
         if(!response) {
             return;
         }
-        Rest.doPut("/api/chat/room/" + room.id + "/lastSeenAt");
+        me.updateLastSeen()
     });
 }
 
+ChatMain.prototype.updateLastSeen = function() {
+    Rest.doPut("/api/chat/room/" + this.room + "/lastSeenAt");
+}
 ChatMain.prototype.appendMessage = function(message) {
     if(message.roomId !== this.room) {
         return;
     }
+    this.updateLastSeen();
     for(var i = 0; i < this.currentMessages.length; i++) {
         if(this.currentMessages[i].message.id === message.id) {
+            //@todo
+            this.currentMessages[i].update(message);
             return;
         }
     }

@@ -68,3 +68,9 @@ ChatMessage.prototype.tryEdit = function() {
     });
 
 }
+ChatMessage.prototype.update = function(message) {
+    if(this.editMessage === null) {
+        this.message.message = message.message;
+        this.canvas.innerHTML = message.message;
+    }
+}
