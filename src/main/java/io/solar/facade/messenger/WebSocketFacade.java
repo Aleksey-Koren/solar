@@ -1,21 +1,16 @@
 package io.solar.facade.messenger;
 
 import io.solar.dto.messenger.MessageDto;
-import io.solar.entity.messenger.MessageType;
 import io.solar.entity.User;
 import io.solar.entity.messenger.Message;
-import io.solar.entity.messenger.Room;
+import io.solar.entity.messenger.MessageType;
 import io.solar.mapper.messanger.MessageMapper;
-import io.solar.repository.messenger.RoomRepository;
-import io.solar.service.MessageService;
 import io.solar.service.mail.EmailService;
+import io.solar.service.messenger.MessageService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.time.Instant;
 import java.util.List;
 
 @Service

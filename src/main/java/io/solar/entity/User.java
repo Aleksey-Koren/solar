@@ -59,16 +59,11 @@ public class User {
     @ToString.Exclude
     private Set<Permission> permissions;
 
-    @ManyToMany
-    @JoinTable(
-            name = "users_rooms",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "room_id")
-    )
+    @ManyToMany(mappedBy = "users")
     @ToString.Exclude
     private List<Room> rooms;
 
-    @OneToMany(mappedBy = "user", cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.DETACH})
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @ToString.Exclude
     private List<UserRoom> userRooms;
 

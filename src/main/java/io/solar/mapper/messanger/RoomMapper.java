@@ -1,24 +1,20 @@
 package io.solar.mapper.messanger;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.solar.dto.messenger.RoomDto;
 import io.solar.dto.messenger.RoomDtoImpl;
 import io.solar.dto.messenger.SearchRoomDto;
-import io.solar.entity.messenger.Room;
 import io.solar.entity.User;
-import io.solar.entity.messenger.RoomType;
+import io.solar.entity.messenger.Room;
 import io.solar.mapper.EntityDtoMapper;
 import io.solar.mapper.UserMapper;
-import io.solar.repository.messenger.RoomRepository;
 import io.solar.repository.UserRepository;
-import io.solar.service.exception.ServiceException;
+import io.solar.repository.messenger.RoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -41,45 +37,18 @@ public class RoomMapper implements EntityDtoMapper<Room, RoomDtoImpl> {
 
         return RoomDtoImpl.builder()
                 .id(entity.getId())
-                .title(mapTitle(entity))
+                .title(entity.getTitle())
                 .createdAt(entity.getCreatedAt())
                 .ownerId(entity.getOwner().getId())
                 .roomType(entity.getType())
                 .build();
     }
 
-    private String mapTitle(Room entity) {
-        return RoomType.PRIVATE.equals(entity.getType())
-                ? mapPrivateTitle(entity)
-                : mapPublicTitle(entity);
-
-
-    }
-
-    private String mapPrivateTitle(Room room) {
-        return String.format(room.getTitle(),
-                room.getOwner().getTitle(),
-                room.getUsers().stream()
-                        .map(User::getTitle)
-                        .filter(s -> !s.equals(room.getOwner().getTitle()))
-                        .findAny().orElseThrow(() ->  new ServiceException("Something wrong with titles of private room users. Room id = " + room.getId())));
-    }
-
-    private String mapPublicTitle(Room entity) {
-        return entity.getTitle() != null
-                ? entity.getTitle()
-                    : entity.getUsers().stream()
-                                       .map(User::getTitle)
-                                       .collect(Collectors.joining("], [", "Room: [", "]"));
-    }
-
-
-
     public SearchRoomDto toSearchRoomDto(Room room) {
 
         return SearchRoomDto.builder()
                 .id(room.getId())
-                .title(mapTitle(room))
+                .title(room.getTitle())
                 .createdAt(room.getCreatedAt())
                 .ownerId(room.getOwner().getId())
                 .roomType(room.getType())
@@ -92,7 +61,10 @@ public class RoomMapper implements EntityDtoMapper<Room, RoomDtoImpl> {
         return RoomDtoImpl.builder()
                 .id(roomDto.getId())
                 .amount(roomDto.getAmount() == null ? 0 : roomDto.getAmount())
-                .title(mapTitle(roomRepository.getById(roomDto.getId())))
+                .title(roomDto.getTitle())
+                .ownerId(roomDto.getOwnerId())
+                .roomType(roomDto.getRoomType())
+                .createdAt(roomDto.getCreatedAt())
                 .build();
     }
 

@@ -59,7 +59,7 @@ app:
     navigator:
         max_distance: 10
         max_speed: 1000
-        update_coordinates_delay: PT5S
+        update_coordinates_delay: PT120M
         num_update_object: 100
 
 
@@ -75,9 +75,9 @@ log4jdbc:
 logging:
     level:
         jdbc:
-            sqlonly: "INFO"
+            sqlonly: "OFF"
             sqltiming: "OFF"
             audit: "OFF"
             resultset: "OFF"
-            resultsettable: "INFO"
+            resultsettable: "OFF"
             connection: "OFF"

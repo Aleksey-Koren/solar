@@ -2,7 +2,7 @@ package io.solar.controller.messenger;
 
 import io.solar.dto.messenger.MessageDto;
 import io.solar.facade.messenger.WebSocketFacade;
-import io.solar.service.MessageService;
+import io.solar.service.messenger.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -36,7 +36,13 @@ public class WebSocketController {
     @SendTo("/room/{roomId}")
     public MessageDto processMessage(@DestinationVariable("roomId") Long roomId, @Payload MessageDto message) {
         message.setRoomId(roomId);
-        webSocketFacade.processMessage(message);
+
+        if (message.getId() != null) {
+            messageService.editMessage(message);
+        } else {
+            webSocketFacade.processMessage(message);
+        }
+
         return message;
     }
 }

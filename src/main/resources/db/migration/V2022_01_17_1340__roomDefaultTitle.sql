@@ -1,0 +1,6 @@
+ALTER TABLE rooms
+    ADD COLUMN default_title BOOLEAN NOT NULL DEFAULT true;
+
+ALTER TABLE rooms
+    MODIFY title VARCHAR(300);
+

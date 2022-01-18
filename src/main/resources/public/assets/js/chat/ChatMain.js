@@ -85,7 +85,7 @@ ChatMain.prototype.createChatBodyControls = function() {
 
 ChatMain.prototype.loadChats = function() {
     var me = this;
-    Rest.doGet("/api/chat/user/room").then(function(value) {
+    Rest.doGet("/api/chat/room/user").then(function(value) {
         me.rooms = value;
         Dom.clear(me.chatList);
         Dom.append(me.chatList, me.createRooms())

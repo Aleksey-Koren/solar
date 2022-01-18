@@ -6,7 +6,7 @@ import io.solar.entity.User;
 import io.solar.mapper.UserMapper;
 import io.solar.mapper.objects.BasicObjectViewMapper;
 import io.solar.service.UserService;
-import io.solar.service.messenger.ChatService;
+import io.solar.service.messenger.RoomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -21,7 +21,7 @@ public class UserFacade {
     private final UserService userService;
     private final UserMapper userMapper;
     private final BasicObjectViewMapper basicObjectViewMapper;
-    private final ChatService chatService;
+    private final RoomService roomService;
 
     public UserDto updateOnlyTitle(UserDto dto) {
         User user = userService.findById(dto.getId())
@@ -49,7 +49,7 @@ public class UserFacade {
         Optional<User> userOptional = userService.findById(userId);
 
         userOptional.ifPresent(user -> {
-            chatService.deleteRoomsWithOneParticipantByUserRooms(user);
+            roomService.deleteRoomsWithOneParticipantByUserRooms(user);
             userService.delete(user);
         });
     }
