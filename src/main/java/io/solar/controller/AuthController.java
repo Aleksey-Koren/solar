@@ -10,7 +10,9 @@ import io.solar.mapper.UserMapper;
 import io.solar.security.JwtProvider;
 import io.solar.security.Role;
 import io.solar.service.UserService;
+import io.solar.service.mail.EmailService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +29,7 @@ import java.util.Optional;
 public class AuthController {
 
     private final UserService userService;
+    private final EmailService emailService;
     private final JwtProvider jwtProvider;
     private final UserMapper userMapper;
 
@@ -67,6 +70,20 @@ public class AuthController {
             }
         }
         return new Token();
+    }
+
+    @PostMapping("/account/password")
+    @Transactional
+    public ResponseEntity<Void> forgotPassword(@RequestBody String email) {
+        Optional<User> userOptional = userService.findUserByEmail(email);
+
+        if (userOptional.isPresent()) {
+            emailService.sendForgotPasswordEmail(userOptional.get());
+        } else {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok().build();
     }
 
     @Transactional

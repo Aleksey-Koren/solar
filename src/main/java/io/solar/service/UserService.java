@@ -76,6 +76,11 @@ public class UserService implements UserDetailsService {
         return userRepository.save(user);
     }
 
+    public Optional<User> findUserByEmail(String email) {
+
+        return userRepository.findByEmail(email);
+    }
+
     public List<MessageType> getMessageTypesToEmail(User user) {
         if (user.getEmailNotifications() == null) {
             return Collections.emptyList();

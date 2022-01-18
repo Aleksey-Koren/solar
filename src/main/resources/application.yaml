@@ -59,8 +59,11 @@ app:
     navigator:
         max_distance: 10
         max_speed: 1000
-        update_coordinates_delay: PT5S
+        update_coordinates_delay: PT5M
         num_update_object: 100
+    email:
+        token_lifetime_hours: 24
+        forgot_password_template: http://localhost:8081/forgot-password.html?token=
 
 
 log4jdbc:

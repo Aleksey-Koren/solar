@@ -26,6 +26,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Random;
@@ -59,7 +60,6 @@ public class FillDatabaseTest {
     @Order(1)
     @RepeatedTest(100)
     public void createUsers() {
-
         User user = User.builder()
                 .login(UUID.randomUUID().toString())
                 .password("pass")

@@ -48,7 +48,7 @@ public class ObjectCoordinatesService {
         long now = System.currentTimeMillis();
         long schedulerDuration = Duration.parse(schedulerDelaySeconds).toMillis();
         long currentIteration = Long.parseLong(utilityService.getValue(POSITION_ITERATION_UTILITY_KEY, "1"));
-        double delta = calculateDelta(now);
+        double delta = calculateDelta(schedulerDuration);
         List<BasicObject> objects;
 
         updatePlanets(delta);
