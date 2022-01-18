@@ -76,9 +76,8 @@ public class UsersController {
         }
     }
 
-
     @DeleteMapping("{id}")
-    @PreAuthorize("hasAnyAuthority('EDIT_USER')")
+    @PreAuthorize("hasAuthority('EDIT_USER')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Transactional
     public void deleteUser(@PathVariable("id") Long userId) {

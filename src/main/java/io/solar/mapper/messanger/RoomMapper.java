@@ -37,7 +37,7 @@ public class RoomMapper implements EntityDtoMapper<Room, RoomDtoImpl> {
 
         return RoomDtoImpl.builder()
                 .id(entity.getId())
-                .title(mapTitle(entity))
+                .title(entity.getTitle())
                 .createdAt(entity.getCreatedAt())
                 .ownerId(entity.getOwner().getId())
                 .roomType(entity.getType())

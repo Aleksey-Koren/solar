@@ -1,12 +1,12 @@
 package io.solar.controller.messenger;
 
+import io.solar.dto.UserDto;
 import io.solar.dto.messenger.CreateRoomDto;
 import io.solar.dto.messenger.RoomDtoImpl;
 import io.solar.dto.messenger.SearchRoomDto;
 import io.solar.entity.User;
-import io.solar.facade.messenger.ChatFacade;
+import io.solar.facade.messenger.RoomFacade;
 import io.solar.service.UserService;
-import io.solar.service.messenger.ChatService;
 import io.solar.specification.filter.RoomFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -30,8 +30,7 @@ import java.util.List;
 public class RoomController {
 
     private final UserService userService;
-    private final ChatService chatService;
-    private final ChatFacade chatFacade;
+    private final RoomFacade roomFacade;
 
     @GetMapping
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
@@ -39,7 +38,7 @@ public class RoomController {
     public List<SearchRoomDto> findRoomsWithSpecificUser(Principal principal, RoomFilter roomFilter) {
         User user = userService.findByLogin(principal.getName());
 
-        return chatFacade.findAllRooms(user, roomFilter);
+        return roomFacade.findAllRooms(user, roomFilter);
     }
 
     @PostMapping
@@ -48,7 +47,7 @@ public class RoomController {
     public ResponseEntity<RoomDtoImpl> createRoom(@RequestBody CreateRoomDto dto, Principal principal) {
         User user = userService.findByLogin(principal.getName());
 
-        return ResponseEntity.ok(chatService.createRoom(dto, user));
+        return ResponseEntity.ok(roomFacade.createRoom(dto, user));
     }
 
     @GetMapping("/user")
@@ -57,7 +56,7 @@ public class RoomController {
     public List<RoomDtoImpl> getRoomsWithAmountUnreadMessages(Principal principal) {
         User user = userService.findByLogin(principal.getName());
 
-        return chatService.getUserRooms(user.getId());
+        return roomFacade.getUserRooms(user.getId());
     }
 
     @PatchMapping("/{roomId}/participants")
@@ -69,7 +68,14 @@ public class RoomController {
 
         User inviter = userService.findByLogin(principal.getName());
 
-        chatService.inviteToExistingRoom(inviter, invitedId, roomId);
+        roomFacade.inviteToExistingRoom(inviter, invitedId, roomId);
+    }
+
+    @GetMapping("/{roomId}/participants")
+    @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
+    @Transactional
+    public List<UserDto> getUsersOfRoom(@PathVariable("roomId") Long roomId) {
+        return roomFacade.findAllByRoomId(roomId);
     }
 
     @PatchMapping("/{roomId}/title")
@@ -78,7 +84,7 @@ public class RoomController {
     public void updateRoomTitle(@PathVariable("roomId") Long roomId, @RequestBody String roomTitle, Principal principal) {
         User user = userService.findByLogin(principal.getName());
 
-        chatService.updateRoomTitle(roomId, roomTitle, user);
+        roomFacade.updateTitle(roomId, roomTitle, user);
     }
 
     @PutMapping("/{roomId}/lastSeenAt")
@@ -87,6 +93,6 @@ public class RoomController {
     public ResponseEntity<Void> updateLastSeenAt(@PathVariable("roomId") Long roomId, Principal principal) {
         User user = userService.findByLogin(principal.getName());
 
-        return ResponseEntity.status(chatService.updateLastSeenAt(roomId, user)).build();
+        return ResponseEntity.status(roomFacade.updateLastSeenAt(roomId, user)).build();
     }
 }
