@@ -42,7 +42,7 @@ public class CourseMapper {
                                         String.format("There is no object with id = %d in database", dto.getObjectId()))));
         course.setAccelerationX(dto.getAccelerationX());
         course.setAccelerationY(dto.getAccelerationY());
-        course.setTime(dto.getTime());
+        course.setTime(dto.getTime() * 1000);
         course.setNext(dto.getNextId() != null ? courseRepository.findById(dto.getNextId())
                                                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                                                             String.format("There is no course with id = %d in database", dto.getNextId())))

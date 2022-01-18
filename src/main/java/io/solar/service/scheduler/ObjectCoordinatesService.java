@@ -47,7 +47,7 @@ public class ObjectCoordinatesService {
         long now = System.currentTimeMillis();
         long schedulerDuration = Duration.parse(schedulerDelaySeconds).toMillis();
         long currentIteration = Long.parseLong(utilityService.getValue(POSITION_ITERATION_UTILITY_KEY, "1"));
-        double delta = calculateDelta(now);
+        double delta = calculateDelta(schedulerDuration);
         List<BasicObject> objects;
 
         updatePlanets(delta);
@@ -111,13 +111,26 @@ public class ObjectCoordinatesService {
     private void updateOrbitalObjectLocation(BasicObject object, Double delta) {
         double deltaAngleRadians = delta / object.getOrbitalPeriod();
 
-        double objectAngle = object.getClockwiseRotation()
-                ? object.getAngle() - deltaAngleRadians
-                : object.getAngle() + deltaAngleRadians;
+        double angleDegrees = Math.toDegrees(object.getAngle()) < 0
+                ? 360 + Math.toDegrees(object.getAngle())
+                : Math.toDegrees(object.getAngle());
+        double deltaAngleDegrees = Math.toDegrees(deltaAngleRadians);
 
-        object.setX((float) Math.cos(objectAngle) * object.getAphelion() + object.getPlanet().getX());
-        object.setY((float) Math.sin(objectAngle) * object.getAphelion() + object.getPlanet().getY());
-        object.setAngle((float) objectAngle);
+        double objectAngleDegrees = object.getClockwiseRotation()
+                ? angleDegrees - deltaAngleDegrees
+                : angleDegrees + deltaAngleDegrees;
+
+        int rounds = (int) objectAngleDegrees / 360;
+        if (objectAngleDegrees <= 0) {
+            objectAngleDegrees += 360.00 * (rounds + 1);
+        }else if (objectAngleDegrees >= 360) {
+            objectAngleDegrees -= 360.00 * (rounds + 1);
+        }
+
+        double angleRadians = Math.toRadians(objectAngleDegrees);
+        object.setX((float) Math.cos(angleRadians) * object.getAphelion() + object.getPlanet().getX());
+        object.setY((float) Math.sin(angleRadians) * object.getAphelion() + object.getPlanet().getY());
+        object.setAngle((float) angleRadians);
     }
 
     private void updateUnattachedObject(BasicObject object, Long currentTimeMills, Long schedulerDuration) {
@@ -225,9 +238,9 @@ public class ObjectCoordinatesService {
 
     private Float determinePosition(Float coordinate, Float speed, Long time, Float acceleration) {
         double dividedTime = time / 3_600_000d;
-        float distanceCovered = (float) (speed * dividedTime + (acceleration * Math.pow(dividedTime, 2)) / 2);
+        double distanceCovered = (speed * dividedTime + (acceleration * Math.pow(dividedTime, 2)) / 2);
 
-        return coordinate + distanceCovered;
+        return (float)(coordinate + distanceCovered);
     }
 
     private boolean isAccelerationInvalid(BasicObject object, Course course) {

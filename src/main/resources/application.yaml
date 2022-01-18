@@ -59,7 +59,7 @@ app:
     navigator:
         max_distance: 10
         max_speed: 1000
-        update_coordinates_delay: PT120M
+        update_coordinates_delay: PT5S
         num_update_object: 100
 
 
