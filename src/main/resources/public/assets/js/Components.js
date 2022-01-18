@@ -172,8 +172,7 @@ function Popup(params) {
     ]);
     this.container = Dom.el(
         'div',
-        {class: "overlay"},
-        this.window
+        {class: "overlay"}
     );
     this.onClose = params.onClose;
     this.hideWrapper = null;
@@ -190,12 +189,14 @@ Popup.prototype.show = function () {
         this.context.escListener.add(this.hideWrapper)
     }
     document.body.appendChild(this.container);
+    document.body.appendChild(this.window);
 };
 Popup.prototype.hide = function () {
     if(this.context && this.context.escListener) {
         this.context.escListener.remove(this.hideWrapper);
     }
     this.container.parentElement && this.container.parentElement.removeChild(this.container);
+    this.window.parentElement && this.window.parentElement.removeChild(this.window);
     this.onClose && this.onClose();
 };
 

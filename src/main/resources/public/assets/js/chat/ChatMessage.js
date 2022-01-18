@@ -1,17 +1,22 @@
 /**
  * @param message {{senderId:number, createdAt:string, message:string, id: number}}
- * @param currentUser number
+ * @param sender {{id:number, title: string}}
+ * @param currentUser {number}
+ * @param sendUpdate {PromiseSupplier}
  * @constructor
  */
-function ChatMessage(message, currentUser) {
+function ChatMessage(message, sender, currentUser, sendUpdate) {
     this.canvas = Dom.el('div', null, message.message);
     this.canvasContainer = Dom.el('div', null, this.canvas);
     this.message = message;
+    this.sendUpdate = sendUpdate;
     var me = this;
     this.editMessage = null;
     this.container = Dom.el('div', 'chat-message ' + (currentUser === message.senderId ? "chat-your-message" : ""), [
         Dom.el('div', null, [
-            message.senderId + " " + message.createdAt + " ",
+            (currentUser === message.senderId ? "" : (sender||{}).title + " ")
+            + this.renderDate(message.createdAt)
+            + " ",
             currentUser === message.senderId ? Dom.el('a', {
                 href: '/#',
                 class: 'edit-icon',
@@ -56,17 +61,24 @@ ChatMessage.prototype.tryEdit = function() {
         Dom.append(me.canvasContainer, me.canvas);
         return;
     }
-    Rest.doPatch("/api/chat/room/messages/" + me.message.id, me.editMessage).then(function(){
-        me.message.message = me.editMessage;
-        me.editMessage = null;
-        me.canvasContainer.removeChild(me.canvas);
-        me.canvas = Dom.el('div', null, me.message.message);
-        Dom.append(me.canvasContainer, me.canvas);
-    }).catch(function(e) {
-        console.error(e);
-        Notification.error("Fail to update message")
-    });
+    this.sendUpdate(me.editMessage)
 
+    me.message.message = me.editMessage;
+    me.editMessage = null;
+    me.canvasContainer.removeChild(me.canvas);
+    me.canvas = Dom.el('div', null, me.message.message);
+    Dom.append(me.canvasContainer, me.canvas);
+
+}
+ChatMessage.prototype.renderDate = function(str) {
+    if(!str) {
+        return '';
+    }
+    var date = new Date(str);
+    if(isNaN(date.getDate())) {
+        return '';
+    }
+    return humanDate(date)
 }
 ChatMessage.prototype.update = function(message) {
     if(this.editMessage === null) {

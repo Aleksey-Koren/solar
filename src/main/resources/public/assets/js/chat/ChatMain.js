@@ -12,8 +12,9 @@ function ChatMain(solarMap) {
     this.chatControls = null;//chat controls container - invite to chat, search for particular chat, etc
     this.chatBody = null;//chat body container (messages from particular chat)
     this.chatBodyControls = null;//controls to post message
-    this.chatTitle = new ChatTitle();
+    this.chatTitle = new ChatTitle(solarMap.context.stores.userStore.user.user_id);
     this.currentMessages = [];
+    this.participants = {};
     var me = this;
     var socket = new SockJS('/api/ws');
     this.stompClient = Stomp.over(socket);
@@ -166,7 +167,7 @@ ChatMain.prototype.createChatList = function() {
                 chatInviteList.style.display = 'block';
                 Dom.append(chatInviteList, users)
             } else {
-                Dom.append(chatInviteList, Dom.el('div', null, "No users with such search criteria"))
+                Dom.append(chatInviteList, Dom.el('div', null, "No more users with such name"))
             }
             return response;
         }).catch(function(e){
@@ -216,13 +217,16 @@ ChatMain.prototype.subscribeToRoom = function(room) {
         me.stompClient.subscribe("/room/" + room.id, function(response) {
             var message = JSON.parse(response.body);
             me.appendMessage(message);
+            if(room.id === me.room) {
+                me.updateLastSeen()
+            }
             for(var i = 0; i < me.rooms.length; i++) {
-                var room = me.rooms[i];
-                if(room.id === message.roomId) {
-                    if(room.id !== me.room) {
-                        room.amount++;
-                        var unread = document.getElementById('chat-unread-' + room.id );
-                        if(unread) unread.innerHTML = "+" + room.amount;
+                var subsRoom = me.rooms[i];
+                if(subsRoom.id === message.roomId) {
+                    if(subsRoom.id !== me.room) {
+                        subsRoom.amount++;
+                        var unread = document.getElementById('chat-unread-' + subsRoom.id );
+                        if(unread) unread.innerHTML = "+" + subsRoom.amount;
                     }
                     break;
                 }
@@ -246,7 +250,15 @@ ChatMain.prototype.openRoom = function(room) {
     var me = this;
     me.room = room.id;
     me.chatTitle.setRoom(room);
-    Rest.doGet("/api/chat/room/" + room.id + "/messages").then(function(page) {
+    Rest.doGet("/api/chat/room/" + room.id + "/participants").then(function(participants) {
+        this.participants = {};
+        participants.forEach(function(p) {
+            me.participants[p.id] = p;
+        })
+        return participants;
+    }).then(function() {
+        return Rest.doGet("/api/chat/room/" + room.id + "/messages");
+    }).then(function(page) {
         if(me.room !== room.id) {
             return null;
         }
@@ -269,7 +281,7 @@ ChatMain.prototype.appendMessage = function(message) {
     if(message.roomId !== this.room) {
         return;
     }
-    this.updateLastSeen();
+    var me = this;
     for(var i = 0; i < this.currentMessages.length; i++) {
         if(this.currentMessages[i].message.id === message.id) {
             //@todo
@@ -277,7 +289,13 @@ ChatMain.prototype.appendMessage = function(message) {
             return;
         }
     }
-    var mes = new ChatMessage(message, this.solarMap.context.stores.userStore.user.user_id);
+    var mes = new ChatMessage(message, this.participants[message.senderId], this.solarMap.context.stores.userStore.user.user_id, function(newMessage) {
+        me.stompClient.send("/chat/" + me.room, {}, JSON.stringify({
+            id: message.id,
+            senderId: me.solarMap.context.stores.userStore.user.user_id,
+            message: newMessage
+        }));
+    });
     this.currentMessages.push(mes);
     Dom.append(this.chatBody, mes.container);
     mes.scroll();

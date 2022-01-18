@@ -1,10 +1,12 @@
 /**
+ * @param currentUser {number}
  * @constructor
  */
-function ChatTitle() {
+function ChatTitle(currentUser) {
+    this.currentUser = currentUser
     this.room = null;
     this.title = "";
-    this.container = Dom.el('div');
+    this.container = Dom.el('div', 'chat-head');
     this.editTitle = null;
     var me = this;
     this.button = Dom.el('a', {
@@ -42,7 +44,14 @@ ChatTitle.prototype.setTitle = function(title) {
     this.editTitle = null;
     Dom.clear(this.container);
     this.canvas = Dom.el('h3', 'chat-title', [this.title, " ", this.button]);
-    Dom.append(this.container, [this.canvas]);
+    Dom.append(this.container, [this.canvas, Dom.el('a', {
+        href: '/#',
+        style: {width: '16px', height: '16px', display: 'inline-block'},
+        class: "icon-add-user",
+        onclick: function(e) {
+            e.preventDefault();
+            this.inviteUser();
+        }})]);
 }
 /**
  *
@@ -51,6 +60,7 @@ ChatTitle.prototype.setTitle = function(title) {
  */
 ChatTitle.prototype.setRoom = function(room) {
     this.room = room;
+    var me = this;
     if(this.room.roomType === 'PUBLIC') {
         this.button.style.display = "inline-block";
         this.title = this.room.title;
@@ -60,11 +70,12 @@ ChatTitle.prototype.setRoom = function(room) {
     } else if(this.room.roomType === 'PRIVATE') {
         this.button.style.display = "none";
         try {
-            this.room.title = '["john", "doe"]';
             var titles = JSON.parse(this.room.title);
-            this.title = titles.filter(function(t) {
-                return t;
-            })[0];
+            this.title = titles.map(function(t) {
+                return t.split(":");
+            }).filter(function(t) {
+                return parseInt(t[0]) !== me.currentUser;
+            })[0][1];
         } catch (e) {
             console.error(e);
             this.title = this.room.title;

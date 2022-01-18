@@ -131,6 +131,7 @@ input, select, textarea {
     height: 100%;
     background: #3a3a3a;
     z-index: 1000;
+    opacity: 0.8;
 }
 
 .modal, .small-modal, .large-modal  {
@@ -142,6 +143,7 @@ input, select, textarea {
     top: 100px;
     max-height: calc(80% - 100px);
     overflow: auto;
+    z-index: 1100;
 }
 .small-modal {
     width: 460px;
@@ -249,12 +251,18 @@ a.disabled {
     display: inline-block;
     padding: 10px;
 }
+.chat-sidebar {
+    border-right: 1px solid #ffc562;;
+    padding-right: 10px;
+    overflow: auto;
+}
 .chat-body-controls {
     border-top: 1px solid #ffc562;
     padding: 5px 0;
     display: flex;
     flex-direction: row;
     justify-content: stretch;
+    margin-top: auto;
 }
 .chat-body-controls textarea {
     flex: 1;
@@ -269,7 +277,7 @@ a.disabled {
     flex: 1;
     display: flex;
     flex-direction: column;
-    margin-left: 20px;
+    margin-left: 10px;
 }
 .chat-room {
     line-height: 23px;
@@ -279,6 +287,11 @@ a.disabled {
 }
 .chat-message {
     margin-bottom: 10px;
+    border: 1px solid;
+    padding: 5px;
+    margin-right: 10px;
+    float: left;
+    clear: both;
 }
 .chat-body {
     overflow: auto;
@@ -289,14 +302,32 @@ a.disabled {
 .chat-title {
     margin-top: 0;
     color: #ffc562;
+    padding-bottom: 5px;
+    margin-bottom: 0;
+}
+.icon-add-user {
+    background-image: url(/assets/svgs/solid/user-plus.svg);
+    background-repeat: no-repeat;
+}
+.icon-add-user:hover, .icon-add-user-selected, .icon-add-user.icon-add-user-selected {
+    background-image: url(/assets/svgs/solid/user-plus-selected.svg);
+    background-repeat: no-repeat;
 }
 .edit-icon {
     background-image: url(/assets/svgs/solid/pencil-alt.svg);
+    background-repeat: no-repeat;
 }
 .edit-icon:hover, .edit-icon-selected, .edit-icon.edit-icon-selected {
     background-image: url(/assets/svgs/solid/pencil-alt-selected.svg);
+    background-repeat: no-repeat;
 }
 .chat-your-message {
     text-align: right;
-    margin-right: 10px;
+    float: right !important;
+}
+.chat-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-right: 20px;
 }
