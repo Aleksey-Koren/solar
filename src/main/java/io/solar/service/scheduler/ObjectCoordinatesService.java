@@ -18,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -225,9 +226,9 @@ public class ObjectCoordinatesService {
 
     private Float determinePosition(Float coordinate, Float speed, Long time, Float acceleration) {
         double dividedTime = time / 3_600_000d;
-        float distanceCovered = (float) (speed * dividedTime + (acceleration * Math.pow(dividedTime, 2)) / 2);
+        double distanceCovered = (speed * dividedTime + (acceleration * Math.pow(dividedTime, 2)) / 2);
 
-        return coordinate + distanceCovered;
+        return (float)(coordinate + distanceCovered);
     }
 
     private boolean isAccelerationInvalid(BasicObject object, Course course) {
