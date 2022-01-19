@@ -51,23 +51,13 @@ public class EmailService {
 
     public void sendForgotPasswordEmail(User user) {
         Optional<PasswordToken> passwordTokenOptional = passwordTokenRepository.findById(user.getId());
-
-        if (passwordTokenOptional.isPresent() && passwordTokenOptional.get().getExpireAt().isBefore(Instant.now())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Password can reset once every " + tokenLifetimeHours + " hours "
-            );
-        }
-
         String token = UUID.randomUUID().toString();
 
-        passwordTokenRepository.save(PasswordToken.builder()
-                .user(user)
-                .expireAt(Instant.now().plus(tokenLifetimeHours, ChronoUnit.HOURS))
-                .isActivated(false)
-                .token(token)
-                .build()
-        );
+        PasswordToken passwordToken = passwordTokenOptional
+                .map(value -> updateToken(token, value))
+                .orElseGet(() -> createNewToken(user, token));
 
+        passwordTokenRepository.save(passwordToken);
         sendSimpleEmail(user, "Forgot password", forgotPasswordTemplate + token);
     }
 
@@ -95,5 +85,29 @@ public class EmailService {
             //todo: log.error("Error while sending mail to {}", email.getSendAddress());
             throw new ServiceException(String.format("Cannot send email to %s", templateEmail.getSendAddress()));
         }
+    }
+
+    private PasswordToken updateToken(String token, PasswordToken oldToken) {
+        if (oldToken.getExpireAt().isAfter(Instant.now())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Password can reset once every " + tokenLifetimeHours + " hours "
+            );
+        }
+
+        oldToken.setToken(token);
+        oldToken.setIsActivated(false);
+        oldToken.setExpireAt(Instant.now().plus(tokenLifetimeHours, ChronoUnit.HOURS));
+
+        return oldToken;
+    }
+
+    private PasswordToken createNewToken(User user, String token) {
+
+        return PasswordToken.builder()
+                .user(user)
+                .expireAt(Instant.now().plus(tokenLifetimeHours, ChronoUnit.HOURS))
+                .isActivated(false)
+                .token(token)
+                .build();
     }
 }
