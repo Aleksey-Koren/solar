@@ -52,6 +52,7 @@ app:
     goods_generation_delay_minutes: 60
     goods_initial_delay_minutes: 60
     view_distance_without_radar: 5
+    time_flow_modifier: 3650
     images:
         path: src/main/resources/images
         width: 300

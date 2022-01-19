@@ -4,7 +4,7 @@ import io.solar.dto.UserDto;
 import io.solar.entity.Permission;
 import io.solar.entity.User;
 import io.solar.mapper.UserMapper;
-import io.solar.mapper.objects.BasicObjectViewMapper;
+import io.solar.mapper.object.BasicObjectViewMapper;
 import io.solar.service.UserService;
 import io.solar.service.messenger.RoomService;
 import lombok.RequiredArgsConstructor;

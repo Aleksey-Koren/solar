@@ -1,5 +1,6 @@
 package io.solar.service.scheduler;
 
+import io.solar.config.AppProperties;
 import io.solar.entity.Course;
 import io.solar.entity.Planet;
 import io.solar.entity.interfaces.SpaceTech;
@@ -35,15 +36,19 @@ public class ObjectCoordinatesService {
     @Value("${app.navigator.update_coordinates_delay}")
     private String schedulerDelaySeconds;
 
+    private int timeFlowModifier = 1;
+
     private final UtilityService utilityService;
     private final BasicObjectRepository basicObjectRepository;
     private final PlanetService planetService;
     private final CourseService courseService;
     private final SpaceTechEngine spaceTechEngine;
     private final NavigatorService navigatorService;
+    private final AppProperties appProperties;
 
     @Transactional
     public void update() {
+        timeFlowModifier = appProperties.getTimeFlowModifier();
         long now = System.currentTimeMillis();
         long schedulerDuration = Duration.parse(schedulerDelaySeconds).toMillis();
         long currentIteration = Long.parseLong(utilityService.getValue(POSITION_ITERATION_UTILITY_KEY, "1"));
@@ -82,7 +87,11 @@ public class ObjectCoordinatesService {
         planetService.saveAll(planets);
     }
 
-    private void updateObjects(List<BasicObject> objects, long currentIteration, long now, long schedulerDuration, double delta) {
+    private void updateObjects(List<BasicObject> objects,
+                               long currentIteration,
+                               long now,
+                               long schedulerDuration,
+                               double delta) {
         objects.forEach(object -> {
             if (object.getPlanet() != null && object.getAphelion() != null
                     && object.getAngle() != null && object.getOrbitalPeriod() != null) {
@@ -237,7 +246,7 @@ public class ObjectCoordinatesService {
     }
 
     private Float determinePosition(Float coordinate, Float speed, Long time, Float acceleration) {
-        double dividedTime = time / 3_600_000d;
+        double dividedTime = (time / 3_600_000d) * timeFlowModifier;
         double distanceCovered = (speed * dividedTime + (acceleration * Math.pow(dividedTime, 2)) / 2);
 
         return (float)(coordinate + distanceCovered);
@@ -251,7 +260,7 @@ public class ObjectCoordinatesService {
 
     private Double calculateDelta(Long schedulerDuration) {
 
-        return Math.PI * 2 * schedulerDuration / (1000 * 60 * 60 * 24);
+        return Math.PI * 2 * schedulerDuration * timeFlowModifier / (1000 * 60 * 60 * 24);
     }
 
     private Double calculateAcceleration(Float accelerationX, Float accelerationY) {
@@ -261,6 +270,6 @@ public class ObjectCoordinatesService {
 
     private Float calculateSpeed(Float speed, Float acceleration, long time) {
 
-        return speed + (acceleration * time / 3_600_000);
+        return speed + (acceleration * time * timeFlowModifier/ 3_600_000);
     }
 }

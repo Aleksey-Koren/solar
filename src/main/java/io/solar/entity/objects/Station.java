@@ -3,6 +3,7 @@ package io.solar.entity.objects;
 import io.solar.entity.Goods;
 import io.solar.entity.Production;
 import io.solar.entity.interfaces.SpaceTech;
+import io.solar.entity.shop.StationShop;
 import lombok.*;
 
 import javax.persistence.*;
@@ -23,6 +24,9 @@ public class Station extends BasicObject implements SpaceTech {
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
     @EqualsAndHashCode.Exclude
     private List<Goods> goods;
+
+    @OneToOne(mappedBy = "station", fetch = FetchType.LAZY)
+    private StationShop shop;
 
 //    private List<Inventory> inventory;
 
