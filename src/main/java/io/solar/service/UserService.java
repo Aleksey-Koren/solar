@@ -1,10 +1,13 @@
 package io.solar.service;
 
+import io.solar.dto.ChangePasswordDto;
 import io.solar.dto.UserDto;
+import io.solar.entity.PasswordToken;
 import io.solar.entity.Permission;
 import io.solar.entity.User;
 import io.solar.entity.messenger.MessageType;
 import io.solar.mapper.UserMapper;
+import io.solar.repository.PasswordTokenRepository;
 import io.solar.repository.PermissionRepository;
 import io.solar.repository.UserRepository;
 import io.solar.security.Role;
@@ -43,6 +46,7 @@ public class UserService implements UserDetailsService {
     private final UserMapper userMapper;
     private final PermissionRepository permissionRepository;
     private final PasswordEncoder passwordEncoder;
+    private final PasswordTokenRepository passwordTokenRepository;
 
     @Value("${app.hack_block_time_min}")
     private Integer HACK_BLOCK_TIME_MIN;
@@ -76,9 +80,15 @@ public class UserService implements UserDetailsService {
         return userRepository.save(user);
     }
 
-    public Optional<User> findUserByEmail(String email) {
+    public User changePassword(ChangePasswordDto changePasswordDto) {
+        PasswordToken passwordToken = passwordTokenRepository.findByToken(changePasswordDto.getToken())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot find token"));
 
-        return userRepository.findByEmail(email);
+        if (passwordToken.getIsActivated()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "The token has already been used");
+        }
+
+        return updateUserPassword(passwordToken, changePasswordDto.getNewPassword());
     }
 
     public List<MessageType> getMessageTypesToEmail(User user) {
@@ -119,23 +129,14 @@ public class UserService implements UserDetailsService {
         return userMapper.toDto(user);
     }
 
-    private String receiveEmailFromLogin(User user) {
-
-        return user.getLogin().contains("@")
-                ? user.getLogin()
-                : null;
-    }
-
     public void saveEmailNotifications(User user, List<MessageType> messageTypes) {
         user.setEmailNotifications(calculateEmailNotifications(messageTypes));
         userRepository.save(user);
     }
 
-    private Integer calculateEmailNotifications(List<MessageType> messageTypes) {
+    public Optional<User> findUserByEmail(String email) {
 
-        return messageTypes.stream()
-                .mapToInt(MessageType::getIndex)
-                .sum();
+        return userRepository.findByEmail(email);
     }
 
     public Optional<User> findById(Long id) {
@@ -160,5 +161,31 @@ public class UserService implements UserDetailsService {
 
     public boolean isUserNotLocatedInObject(User user, Long objectId) {
         return !user.getLocation().getId().equals(objectId);
+    }
+
+    private User updateUserPassword(PasswordToken passwordToken, String newPassword) {
+        User user = passwordToken.getUser();
+        user.setPassword(passwordEncoder.encode(newPassword));
+
+        passwordToken.setIsActivated(true);
+
+        userRepository.save(user);
+        passwordTokenRepository.save(passwordToken);
+
+        return user;
+    }
+
+    private Integer calculateEmailNotifications(List<MessageType> messageTypes) {
+
+        return messageTypes.stream()
+                .mapToInt(MessageType::getIndex)
+                .sum();
+    }
+
+    private String receiveEmailFromLogin(User user) {
+
+        return user.getLogin().contains("@")
+                ? user.getLogin()
+                : null;
     }
 }

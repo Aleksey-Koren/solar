@@ -2,6 +2,7 @@ package io.solar.controller;
 
 
 import io.solar.dto.BlockedToken;
+import io.solar.dto.ChangePasswordDto;
 import io.solar.dto.Register;
 import io.solar.dto.Token;
 import io.solar.dto.UserDto;
@@ -37,15 +38,19 @@ public class AuthController {
     @PostMapping("/register")
     public Register register(@RequestBody UserDto dto) {
         User userFromClient = userMapper.toEntity(dto);
+
         if (userFromClient.getLogin().equals("admin")) {
             return new Register(false, "", "Login \"admin\" is reserved. You have to choose another login");
         }
+
         User userFromDb = userService.findByLogin(userFromClient.getLogin());
         if (userFromDb != null) {
             return new Register(false, "", "User with this login already exists");
         }
+
         userFromClient = userService.registerNewUser(userFromClient, Role.USER);
         Token token = createToken(userFromClient);
+
         return new Register(true, token.getData(), "");
     }
 
@@ -86,14 +91,24 @@ public class AuthController {
         return ResponseEntity.ok().build();
     }
 
+    @PatchMapping("/account/password/change")
     @Transactional
+    public ResponseEntity<Token> changePassword(@RequestBody ChangePasswordDto changePasswordDto) {
+        User user = userService.changePassword(changePasswordDto);
+
+        return ResponseEntity.ok(createToken(user));
+    }
+
     @GetMapping("/refresh")
+    @Transactional
     public Token refresh(@RequestHeader("auth_token") String token) {
         Optional<User> out = jwtProvider.verifyToken(token);
-        return out.isPresent() ? createToken(out.get()) : new Token();
+
+        return out.map(this::createToken).orElseGet(Token::new);
     }
 
     private boolean isHackBlocked(User userFromDb, Instant now) {
+
         return userFromDb.getHackBlock() != null && now.isBefore(userFromDb.getHackBlock());
     }
 
