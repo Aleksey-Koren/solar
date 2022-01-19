@@ -54,6 +54,7 @@ public class InitService {
         User admin = new User();
         admin.setLogin(LOGIN);
         admin.setPassword(PASSWORD);
+        admin.setMoney(100000L);
         admin = userService.registerNewUser(admin, Role.ADMIN);
         createDefaultShip(admin);
     }
