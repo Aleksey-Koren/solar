@@ -73,6 +73,7 @@
     <script src="/assets/js/map/CollapsibleWindow.js"></script>
     <script src="/assets/js/map/PlanetWindow.js"></script>
     <script src="/assets/js/utils/DragHelper.js"></script>
+    <script src="/assets/js/utils/DateUtils.js"></script>
 
     <script src="/assets/js/AppContext.js"></script>
     <script src="/assets/js/store/AbstractStore.js"></script>
@@ -1113,7 +1114,7 @@ yin-yang.svg
     setTimeout(function(){
         document.getElementById('text').value.split("\n").map(v => v.trim()).filter(v => v).forEach(icon => {
             var path = "/assets/svgs/solid/" + icon;
-            //document.body.appendChild(Dom.el('img', {src: path, style: "width: 30px; height: 30px"}));
+            //document.body.appendChild(Dom.el('img', {src: path, style: {width: '30px', height: '30px'}}));
         })
     }, 1000)
 </script>
