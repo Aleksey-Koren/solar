@@ -2,7 +2,7 @@ package io.solar.mapper;
 
 import io.solar.dto.UserDto;
 import io.solar.entity.User;
-import io.solar.mapper.objects.BasicObjectViewMapper;
+import io.solar.mapper.object.BasicObjectViewMapper;
 import io.solar.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

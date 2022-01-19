@@ -1,12 +1,11 @@
-package io.solar.mapper;
+package io.solar.mapper.object;
 
-import io.solar.dto.inventory.InventoryItemDto;
+import io.solar.dto.object.ObjectTypeDescriptionDto;
 import io.solar.entity.objects.ObjectTypeDescription;
-import io.solar.repository.InventorySocketRepository;
+import io.solar.mapper.EntityDtoMapper;
 import io.solar.repository.InventoryTypeRepository;
 import io.solar.repository.ObjectTypeDescriptionRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
@@ -15,13 +14,13 @@ import java.util.Objects;
 
 @Component
 @RequiredArgsConstructor
-public class ObjectTypeDescriptionMapper implements EntityDtoMapper<ObjectTypeDescription, InventoryItemDto> {
+public class ObjectTypeDescriptionMapper implements EntityDtoMapper<ObjectTypeDescription, ObjectTypeDescriptionDto> {
 
     private final ObjectTypeDescriptionRepository objectTypeDescriptionRepository;
     private final InventoryTypeRepository inventoryTypeRepository;
 
     @Override
-    public ObjectTypeDescription toEntity(InventoryItemDto dto) {
+    public ObjectTypeDescription toEntity(ObjectTypeDescriptionDto dto) {
 
         return Objects.isNull(dto.getId())
                 ? createObjectTypeDescription(dto)
@@ -29,9 +28,9 @@ public class ObjectTypeDescriptionMapper implements EntityDtoMapper<ObjectTypeDe
     }
 
     @Override
-    public InventoryItemDto toDto(ObjectTypeDescription entity) {
+    public ObjectTypeDescriptionDto toDto(ObjectTypeDescription entity) {
 
-        return InventoryItemDto.builder()
+        return ObjectTypeDescriptionDto.builder()
                 .id(entity.getId())
                 .title(entity.getTitle())
                 .description(entity.getDescription())
@@ -50,7 +49,7 @@ public class ObjectTypeDescriptionMapper implements EntityDtoMapper<ObjectTypeDe
                 .build();
     }
 
-    private ObjectTypeDescription createObjectTypeDescription(InventoryItemDto dto) {
+    private ObjectTypeDescription createObjectTypeDescription(ObjectTypeDescriptionDto dto) {
         ObjectTypeDescription objectTypeDescription = new ObjectTypeDescription();
 
         fillObjectTypeDescriptionFieldsByDto(objectTypeDescription, dto);
@@ -58,7 +57,7 @@ public class ObjectTypeDescriptionMapper implements EntityDtoMapper<ObjectTypeDe
         return objectTypeDescription;
     }
 
-    private ObjectTypeDescription findObjectTypeDescription(InventoryItemDto dto) {
+    private ObjectTypeDescription findObjectTypeDescription(ObjectTypeDescriptionDto dto) {
 
         ObjectTypeDescription objectTypeDescription = objectTypeDescriptionRepository.findById(dto.getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
@@ -70,7 +69,7 @@ public class ObjectTypeDescriptionMapper implements EntityDtoMapper<ObjectTypeDe
         return objectTypeDescription;
     }
 
-    private void fillObjectTypeDescriptionFieldsByDto(ObjectTypeDescription objectTypeDescription, InventoryItemDto dto) {
+    private void fillObjectTypeDescriptionFieldsByDto(ObjectTypeDescription objectTypeDescription, ObjectTypeDescriptionDto dto) {
 
         objectTypeDescription.setTitle(dto.getTitle());
         objectTypeDescription.setDescription(dto.getDescription());

@@ -1,4 +1,4 @@
-package io.solar.mapper.objects;
+package io.solar.mapper.object;
 
 import io.solar.dto.BasicObjectViewDto;
 import io.solar.entity.Planet;

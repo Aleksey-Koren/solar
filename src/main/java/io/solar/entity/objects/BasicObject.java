@@ -2,8 +2,11 @@ package io.solar.entity.objects;
 
 import io.solar.entity.Course;
 import io.solar.entity.Planet;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -13,6 +16,9 @@ import java.util.List;
 @Entity
 @Table(name = "objects")
 @Inheritance(strategy = InheritanceType.JOINED)
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class BasicObject implements Serializable {
 
     @Id

@@ -1,6 +1,7 @@
 package io.solar.entity;
 
 import io.solar.entity.objects.BasicObject;
+import io.solar.entity.shop.StationShop;
 import lombok.*;
 
 import javax.persistence.*;
@@ -27,9 +28,6 @@ public class Goods {
 
     private Long amount;
     private Float price;
-
-
-
 
     @EqualsAndHashCode
     @Getter

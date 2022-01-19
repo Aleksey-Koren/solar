@@ -1,12 +1,11 @@
 package io.solar.controller.inventory;
 
-import io.solar.dto.inventory.InventoryItemDto;
+import io.solar.dto.object.ObjectTypeDescriptionDto;
 import io.solar.entity.objects.ObjectTypeDescription;
 import io.solar.facade.ObjectTypeDescriptionFacade;
-import io.solar.mapper.ObjectTypeDescriptionMapper;
+import io.solar.mapper.object.ObjectTypeDescriptionMapper;
 import io.solar.service.object.ObjectTypeDescriptionService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -30,15 +29,15 @@ public class InventoryItemsController {
     private final ObjectTypeDescriptionMapper objectTypeDescriptionMapper;
 
     @GetMapping
-    public List<InventoryItemDto> getAll() {
+    public List<ObjectTypeDescriptionDto> getAll() {
 
         return objectTypeDescriptionFacade.getAll();
     }
 
     @PostMapping
     @PreAuthorize("hasAuthority('EDIT_INVENTORY')")
-    public ResponseEntity<InventoryItemDto> save(@RequestBody InventoryItemDto inventoryItem) {
-        InventoryItemDto savedInventoryItem = objectTypeDescriptionFacade.save(inventoryItem);
+    public ResponseEntity<ObjectTypeDescriptionDto> save(@RequestBody ObjectTypeDescriptionDto inventoryItem) {
+        ObjectTypeDescriptionDto savedInventoryItem = objectTypeDescriptionFacade.save(inventoryItem);
 
         objectTypeDescriptionFacade.saveModifications(inventoryItem);
         objectTypeDescriptionFacade.saveSockets(inventoryItem);
@@ -54,15 +53,15 @@ public class InventoryItemsController {
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<InventoryItemDto> getOne(@PathVariable("id") Long itemId) {
+    public ResponseEntity<ObjectTypeDescriptionDto> getOne(@PathVariable("id") Long itemId) {
         Optional<ObjectTypeDescription> objectOptional = objectTypeDescriptionService.findById(itemId);
 
         if (objectOptional.isPresent()) {
-            InventoryItemDto inventoryItemDto = objectTypeDescriptionMapper.toDto(objectOptional.get());
-            inventoryItemDto.setModifications(objectTypeDescriptionFacade.findAllModifications(itemId));
-            inventoryItemDto.setSockets(objectTypeDescriptionFacade.findAllSockets(itemId));
+            ObjectTypeDescriptionDto objectTypeDescriptionDto = objectTypeDescriptionMapper.toDto(objectOptional.get());
+            objectTypeDescriptionDto.setModifications(objectTypeDescriptionFacade.findAllModifications(itemId));
+            objectTypeDescriptionDto.setSockets(objectTypeDescriptionFacade.findAllSockets(itemId));
 
-            return ResponseEntity.ok(inventoryItemDto);
+            return ResponseEntity.ok(objectTypeDescriptionDto);
         } else {
             return ResponseEntity.notFound().build();
         }

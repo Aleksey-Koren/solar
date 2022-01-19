@@ -1,13 +1,13 @@
 package io.solar.facade;
 
 import io.solar.dto.ObjectModificationTypeDto;
-import io.solar.dto.inventory.InventoryItemDto;
+import io.solar.dto.object.ObjectTypeDescriptionDto;
 import io.solar.dto.inventory.InventorySocketDto;
 import io.solar.entity.inventory.InventorySocket;
 import io.solar.entity.objects.ObjectModification;
 import io.solar.entity.objects.ObjectModificationType;
 import io.solar.entity.objects.ObjectTypeDescription;
-import io.solar.mapper.ObjectTypeDescriptionMapper;
+import io.solar.mapper.object.ObjectTypeDescriptionMapper;
 import io.solar.mapper.ObjectModificationTypeMapper;
 import io.solar.mapper.SocketMapper;
 import io.solar.service.object.BasicObjectService;
@@ -16,7 +16,6 @@ import io.solar.service.object.ObjectModificationService;
 import io.solar.service.object.ObjectTypeDescriptionService;
 import io.solar.service.ProductionService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -37,7 +36,7 @@ public class ObjectTypeDescriptionFacade {
     private final ObjectModificationTypeMapper objectModificationTypeMapper;
     private final SocketMapper socketMapper;
 
-    public List<InventoryItemDto> getAll() {
+    public List<ObjectTypeDescriptionDto> getAll() {
 
         return objectTypeDescriptionService.getAll()
                 .stream()
@@ -45,8 +44,8 @@ public class ObjectTypeDescriptionFacade {
                 .collect(Collectors.toList());
     }
 
-    public InventoryItemDto save(InventoryItemDto inventoryItemDto) {
-        ObjectTypeDescription objectTypeDescription = objectTypeDescriptionMapper.toEntity(inventoryItemDto);
+    public ObjectTypeDescriptionDto save(ObjectTypeDescriptionDto objectTypeDescriptionDto) {
+        ObjectTypeDescription objectTypeDescription = objectTypeDescriptionMapper.toEntity(objectTypeDescriptionDto);
 
         return objectTypeDescriptionMapper.toDto(
                 objectTypeDescriptionService.save(objectTypeDescription)
@@ -54,15 +53,15 @@ public class ObjectTypeDescriptionFacade {
     }
 
     @Transactional
-    public void saveModifications(InventoryItemDto inventoryItemDto) {
-        List<ObjectModificationTypeDto> modifications = inventoryItemDto.getModifications();
+    public void saveModifications(ObjectTypeDescriptionDto objectTypeDescriptionDto) {
+        List<ObjectModificationTypeDto> modifications = objectTypeDescriptionDto.getModifications();
 
         if (CollectionUtils.isEmpty(modifications)) {
-            objectModificationService.deleteByItemId(inventoryItemDto.getId());
+            objectModificationService.deleteByItemId(objectTypeDescriptionDto.getId());
             return;
         }
 
-        List<ObjectModificationType> existModifications = objectModificationService.findAllObjectModifications(inventoryItemDto.getId())
+        List<ObjectModificationType> existModifications = objectModificationService.findAllObjectModifications(objectTypeDescriptionDto.getId())
                 .stream()
                 .map(ObjectModification::getModification)
                 .collect(Collectors.toList());
@@ -77,15 +76,15 @@ public class ObjectTypeDescriptionFacade {
         List<ObjectModification> toInsert = modifications.stream()
                 .map(objectModificationTypeMapper::toEntity)
                 .filter(modification -> !existModifications.contains(modification))
-                .map(modification -> new ObjectModification(null, objectTypeDescriptionMapper.toEntity(inventoryItemDto), modification))
+                .map(modification -> new ObjectModification(null, objectTypeDescriptionMapper.toEntity(objectTypeDescriptionDto), modification))
                 .collect(Collectors.toList());
 
         objectModificationService.saveAll(toInsert);
-        objectModificationService.deleteModificationsWithItemId(toDeleteIds, inventoryItemDto.getId());
+        objectModificationService.deleteModificationsWithItemId(toDeleteIds, objectTypeDescriptionDto.getId());
     }
 
     @Transactional
-    public void saveSockets(InventoryItemDto inventoryItem) {
+    public void saveSockets(ObjectTypeDescriptionDto inventoryItem) {
         List<InventorySocketDto> sockets = inventoryItem.getSockets();
 
         if (CollectionUtils.isEmpty(sockets)) {

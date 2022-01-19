@@ -2,7 +2,7 @@ package io.solar.facade;
 
 import io.solar.dto.BasicObjectViewDto;
 import io.solar.entity.objects.StarShip;
-import io.solar.mapper.objects.BasicObjectViewMapper;
+import io.solar.mapper.object.BasicObjectViewMapper;
 import io.solar.service.StarMapService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

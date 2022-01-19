@@ -74,7 +74,6 @@ public class NavigatorService {
     private double calcAngle(BasicObject atOrbit, BasicObject atCenter) {
         float relativeX = atOrbit.getX() - atCenter.getX();
         float relativeY = atOrbit.getY() - atCenter.getY();
-
         double angle = atan2(relativeY, relativeX);
         return angle >= 0 ? angle : PI * 2 + angle;
     }
