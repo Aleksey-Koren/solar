@@ -3,7 +3,12 @@ package io.solar.service.messenger;
 import io.solar.dto.messenger.CreateRoomDto;
 import io.solar.dto.messenger.NotificationDto;
 import io.solar.entity.User;
-import io.solar.entity.messenger.*;
+import io.solar.entity.messenger.Message;
+import io.solar.entity.messenger.MessageType;
+import io.solar.entity.messenger.NotificationType;
+import io.solar.entity.messenger.Room;
+import io.solar.entity.messenger.RoomType;
+import io.solar.entity.messenger.UserRoom;
 import io.solar.facade.messenger.WebSocketFacade;
 import io.solar.mapper.messanger.RoomMapper;
 import io.solar.repository.UserRepository;
@@ -20,7 +25,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 
 import static java.util.stream.Collectors.joining;
 
