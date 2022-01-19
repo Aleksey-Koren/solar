@@ -13,8 +13,11 @@ public class StationShopMapper {
 
     private final ObjectTypeDescriptionMapper objectTypeDescriptionMapper;
     private final GoodsMapper goodsMapper;
+
     public StationShopDto toDto(StationShop entity) {
-        return StationShopDto.builder().id(entity.getId())
+
+        return StationShopDto.builder()
+                .id(entity.getId())
                 .stationId(entity.getStation().getId())
                 .shopLevel(entity.getShopLevel().name())
                 .inventoryGoods(entity.getInventoryGoods().stream().map(objectTypeDescriptionMapper::toDto).toList())
