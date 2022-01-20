@@ -7,8 +7,6 @@ import io.solar.entity.objects.BasicObject;
 import io.solar.entity.shop.StationShop;
 import io.solar.facade.UserFacade;
 import io.solar.mapper.shop.StationShopMapper;
-import io.solar.repository.BasicObjectRepository;
-import io.solar.repository.ObjectTypeDescriptionRepository;
 import io.solar.service.engine.interfaces.InventoryEngine;
 import io.solar.service.engine.interfaces.ObjectEngine;
 import io.solar.service.object.BasicObjectService;
@@ -26,7 +24,7 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class StationShopFacade {
+public class InventoryShopFacade {
 
     private final StationShopService stationShopService;
     private final UserFacade userFacade;
@@ -62,14 +60,25 @@ public class StationShopFacade {
         long sellAmount = objects.stream()
                 .peek(obj -> {
                     if (!inventoryEngine.isInShipInventory(user.getLocation(), obj)) {
-                        log.warn("Fail to sell object id = {}. It isn't in ship inventory", obj.getId());
-                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                                String.format("Fail to sell object id = {}. Reason: object isn't in ship inventory", obj.getId()));
                     }
-                }).map(this::calculateInventorySellPrice).mapToLong(Long::longValue).sum();
+                }).map(this::calculateSellPrice).mapToLong(Long::longValue).sum();
 
         userFacade.increaseUserBalance(user, sellAmount);
         basicObjectService.deleteAll(objects);
         return HttpStatus.OK;
+    }
+
+    public Long getSellPrice(User user, Long objectId) {
+        BasicObject object = basicObjectService.getById(objectId);
+
+        if (!inventoryEngine.isInShipInventory(user.getLocation(), object)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    String.format("Fail to get sell price for object id = {}. Reason: object isn't in ship inventory", object.getId()));
+        }
+
+        return calculateSellPrice(object);
     }
 
 
@@ -80,7 +89,7 @@ public class StationShopFacade {
                 .mapToLong(Long::longValue).sum();
     }
 
-    private long calculateInventorySellPrice(BasicObject inventoryObject) {
+    private long calculateSellPrice(BasicObject inventoryObject) {
         double durabilityModifier = (double) inventoryObject.getDurability() / inventoryObject.getObjectTypeDescription().getDurability();
         return (long) (inventoryObject.getObjectTypeDescription().getPrice().longValue() * stationSellModifier * durabilityModifier);
     }
@@ -91,8 +100,4 @@ public class StationShopFacade {
                 .flatMap(List::stream)
                 .toList();
     }
-
-
-
-
 }
