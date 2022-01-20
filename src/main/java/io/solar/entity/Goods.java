@@ -27,7 +27,7 @@ public class Goods {
     private Product product;
 
     private Long amount;
-    private Float price;
+    private Long price;
 
     @EqualsAndHashCode
     @Getter

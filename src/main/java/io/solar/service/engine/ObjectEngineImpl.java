@@ -8,6 +8,9 @@ import io.solar.service.object.BasicObjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Component
 @RequiredArgsConstructor
 public class ObjectEngineImpl implements ObjectEngine {
@@ -24,4 +27,15 @@ public class ObjectEngineImpl implements ObjectEngine {
 
         return basicObjectService.save(basicObject);
     }
+
+    @Override
+    public List<BasicObject> createInventoryObject(ObjectTypeDescription otd, int quantity) {
+        List<BasicObject> objects = new ArrayList<>();
+        for(int i = 0; i < quantity; i++) {
+            objects.add(createInventoryObject(otd));
+        }
+        return objects;
+    }
+
+
 }

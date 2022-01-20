@@ -43,4 +43,12 @@ public class StationShopController {
         return ResponseEntity.status(stationShopFacade.buyInventory(user, dto)).build();
     }
 
+    @PatchMapping("/sell-inventory")
+    @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
+    @Transactional
+    public ResponseEntity<Void> sellInventoryGoods (Principal principal, @RequestBody ShopDto dto) {
+        User user = userService.findByLogin(principal.getName());
+        return ResponseEntity.status(stationShopFacade.sellInventory(user, dto)).build();
+    }
+
 }

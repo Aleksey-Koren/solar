@@ -5,7 +5,6 @@ import io.solar.dto.BasicObjectViewDto;
 import io.solar.facade.BasicObjectFacade;
 import io.solar.specification.filter.BasicObjectFilter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;

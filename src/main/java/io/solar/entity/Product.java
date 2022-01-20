@@ -16,5 +16,5 @@ public class Product {
     private String image;
     private Float bulk;
     private Float mass;
-    private Float price;
+    private Long price;
 }

@@ -16,5 +16,5 @@ public class ProductDto {
     private String image;
     private Float bulk;
     private Float mass;
-    private Float price;
+    private Long price;
 }

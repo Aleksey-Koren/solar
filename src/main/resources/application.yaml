@@ -1,4 +1,7 @@
 spring:
+    mvc:
+        log-resolved-exception: true
+
     datasource:
         url: ${solar_db_url}
         driver-class-name: org.mariadb.jdbc.Driver
@@ -53,6 +56,7 @@ app:
     goods_initial_delay_minutes: 60
     view_distance_without_radar: 5
     time_flow_modifier: 3650
+    station_sell_modifier: 0.7
     images:
         path: src/main/resources/images
         width: 300

@@ -30,12 +30,7 @@ public class BasicObjectFacade {
 
 
     public BasicObjectDto findById(Long objectId) {
-
-        BasicObject basicObject = basicObjectService.findById(objectId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                        String.format("Cannot find object with id = %d", objectId)));
-
-        return basicObjectMapper.toDto(basicObject);
+        return basicObjectMapper.toDto(basicObjectService.getById(objectId));
     }
 
     public BasicObjectDto save(BasicObjectDto basicObjectDto) {
