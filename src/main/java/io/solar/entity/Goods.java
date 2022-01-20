@@ -14,6 +14,7 @@ import java.io.Serializable;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class Goods {
 
     @Id
@@ -27,7 +28,7 @@ public class Goods {
     private Product product;
 
     private Long amount;
-    private Float price;
+    private Long price;
 
     @EqualsAndHashCode
     @Getter

@@ -9,6 +9,7 @@ import io.solar.service.UserService;
 import io.solar.service.messenger.RoomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -52,5 +53,19 @@ public class UserFacade {
             roomService.deleteRoomsWithOneParticipantByUserRooms(user);
             userService.delete(user);
         });
+    }
+
+    public void decreaseUserBalance(User user, Long cost) {
+        if (user.getMoney() < cost) {
+            throw new ResponseStatusException(HttpStatus.PAYMENT_REQUIRED, "Not enough credits at user's balance");
+        } else {
+            user.setMoney(user.getMoney() - cost);
+            userService.update(user);
+        }
+    }
+
+    public void increaseUserBalance(User user, Long cost) {
+        user.setMoney(user.getMoney() + cost);
+        userService.update(user);
     }
 }

@@ -3,7 +3,9 @@ package io.solar.service.scheduler;
 import io.solar.entity.Goods;
 import io.solar.entity.Product;
 import io.solar.entity.Production;
+import io.solar.entity.interfaces.SpaceTech;
 import io.solar.entity.objects.Station;
+import io.solar.repository.GoodsRepository;
 import io.solar.repository.ProductionRepository;
 import io.solar.repository.StationRepository;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +35,7 @@ public class GoodsGeneration {
             Long amount = (long) (production.getPower() * retrieveRandomModifier() + 10);
             Float price = product.getPrice() * retrievePriceModifier(0.3, 1.7);
             price = (float) Math.round(price);
-            goods.add(new Goods(station, product, amount, price));
+            goods.add(new Goods(station, product, amount, price.longValue()));
         }
         station.setGoods(goods);
         stationRepository.save(station);

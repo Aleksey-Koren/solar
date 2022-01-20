@@ -78,7 +78,7 @@ public class ProductControllerTest {
 
         ProductDto productDto = ProductDto.builder()
                 .bulk(0.1f).mass(1500f)
-                .title("Test product").price(15.99f)
+                .title("Test product").price(15L)
                 .build();
 
         mockMvc
