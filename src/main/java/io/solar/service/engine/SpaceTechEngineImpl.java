@@ -7,13 +7,14 @@ import io.solar.repository.InventoryTypeRepository;
 import io.solar.service.engine.interfaces.SpaceTechEngine;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
 
-@Service
+@Component
 @RequiredArgsConstructor
 public class SpaceTechEngineImpl implements SpaceTechEngine {
 

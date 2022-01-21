@@ -16,4 +16,5 @@ public class AppProperties {
     private String goodsGenerationDelayMinutes;
     private String goodsInitialDelayMinutes;
     private Float viewDistanceWithoutRadar;
+    private Integer timeFlowModifier;
 }

@@ -1,4 +1,7 @@
 spring:
+    mvc:
+        log-resolved-exception: true
+
     datasource:
         url: ${solar_db_url}
         driver-class-name: org.mariadb.jdbc.Driver
@@ -52,6 +55,8 @@ app:
     goods_generation_delay_minutes: 60
     goods_initial_delay_minutes: 60
     view_distance_without_radar: 5
+    time_flow_modifier: 3650
+    station_sell_modifier: 0.7
     images:
         path: src/main/resources/images
         width: 300
@@ -59,8 +64,11 @@ app:
     navigator:
         max_distance: 10
         max_speed: 1000
-        update_coordinates_delay: PT5S
+        update_coordinates_delay: PT5M
         num_update_object: 100
+    email:
+        token_lifetime_hours: 24
+        forgot_password_template: http://localhost:8081/forgot-password.html?token=
 
 
 log4jdbc:

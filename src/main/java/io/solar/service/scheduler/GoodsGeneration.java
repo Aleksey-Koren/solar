@@ -17,7 +17,6 @@ import java.util.List;
 public class GoodsGeneration {
 
     private final StationRepository stationRepository;
-    private final ProductionRepository productionRepository;
 
     public void generateOnStations() {
         List<Station> stations = stationRepository.findAll();
@@ -31,8 +30,7 @@ public class GoodsGeneration {
         for (Production production : station.getProduction()) {
             Product product = production.getProduct();
             Long amount = (long) (production.getPower() * retrieveRandomModifier() + 10);
-            Float price = product.getPrice() * retrievePriceModifier(0.3, 1.7);
-            price = (float) Math.round(price);
+            long price = (long) (product.getPrice() * retrievePriceModifier(0.3, 1.7));
             goods.add(new Goods(station, product, amount, price));
         }
         station.setGoods(goods);

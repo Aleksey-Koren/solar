@@ -4,7 +4,7 @@ import io.solar.dto.UserDto;
 import io.solar.entity.Permission;
 import io.solar.entity.User;
 import io.solar.mapper.UserMapper;
-import io.solar.mapper.objects.BasicObjectViewMapper;
+import io.solar.mapper.object.BasicObjectViewMapper;
 import io.solar.service.UserService;
 import io.solar.service.messenger.RoomService;
 import lombok.RequiredArgsConstructor;
@@ -52,5 +52,19 @@ public class UserFacade {
             roomService.deleteRoomsWithOneParticipantByUserRooms(user);
             userService.delete(user);
         });
+    }
+
+    public void decreaseUserBalance(User user, Long amount) {
+        if (user.getMoney() < amount) {
+            throw new ResponseStatusException(HttpStatus.PAYMENT_REQUIRED, "Not enough credits at user's balance");
+        } else {
+            user.setMoney(user.getMoney() - amount);
+            userService.update(user);
+        }
+    }
+
+    public void increaseUserBalance(User user, Long amount) {
+        user.setMoney(user.getMoney() + amount);
+        userService.update(user);
     }
 }

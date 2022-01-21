@@ -1,6 +1,7 @@
-package io.solar.dto.inventory;
+package io.solar.dto.object;
 
 import io.solar.dto.ObjectModificationTypeDto;
+import io.solar.dto.inventory.InventorySocketDto;
 import io.solar.entity.objects.ObjectSubType;
 import io.solar.entity.objects.ObjectType;
 import lombok.Builder;
@@ -15,7 +16,7 @@ import java.util.List;
 
 @Data
 @Builder
-public class InventoryItemDto {
+public class ObjectTypeDescriptionDto {
     private Long id;
     private Long inventoryType;
     private String title;

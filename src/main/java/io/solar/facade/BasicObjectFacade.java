@@ -3,13 +3,12 @@ package io.solar.facade;
 import io.solar.dto.BasicObjectDto;
 import io.solar.dto.BasicObjectViewDto;
 import io.solar.entity.objects.BasicObject;
-import io.solar.mapper.objects.BasicObjectMapper;
-import io.solar.mapper.objects.BasicObjectViewMapper;
+import io.solar.mapper.object.BasicObjectMapper;
+import io.solar.mapper.object.BasicObjectViewMapper;
 import io.solar.service.object.BasicObjectService;
 import io.solar.specification.BasicObjectSpecification;
 import io.solar.specification.filter.BasicObjectFilter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -31,12 +30,7 @@ public class BasicObjectFacade {
 
 
     public BasicObjectDto findById(Long objectId) {
-
-        BasicObject basicObject = basicObjectService.findById(objectId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                        String.format("Cannot find object with id = %d", objectId)));
-
-        return basicObjectMapper.toDto(basicObject);
+        return basicObjectMapper.toDto(basicObjectService.getById(objectId));
     }
 
     public BasicObjectDto save(BasicObjectDto basicObjectDto) {
