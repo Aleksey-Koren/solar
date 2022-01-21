@@ -20,7 +20,7 @@ import java.util.List;
 @ToString
 public class StarShip extends BasicObject implements SpaceTech {
 
-    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "owner", orphanRemoval = true, cascade = CascadeType.ALL)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private List<Goods> goods;

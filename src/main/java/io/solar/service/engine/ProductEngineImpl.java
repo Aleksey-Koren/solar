@@ -4,6 +4,7 @@ import io.solar.dto.shop.ShopDto;
 import io.solar.entity.Goods;
 import io.solar.entity.interfaces.SpaceTech;
 import io.solar.entity.objects.BasicObject;
+import io.solar.repository.GoodsRepository;
 import io.solar.service.ProductService;
 import io.solar.service.engine.interfaces.ProductEngine;
 import io.solar.service.object.BasicObjectService;
