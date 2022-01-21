@@ -143,6 +143,12 @@ public class UserService implements UserDetailsService {
         return userRepository.findById(id);
     }
 
+    public User getById(Long userId) {
+
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cannot find user with id = " + userId));
+    }
+
     public User findByLogin(String login) {
         return userRepository.findByLogin(login);
     }
