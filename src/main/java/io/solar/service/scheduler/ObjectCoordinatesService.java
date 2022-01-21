@@ -36,7 +36,6 @@ public class ObjectCoordinatesService {
     @Value("${app.navigator.update_coordinates_delay}")
     private String schedulerDelaySeconds;
 
-    private int timeFlowModifier = 1;
 
     private final UtilityService utilityService;
     private final BasicObjectRepository basicObjectRepository;
@@ -48,7 +47,6 @@ public class ObjectCoordinatesService {
 
     @Transactional
     public void update() {
-        timeFlowModifier = appProperties.getTimeFlowModifier();
         long now = System.currentTimeMillis();
         long schedulerDuration = Duration.parse(schedulerDelaySeconds).toMillis();
         long currentIteration = Long.parseLong(utilityService.getValue(POSITION_ITERATION_UTILITY_KEY, "1"));
@@ -246,7 +244,7 @@ public class ObjectCoordinatesService {
     }
 
     private Float determinePosition(Float coordinate, Float speed, Long time, Float acceleration) {
-        double dividedTime = (time / 3_600_000d) * timeFlowModifier;
+        double dividedTime = (time / 3_600_000d) * appProperties.getTimeFlowModifier();
         double distanceCovered = (speed * dividedTime + (acceleration * Math.pow(dividedTime, 2)) / 2);
 
         return (float)(coordinate + distanceCovered);
@@ -260,7 +258,7 @@ public class ObjectCoordinatesService {
 
     private Double calculateDelta(Long schedulerDuration) {
 
-        return Math.PI * 2 * schedulerDuration * timeFlowModifier / (1000 * 60 * 60 * 24);
+        return Math.PI * 2 * schedulerDuration * appProperties.getTimeFlowModifier() / (1000 * 60 * 60 * 24);
     }
 
     private Double calculateAcceleration(Float accelerationX, Float accelerationY) {
@@ -270,6 +268,6 @@ public class ObjectCoordinatesService {
 
     private Float calculateSpeed(Float speed, Float acceleration, long time) {
 
-        return speed + (acceleration * time * timeFlowModifier/ 3_600_000);
+        return speed + (acceleration * time * appProperties.getTimeFlowModifier() / 1000 * 60 * 60);
     }
 }

@@ -55,7 +55,7 @@ app:
     goods_generation_delay_minutes: 60
     goods_initial_delay_minutes: 60
     view_distance_without_radar: 5
-    time_flow_modifier: 3650
+    time_flow_modifier: 12
     station_sell_modifier: 0.7
     images:
         path: src/main/resources/images
@@ -64,7 +64,7 @@ app:
     navigator:
         max_distance: 10
         max_speed: 1000
-        update_coordinates_delay: PT5M
+        update_coordinates_delay: PT5S
         num_update_object: 100
     email:
         token_lifetime_hours: 24
