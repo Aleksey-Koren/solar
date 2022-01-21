@@ -17,6 +17,7 @@ body, html {
     padding: 0;
     margin: 0;
     box-sizing: border-box;
+    font-size: 17px;
 }
 a {
     color: #ffc562;
@@ -139,7 +140,7 @@ input, select, textarea {
     border: 1px solid  #ffc562;
     padding: 15px;
     left: 50%;
-    position: relative;
+    position: absolute;
     top: 100px;
     max-height: calc(80% - 100px);
     overflow: auto;
@@ -196,8 +197,8 @@ tr, td, th {
     cursor: pointer;
 }
 .popup-close {
-    width: 10px;
-    height: 10px;
+    width: 12px;
+    height: 12px;
     background-color: #f34848;
     border: 1px solid #e04343;
     border-radius: 50%;
@@ -252,9 +253,10 @@ a.disabled {
     padding: 10px;
 }
 .chat-sidebar {
-    border-right: 1px solid #ffc562;;
+    border-right: 1px solid #ffc562;
     padding-right: 10px;
-    overflow: auto;
+    display: flex;
+    flex-direction: column;
 }
 .chat-body-controls {
     border-top: 1px solid #ffc562;
@@ -281,9 +283,12 @@ a.disabled {
 }
 .chat-room {
     line-height: 23px;
+    float: left;
+    clear: both;
 }
 .chat-list {
     padding: 10px 0;
+    overflow: auto;
 }
 .chat-message {
     margin-bottom: 10px;
@@ -330,4 +335,11 @@ a.disabled {
     justify-content: space-between;
     align-items: center;
     margin-right: 20px;
+}
+.chat-inv-panel > div {
+    display: inline-block;
+    padding: 5px 15px 5px 0;
+}
+.chat-controls {
+    margin-bottom: 10px;
 }

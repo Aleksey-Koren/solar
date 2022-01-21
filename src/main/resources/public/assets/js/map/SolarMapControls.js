@@ -12,7 +12,7 @@ function SolarMapControls(context, solarMap) {
 
 SolarMapControls.prototype.render = function () {
     Dom.append(document.body, this.container);
-    this.chat = new SolarMapChatButton(this.solarMap);
+    this.chat = new SolarMapChatButton(this.context);
     this.container.append(new SolarMapCenterShip(this.solarMap).container);
     this.container.append(this.chat.container);
 };
