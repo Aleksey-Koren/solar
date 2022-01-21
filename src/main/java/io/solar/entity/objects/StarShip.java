@@ -4,6 +4,7 @@ import io.solar.entity.Goods;
 import io.solar.entity.interfaces.SpaceTech;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -16,17 +17,11 @@ import java.util.List;
 @Entity
 @Table(name = "star_ships")
 @PrimaryKeyJoinColumn(name = "id")
+@ToString
 public class StarShip extends BasicObject implements SpaceTech {
 
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
     @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private List<Goods> goods;
-
-//TODO All this fields would be in ObjectTypeDescription field of BaseObject
-
-//    private String hullTitle;
-//    private Float powerDegradation;
-//    private Float energyConsumption;
-//    private Long maxDurability;
-//    private String hullDescription;
 }

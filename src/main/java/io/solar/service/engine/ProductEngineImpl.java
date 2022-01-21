@@ -33,7 +33,7 @@ public class ProductEngineImpl implements ProductEngine {
 
             products.forEach(product -> {
                 Goods goodsToDecrease = fromProductsGoods.get(product.getProductId());
-                goodsToDecrease.setAmount(goodsToDecrease.getAmount() - product.getQuantity());
+                decreaseGoods(product, goodsToDecrease, from);
 
                 Goods goodsToIncrease = toProductsGoods.get(product.getProductId());
                 increaseGoods(product, goodsToIncrease, to);
@@ -57,6 +57,14 @@ public class ProductEngineImpl implements ProductEngine {
                     .build();
 
             spaceTech.getGoods().add(goods);
+        }
+    }
+
+    private void decreaseGoods(ShopDto product, Goods goods, SpaceTech spaceTech) {
+        goods.setAmount(goods.getAmount() - product.getQuantity());
+
+        if (goods.getAmount() == 0) {
+            spaceTech.getGoods().remove(goods);
         }
     }
 

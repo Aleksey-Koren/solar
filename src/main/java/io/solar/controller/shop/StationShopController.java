@@ -1,5 +1,6 @@
 package io.solar.controller.shop;
 
+import io.solar.dto.shop.ProductPriceDto;
 import io.solar.dto.shop.ShopDto;
 import io.solar.dto.shop.StationShopDto;
 import io.solar.entity.User;
@@ -24,14 +25,13 @@ import java.security.Principal;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/shop/station")
+@RequestMapping("api/shop")
 @RequiredArgsConstructor
 public class StationShopController {
 
     private final InventoryShopFacade inventoryShopFacade;
     private final ProductShopFacade productShopFacade;
     private final UserService userService;
-    private final BasicObjectService basicObjectService;
 
     @GetMapping("/{stationId}")
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
@@ -44,7 +44,7 @@ public class StationShopController {
     @PatchMapping("/buy/inventory")
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
     @Transactional
-    public ResponseEntity<Void> byInventoryGoods (Principal principal, @RequestBody List<ShopDto> dto ) {
+    public ResponseEntity<Void> byInventoryGoods(Principal principal, @RequestBody List<ShopDto> dto) {
         User user = userService.findByLogin(principal.getName());
         return ResponseEntity.status(inventoryShopFacade.buyInventory(user, dto)).build();
     }
@@ -52,7 +52,7 @@ public class StationShopController {
     @PatchMapping("/sell/inventory")
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
     @Transactional
-    public ResponseEntity<Void> sellInventoryGoods (Principal principal, @RequestBody ShopDto dto) {
+    public ResponseEntity<Void> sellInventoryGoods(Principal principal, @RequestBody ShopDto dto) {
         User user = userService.findByLogin(principal.getName());
         return ResponseEntity.status(inventoryShopFacade.sellInventory(user, dto)).build();
     }
@@ -60,7 +60,7 @@ public class StationShopController {
     @GetMapping("/sell/inventory/price")
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
     @Transactional
-    public ResponseEntity<Long> calculateSellPrice(Principal principal, @RequestBody Long objectId) {
+    public ResponseEntity<Long> calculateInventorySellPrice(Principal principal, @RequestBody Long objectId) {
         User user = userService.findByLogin(principal.getName());
         return ResponseEntity.ok(inventoryShopFacade.getSellPrice(user, objectId));
     }
@@ -81,5 +81,14 @@ public class StationShopController {
         User user = userService.findByLogin(principal.getName());
 
         productShopFacade.sellProducts(user, products);
+    }
+
+    @GetMapping("/sell/products/price")
+    @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
+    @Transactional
+    public List<ProductPriceDto> calculateProductsSellPrice(@RequestBody List<Long> productsIds, Principal principal) {
+        User user = userService.findByLogin(principal.getName());
+
+        return productShopFacade.getProductsSellPrices(user, productsIds);
     }
 }

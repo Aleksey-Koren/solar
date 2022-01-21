@@ -1,5 +1,6 @@
 package io.solar.facade.shop;
 
+import io.solar.dto.shop.ProductPriceDto;
 import io.solar.dto.shop.ShopDto;
 import io.solar.entity.Goods;
 import io.solar.entity.User;
@@ -42,23 +43,32 @@ public class ProductShopFacade {
 
         productEngine.transferProducts(spaceship, station, products);
 
-        userFacade.increaseUserBalance(user, calculateSellPrice(station, products));
+        userFacade.increaseUserBalance(user, calculateTotalSellPrice(station, products));
     }
 
-    private long calculateSellPrice(Station station, List<ShopDto> products) {
-        long price = 0L;
-        List<Long> stationProductsIds = station.getGoods()
-                .stream()
-                .map(goods -> goods.getProduct().getId())
+    public List<ProductPriceDto> getProductsSellPrices(User user, List<Long> productsIds) {
+        Station station = stationService.getById(user.getLocation().getAttachedToShip().getId());
+        List<Long> stationProductIds = getStationGoodsIds(station);
+
+        return productsIds.stream()
+                .map(productId -> new ProductPriceDto(productId, calculateProductSellPrice(stationProductIds, productId)))
                 .toList();
+    }
 
-        for (ShopDto product : products) {
-            price += stationProductsIds.contains(product.getProductId())
-                    ? Math.floor(productService.getById(product.getProductId()).getPrice() * 0.5)
-                    : Math.floor(productService.getById(product.getProductId()).getPrice() * 0.7);
-        }
+    private long calculateTotalSellPrice(Station station, List<ShopDto> products) {
+        List<Long> stationProductsIds = getStationGoodsIds(station);
 
-        return price;
+        return products.stream()
+                .map(product -> calculateProductSellPrice(stationProductsIds, product.getProductId()))
+                .mapToLong(Long::longValue)
+                .sum();
+    }
+
+    private long calculateProductSellPrice(List<Long> stationProductsIds, Long productId) {
+
+        return (long) (stationProductsIds.contains(productId)
+                ? Math.floor(productService.getById(productId).getPrice() * 0.5)
+                : Math.floor(productService.getById(productId).getPrice() * 0.7));
     }
 
     private long calculatePurchasePrice(List<ShopDto> products) {
@@ -69,5 +79,12 @@ public class ProductShopFacade {
                 .sum();
     }
 
+    private List<Long> getStationGoodsIds(Station station) {
+
+        return station.getGoods()
+                .stream()
+                .map(goods -> goods.getProduct().getId())
+                .toList();
+    }
 
 }
