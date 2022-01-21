@@ -2,11 +2,16 @@ package io.solar;
 
 
 import io.solar.dto.messenger.CreateRoomDto;
+import io.solar.entity.Goods;
+import io.solar.entity.Product;
 import io.solar.entity.User;
 import io.solar.entity.messenger.Message;
 import io.solar.entity.messenger.MessageType;
 import io.solar.entity.messenger.Room;
+import io.solar.entity.objects.StarShip;
 import io.solar.facade.messenger.RoomFacade;
+import io.solar.repository.ProductRepository;
+import io.solar.repository.StarShipRepository;
 import io.solar.repository.UserRepository;
 import io.solar.repository.messenger.MessageRepository;
 import io.solar.repository.messenger.RoomRepository;
@@ -26,8 +31,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -42,6 +47,7 @@ public class FillDatabaseTest {
     private final RoomRepository roomRepository;
     private final MessageRepository messageRepository;
     private final UserService userService;
+    private final ProductRepository productRepository;
     private final RoomFacade roomFacade;
 
     @Autowired
@@ -49,11 +55,14 @@ public class FillDatabaseTest {
                             RoomRepository roomRepository,
                             MessageRepository messageRepository,
                             UserService userService,
+                            ProductRepository productRepository,
+                            StarShipRepository starShipRepository,
                             RoomFacade roomFacade) {
         this.userRepository = userRepository;
         this.roomRepository = roomRepository;
         this.messageRepository = messageRepository;
         this.userService = userService;
+        this.productRepository = productRepository;
         this.roomFacade = roomFacade;
     }
 
@@ -106,5 +115,11 @@ public class FillDatabaseTest {
         List<Room> rooms = roomRepository.findAll();
 
         return rooms.get(Math.abs(new Random().nextInt(rooms.size())));
+    }
+
+    private Product findRandomProduct() {
+        List<Product> products = productRepository.findAll();
+
+        return products.get(Math.abs(new Random().nextInt(products.size())));
     }
 }

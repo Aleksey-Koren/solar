@@ -12,4 +12,8 @@ public class Start {
 
         SpringApplication.run(Start.class, args);
     }
+
+    //TODO add to all CRUD services  [Object getById(long id)] methods,
+    // where Optional<Object> findById(Long id).orElseThrow(new ResponseStatusException) will be used
+    // to decrease boiler plate code quantity
 }

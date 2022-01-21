@@ -5,7 +5,9 @@ import io.solar.entity.objects.StarShip;
 import io.solar.entity.objects.Station;
 import io.solar.repository.StarShipRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
@@ -18,6 +20,12 @@ public class StarShipService {
 
     public Optional<StarShip> findById(Long id) {
         return starShipRepository.findById(id);
+    }
+
+    public StarShip getById(Long starshipId) {
+
+        return starShipRepository.findById(starshipId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cannot find starship with id = " + starshipId));
     }
 
     public StarShip save(StarShip starShip) {
@@ -37,4 +45,6 @@ public class StarShipService {
 
         return starShipRepository.save(starShip);
     }
+
+
 }

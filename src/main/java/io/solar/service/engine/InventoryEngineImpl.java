@@ -24,4 +24,14 @@ public class InventoryEngineImpl implements InventoryEngine {
         basicObjectRepository.saveAll(items);
         return items.size();
     }
+
+    @Override
+    public boolean isInShipInventory(BasicObject ship, BasicObject object) {
+        return ship.getId().equals(object.getAttachedToShip().getId());
+    }
+
+    @Override
+    public boolean isInShipInventory(BasicObject ship, List<BasicObject> objects) {
+        return objects.stream().allMatch(obj -> isInShipInventory(ship, obj));
+    }
 }

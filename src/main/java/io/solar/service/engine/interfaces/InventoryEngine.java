@@ -9,4 +9,8 @@ import java.util.List;
 public interface InventoryEngine {
 
     int putToInventory(BasicObject location, List<BasicObject> items);
+
+    boolean isInShipInventory(BasicObject ship, BasicObject object);
+
+    boolean isInShipInventory(BasicObject ship, List<BasicObject> objects);
 }

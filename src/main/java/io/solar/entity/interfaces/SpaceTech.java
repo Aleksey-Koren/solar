@@ -1,5 +1,9 @@
 package io.solar.entity.interfaces;
 
-public interface SpaceTech {
+import io.solar.entity.Goods;
 
+import java.util.List;
+
+public interface SpaceTech {
+    List<Goods> getGoods();
 }
