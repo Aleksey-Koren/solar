@@ -1,6 +1,5 @@
 package io.solar.controller.marketplace;
 
-import io.solar.dto.marketplace.LotBetDto;
 import io.solar.dto.marketplace.MarketplaceLotDto;
 import io.solar.entity.User;
 import io.solar.service.UserService;
