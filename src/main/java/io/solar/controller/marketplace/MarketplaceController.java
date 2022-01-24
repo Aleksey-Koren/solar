@@ -27,4 +27,10 @@ public class MarketplaceController {
         return marketplaceLotFacade.findAll(pageable, filter);
     }
 
+    @Transactional
+    @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
+    public void pickUpWonLot() {
+
+    }
+
 }

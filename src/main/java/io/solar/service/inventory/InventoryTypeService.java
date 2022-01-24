@@ -6,7 +6,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
@@ -22,6 +24,12 @@ public class InventoryTypeService {
 
     public Optional<InventoryType> findById(Long id) {
         return inventoryTypeRepository.findById(id);
+    }
+
+    public InventoryType getByTitle(String title) {
+
+        return inventoryTypeRepository.findByTitle(title)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cannot found inventory type: " + title));
     }
 
     public Page<InventoryType> findAll(Pageable pageable) {

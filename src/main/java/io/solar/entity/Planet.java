@@ -29,8 +29,10 @@ public class Planet extends BasicObject {
     private String siderealRotationPeriod;
     private String surfaceGravity;
     private String surfacePressure;
-    private String volume;
     private String type;
+
+    @Column(name = "volume")
+    private String planetVolume;
 
     @OneToMany(mappedBy = "planet")
     @EqualsAndHashCode.Exclude

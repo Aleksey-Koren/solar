@@ -77,6 +77,9 @@ public class BasicObject implements Serializable {
     @Column(name = "clockwise_rotation")
     protected Boolean clockwiseRotation;
 
+    @Column(name = "volume")
+    protected Float volume;
+
     @OneToMany(mappedBy = "attachedToShip")
     @EqualsAndHashCode.Exclude
     protected List<BasicObject> attachedObjects;
