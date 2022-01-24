@@ -8,6 +8,7 @@ import io.solar.service.StarShipService;
 import io.solar.service.UserService;
 import io.solar.service.marketplace.MarketplaceBetService;
 import io.solar.service.marketplace.MarketplaceLotService;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -32,7 +33,7 @@ public class MarketplaceBetServiceTest {
     @Autowired
     private MarketplaceBetRepository marketplaceBetRepository;
 
-    @Test
+    @RepeatedTest(30)
     @Transactional
     @Rollback(false)
     void save_shouldSaveLotBet() {
