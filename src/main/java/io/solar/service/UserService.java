@@ -51,6 +51,17 @@ public class UserService implements UserDetailsService {
     @Value("${app.hack_block_time_min}")
     private Integer HACK_BLOCK_TIME_MIN;
 
+    public Optional<User> findById(Long id) {
+        return userRepository.findById(id);
+    }
+
+    public User getById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        String.format("There is no %s object with id = %d in database", User.class.getSimpleName(), userId))
+                );
+    }
+
     @Override
     public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
         return User.retrieveUserDetails(userRepository.findByLogin(login));
@@ -120,15 +131,6 @@ public class UserService implements UserDetailsService {
         return users.map(userMapper::toDto);
     }
 
-    public UserDto getUserById(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        String.format("No user with id = %d", userId))
-                );
-
-        return userMapper.toDto(user);
-    }
-
     public void saveEmailNotifications(User user, List<MessageType> messageTypes) {
         user.setEmailNotifications(calculateEmailNotifications(messageTypes));
         userRepository.save(user);
@@ -137,16 +139,6 @@ public class UserService implements UserDetailsService {
     public Optional<User> findUserByEmail(String email) {
 
         return userRepository.findByEmail(email);
-    }
-
-    public Optional<User> findById(Long id) {
-        return userRepository.findById(id);
-    }
-
-    public User getById(Long userId) {
-
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cannot find user with id = " + userId));
     }
 
     public User findByLogin(String login) {

@@ -26,4 +26,11 @@ public class MarketplaceLotService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cannot find lot with id = " + lotId));
     }
 
+    public MarketplaceLot save(MarketplaceLot lot) {
+        return marketplaceLotRepository.save(lot);
+    }
+
+    public void delete(MarketplaceLot lot) {
+        marketplaceLotRepository.delete(lot);
+    }
 }

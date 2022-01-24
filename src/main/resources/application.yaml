@@ -24,7 +24,7 @@ spring:
     jpa:
         properties:
             hibernate:
-                show_sql: false
+                show_sql: true
                 format_sql: true
                 use_sql_comments: false
                 ddl-auto: validate
@@ -64,7 +64,7 @@ app:
     navigator:
         max_distance: 10
         max_speed: 1000
-        update_coordinates_delay: PT5S
+        update_coordinates_delay: PT15M
         num_update_object: 100
     email:
         token_lifetime_hours: 24

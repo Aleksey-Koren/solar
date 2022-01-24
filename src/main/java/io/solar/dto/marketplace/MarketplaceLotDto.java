@@ -15,6 +15,7 @@ public class MarketplaceLotDto {
     private Long id;
     private Long objectId;
     private Long ownerId;
+    private MarketplaceBetDto currentBet;
     private Instant startDate;
     private Instant finishDate;
     private Long startPrice;

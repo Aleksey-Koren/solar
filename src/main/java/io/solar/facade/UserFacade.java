@@ -67,4 +67,8 @@ public class UserFacade {
         user.setMoney(user.getMoney() + amount);
         userService.update(user);
     }
+
+    public UserDto getById(Long id) {
+        return userMapper.toDto(userService.getById(id));
+    }
 }

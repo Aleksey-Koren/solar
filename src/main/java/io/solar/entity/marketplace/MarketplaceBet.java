@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
@@ -18,19 +19,19 @@ import javax.persistence.Table;
 import java.time.Instant;
 
 @Entity
-@Table(name = "lots_bets")
+@Table(name = "marketplace_bets")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class LotBet {
+public class MarketplaceBet {
 
     @Id
     private Long id;
 
     @MapsId
+    @OneToOne
     @JoinColumn(name = "lot_id")
-    @OneToOne(fetch = FetchType.LAZY)
     @ToString.Exclude
     private MarketplaceLot lot;
 

@@ -12,7 +12,6 @@ public class MarketplaceLotMapper implements EntityDtoMapper<MarketplaceLot, Mar
 
     @Override
     public MarketplaceLot toEntity(MarketplaceLotDto dto) {
-
         return null;
     }
 

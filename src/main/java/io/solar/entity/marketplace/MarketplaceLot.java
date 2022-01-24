@@ -39,8 +39,9 @@ public class MarketplaceLot {
     @JoinColumn(name = "owner_id")
     private User owner;
 
-    @OneToOne(mappedBy = "lot", cascade = CascadeType.ALL)
-    private LotBet currentBet;
+
+    @OneToOne(mappedBy = "lot", cascade = CascadeType.REMOVE)
+    private MarketplaceBet currentBet;
 
     private Instant startDate;
     private Instant finishDate;

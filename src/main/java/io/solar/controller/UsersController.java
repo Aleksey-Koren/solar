@@ -49,7 +49,7 @@ public class UsersController {
     @Transactional
     public ResponseEntity<UserDto> getOne(@PathVariable("id") long userId) {
 
-        return ResponseEntity.ok(userService.getUserById(userId));
+        return ResponseEntity.ok(userFacade.getById(userId));
     }
 
     @PutMapping("{id}")
