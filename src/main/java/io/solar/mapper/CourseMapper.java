@@ -1,6 +1,6 @@
 package io.solar.mapper;
 
-import io.solar.config.AppProperties;
+import io.solar.config.properties.AppProperties;
 import io.solar.dto.CourseDto;
 import io.solar.entity.Course;
 import io.solar.entity.CourseType;

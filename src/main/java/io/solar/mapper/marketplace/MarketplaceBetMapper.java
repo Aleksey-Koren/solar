@@ -23,32 +23,32 @@ public class MarketplaceBetMapper implements EntityDtoMapper<MarketplaceBet, Mar
     @Override
     public MarketplaceBet toEntity(MarketplaceBetDto dto) {
 
-        return dto.getLotId() == null
-                ? createLotBet(dto)
-                : updateLotBet(dto);
+        return dto.getId() == null
+                ? createBet(dto)
+                : updateBet(dto);
     }
 
     @Override
     public MarketplaceBetDto toDto(MarketplaceBet entity) {
 
         return MarketplaceBetDto.builder()
+                .id(entity.getId())
                 .lotId(entity.getId())
-                .amount(entity.getAmount())
                 .userId(entity.getUser().getId())
+                .amount(entity.getAmount())
                 .betTime(entity.getBetTime())
                 .build();
     }
 
-    private MarketplaceBet createLotBet(MarketplaceBetDto betDto) {
+    private MarketplaceBet createBet(MarketplaceBetDto betDto) {
 
         return MarketplaceBet.builder()
                 .lot(marketplaceLotService.getById(betDto.getLotId()))
-                .user(userService.getById(betDto.getUserId()))
                 .amount(betDto.getAmount())
                 .build();
     }
 
-    private MarketplaceBet updateLotBet(MarketplaceBetDto betDto) {
+    private MarketplaceBet updateBet(MarketplaceBetDto betDto) {
         MarketplaceBet marketplaceBet = marketplaceBetService.getById(betDto.getLotId());
 
         marketplaceBet.setUser(userService.getById(betDto.getUserId()));

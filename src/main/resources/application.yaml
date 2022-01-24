@@ -57,6 +57,8 @@ app:
     view_distance_without_radar: 5
     time_flow_modifier: 12
     station_sell_modifier: 0.7
+
+
     images:
         path: src/main/resources/images
         width: 300
@@ -69,6 +71,11 @@ app:
     email:
         token_lifetime_hours: 24
         forgot_password_template: http://localhost:8081/forgot-password.html?token=
+    marketplace:
+        bet_step_percents: 2
+        commission_percent: 5
+    messenger:
+        notification_destination: "/notifications"
 
 
 log4jdbc:

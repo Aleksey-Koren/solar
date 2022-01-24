@@ -42,7 +42,7 @@ public class MarketplaceLot {
     private User owner;
 
     @OneToMany(mappedBy = "lot", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<MarketplaceBet> currentBet;
+    private List<MarketplaceBet> bets;
 
     private Instant startDate;
     private Instant finishDate;

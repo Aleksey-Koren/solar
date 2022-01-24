@@ -1,12 +1,11 @@
 package io.solar.service;
 
-import io.solar.config.AppProperties;
+import io.solar.config.properties.AppProperties;
 import io.solar.entity.interfaces.SpaceTech;
 import io.solar.entity.objects.BasicObject;
 import io.solar.repository.BasicObjectRepository;
 import io.solar.service.engine.interfaces.SpaceTechEngine;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

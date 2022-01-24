@@ -65,12 +65,4 @@ public class MarketplaceBetServiceTest {
                 .build();
         marketplaceBetService.save(bet);
     }
-
-    @Test
-    @Transactional
-    @Rollback(value = false)
-    void delete ()  {
-//        marketplaceBetRepository.deleteById(7L);
-        marketplaceLotRepository.deleteById(2L);
-    }
 }

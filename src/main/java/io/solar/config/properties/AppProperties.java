@@ -1,4 +1,4 @@
-package io.solar.config;
+package io.solar.config.properties;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -20,7 +20,7 @@ public class MarketplaceLotDto {
     private MarketplaceBetDto currentBet;
     private Instant startDate;
     private Instant finishDate;
-    private Long expirationSeconds;
+    private Long durationSeconds;
     private Long startPrice;
     private Long instantPrice;
     private Boolean isBuyerHasTaken;

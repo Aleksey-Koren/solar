@@ -12,5 +12,7 @@ public interface InventoryEngine {
 
     boolean isInShipInventory(BasicObject ship, BasicObject object);
 
+    void moveToMarketplace(BasicObject object);
+
     boolean isInShipInventory(BasicObject ship, List<BasicObject> objects);
 }

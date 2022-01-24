@@ -34,4 +34,11 @@ public class InventoryEngineImpl implements InventoryEngine {
     public boolean isInShipInventory(BasicObject ship, List<BasicObject> objects) {
         return objects.stream().allMatch(obj -> isInShipInventory(ship, obj));
     }
+
+    @Override
+    public void moveToMarketplace(BasicObject object) {
+        object.setAttachedToShip(null);
+        object.setStatus(ObjectStatus.AT_MARKETPLACE);
+        basicObjectRepository.save(object);
+    }
 }

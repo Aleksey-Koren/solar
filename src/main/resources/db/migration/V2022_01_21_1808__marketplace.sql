@@ -18,5 +18,6 @@ create table marketplace_bets
     lot_id bigint references marketplace_lots (id) on delete cascade,
     user_id  int not null references users (id) on delete cascade,
     amount   bigint    null,
-    bet_time timestamp not null
+    bet_time timestamp not null,
+    unique (lot_id, amount)
 );

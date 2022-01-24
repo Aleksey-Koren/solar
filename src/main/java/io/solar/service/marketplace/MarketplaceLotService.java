@@ -1,5 +1,6 @@
 package io.solar.service.marketplace;
 
+import io.solar.entity.marketplace.MarketplaceBet;
 import io.solar.entity.marketplace.MarketplaceLot;
 import io.solar.repository.marketplace.MarketplaceLotRepository;
 import lombok.RequiredArgsConstructor;
@@ -7,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -32,5 +35,10 @@ public class MarketplaceLotService {
 
     public void delete(MarketplaceLot lot) {
         marketplaceLotRepository.delete(lot);
+    }
+
+    public Optional<MarketplaceBet> findCurrentBet(MarketplaceLot lot) {
+        return lot.getBets().stream()
+                .max(Comparator.comparing(MarketplaceBet::getAmount));
     }
 }
