@@ -19,7 +19,7 @@ public class ProductMapper {
         if (dto.getId() != null) {
             product = productRepository.findById(dto.getId())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "There is no such product ID in database"));
-        }else{
+        } else {
             product = new Product();
         }
 
@@ -28,6 +28,7 @@ public class ProductMapper {
         product.setBulk(dto.getBulk());
         product.setMass(dto.getMass());
         product.setPrice(dto.getPrice());
+        product.setVolume(dto.getVolume());
 
         return product;
     }
@@ -41,6 +42,7 @@ public class ProductMapper {
         dto.setBulk(product.getBulk());
         dto.setMass(product.getMass());
         dto.setPrice(product.getPrice());
+        dto.setVolume(product.getVolume());
 
         return dto;
     }

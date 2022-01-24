@@ -30,6 +30,7 @@ public class ObjectTypeDescriptionDto {
     private Integer mass;
     private String description;
     private Integer price;
+    private Float volume;
     private ObjectType type;
     private ObjectSubType subType;
 

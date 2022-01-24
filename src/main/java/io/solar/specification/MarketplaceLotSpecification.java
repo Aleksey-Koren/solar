@@ -26,34 +26,41 @@ public class MarketplaceLotSpecification implements Specification<MarketplaceLot
 
     @Override
     public Predicate toPredicate(Root<MarketplaceLot> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
-
         List<Predicate> predicates = new ArrayList<>();
 
-        Join<BasicObject, ObjectTypeDescription> join = root.join(MarketplaceLot_.object).join(BasicObject_.objectTypeDescription);
+        Join<BasicObject, ObjectTypeDescription> objectTypeDescriptionJoin = root.join(MarketplaceLot_.object).join(BasicObject_.objectTypeDescription);
 
         if (filter.getOwnerId() != null) {
             predicates.add(criteriaBuilder.equal(root.get(MarketplaceLot_.owner), filter.getOwnerId()));
         }
 
-//        if (filter.getLotId() != null) {
-//            predicates.add(criteriaBuilder.equal(root.get(MarketplaceLot_.currentBet).get(MarketplaceBet_.id), filter.getLotId()));
-//        }
-
-        if (filter.getObjectTypeDescriptionTitle() != null) {
-            predicates.add(criteriaBuilder.like(join.get(ObjectTypeDescription_.title), filter.getObjectTypeDescriptionTitle() + "%"));
+        if (filter.getLotId() != null) {
+            predicates.add(criteriaBuilder.equal(root.get(MarketplaceLot_.id), filter.getLotId()));
         }
 
-        if (filter.getObjectType() != null) {
-            predicates.add(criteriaBuilder.equal(join.get(ObjectTypeDescription_.type), filter.getObjectType()));
+        if (filter.getUserId() != null) {
+            predicates.add(criteriaBuilder.equal(root.join(MarketplaceLot_.currentBet).get(MarketplaceBet_.user), filter.getUserId()));
+        }
+
+        if (filter.getMinPrice() != null) {
+            predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get(MarketplaceLot_.instantPrice), filter.getMinPrice()));
+        }
+
+        if (filter.getMaxPrice() != null) {
+            predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get(MarketplaceLot_.instantPrice), filter.getMaxPrice()));
+        }
+
+        if (filter.getObjectTypesIds() != null) {
+            predicates.add(criteriaBuilder.isTrue(objectTypeDescriptionJoin.get(ObjectTypeDescription_.inventoryType).in(filter.getObjectTypesIds())));
+        }
+
+        if (filter.getObjectTypeDescriptionTitle() != null) {
+            predicates.add(criteriaBuilder.like(objectTypeDescriptionJoin.get(ObjectTypeDescription_.title), filter.getObjectTypeDescriptionTitle() + "%"));
         }
 
         if (filter.getObjectTitle() != null) {
-            predicates.add(criteriaBuilder.like(join.get(BasicObject_.TITLE), filter.getObjectTitle() + "%"));
+            predicates.add(criteriaBuilder.like(root.get(MarketplaceLot_.object).get(BasicObject_.title), filter.getObjectTitle() + "%"));
         }
-
-//        if (filter.getUserId() != null) {
-//            predicates.add(criteriaBuilder.equal(root.get(MarketplaceLot_.currentBet).get(MarketplaceBet_.user), filter.getUserId()));
-//        }
 
         return criteriaBuilder.and(predicates.toArray(Predicate[]::new));
     }

@@ -56,11 +56,15 @@ public class ObjectTypeDescription {
     @Column(name = "price")
     private Integer price;
 
+    @Column(name = "volume")
+    private Float volume;
+
     @Enumerated(EnumType.STRING)
     private ObjectType type;
 
     @Enumerated(EnumType.STRING)
     private ObjectSubType subType;
+
 
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
     @EqualsAndHashCode.Exclude

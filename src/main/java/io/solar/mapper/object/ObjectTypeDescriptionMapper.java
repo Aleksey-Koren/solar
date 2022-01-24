@@ -46,6 +46,7 @@ public class ObjectTypeDescriptionMapper implements EntityDtoMapper<ObjectTypeDe
                 .type(entity.getType())
                 .subType(entity.getSubType())
                 .powerDegradation(entity.getPowerDegradation())
+                .volume(entity.getVolume())
                 .build();
     }
 
@@ -84,6 +85,6 @@ public class ObjectTypeDescriptionMapper implements EntityDtoMapper<ObjectTypeDe
         objectTypeDescription.setPowerMax(dto.getPowerMax());
         objectTypeDescription.setPrice(dto.getPrice());
         objectTypeDescription.setPowerDegradation(dto.getPowerDegradation());
-
+        objectTypeDescription.setVolume(dto.getVolume());
     }
 }

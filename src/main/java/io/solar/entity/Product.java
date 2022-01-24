@@ -17,4 +17,5 @@ public class Product {
     private Float bulk;
     private Float mass;
     private Long price;
+    private Float volume;
 }
