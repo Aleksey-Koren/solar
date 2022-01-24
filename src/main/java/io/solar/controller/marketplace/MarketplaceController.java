@@ -2,7 +2,6 @@ package io.solar.controller.marketplace;
 
 import io.solar.dto.marketplace.MarketplaceLotDto;
 import io.solar.facade.marketplace.MarketplaceLotFacade;
-import io.solar.service.UserService;
 import io.solar.specification.filter.MarketplaceLotFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class MarketplaceController {
 
     private final MarketplaceLotFacade marketplaceLotFacade;
-    private final UserService userService;
 
     @GetMapping("/lot")
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
