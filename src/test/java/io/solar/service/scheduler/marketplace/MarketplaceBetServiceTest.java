@@ -60,7 +60,7 @@ public class MarketplaceBetServiceTest {
     @Test
     void save_shouldOverrideBet() {
         MarketplaceBet bet = MarketplaceBet.builder()
-                .lot(marketplaceLotService.getById(1L))
+                .lot(marketplaceLotService.getById(2L))
                 .user(userService.getById(2L))
                 .amount(799L)
                 .build();
@@ -69,23 +69,9 @@ public class MarketplaceBetServiceTest {
 
     @Test
     @Transactional
-    @Rollback(false)
-    void a() {
-        MarketplaceLot lot = marketplaceLotService.getById(1L);
-        lot.setCurrentBet(MarketplaceBet.builder().lot(marketplaceLotService.getById(1L))
-                .user(userService.getById(2L))
-                .amount(799L)
-                .build());
-        System.out.println(lot);
-    }
-
-    @Test
-    @Transactional
     @Rollback(value = false)
     void delete ()  {
-        marketplaceBetRepository.deleteById(7L);
-        marketplaceLotRepository.deleteById(7L);
+//        marketplaceBetRepository.deleteById(7L);
+        marketplaceLotRepository.deleteById(2L);
     }
-
-
 }

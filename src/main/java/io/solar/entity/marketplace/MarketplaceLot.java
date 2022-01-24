@@ -15,9 +15,11 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import java.time.Instant;
+import java.util.List;
 
 @Entity
 @Table(name = "marketplace_lots")
@@ -39,9 +41,8 @@ public class MarketplaceLot {
     @JoinColumn(name = "owner_id")
     private User owner;
 
-
-    @OneToOne(mappedBy = "lot", cascade = CascadeType.REMOVE)
-    private MarketplaceBet currentBet;
+    @OneToMany(mappedBy = "lot", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<MarketplaceBet> currentBet;
 
     private Instant startDate;
     private Instant finishDate;

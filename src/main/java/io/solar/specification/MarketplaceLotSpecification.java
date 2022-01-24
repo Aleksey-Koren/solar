@@ -1,5 +1,6 @@
 package io.solar.specification;
 
+import io.solar.entity.marketplace.MarketplaceBet_;
 import io.solar.entity.User_;
 import io.solar.entity.marketplace.MarketplaceBet_;
 import io.solar.entity.marketplace.MarketplaceLot;
@@ -36,9 +37,9 @@ public class MarketplaceLotSpecification implements Specification<MarketplaceLot
             predicates.add(criteriaBuilder.equal(root.get(MarketplaceLot_.owner), filter.getOwnerId()));
         }
 
-        if (filter.getLotId() != null) {
-            predicates.add(criteriaBuilder.equal(root.get(MarketplaceLot_.currentBet).get(MarketplaceBet_.id), filter.getLotId()));
-        }
+//        if (filter.getLotId() != null) {
+//            predicates.add(criteriaBuilder.equal(root.get(MarketplaceLot_.currentBet).get(MarketplaceBet_.id), filter.getLotId()));
+//        }
 
         if (filter.getObjectTypeDescriptionTitle() != null) {
             predicates.add(criteriaBuilder.like(join.get(ObjectTypeDescription_.title), filter.getObjectTypeDescriptionTitle() + "%"));
@@ -52,9 +53,9 @@ public class MarketplaceLotSpecification implements Specification<MarketplaceLot
             predicates.add(criteriaBuilder.like(join.get(BasicObject_.TITLE), filter.getObjectTitle() + "%"));
         }
 
-        if (filter.getUserId() != null) {
-            predicates.add(criteriaBuilder.equal(root.get(MarketplaceLot_.currentBet).get(MarketplaceBet_.user).get(User_.id), filter.getUserId()));
-        }
+//        if (filter.getUserId() != null) {
+//            predicates.add(criteriaBuilder.equal(root.get(MarketplaceLot_.currentBet).get(MarketplaceBet_.user), filter.getUserId()));
+//        }
 
         return criteriaBuilder.and(predicates.toArray(Predicate[]::new));
     }
