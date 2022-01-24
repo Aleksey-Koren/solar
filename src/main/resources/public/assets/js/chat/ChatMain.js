@@ -1,24 +1,42 @@
 /**
- * @param solarMap {SolarMap}
+ * @param context {AppContext}
  * @constructor
  */
-function ChatMain(solarMap) {
-
+function ChatMain(context) {
     this.chatPopup = null;
-    this.solarMap = solarMap;
+    this.userStore = context.stores.userStore;
     this.rooms = [];
+    this.context = context;
     this.room = null;//id of active room;
     this.chatList = null;//chat list container
     this.chatControls = null;//chat controls container - invite to chat, search for particular chat, etc
     this.chatBody = null;//chat body container (messages from particular chat)
     this.chatBodyControls = null;//controls to post message
-    this.chatTitle = new ChatTitle(solarMap.context.stores.userStore.user.user_id);
+    var me = this;
+    this.chatTitle = new ChatTitle(this.userStore.user.user_id, function() {
+        var room = null;
+        for(var i = 0; i < me.rooms.length; i++) {
+            if(me.rooms[i].id === me.room) {
+                room = me.rooms[i];
+                break;
+            }
+        }
+        if(room) {
+            me.invitationPopup && me.invitationPopup.unmount();
+            me.invitationPopup = new ChatInvitationPopup(context, function(user) {
+                return me.resolveInvitation(user, room);
+            });
+            me.invitationPopup.show(room, me.participants, ChatTitle.handleRoomTitle(room, me.context.stores.userStore.user.user_id).title);
+        } else {
+            Notification.error("Can't invite users into room which does not exists or is not loaded");
+        }
+    });
     this.currentMessages = [];
     this.participants = {};
-    var me = this;
+    this.invitationPopup = null;
     var socket = new SockJS('/api/ws');
     this.stompClient = Stomp.over(socket);
-    this.stompClient.connect({'auth_token': solarMap.context.loginStorage.getItem('token')}, function() {
+    this.stompClient.connect({'auth_token': context.loginStorage.getItem('token')}, function() {
         me.stompClient.subscribe('/user/notifications', function(response) {
             var object = JSON.parse(response.body);
             switch (object.type) {
@@ -48,7 +66,7 @@ ChatMain.prototype.showChat = function() {
     this.createChatBody();
     this.createChatBodyControls();
     this.chatPopup = new Popup({
-        context: this.solarMap.context,
+        context: this.context,
         content: Dom.el('div', 'chat-content', [
             Dom.el('div', 'chat-sidebar', [
                 this.chatControls,
@@ -109,7 +127,7 @@ ChatMain.prototype.createChatList = function() {
         chatInviteList.style.display = 'none';
     }
 
-    var thisUser = me.solarMap.context.stores.userStore.user.user_id;
+    var thisUser = me.context.stores.userStore.user.user_id;
 
     function lookup(value) {
         value = (value || "").trim();
@@ -176,13 +194,12 @@ ChatMain.prototype.createChatList = function() {
         })
     }
     var chatInviteContainer = Dom.el('div', null, [
-        Dom.el('input', {class: 'chat-new-chat', placeholder: "Search", onblur: function(e){
-                lookup(e.target.value);
+        Dom.el('input', {class: 'chat-new-chat', placeholder: "Search (3 chars min)", onblur: function(){
                 setTimeout(function() {
                     hideSearchResutl();
-                }, 50000)
+                }, 5000)
             }, onkeyup(e) {
-                if (e.key === 'Enter' || e.keyCode === 13) {
+                if (e.key === 'Enter' || e.keyCode === 13 || e.target.value.length >= 3) {
                     lookup(e.target.value)
                 }
             }}),
@@ -198,12 +215,13 @@ ChatMain.prototype.createRooms = function() {
     var me = this;
     var out = this.rooms.map(function(room) {
         me.subscribeToRoom(room);
+        var titleData = ChatTitle.handleRoomTitle(room, me.context.stores.userStore.user.user_id);
         var unread = Dom.el('sup', {class: 'chat-unread', id: 'chat-unread-' + room.id}, room.amount && room.amount !== '0' ? "+" + room.amount : null);
         return Dom.el('div', 'chat-room', Dom.el('a', {href: '/#', click: function(e) {
                 e.preventDefault();
                 me.openRoom(room);
                 Dom.clear(unread);
-            }}, [room.title || room.id, unread]));
+            }}, [titleData.title, unread]));
     })
     if(out.length === 0) {
         out.push(Dom.el("div", 'chat-room', "no chats"))
@@ -239,11 +257,14 @@ ChatMain.prototype.subscribeToRoom = function(room) {
 
 ChatMain.prototype.sendMessage = function(message) {
     this.stompClient.send("/chat/" + this.room, {}, JSON.stringify({
-        senderId: this.solarMap.context.stores.userStore.user.user_id,
+        senderId: this.userStore.user.user_id,
         message:message
     }));
 }
 
+/**
+ * @param room {Room}
+ */
 ChatMain.prototype.openRoom = function(room) {
     Dom.clear(this.chatBody);
     this.currentMessages = [];
@@ -251,7 +272,7 @@ ChatMain.prototype.openRoom = function(room) {
     me.room = room.id;
     me.chatTitle.setRoom(room);
     Rest.doGet("/api/chat/room/" + room.id + "/participants").then(function(participants) {
-        this.participants = {};
+        me.participants = {};
         participants.forEach(function(p) {
             me.participants[p.id] = p;
         })
@@ -277,6 +298,9 @@ ChatMain.prototype.openRoom = function(room) {
 ChatMain.prototype.updateLastSeen = function() {
     Rest.doPut("/api/chat/room/" + this.room + "/lastSeenAt");
 }
+/**
+ * @param message {Message}
+ */
 ChatMain.prototype.appendMessage = function(message) {
     if(message.roomId !== this.room) {
         return;
@@ -289,10 +313,10 @@ ChatMain.prototype.appendMessage = function(message) {
             return;
         }
     }
-    var mes = new ChatMessage(message, this.participants[message.senderId], this.solarMap.context.stores.userStore.user.user_id, function(newMessage) {
+    var mes = new ChatMessage(message, this.participants[message.senderId], me.context.stores.userStore.user.user_id, function(newMessage) {
         me.stompClient.send("/chat/" + me.room, {}, JSON.stringify({
             id: message.id,
-            senderId: me.solarMap.context.stores.userStore.user.user_id,
+            senderId: me.context.stores.userStore.user.user_id,
             message: newMessage
         }));
     });
@@ -305,4 +329,54 @@ ChatMain.prototype.unmount = function() {
     if(this.stompClient != null) {
         this.stompClient.disconnect();
     }
+    this.userStore.remove(this);
+    this.invitationPopup && this.invitationPopup.unmount();
+}
+/**
+ *
+ * @param user {Participant}
+ * @param room {Room}
+ */
+ChatMain.prototype.resolveInvitation = function(user, room) {
+    var roomPromise;
+    var me = this;
+    if(room.roomType === 'PUBLIC') {
+        roomPromise = new Promise(function(resolve) {
+            resolve(room);
+        })
+    } else if(room.roomType === 'PRIVATE') {
+        var oldUser = null;
+        for(var id in this.participants) {
+            var u = this.participants[id];
+            if(u.id === this.context.stores.userStore.user.user_id) {
+                continue;
+            }
+            oldUser = u;
+            break;
+        }
+        if(!oldUser) {
+            Notification.error("Fail to invite user into current room, please try to refresh browser")
+            return new Promise(function(resolve) {
+                resolve(null);
+            })
+        }
+        roomPromise = Rest.doPost("/api/chat/room", {isPrivate: false, userId: oldUser.id}).then(function(room) {
+            me.openRoom(room);
+            return room;
+        });
+    } else {
+        Notification.error("You can't invite users into current room (reason: room type is " + room.roomType + ").")
+        return new Promise(function(resolve) {
+            resolve(null);
+        })
+    }
+    return roomPromise.then(function(room) {
+        return Rest.doPatch("/api/chat/room/" + room.id + "/participants", user.id)
+    }).then(function(response) {
+        me.participants[user.id] = user;
+        return response;
+    }).catch(function(e) {
+        console.error(e);
+        Notification.error("Fail to add participant into group");
+    });
 }

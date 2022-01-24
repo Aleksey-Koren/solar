@@ -1,5 +1,5 @@
 /**
- * @param message {{senderId:number, createdAt:string, message:string, id: number}}
+ * @param message {Message}
  * @param sender {{id:number, title: string}}
  * @param currentUser {number}
  * @param sendUpdate {PromiseSupplier}

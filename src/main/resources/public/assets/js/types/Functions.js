@@ -1,7 +1,7 @@
 /**
- * @param str {*}
+ * @param arg {*}
  * @return {Promise<*>}
  */
-function PromiseSupplier(str) {
+function PromiseSupplier(arg) {
     return new Promise(a => a())
 }

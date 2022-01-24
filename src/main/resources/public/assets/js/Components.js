@@ -145,7 +145,7 @@ GridPagination.prototype.hide = function () {
  * @param params {{
  *     context: object,
  *     content: object,
- *     title: object,
+ *     title?: object,
  *     onClose?: () => void,
  *     noControls?: boolean
  * }}
@@ -170,12 +170,15 @@ function Popup(params) {
             }
         })])
     ]);
-    this.container = Dom.el(
-        'div',
-        {class: "overlay"}
-    );
     this.onClose = params.onClose;
     this.hideWrapper = null;
+}
+Popup.overlay = {
+    components: [],
+    dom: Dom.el(
+        'div',
+        {class: "overlay"}
+    )
 }
 Popup.prototype.setContent = function (content) {
     Dom.append(this.content, content)
@@ -188,16 +191,32 @@ Popup.prototype.show = function () {
         };
         this.context.escListener.add(this.hideWrapper)
     }
-    document.body.appendChild(this.container);
     document.body.appendChild(this.window);
+    if(Popup.overlay.components.indexOf(this) === -1) {
+        Popup.overlay.components.push(this);
+        document.body.appendChild(Popup.overlay.dom);
+    }
+    Popup.overlay.dom.style.zIndex = (1100 + (Popup.overlay.components.length * 2)) + "";
+    this.window.style.zIndex = (1101 + (Popup.overlay.components.length * 2)) + "";
 };
 Popup.prototype.hide = function () {
     if(this.context && this.context.escListener) {
         this.context.escListener.remove(this.hideWrapper);
     }
-    this.container.parentElement && this.container.parentElement.removeChild(this.container);
     this.window.parentElement && this.window.parentElement.removeChild(this.window);
-    this.onClose && this.onClose();
+    try {
+        this.onClose && this.onClose();
+    } catch (e) {
+        console.error("fail to execute popup callback", e);
+    }
+    var index = Popup.overlay.components.indexOf(this);
+    if(index > -1) {
+        Popup.overlay.components.splice(index, 1);
+    }
+    if(Popup.overlay.components.length === 0) {
+        Popup.overlay.dom.parentElement && Popup.overlay.dom.parentElement.removeChild(Popup.overlay.dom);
+    }
+    Popup.overlay.dom.style.zIndex = (1100 + (Popup.overlay.components.length * 2)) + "";
 };
 
 /**

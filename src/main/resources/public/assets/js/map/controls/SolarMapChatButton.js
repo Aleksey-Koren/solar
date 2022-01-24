@@ -1,10 +1,10 @@
 /**
- * @param solarMap {SolarMap}
+ * @param solarMap {AppContext}
  * @constructor
  */
-function SolarMapChatButton( solarMap) {
+function SolarMapChatButton( context) {
     var me = this;
-    me.chat = new ChatMain(solarMap);
+    me.chat = new ChatMain(context);
     this.container = Dom.el('div', {class: 'solar-map-control', onclick: function(){
             me.chat.showChat();
         }

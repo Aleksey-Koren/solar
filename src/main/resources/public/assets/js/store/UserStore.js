@@ -1,3 +1,7 @@
+/**
+ * @property {{user_id:number}} user
+ * @constructor
+ */
 function UserStore() {
     AbstractStore.call(this);
     this.init();
