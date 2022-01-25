@@ -7,6 +7,7 @@ import io.solar.entity.messenger.MessageType;
 import io.solar.mapper.messanger.MessageMapper;
 import io.solar.service.mail.EmailService;
 import io.solar.service.messenger.MessageService;
+import io.solar.service.messenger.WebSocketService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -18,39 +19,25 @@ import java.util.List;
 public class WebSocketFacade {
 
     private final MessageMapper messageMapper;
-    private final MessageService messageService;
-    private final EmailService emailService;
-    private final SimpMessagingTemplate messagingTemplate;
+    private final WebSocketService webSocketService;
+    private final SimpMessagingTemplate simpMessagingTemplate;
 
     public void processMessage(MessageDto messageDto) {
         Message message = messageMapper.toEntity(messageDto);
 
         if (MessageType.CHAT.equals(message.getMessageType())) {
-            processChatMessage(message);
+            webSocketService.processChatMessage(message);
         } else {
-            processNonChatMessage(message);
+            webSocketService.processNonChatMessage(message);
         }
 
         messageDto.setCreatedAt(message.getCreatedAt());
     }
 
-    private void processChatMessage(Message message) {
-        messageService.saveNew(message);
-    }
-
-    private void processNonChatMessage(Message message) {
-        messageService.saveNew(message);
-
-        List<User> usersInRoom = message.getRoom().getUsers();
-
-        usersInRoom.stream()
-                .filter(user -> (user.getEmailNotifications() != null
-                        && (user.getEmailNotifications() & message.getMessageType().getIndex()) == message.getMessageType().getIndex()))
-                .forEach(user -> emailService.sendSimpleEmail(user, message.getTitle(), message.getMessage()));
-    }
-
     public void sendSystemMessage(Message message) {
-        processNonChatMessage(message);
-        messagingTemplate.convertAndSend("/room/" + message.getRoom().getId(), messageMapper.toDto(message));
+        webSocketService.processNonChatMessage(message);
+        simpMessagingTemplate.convertAndSend("/room/" + message.getRoom().getId()
+                , messageMapper.toDto(message));
     }
+
 }

@@ -26,7 +26,6 @@ public class MessageService {
     private final RoomRepository roomRepository;
     private final UserRoomRepository userRoomRepository;
     private final MessageRepository messageRepository;
-    private final MessageMapper messageMapper;
 
     public Message saveNew(Message message) {
         message.setCreatedAt(Instant.now());
@@ -47,7 +46,7 @@ public class MessageService {
         return messageRepository.save(message);
     }
 
-    public Page<MessageDto> getMessageHistory(Long roomId, User user, Pageable pageable) {
+    public Page<Message> getMessageHistory(Long roomId, User user, Pageable pageable) {
         Room room = roomRepository.findById(roomId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND
                 , "There is no room with such id = " + roomId + " . Can't fetch message history"));
 
@@ -56,8 +55,7 @@ public class MessageService {
                         , String.format("User with id = %d isn't subscribed on room id = %d", user.getId(), roomId)));
 
         return messageRepository
-                .findByRoomAndCreatedAtGreaterThanEqualOrderByCreatedAtDesc(room, userRoom.getSubscribedAt(), pageable)
-                .map(messageMapper::toDto);
+                .findByRoomAndCreatedAtGreaterThanEqualOrderByCreatedAtDesc(room, userRoom.getSubscribedAt(), pageable);
     }
 
     public void editMessage(MessageDto messageDto) {

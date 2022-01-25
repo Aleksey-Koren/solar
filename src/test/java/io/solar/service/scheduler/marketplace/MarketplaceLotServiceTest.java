@@ -5,8 +5,6 @@ import io.solar.service.StarShipService;
 import io.solar.service.UserService;
 import io.solar.service.marketplace.MarketplaceLotService;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -47,7 +45,5 @@ public class MarketplaceLotServiceTest {
         marketplaceLotService.save(lot);
         lot = marketplaceLotService.getById(lot.getId());
         assertEquals(startPriceForUpdate, lot.getStartPrice());
-
-
     }
 }
