@@ -4,7 +4,6 @@ import io.solar.entity.marketplace.MarketplaceBet;
 import io.solar.entity.marketplace.MarketplaceLot;
 import io.solar.repository.marketplace.MarketplaceLotRepository;
 import io.solar.specification.MarketplaceLotSpecification;
-import io.solar.specification.filter.MarketplaceLotFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Comparator;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -39,10 +37,12 @@ public class MarketplaceLotService {
     }
 
     public MarketplaceLot save(MarketplaceLot lot) {
+
         return marketplaceLotRepository.save(lot);
     }
 
     public void delete(MarketplaceLot lot) {
+
         marketplaceLotRepository.delete(lot);
     }
 
@@ -50,4 +50,20 @@ public class MarketplaceLotService {
         return lot.getBets().stream()
                 .max(Comparator.comparing(MarketplaceBet::getAmount));
     }
+
+    public MarketplaceBet getCurrentBet(MarketplaceLot lot) {
+
+        return findCurrentBet(lot)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cannot find current bet for lot: " + lot.getId()));
+    }
+
+    //todo: change method name
+    public void checkLotForDelete(MarketplaceLot lot) {
+        if (lot.getIsBuyerHasTaken() && lot.getIsSellerHasTaken()) {
+            delete(lot);
+        } else {
+            save(lot);
+        }
+    }
+
 }

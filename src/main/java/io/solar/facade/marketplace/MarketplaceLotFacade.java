@@ -8,6 +8,7 @@ import io.solar.entity.User;
 import io.solar.entity.marketplace.MarketplaceBet;
 import io.solar.entity.marketplace.MarketplaceLot;
 import io.solar.entity.messenger.NotificationType;
+import io.solar.entity.objects.StarShip;
 import io.solar.facade.UserFacade;
 import io.solar.mapper.marketplace.MarketplaceLotMapper;
 import io.solar.service.StarShipService;
@@ -25,6 +26,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -47,15 +49,32 @@ public class MarketplaceLotFacade {
 
     public HttpStatus pickUpLot(User user, Long lotId) {
         MarketplaceLot lot = marketplaceLotService.getById(lotId);
+        StarShip starship = starShipService.getById(user.getLocation().getId());
 
-        if (!lot.getIsBuyerHasTaken() && isUserWinner(user, lot)) {
-            inventoryEngine.putToInventory(user.getLocation(), List.of(lot.getObject()));
+        if (isUserCanPickUpLot(user, lot)) {
+            inventoryEngine.putToInventory(starship, List.of(lot.getObject()));
             lot.setIsBuyerHasTaken(true);
         } else {
             return HttpStatus.FORBIDDEN;
         }
 
-        updateLot(lot);
+        marketplaceLotService.checkLotForDelete(lot);
+
+        return HttpStatus.OK;
+    }
+
+    public HttpStatus takeMoney(User user, Long lotId) {
+        MarketplaceLot lot = marketplaceLotService.getById(lotId);
+
+        if (isSellerCanTakeMoney(user, lot)) {
+            MarketplaceBet winningBet = marketplaceLotService.getCurrentBet(lot);
+            userFacade.increaseUserBalance(user, winningBet.getAmount());
+            lot.setIsSellerHasTaken(true);
+        } else {
+            return HttpStatus.BAD_REQUEST;
+        }
+
+        marketplaceLotService.checkLotForDelete(lot);
 
         return HttpStatus.OK;
     }
@@ -94,30 +113,12 @@ public class MarketplaceLotFacade {
         return HttpStatus.OK;
     }
 
-    private void updateLot(MarketplaceLot lot) {
-        if (lot.getIsBuyerHasTaken() && lot.getIsSellerHasTaken()) {
-            marketplaceLotService.delete(lot);
-        } else {
-            marketplaceLotService.save(lot);
-        }
-    }
-
-    private boolean isUserWinner(User user, MarketplaceLot lot) {
-        MarketplaceBet winningBet = marketplaceLotService.findCurrentBet(lot)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cannot find current bet for lot: " + lot.getId()));
-
-        return winningBet.getUser().equals(user);
-    }
-
     private void sendInstantPurchaseNotification(MarketplaceLot lot) {
         simpMessagingTemplate.convertAndSendToUser(lot.getOwner().getLogin()
                 , messengerProperties.getNotificationDestination()
                 , new NotificationDto<>(NotificationType.INSTANT_PURCHASE.name(), marketplaceLotMapper.toDto(lot)));
     }
 
-    private long calculateCommission(MarketplaceLot lot) {
-        return Math.round(lot.getStartPrice() * marketplaceProperties.getCommissionPercent() * 0.01);
-    }
 
     private void createLotWithDelay(MarketplaceLotDto dto, MarketplaceLot lot) {
         lot.setStartDate(dto.getStartDate());
@@ -128,5 +129,19 @@ public class MarketplaceLotFacade {
         Instant now = Instant.now();
         lot.setStartDate(now);
         lot.setFinishDate(now.plusSeconds(dto.getDurationSeconds()));
+    }
+
+    private long calculateCommission(MarketplaceLot lot) {
+        return Math.round(lot.getStartPrice() * marketplaceProperties.getCommissionPercent() * 0.01);
+    }
+
+    private boolean isUserCanPickUpLot(User user, MarketplaceLot lot) {
+        MarketplaceBet winningBet = marketplaceLotService.getCurrentBet(lot);
+
+        return (!lot.getIsBuyerHasTaken() && lot.getFinishDate().isBefore(Instant.now()) && winningBet.getUser().equals(user));
+    }
+
+    private boolean isSellerCanTakeMoney(User seller, MarketplaceLot lot) {
+        return (!lot.getIsSellerHasTaken() && lot.getFinishDate().isBefore(Instant.now()) && lot.getOwner().equals(seller));
     }
 }
