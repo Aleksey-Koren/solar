@@ -25,6 +25,8 @@ public class InventoryEngineImpl implements InventoryEngine {
         if (spaceTechEngine.isThereEnoughSpaceForObjects(location, items)) {
             items.forEach(s -> {
                 s.setAttachedToShip((BasicObject) location);
+                s.setX(null);
+                s.setY(null);
                 s.setStatus(ObjectStatus.ATTACHED_TO);
             });
             basicObjectRepository.saveAll(items);

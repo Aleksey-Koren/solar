@@ -22,11 +22,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -113,6 +111,18 @@ public class MarketplaceLotFacade {
         return HttpStatus.OK;
     }
 
+    public HttpStatus takeAwayExpiredLot(MarketplaceLotDto dto, User seller) {
+        MarketplaceLot expiredLot = marketplaceLotService.getById(dto.getId());
+
+        if(isSellerCanTakeAwayExpiredLot(seller, expiredLot)) {
+            inventoryEngine.putToInventory(starShipService.getById(seller.getLocation().getId()), List.of(expiredLot.getObject()));
+            marketplaceLotService.delete(expiredLot);
+        }else{
+            return HttpStatus.BAD_REQUEST;
+        }
+        return HttpStatus.OK;
+    }
+
     private void sendInstantPurchaseNotification(MarketplaceLot lot) {
         simpMessagingTemplate.convertAndSendToUser(lot.getOwner().getLogin()
                 , messengerProperties.getNotificationDestination()
@@ -143,5 +153,9 @@ public class MarketplaceLotFacade {
 
     private boolean isSellerCanTakeMoney(User seller, MarketplaceLot lot) {
         return (!lot.getIsSellerHasTaken() && lot.getFinishDate().isBefore(Instant.now()) && lot.getOwner().equals(seller));
+    }
+
+    private boolean isSellerCanTakeAwayExpiredLot(User seller, MarketplaceLot lot) {
+        return (lot.getFinishDate().isBefore(Instant.now()) && lot.getBets().isEmpty() && lot.getOwner().equals(seller));
     }
 }

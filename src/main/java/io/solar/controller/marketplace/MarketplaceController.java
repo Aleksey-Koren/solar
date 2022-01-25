@@ -81,4 +81,12 @@ public class MarketplaceController {
         User user = userService.findByLogin(principal.getName());
         return ResponseEntity.status(marketplaceLotFacade.instantPurchase(dto, user)).build();
     }
+
+    @PostMapping("/lot/instant-purchase")
+    @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
+    @Transactional
+    public ResponseEntity<Void> takeAwayExpiredLot(@RequestBody MarketplaceLotDto dto, Principal principal) {
+        User user = userService.findByLogin(principal.getName());
+        return ResponseEntity.status(marketplaceLotFacade.takeAwayExpiredLot(dto, user)).build();
+    }
 }
