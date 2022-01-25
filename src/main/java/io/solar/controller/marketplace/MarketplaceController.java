@@ -64,7 +64,7 @@ public class MarketplaceController {
     @PostMapping("/lot/instant-purchase")
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
     @Transactional
-    public ResponseEntity<Void> instantPurchase(MarketplaceLotDto dto, Principal principal) {
+    public ResponseEntity<Void> instantPurchase(@RequestBody MarketplaceLotDto dto, Principal principal) {
         User user = userService.findByLogin(principal.getName());
         return ResponseEntity.status(marketplaceLotFacade.instantPurchase(dto, user)).build();
     }

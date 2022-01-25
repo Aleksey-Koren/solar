@@ -9,6 +9,7 @@ import io.solar.entity.marketplace.MarketplaceLot;
 import io.solar.entity.messenger.NotificationType;
 import io.solar.facade.UserFacade;
 import io.solar.mapper.marketplace.MarketplaceLotMapper;
+import io.solar.service.StarShipService;
 import io.solar.service.engine.interfaces.InventoryEngine;
 import io.solar.service.marketplace.MarketplaceLotService;
 import io.solar.specification.MarketplaceLotSpecification;
@@ -34,6 +35,7 @@ public class MarketplaceLotFacade {
     private final InventoryEngine inventoryEngine;
     private final MessengerProperties messengerProperties;
     private final SimpMessagingTemplate simpMessagingTemplate;
+    private final StarShipService starShipService;
 
     public Page<MarketplaceLotDto> findAll(Pageable pageable, MarketplaceLotFilter filter) {
 
@@ -69,7 +71,7 @@ public class MarketplaceLotFacade {
 
         userFacade.decreaseUserBalance(buyer, lot.getInstantPrice());
         userFacade.increaseUserBalance(lot.getOwner(), lot.getInstantPrice());
-        inventoryEngine.putToInventory(buyer.getLocation(), List.of(lot.getObject()));
+        inventoryEngine.putToInventory(starShipService.getById(buyer.getLocation().getId()), List.of(lot.getObject()));
         sendInstantPurchaseNotification(lot);
         marketplaceLotService.delete(lot);
         return HttpStatus.OK;
@@ -80,7 +82,6 @@ public class MarketplaceLotFacade {
                     , messengerProperties.getNotificationDestination()
                     , new NotificationDto<>(NotificationType.INSTANT_PURCHASE.name(), marketplaceLotMapper.toDto(lot)));
     }
-
 
     private long calculateCommission(MarketplaceLot lot) {
         return Math.round(lot.getStartPrice() * marketplaceProperties.getCommissionPercent() * 0.01);

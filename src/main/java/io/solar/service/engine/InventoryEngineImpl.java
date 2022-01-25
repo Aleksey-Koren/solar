@@ -21,10 +21,10 @@ public class InventoryEngineImpl implements InventoryEngine {
     private final SpaceTechEngine spaceTechEngine;
 
     @Override
-    public int putToInventory(BasicObject location, List<BasicObject> items) {
-        if (spaceTechEngine.isThereEnoughSpaceForObjects((SpaceTech) location, items)) {
+    public int putToInventory(SpaceTech location, List<BasicObject> items) {
+        if (spaceTechEngine.isThereEnoughSpaceForObjects(location, items)) {
             items.forEach(s -> {
-                s.setAttachedToShip(location);
+                s.setAttachedToShip((BasicObject) location);
                 s.setStatus(ObjectStatus.ATTACHED_TO);
             });
             basicObjectRepository.saveAll(items);

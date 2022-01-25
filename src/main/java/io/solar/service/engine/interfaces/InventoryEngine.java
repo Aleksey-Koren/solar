@@ -1,12 +1,13 @@
 package io.solar.service.engine.interfaces;
 
+import io.solar.entity.interfaces.SpaceTech;
 import io.solar.entity.objects.BasicObject;
 
 import java.util.List;
 
 public interface InventoryEngine {
 
-    int putToInventory(BasicObject location, List<BasicObject> items);
+    int putToInventory(SpaceTech location, List<BasicObject> items);
 
     boolean isInShipInventory(BasicObject ship, BasicObject object);
 
