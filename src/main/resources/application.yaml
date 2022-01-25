@@ -75,6 +75,8 @@ app:
         commission_percent: 5
     messenger:
         notification_destination: "/notifications"
+    star_map:
+        capture_distance: 100
     object:
         types:
             container: container
