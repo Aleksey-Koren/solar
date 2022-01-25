@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,11 +39,13 @@ public class MarketplaceController {
         return marketplaceLotFacade.findAll(pageable, filter);
     }
 
-    @Transactional
+    @GetMapping("/lot/{lotId}")
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
-    public void pickUpWonLot() {
+    @Transactional
+    public ResponseEntity<Void> pickUpWonLot(@PathVariable Long lotId, Principal principal) {
+        User user = userService.findByLogin(principal.getName());
 
-
+        return ResponseEntity.status(marketplaceLotFacade.pickUpLot(user, lotId)).build();
     }
 
     @PostMapping("/lot")

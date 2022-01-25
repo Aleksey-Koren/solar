@@ -5,6 +5,7 @@ import io.solar.config.properties.MessengerProperties;
 import io.solar.dto.marketplace.MarketplaceLotDto;
 import io.solar.dto.messenger.NotificationDto;
 import io.solar.entity.User;
+import io.solar.entity.marketplace.MarketplaceBet;
 import io.solar.entity.marketplace.MarketplaceLot;
 import io.solar.entity.messenger.NotificationType;
 import io.solar.facade.UserFacade;
@@ -19,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.util.List;
@@ -39,6 +41,18 @@ public class MarketplaceLotFacade {
 
         return marketplaceLotService.findAll(pageable, new MarketplaceLotSpecification(filter))
                 .map(marketplaceLotMapper::toDto);
+    }
+
+    public HttpStatus pickUpLot(User user, Long lotId) {
+        MarketplaceLot lot = marketplaceLotService.getById(lotId);
+
+        if (!lot.getIsBuyerHasTaken() && isUserWinner(user, lot)) {
+            inventoryEngine.putToInventory(user.getLocation(), List.of(lot.getObject()));
+        } else {
+            return HttpStatus.FORBIDDEN;
+        }
+
+        return HttpStatus.OK;
     }
 
     public HttpStatus createLot(MarketplaceLotDto dto, User owner) {
@@ -75,10 +89,17 @@ public class MarketplaceLotFacade {
         return HttpStatus.OK;
     }
 
+    private boolean isUserWinner(User user, MarketplaceLot lot) {
+        MarketplaceBet winningBet = marketplaceLotService.findCurrentBet(lot)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cannot find current bet for lot: " + lot.getId()));
+
+        return winningBet.getUser().equals(user);
+    }
+
     private void sendInstantPurchaseNotification(MarketplaceLot lot) {
-            simpMessagingTemplate.convertAndSendToUser(lot.getOwner().getLogin()
-                    , messengerProperties.getNotificationDestination()
-                    , new NotificationDto<>(NotificationType.INSTANT_PURCHASE.name(), marketplaceLotMapper.toDto(lot)));
+        simpMessagingTemplate.convertAndSendToUser(lot.getOwner().getLogin()
+                , messengerProperties.getNotificationDestination()
+                , new NotificationDto<>(NotificationType.INSTANT_PURCHASE.name(), marketplaceLotMapper.toDto(lot)));
     }
 
 

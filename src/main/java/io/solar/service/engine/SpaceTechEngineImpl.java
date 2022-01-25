@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.stream.DoubleStream;
+import java.util.stream.Stream;
 
 
 @Component
@@ -92,16 +94,16 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
 
         float shipVolume = calculateSpaceTechVolume(spaceTech);
 
-        float objectsVolume = (float) objects.stream()
+        double objectsVolume = objects.stream()
                 .mapToDouble(BasicObject::getVolume)
                 .sum();
 
-        float currentUsedVolume = (float) object.getAttachedObjects()
+        double currentUsedVolume = object.getAttachedObjects()
                 .stream()
                 .mapToDouble(BasicObject::getVolume)
                 .sum();
 
-        float goodsVolume = (float) spaceTech.getGoods()
+        double goodsVolume = spaceTech.getGoods()
                 .stream()
                 .mapToDouble(goods -> goods.getProduct().getVolume() * goods.getAmount())
                 .sum();
