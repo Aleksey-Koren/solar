@@ -3,8 +3,8 @@ package io.solar.controller.messenger;
 import io.solar.dto.messenger.MessageDto;
 import io.solar.entity.User;
 import io.solar.entity.messenger.MessageType;
+import io.solar.facade.messenger.MessageFacade;
 import io.solar.service.UserService;
-import io.solar.service.messenger.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 public class MessageController {
 
     private final UserService userService;
-    private final MessageService messageService;
+    private final MessageFacade messageFacade;
 
     @GetMapping("room/{roomId}/messages")
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
@@ -38,8 +38,7 @@ public class MessageController {
                                               Principal principal) {
 
         User user = userService.findByLogin(principal.getName());
-//        return chatService.getMessageHistory(roomId, user, pageable);
-        return messageService.getMessageHistory(roomId, user, pageable);
+        return messageFacade.getMessageHistory(roomId, user, pageable);
     }
 
     @PostMapping("/email")

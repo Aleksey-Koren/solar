@@ -33,6 +33,7 @@ public class RoomFacade {
     private final UserMapper userMapper;
     private final RoomService roomService;
     private final UserRoomService userRoomService;
+    private final WebSocketFacade webSocketFacade;
 
     public List<SearchRoomDto> findAllRooms(User user, RoomFilter roomFilter) {
         roomFilter.setUserId(user.getId());
@@ -64,6 +65,7 @@ public class RoomFacade {
 
     public void updateTitle(Long roomId, String roomTitle, User user) {
         roomService.updateTitle(roomId, roomTitle, user);
+        webSocketFacade.sendSystemMessage(roomService.createChangeTitleSystemMessage(roomId, user, roomTitle));
     }
 
     public HttpStatus updateLastSeenAt(Long roomId, User user) {
