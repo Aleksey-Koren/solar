@@ -5,23 +5,31 @@ import io.solar.entity.inventory.InventoryType;
 import io.solar.entity.objects.BasicObject;
 import io.solar.repository.BasicObjectRepository;
 import io.solar.repository.InventoryTypeRepository;
-import io.solar.service.engine.interfaces.InventoryEngine;
 import io.solar.service.engine.interfaces.SpaceTechEngine;
 import io.solar.service.inventory.InventoryTypeService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.stream.DoubleStream;
-import java.util.stream.Stream;
-
 
 @Component
 @RequiredArgsConstructor
 public class SpaceTechEngineImpl implements SpaceTechEngine {
+
+    @Value("${app.object.types.container}")
+    private String containerObjectTypeTitle;
+
+    @Value("${app.object.types.generator}")
+    private String generatorObjectTypeTitle;
+
+    @Value("${app.object.types.large_generator}")
+    private String largeGeneratorObjectTypeTitle;
+
+    @Value("${app.object.types.battery}")
+    private String batteryObjectTypeTitle;
 
     private final BasicObjectRepository basicObjectRepository;
     private final InventoryTypeRepository objectTypeRepository;
@@ -80,10 +88,26 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
     public float calculateSpaceTechVolume(SpaceTech spaceTech) {
         BasicObject ship = (BasicObject) spaceTech;
 
-        InventoryType container = inventoryTypeService.getByTitle("container");
+        InventoryType container = inventoryTypeService.getByTitle(containerObjectTypeTitle);
 
         return (float) ship.getAttachedObjects().stream()
                 .filter(object -> object.getObjectTypeDescription().getInventoryType().equals(container))
+                .mapToDouble(object -> object.getObjectTypeDescription().getPowerMin())
+                .sum();
+    }
+
+    @Override
+    //todo: What are batteries for?
+    public float calculateEnergyAmount(SpaceTech spaceTech) {
+        BasicObject ship = (BasicObject) spaceTech;
+
+        List<InventoryType> energyTypes = inventoryTypeService.findAllByTitleIn(
+                List.of(generatorObjectTypeTitle, largeGeneratorObjectTypeTitle, batteryObjectTypeTitle)
+        );
+
+        return (float) ship.getAttachedObjects()
+                .stream()
+                .filter(object -> energyTypes.contains(object.getObjectTypeDescription().getInventoryType()))
                 .mapToDouble(object -> object.getObjectTypeDescription().getPowerMin())
                 .sum();
     }
@@ -108,7 +132,21 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
                 .mapToDouble(goods -> goods.getProduct().getVolume() * goods.getAmount())
                 .sum();
 
-        return ((currentUsedVolume + objectsVolume + goodsVolume) < shipVolume);
+        return ((currentUsedVolume + objectsVolume + goodsVolume) <= shipVolume);
+    }
+
+    @Override
+    public boolean isThereEnoughEnergyForObject(SpaceTech ship, BasicObject object) {
+        BasicObject shipObject = (BasicObject) ship;
+
+        double currentEnergyConsumption = shipObject.getAttachedObjects()
+                .stream()
+                .mapToDouble(attachedObject -> attachedObject.getObjectTypeDescription().getEnergyConsumption())
+                .sum();
+
+        double objectEnergyConsumption = object.getObjectTypeDescription().getEnergyConsumption();
+
+        return ((currentEnergyConsumption + objectEnergyConsumption) <= calculateEnergyAmount(ship));
     }
 
     @Override

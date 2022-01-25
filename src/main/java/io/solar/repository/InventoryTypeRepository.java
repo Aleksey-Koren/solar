@@ -5,6 +5,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -12,4 +13,7 @@ public interface InventoryTypeRepository extends JpaRepository<InventoryType, Lo
 
     @Cacheable("inventoryTypes")
     Optional<InventoryType> findByTitle(String type);
+
+    @Cacheable("inventoryTypesTitle")
+    List<InventoryType> findAllByTitleIn(List<String> typesTitle);
 }

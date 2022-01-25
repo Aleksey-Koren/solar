@@ -58,7 +58,6 @@ app:
     time_flow_modifier: 12
     station_sell_modifier: 0.7
 
-
     images:
         path: src/main/resources/images
         width: 300
@@ -76,6 +75,13 @@ app:
         commission_percent: 5
     messenger:
         notification_destination: "/notifications"
+    object:
+        types:
+            container: container
+            engine: engine
+            generator: generator
+            large_generator: large_generator
+            battery: battery
 
 
 log4jdbc:

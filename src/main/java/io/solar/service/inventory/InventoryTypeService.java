@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -34,6 +35,11 @@ public class InventoryTypeService {
 
     public Page<InventoryType> findAll(Pageable pageable) {
         return inventoryTypeRepository.findAll(pageable);
+    }
+
+    public List<InventoryType> findAllByTitleIn(List<String> typesTitle) {
+
+        return inventoryTypeRepository.findAllByTitleIn(typesTitle);
     }
 
     public void delete(Long id) {

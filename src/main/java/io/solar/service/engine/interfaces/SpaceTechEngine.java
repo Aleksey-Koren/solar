@@ -17,5 +17,9 @@ public interface SpaceTechEngine {
 
     float calculateSpaceTechVolume(SpaceTech spaceTech);
 
+    float calculateEnergyAmount(SpaceTech spaceTech);
+
     boolean isThereEnoughSpaceForObjects(SpaceTech ship, List<BasicObject> objects);
+
+    boolean isThereEnoughEnergyForObject(SpaceTech ship, BasicObject object);
 }
