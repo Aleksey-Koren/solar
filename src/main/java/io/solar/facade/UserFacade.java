@@ -3,9 +3,11 @@ package io.solar.facade;
 import io.solar.dto.UserDto;
 import io.solar.entity.Permission;
 import io.solar.entity.User;
+import io.solar.entity.messenger.NotificationType;
 import io.solar.mapper.UserMapper;
 import io.solar.mapper.object.BasicObjectViewMapper;
 import io.solar.service.UserService;
+import io.solar.service.engine.interfaces.NotificationEngine;
 import io.solar.service.messenger.RoomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,6 +24,7 @@ public class UserFacade {
     private final UserMapper userMapper;
     private final BasicObjectViewMapper basicObjectViewMapper;
     private final RoomService roomService;
+    private final NotificationEngine notificationEngine;
 
     public UserDto updateOnlyTitle(UserDto dto) {
         User user = userService.findById(dto.getId())
@@ -60,12 +63,14 @@ public class UserFacade {
         } else {
             user.setMoney(user.getMoney() - amount);
             userService.update(user);
+            notificationEngine.simpleNotification(NotificationType.MONEY_UPDATED, user);
         }
     }
 
     public void increaseUserBalance(User user, Long amount) {
         user.setMoney(user.getMoney() + amount);
         userService.update(user);
+        notificationEngine.simpleNotification(NotificationType.MONEY_UPDATED, user);
     }
 
     public UserDto getById(Long id) {
