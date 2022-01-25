@@ -48,9 +48,12 @@ public class MarketplaceLotFacade {
 
         if (!lot.getIsBuyerHasTaken() && isUserWinner(user, lot)) {
             inventoryEngine.putToInventory(user.getLocation(), List.of(lot.getObject()));
+            lot.setIsBuyerHasTaken(true);
         } else {
             return HttpStatus.FORBIDDEN;
         }
+
+        updateLot(lot);
 
         return HttpStatus.OK;
     }
@@ -87,6 +90,14 @@ public class MarketplaceLotFacade {
         sendInstantPurchaseNotification(lot);
         marketplaceLotService.delete(lot);
         return HttpStatus.OK;
+    }
+
+    private void updateLot(MarketplaceLot lot) {
+        if (lot.getIsBuyerHasTaken() && lot.getIsSellerHasTaken()) {
+            marketplaceLotService.delete(lot);
+        } else {
+            marketplaceLotService.save(lot);
+        }
     }
 
     private boolean isUserWinner(User user, MarketplaceLot lot) {
