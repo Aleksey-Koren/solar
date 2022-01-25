@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +31,16 @@ public class MessageService {
     public Message saveNew(Message message) {
         message.setCreatedAt(Instant.now());
         return messageRepository.save(message);
+    }
+
+    public Optional<Message> findById(Long id) {
+        return messageRepository.findById(id);
+    }
+
+    public Message getById(Long id) {
+        return messageRepository.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        String.format("There is no %s with id = %d in database", Message.class.getSimpleName(), id)));
     }
 
     public Message update(Message message) {

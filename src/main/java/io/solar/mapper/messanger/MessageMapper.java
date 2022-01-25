@@ -1,16 +1,14 @@
 package io.solar.mapper.messanger;
 
 import io.solar.dto.messenger.MessageDto;
-import io.solar.entity.messenger.MessageType;
 import io.solar.entity.messenger.Message;
+import io.solar.entity.messenger.MessageType;
 import io.solar.mapper.EntityDtoMapper;
-import io.solar.repository.messenger.MessageRepository;
-import io.solar.repository.messenger.RoomRepository;
-import io.solar.repository.UserRepository;
+import io.solar.service.UserService;
+import io.solar.service.messenger.MessageService;
+import io.solar.service.messenger.RoomService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import static io.solar.entity.messenger.MessageType.CHAT;
 
@@ -18,29 +16,24 @@ import static io.solar.entity.messenger.MessageType.CHAT;
 @RequiredArgsConstructor
 public class MessageMapper implements EntityDtoMapper<Message, MessageDto> {
 
-    private final MessageRepository messageRepository;
-    private final UserRepository userRepository;
-    private final RoomRepository roomRepository;
+    private final MessageService messageService;
+    private final UserService userService;
+    private final RoomService roomService;
 
     @Override
     public Message toEntity(MessageDto dto) {
         Message entity;
 
         if (dto.getId() != null) {
-            entity = messageRepository.findById(dto.getId()).orElseThrow(
-                    () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "There is no such id in database"));
+            entity = messageService.getById(dto.getId());
             entity.setCreatedAt(dto.getCreatedAt());
         } else {
             entity = new Message();
         }
 
-        entity.setSender(userRepository.findById(dto.getSenderId()).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "There is no such user id = " + dto.getSenderId() + " in database")
-        ));
+        entity.setSender(userService.getById(dto.getSenderId()));
 
-        entity.setRoom(roomRepository.findById(dto.getRoomId()).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "There is no such room id = " + dto.getRoomId() + " in database")
-        ));
+        entity.setRoom(roomService.getById(dto.getRoomId()));
 
         entity.setTitle(dto.getTitle());
         entity.setMessage(dto.getMessage());

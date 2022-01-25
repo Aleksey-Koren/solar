@@ -25,6 +25,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 import static java.util.stream.Collectors.joining;
 
@@ -39,6 +40,17 @@ public class RoomService {
     private final WebSocketFacade webSocketFacade;
     private final UserRoomRepository userRoomRepository;
     private final MessageRepository messageRepository;
+
+    public Optional<Room> findById(Long id) {
+        return roomRepository.findById(id);
+    }
+
+    public Room getById(Long id) {
+        return roomRepository.findById(id).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        String.format("there is no %s with id = %d in database", Room.class.getSimpleName(), id)
+                ));
+    }
 
     public Room createRoom(CreateRoomDto dto, User owner) {
 

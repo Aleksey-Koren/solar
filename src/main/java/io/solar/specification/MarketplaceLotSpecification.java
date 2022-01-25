@@ -39,7 +39,7 @@ public class MarketplaceLotSpecification implements Specification<MarketplaceLot
         }
 
         if (filter.getUserId() != null) {
-            predicates.add(criteriaBuilder.equal(root.join(MarketplaceLot_.currentBet).get(MarketplaceBet_.user), filter.getUserId()));
+            predicates.add(criteriaBuilder.equal(root.join(MarketplaceLot_.bets).get(MarketplaceBet_.user), filter.getUserId()));
         }
 
         if (filter.getMinPrice() != null) {

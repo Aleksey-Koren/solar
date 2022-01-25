@@ -3,7 +3,7 @@ package io.solar.controller.marketplace;
 import io.solar.dto.marketplace.MarketplaceBetDto;
 import io.solar.dto.marketplace.MarketplaceLotDto;
 import io.solar.entity.User;
-import io.solar.facade.marketplace.MarketplaceFacade;
+import io.solar.facade.marketplace.MarketplaceBetFacade;
 import io.solar.service.UserService;
 import io.solar.facade.marketplace.MarketplaceLotFacade;
 import io.solar.specification.filter.MarketplaceLotFilter;
@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Principal;
+
 @RestController
 @RequestMapping("api/marketplace")
 @RequiredArgsConstructor
@@ -26,7 +28,7 @@ public class MarketplaceController {
 
     private final MarketplaceLotFacade marketplaceLotFacade;
     private final UserService userService;
-    private final MarketplaceFacade marketplaceFacade;
+    private final MarketplaceBetFacade marketplaceBetFacade;
 
     @GetMapping("/lot")
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
@@ -40,7 +42,7 @@ public class MarketplaceController {
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
     public void pickUpWonLot() {
 
-        return null;
+
     }
 
     @PostMapping("/lot")
@@ -48,7 +50,7 @@ public class MarketplaceController {
     @Transactional
     public ResponseEntity<Void> createLot(MarketplaceLotDto dto, Principal principal) {
         User user = userService.findByLogin(principal.getName());
-        return ResponseEntity.status(marketplaceFacade.createLot(dto, user)).build();
+        return ResponseEntity.status(marketplaceLotFacade.createLot(dto, user)).build();
     }
 
     @PostMapping("/lot/bet")
@@ -56,6 +58,14 @@ public class MarketplaceController {
     @Transactional
     public ResponseEntity<Void> makeBet(@RequestBody MarketplaceBetDto dto, Principal principal) {
         User user = userService.findByLogin(principal.getName());
-        return ResponseEntity.status(marketplaceFacade.makeBet(dto, user)).build();
+        return ResponseEntity.status(marketplaceBetFacade.makeBet(dto, user)).build();
+    }
+
+    @PostMapping("/lot/instant-purchase")
+    @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
+    @Transactional
+    public ResponseEntity<Void> instantPurchase(MarketplaceLotDto dto, Principal principal) {
+        User user = userService.findByLogin(principal.getName());
+        return ResponseEntity.status(marketplaceLotFacade.instantPurchase(dto, user)).build();
     }
 }
