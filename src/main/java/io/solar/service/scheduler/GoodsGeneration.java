@@ -4,19 +4,20 @@ import io.solar.entity.Goods;
 import io.solar.entity.Product;
 import io.solar.entity.Production;
 import io.solar.entity.objects.Station;
-import io.solar.repository.ProductionRepository;
 import io.solar.repository.StationRepository;
+import io.solar.service.GoodsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class GoodsGeneration {
 
     private final StationRepository stationRepository;
+    private final GoodsService goodsService;
 
     public void generateOnStations() {
         List<Station> stations = stationRepository.findAll();
@@ -26,15 +27,26 @@ public class GoodsGeneration {
     }
 
     private void generateGoods(Station station) {
-        List<Goods> goods = new ArrayList<>();
         for (Production production : station.getProduction()) {
             Product product = production.getProduct();
             Long amount = (long) (production.getPower() * retrieveRandomModifier() + 10);
             long price = (long) (product.getPrice() * retrievePriceModifier(0.3, 1.7));
-            goods.add(new Goods(station, product, amount, price));
+            Optional<Goods> goodOpt = goodsService.findByOwnerAndProduct(station, product);
+            Goods goods;
+            if (goodOpt.isPresent()) {
+                goods = goodOpt.get();
+                goods.setAmount(amount);
+                goods.setPrice(price);
+            }else {
+                goods = Goods.builder()
+                        .owner(station)
+                        .product(product)
+                        .amount(amount)
+                        .price(price)
+                        .build();
+            }
+            goodsService.save(goods);
         }
-        station.setGoods(goods);
-        stationRepository.save(station);
     }
 
     private Float retrieveRandomModifier() {

@@ -1,0 +1,10 @@
+ALTER TABLE goods
+    DROP CONSTRAINT goods_ibfk_1,
+    DROP CONSTRAINT goods_ibfk_2,
+    DROP PRIMARY KEY,
+ADD COLUMN id BIGINT AUTO_INCREMENT PRIMARY KEY;
+
+ALTER TABLE goods
+    ADD CONSTRAINT goods_ibfk_1 FOREIGN KEY (owner) REFERENCES objects (id) ON DELETE CASCADE,
+    ADD CONSTRAINT goods_ibfk_2 FOREIGN KEY (product) REFERENCES products (id) ON DELETE CASCADE,
+    ADD CONSTRAINT owner_product_unique UNIQUE (owner, product);

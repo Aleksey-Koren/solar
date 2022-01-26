@@ -88,5 +88,4 @@ public class ProductEngineImpl implements ProductEngine {
 
         return isProductsInStock;
     }
-
 }
