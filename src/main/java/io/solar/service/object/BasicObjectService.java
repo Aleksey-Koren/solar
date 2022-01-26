@@ -1,11 +1,10 @@
 package io.solar.service.object;
 
 import io.solar.entity.objects.BasicObject;
+import io.solar.entity.objects.StarShip;
 import io.solar.repository.BasicObjectRepository;
-import io.solar.service.exception.ServiceException;
 import io.solar.specification.BasicObjectSpecification;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -14,7 +13,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -36,11 +34,6 @@ public class BasicObjectService {
     public Page<BasicObject> findAll(BasicObjectSpecification basicObjectSpecification, Pageable pageable) {
 
         return basicObjectRepository.findAll(basicObjectSpecification, pageable);
-    }
-
-    public List<BasicObject> findAllByAttachedShipId(Long attachedShipId) {
-
-        return basicObjectRepository.findAllByAttachedToShipId(attachedShipId);
     }
 
     public BasicObject save(BasicObject basicObject) {

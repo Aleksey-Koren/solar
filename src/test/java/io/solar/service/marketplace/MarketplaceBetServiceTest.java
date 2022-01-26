@@ -1,4 +1,4 @@
-package io.solar.service.scheduler.marketplace;
+package io.solar.service.marketplace;
 
 import io.solar.entity.marketplace.MarketplaceBet;
 import io.solar.entity.marketplace.MarketplaceLot;

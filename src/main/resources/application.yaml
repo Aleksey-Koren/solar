@@ -86,6 +86,8 @@ app:
             generator: generator
             large_generator: large_generator
             battery: battery
+    star_ship:
+        drop_radius: 10
 
 
 log4jdbc:

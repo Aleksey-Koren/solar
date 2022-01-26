@@ -80,7 +80,7 @@ public class BasicObject implements Serializable {
     @Column(name = "volume")
     protected Float volume;
 
-    @OneToMany(mappedBy = "attachedToShip")
+    @OneToMany(mappedBy = "attachedToShip", orphanRemoval = true)
     @EqualsAndHashCode.Exclude
     protected List<BasicObject> attachedObjects;
 
