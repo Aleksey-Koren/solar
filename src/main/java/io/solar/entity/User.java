@@ -52,7 +52,7 @@ public class User {
     private String password;
     private Long money;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "location")
     private BasicObject location;
 

@@ -57,8 +57,7 @@ public class MarketplaceLotService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cannot find current bet for lot: " + lot.getId()));
     }
 
-    //todo: change method name
-    public void checkLotForDelete(MarketplaceLot lot) {
+    public void deleteIfBothHasTaken(MarketplaceLot lot) {
         if (lot.getIsBuyerHasTaken() && lot.getIsSellerHasTaken()) {
             delete(lot);
         } else {

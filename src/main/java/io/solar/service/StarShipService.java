@@ -46,5 +46,7 @@ public class StarShipService {
         return starShipRepository.save(starShip);
     }
 
-
+    public void delete(StarShip starShip) {
+        starShipRepository.delete(starShip);
+    }
 }

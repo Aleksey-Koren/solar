@@ -56,7 +56,7 @@ public class MarketplaceLotFacade {
             return HttpStatus.FORBIDDEN;
         }
 
-        marketplaceLotService.checkLotForDelete(lot);
+        marketplaceLotService.deleteIfBothHasTaken(lot);
 
         return HttpStatus.OK;
     }
@@ -72,7 +72,7 @@ public class MarketplaceLotFacade {
             return HttpStatus.BAD_REQUEST;
         }
 
-        marketplaceLotService.checkLotForDelete(lot);
+        marketplaceLotService.deleteIfBothHasTaken(lot);
 
         return HttpStatus.OK;
     }

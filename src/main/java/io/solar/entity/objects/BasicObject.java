@@ -45,9 +45,10 @@ public class BasicObject implements Serializable {
 
     protected Long userId;
     protected Boolean active;
-    protected Long durability;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    protected Integer durability;
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "attached_to_ship")
     protected BasicObject attachedToShip;
 
