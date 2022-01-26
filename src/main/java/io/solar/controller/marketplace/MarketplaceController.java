@@ -82,7 +82,7 @@ public class MarketplaceController {
         return ResponseEntity.status(marketplaceLotFacade.instantPurchase(dto, user)).build();
     }
 
-    @PostMapping("/lot/instant-purchase")
+    @PostMapping("/lot/expired")
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
     @Transactional
     public ResponseEntity<Void> takeAwayExpiredLot(@RequestBody MarketplaceLotDto dto, Principal principal) {
