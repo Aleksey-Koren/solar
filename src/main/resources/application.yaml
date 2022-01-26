@@ -79,8 +79,10 @@ app:
         capture_distance: 100
     object:
         types:
+            radar: radar
             container: container
             engine: engine
+            huge_engine: huge_engine
             generator: generator
             large_generator: large_generator
             battery: battery
