@@ -10,6 +10,7 @@ import io.solar.entity.messenger.UserRoom;
 import io.solar.mapper.UserMapper;
 import io.solar.mapper.messanger.RoomMapper;
 import io.solar.repository.messenger.RoomRepository;
+import io.solar.service.engine.interfaces.NotificationEngine;
 import io.solar.service.messenger.RoomService;
 import io.solar.service.messenger.UserRoomService;
 import io.solar.specification.RoomSpecification;
@@ -34,6 +35,7 @@ public class RoomFacade {
     private final RoomService roomService;
     private final UserRoomService userRoomService;
     private final WebSocketFacade webSocketFacade;
+    private final NotificationEngine notificationEngine;
 
     public List<SearchRoomDto> findAllRooms(User user, RoomFilter roomFilter) {
         roomFilter.setUserId(user.getId());
@@ -88,5 +90,32 @@ public class RoomFacade {
 
     public void inviteToExistingRoom(User inviter, Long invitedId, Long roomId) {
         roomService.inviteToExistingRoom(inviter, invitedId, roomId);
+    }
+
+    public HttpStatus leaveFromRoom(User user, Long roomId) {
+        Room room = roomService.getById(roomId);
+
+
+        if (room.getUsers().size() == 1) {
+            //todo: remove all messages and room
+        }
+
+        roomService.removeUserFromRoom(room, user);
+
+        if (room.getDefaultTitle()) {
+            List<String> usersTitles = room.getUsers().stream().map(User::getTitle).toList();
+
+            room.setTitle(roomService.generatePublicTitle(usersTitles));
+        }
+
+        roomService.save(room);
+        sendLeaveRoomNotifications(room.getUsers(), user);
+
+        return HttpStatus.OK;
+    }
+
+    private void sendLeaveRoomNotifications(List<User> roomParticipants, User departedUser) {
+        roomParticipants.forEach(userInRoom ->
+                notificationEngine.sendLeaveRoomNotification(userInRoom, userMapper.toDtoWithIdAndTitle(departedUser)));
     }
 }

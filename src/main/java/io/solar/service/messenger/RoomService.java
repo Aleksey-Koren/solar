@@ -9,7 +9,6 @@ import io.solar.entity.messenger.NotificationType;
 import io.solar.entity.messenger.Room;
 import io.solar.entity.messenger.RoomType;
 import io.solar.entity.messenger.UserRoom;
-import io.solar.facade.messenger.WebSocketFacade;
 import io.solar.mapper.messanger.RoomMapper;
 import io.solar.repository.UserRepository;
 import io.solar.repository.messenger.MessageRepository;
@@ -67,7 +66,7 @@ public class RoomService {
                 .type(dto.getIsPrivate() ? RoomType.PRIVATE : RoomType.PUBLIC)
                 .title(dto.getIsPrivate()
                         ? generatePrivateTitle(owner, interlocutor)
-                        : generateDefaultPublicTitle(List.of(owner.getTitle(), interlocutor.getTitle())))
+                        : generatePublicTitle(List.of(owner.getTitle(), interlocutor.getTitle())))
                 .defaultTitle(true)
                 .build();
 
@@ -131,6 +130,11 @@ public class RoomService {
         addUserToRoom(invited, room);
     }
 
+    public String generatePublicTitle(List<String> usersTitles) {
+        return usersTitles.stream()
+                .collect(joining("], [", "[", "]"));
+    }
+
     public void deleteRoomsWithOneParticipantByUserRooms(User user) {
         user.getRooms()
                 .stream()
@@ -144,6 +148,18 @@ public class RoomService {
     public List<Room> findAll(RoomSpecification roomSpecification) {
 
         return roomRepository.findAll(roomSpecification);
+    }
+
+    public Room save(Room room) {
+
+        return roomRepository.save(room);
+    }
+
+    public void removeUserFromRoom(Room room, User user) {
+        //todo: implement delete userRoom
+//        UserRoom.UserRoomPK userRoom = new UserRoom.UserRoomPK(user, room);
+//        userRoomRepository.deleteById(userRoom);
+//        user.getUserRooms().remove(userRoom);
     }
 
     private boolean isPrivateRoomAlreadyExists(Long user1Id, Long user2Id) {
@@ -171,11 +187,6 @@ public class RoomService {
         room.getUsers().forEach(s -> simpMessagingTemplate.convertAndSendToUser(s.getLogin(),
                 "/notifications",
                 new NotificationDto<>(NotificationType.EDITED_ROOM_TITLE.name(), roomMapper.toDto(room))));
-    }
-
-    private String generateDefaultPublicTitle(List<String> titles) {
-        return titles.stream()
-                .collect(joining("], [", "[", "]"));
     }
 
     private String generatePrivateTitle(User user1, User user2) {

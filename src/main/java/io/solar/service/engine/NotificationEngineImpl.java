@@ -1,6 +1,7 @@
 package io.solar.service.engine;
 
 import io.solar.config.properties.MessengerProperties;
+import io.solar.dto.UserDto;
 import io.solar.dto.messenger.NotificationDto;
 import io.solar.entity.User;
 import io.solar.entity.messenger.NotificationType;
@@ -18,8 +19,17 @@ public class NotificationEngineImpl implements NotificationEngine {
 
     @Override
     public void simpleNotification(NotificationType type, User user) {
+
         simpMessagingTemplate.convertAndSendToUser(user.getLogin(),
                 messengerProperties.getNotificationDestination(),
                 new NotificationDto<Void>(NotificationType.MONEY_UPDATED.name(), null));
+    }
+
+    @Override
+    public void sendLeaveRoomNotification(User userDestination, UserDto payload) {
+
+        simpMessagingTemplate.convertAndSendToUser(userDestination.getLogin(),
+                messengerProperties.getNotificationDestination(),
+                new NotificationDto<>(NotificationType.LEAVE_ROOM.name(), payload));
     }
 }

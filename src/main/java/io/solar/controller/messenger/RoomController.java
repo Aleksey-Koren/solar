@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -69,6 +70,15 @@ public class RoomController {
         User inviter = userService.findByLogin(principal.getName());
 
         roomFacade.inviteToExistingRoom(inviter, invitedId, roomId);
+    }
+
+    @PatchMapping("/{roomId}/leave")
+    @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
+    @Transactional
+    public ResponseEntity<Void> leaveFromRoom(@PathVariable Long roomId, Principal principal) {
+        User user = userService.findByLogin(principal.getName());
+
+        return ResponseEntity.status(roomFacade.leaveFromRoom(user, roomId)).build();
     }
 
     @GetMapping("/{roomId}/participants")

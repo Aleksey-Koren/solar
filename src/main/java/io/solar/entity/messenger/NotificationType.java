@@ -5,5 +5,6 @@ public enum NotificationType {
     EDITED_ROOM_TITLE,
     BET_OVERBID,
     INSTANT_PURCHASE,
-    MONEY_UPDATED
+    MONEY_UPDATED,
+    LEAVE_ROOM
 }
