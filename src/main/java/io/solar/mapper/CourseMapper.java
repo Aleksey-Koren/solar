@@ -1,5 +1,6 @@
 package io.solar.mapper;
 
+import io.solar.config.properties.AppProperties;
 import io.solar.dto.CourseDto;
 import io.solar.entity.Course;
 import io.solar.entity.CourseType;
@@ -19,6 +20,7 @@ public class CourseMapper {
     private final CourseRepository courseRepository;
     private final BasicObjectRepository basicObjectRepository;
     private final PlanetRepository planetRepository;
+    private final AppProperties appProperties;
 
     public Course toEntity(CourseDto dto) {
         Course course;
@@ -42,7 +44,7 @@ public class CourseMapper {
                                         String.format("There is no object with id = %d in database", dto.getObjectId()))));
         course.setAccelerationX(dto.getAccelerationX());
         course.setAccelerationY(dto.getAccelerationY());
-        course.setTime(dto.getTime() * 1000);
+        course.setTime((dto.getTime() * 1000) / (long) Math.pow(appProperties.getTimeFlowModifier(), 2));
         course.setNext(dto.getNextId() != null ? courseRepository.findById(dto.getNextId())
                                                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                                                             String.format("There is no course with id = %d in database", dto.getNextId())))

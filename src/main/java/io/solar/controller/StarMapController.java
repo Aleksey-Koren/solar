@@ -7,9 +7,12 @@ import io.solar.facade.StarMapFacade;
 import io.solar.service.StarShipService;
 import io.solar.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -37,5 +40,14 @@ public class StarMapController {
             return new ArrayList<>();
         }
         return starMapFacade.getStarshipView(starShip.get());
+    }
+
+    @PatchMapping("/object/{objectId}")
+    @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
+    @Transactional
+    public ResponseEntity<Void> pickUpObject(@PathVariable Long objectId, Principal principal) {
+        User user = userService.findByLogin(principal.getName());
+
+        return ResponseEntity.status(starMapFacade.pickUpObject(user, objectId)).build();
     }
 }

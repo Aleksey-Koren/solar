@@ -9,6 +9,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,17 +22,6 @@ public class WebSocketController {
     private final MessageService messageService;
     private final WebSocketFacade webSocketFacade;
 
-//    @MessageMapping("/chat")
-//    public void processMessage(@Payload Message chatMessage) {
-//
-//        Message saved = messageService.save(chatMessage);
-//
-//        messagingTemplate.convertAndSendToUser(
-//                1,"/queue/messages",
-//                chatMessage;
-//    }
-
-
     @MessageMapping("/{roomId}")
     @SendTo("/room/{roomId}")
     public MessageDto processMessage(@DestinationVariable("roomId") Long roomId, @Payload MessageDto message) {
@@ -42,7 +32,6 @@ public class WebSocketController {
         } else {
             webSocketFacade.processMessage(message);
         }
-
         return message;
     }
 }

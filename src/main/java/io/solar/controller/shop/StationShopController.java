@@ -4,11 +4,9 @@ import io.solar.dto.shop.ProductPriceDto;
 import io.solar.dto.shop.ShopDto;
 import io.solar.dto.shop.StationShopDto;
 import io.solar.entity.User;
-import io.solar.entity.objects.BasicObject;
-import io.solar.facade.shop.ProductShopFacade;
 import io.solar.facade.shop.InventoryShopFacade;
+import io.solar.facade.shop.ProductShopFacade;
 import io.solar.service.UserService;
-import io.solar.service.object.BasicObjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -44,7 +42,7 @@ public class StationShopController {
     @PatchMapping("/buy/inventory")
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
     @Transactional
-    public ResponseEntity<Void> byInventoryGoods(Principal principal, @RequestBody List<ShopDto> dto) {
+    public ResponseEntity<Void> buyInventoryGoods(Principal principal, @RequestBody List<ShopDto> dto) {
         User user = userService.findByLogin(principal.getName());
         return ResponseEntity.status(inventoryShopFacade.buyInventory(user, dto)).build();
     }

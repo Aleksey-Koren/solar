@@ -1,6 +1,9 @@
 package io.solar.service.engine.interfaces;
 
 import io.solar.entity.interfaces.SpaceTech;
+import io.solar.entity.objects.BasicObject;
+
+import java.util.List;
 
 public interface SpaceTechEngine {
 
@@ -11,4 +14,12 @@ public interface SpaceTechEngine {
     float calculateMaxThrust(SpaceTech spaceTech);
 
     float calculateMaxAcceleration(SpaceTech spaceTech);
+
+    float calculateSpaceTechVolume(SpaceTech spaceTech);
+
+    float calculateEnergyAmount(SpaceTech spaceTech);
+
+    boolean isThereEnoughSpaceForObjects(SpaceTech ship, List<BasicObject> objects);
+
+    boolean isThereEnoughEnergyForObject(SpaceTech ship, BasicObject object);
 }

@@ -51,7 +51,7 @@ public class PlanetMapper {
         entity.setSiderealRotationPeriod(dto.getSiderealRotationPeriod());
         entity.setSurfaceGravity(dto.getSurfaceGravity());
         entity.setSurfacePressure(dto.getSurfacePressure());
-        entity.setVolume(dto.getVolume());
+        entity.setPlanetVolume(dto.getVolume());
         entity.setAngle(dto.getAngle());
         entity.setType(dto.getType());
 
@@ -78,7 +78,7 @@ public class PlanetMapper {
                 .siderealRotationPeriod(entity.getSiderealRotationPeriod())
                 .surfaceGravity(entity.getSurfaceGravity())
                 .surfacePressure(entity.getSurfacePressure())
-                .volume(entity.getVolume())
+                .volume(entity.getPlanetVolume())
                 .angle(entity.getAngle())
                 .type(entity.getType())
                 .x(entity.getX())

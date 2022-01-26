@@ -1,4 +1,4 @@
-package io.solar.config;
+package io.solar.config.properties;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -6,15 +6,12 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-
 @Component
 @EnableConfigurationProperties
-@ConfigurationProperties("app")
+@ConfigurationProperties("app.marketplace")
 @Getter
 @Setter
-public class AppProperties {
-    private String goodsGenerationDelayMinutes;
-    private String goodsInitialDelayMinutes;
-    private Float viewDistanceWithoutRadar;
-    private Integer timeFlowModifier;
+public class MarketplaceProperties {
+    private Byte betStepPercents;
+    private Byte commissionPercent;
 }

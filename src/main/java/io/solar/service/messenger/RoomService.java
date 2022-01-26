@@ -25,6 +25,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 import static java.util.stream.Collectors.joining;
 
@@ -36,9 +37,19 @@ public class RoomService {
     private final RoomMapper roomMapper;
     private final UserRepository userRepository;
     private final SimpMessagingTemplate simpMessagingTemplate;
-    private final WebSocketFacade webSocketFacade;
     private final UserRoomRepository userRoomRepository;
     private final MessageRepository messageRepository;
+
+    public Optional<Room> findById(Long id) {
+        return roomRepository.findById(id);
+    }
+
+    public Room getById(Long id) {
+        return roomRepository.findById(id).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        String.format("there is no %s with id = %d in database", Room.class.getSimpleName(), id)
+                ));
+    }
 
     public Room createRoom(CreateRoomDto dto, User owner) {
 
@@ -67,8 +78,7 @@ public class RoomService {
     }
 
     public void updateTitle(Long roomId, String roomTitle, User user) {
-        Room room = roomRepository.findById(roomId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                String.format("There is no room with id = %d in database", roomId)));
+        Room room = getById(roomId);
 
         if (!room.getUsers().contains(user)) {
             throw new ServiceException("User, who tries to change room title, is not in room");
@@ -81,7 +91,6 @@ public class RoomService {
         room.setDefaultTitle(false);
         roomRepository.save(room);
 
-        webSocketFacade.sendSystemMessage(createChangeTitleSystemMessage(room, user, roomTitle));
         sendChangeRoomTitleNotification(room);
     }
 
@@ -173,12 +182,12 @@ public class RoomService {
         return String.format("[\"%d:%s\",\"%d:%s\"]", user1.getId(), user1.getTitle(), user2.getId(), user2.getTitle());
     }
 
-    private Message createChangeTitleSystemMessage(Room room, User user, String roomTitle) {
+    public Message createChangeTitleSystemMessage(Long roomId, User user, String roomTitle) {
         return Message.builder()
                 .message("Room title has been changed to \"" + roomTitle + "\"")
                 .messageType(MessageType.SYSTEM)
                 .sender(user)
-                .room(room)
+                .room(getById(roomId))
                 .build();
     }
 }
