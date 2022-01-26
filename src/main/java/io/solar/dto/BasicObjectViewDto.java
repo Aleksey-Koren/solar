@@ -26,7 +26,7 @@ public class BasicObjectViewDto {
     private Long hullId;
     private Long userId;
     private Boolean active;
-    private Long durability;
+    private Integer durability;
     private Long attachedToShip;
     private Long attachedToSocket;
     private ObjectStatus status;

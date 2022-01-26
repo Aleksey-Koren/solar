@@ -4,6 +4,6 @@ import io.solar.entity.objects.StarShip;
 
 public interface StarShipEngine {
 
-    void explosion(StarShip starship);
+    void blowUp(StarShip starship);
 
 }

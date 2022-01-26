@@ -21,7 +21,7 @@ public class ObjectEngineImpl implements ObjectEngine {
     public BasicObject createInventoryObject(ObjectTypeDescription otd) {
         BasicObject basicObject = BasicObject.builder()
                 .objectTypeDescription(otd)
-                .durability((long) otd.getDurability())
+                .durability(otd.getDurability())
                 .status(ObjectStatus.NOT_DEFINED)
                 .build();
 

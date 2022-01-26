@@ -8,7 +8,6 @@ import io.solar.entity.objects.StarShip;
 import io.solar.repository.BasicObjectRepository;
 import io.solar.service.engine.interfaces.InventoryEngine;
 import io.solar.service.engine.interfaces.SpaceTechEngine;
-import io.solar.service.object.BasicObjectService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -16,11 +15,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
@@ -73,7 +69,7 @@ public class InventoryEngineImpl implements InventoryEngine {
 
     @Override
     public void dropToSpace(StarShip starShip, List<BasicObject> objects) {
-        objects.forEach(s -> setInSpaceParameters(s, new CoordinatePoint(randomCoordinateShift(starShip.getX()), randomCoordinateShift(starShip.getY()))));
+        objects.forEach(s -> setInSpaceParameters(s, generateRandomCoordinatesInDropRadius(starShip)));
         basicObjectRepository.saveAllAndFlush(objects);
     }
 
@@ -85,7 +81,7 @@ public class InventoryEngineImpl implements InventoryEngine {
         Random random = new Random();
         boolean positive = random.nextBoolean();
         return positive ? random.nextFloat(value, value + starShipProperties.getDropRadius())
-                : random.nextFloat(value, value - starShipProperties.getDropRadius());
+                : random.nextFloat(value - starShipProperties.getDropRadius(), value );
     }
 
     private void setInSpaceParameters(BasicObject object, CoordinatePoint point) {

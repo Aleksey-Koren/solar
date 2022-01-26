@@ -85,6 +85,7 @@ public class InitService {
         BasicObject engine = new BasicObject();
         engine.setObjectTypeDescription(objectTypeDescriptionRepository.findById(33L)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Couldn't find ObjectTypeDescription with such id")));
+        engine.setDurability(engine.getObjectTypeDescription().getDurability());
         return basicObjectRepository.save(engine);
     }
 
@@ -92,6 +93,7 @@ public class InitService {
         BasicObject radar = new BasicObject();
         radar.setObjectTypeDescription(objectTypeDescriptionRepository.findById(44L)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Couldn't find ObjectTypeDescription with such id")));
+        radar.setDurability(radar.getObjectTypeDescription().getDurability());
         return basicObjectRepository.save(radar);
     }
 }
