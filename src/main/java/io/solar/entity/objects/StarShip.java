@@ -3,6 +3,7 @@ package io.solar.entity.objects;
 import io.solar.entity.Goods;
 import io.solar.entity.User;
 import io.solar.entity.interfaces.SpaceTech;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -26,6 +27,7 @@ import java.util.List;
 @ToString
 @SuperBuilder
 @NoArgsConstructor
+@AllArgsConstructor
 public class StarShip extends BasicObject implements SpaceTech {
 
     @OneToMany(mappedBy = "owner", orphanRemoval = true, cascade = CascadeType.ALL)

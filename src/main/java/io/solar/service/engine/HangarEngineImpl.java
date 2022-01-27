@@ -6,7 +6,6 @@ import io.solar.entity.objects.StarShip;
 import io.solar.service.UserService;
 import io.solar.service.engine.interfaces.HangarEngine;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 @Component
