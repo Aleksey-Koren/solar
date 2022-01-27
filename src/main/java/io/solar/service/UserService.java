@@ -186,4 +186,8 @@ public class UserService implements UserDetailsService {
                 ? user.getLogin()
                 : null;
     }
+
+    public User save(User user) {
+        return userRepository.save(user);
+    }
 }

@@ -10,11 +10,13 @@ import io.solar.entity.marketplace.MarketplaceLot;
 import io.solar.entity.messenger.NotificationType;
 import io.solar.entity.objects.BasicObject;
 import io.solar.entity.objects.StarShip;
+import io.solar.facade.HangarFacade;
 import io.solar.facade.UserFacade;
 import io.solar.mapper.marketplace.MarketplaceLotMapper;
 import io.solar.service.StarShipService;
 import io.solar.service.engine.interfaces.HangarEngine;
 import io.solar.service.engine.interfaces.InventoryEngine;
+import io.solar.service.engine.interfaces.SpaceTechEngine;
 import io.solar.service.marketplace.MarketplaceLotService;
 import io.solar.specification.MarketplaceLotSpecification;
 import io.solar.specification.filter.MarketplaceLotFilter;
@@ -43,6 +45,9 @@ public class MarketplaceLotFacade {
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final StarShipService starShipService;
     private final HangarEngine hangarEngine;
+    private final HangarFacade hangarFacade;
+    private final SpaceTechEngine spaceTechEngine;
+
 
     public Page<MarketplaceLotDto> findAll(Pageable pageable, MarketplaceLotFilter filter) {
 
@@ -98,10 +103,15 @@ public class MarketplaceLotFacade {
 
         if (optionalStarShip.isPresent()) {
             StarShip ship = optionalStarShip.get();
-            if (isOwnerIsAbleToSellThisShip(owner, ship)) {
+            if (hangarEngine.isUserAndShipAreInTheSameHangar(owner, ship)) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                        "User can't sell this ship. Ship doesn't belong to user or it isn't in hangar at current station");
+                        "User can't sell this ship because ship and user are not at the same station");
             }
+            if(!spaceTechEngine.isUserOwnsThisSpaceTech(owner, ship)) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "User can't sell this ship because it isn't his");
+            }
+
             hangarEngine.moveToMarketplace(ship, owner);
         } else {
             if (!isOwnerIsAbleToSellThisItem(owner, lot.getObject())) {
@@ -183,7 +193,5 @@ public class MarketplaceLotFacade {
         return owner.getLocation().equals(object.getAttachedToShip());
     }
 
-    private boolean isOwnerIsAbleToSellThisShip(User owner, StarShip ship) {
-        return owner.equals(ship.getUser()) && owner.getLocation().getAttachedToShip().equals(ship.getAttachedToShip());
-    }
+
 }

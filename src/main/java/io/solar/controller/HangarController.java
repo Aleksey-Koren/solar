@@ -34,16 +34,12 @@ public class HangarController {
         return hangarFacade.getAllStarships(stationId, user);
     }
 
-    @PatchMapping("/{stationId}/starship/{starshipId}")
+    @PatchMapping("/starship/{starshipId}")
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
     @Transactional
-    public ResponseEntity<Void> boardStarship(@PathVariable Long stationId,
-                                              @PathVariable Long starshipId,
+    public ResponseEntity<Void> boardStarShip(@PathVariable Long starshipId,
                                               Principal principal) {
         User user = userService.findByLogin(principal.getName());
-
-        return null;
+        return ResponseEntity.status(hangarFacade.boardStarShip(starshipId, user)).build();
     }
-
-
 }
