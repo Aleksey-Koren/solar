@@ -2,8 +2,6 @@ package io.solar.service.engine;
 
 import io.solar.entity.objects.BasicObject;
 import io.solar.service.engine.interfaces.StarMapEngine;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
