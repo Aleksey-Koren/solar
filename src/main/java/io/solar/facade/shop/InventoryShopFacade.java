@@ -98,7 +98,7 @@ public class InventoryShopFacade {
 
     private List<BasicObject> createObjects(List<ShopDto> shopDto) {
         return shopDto.stream()
-                .map(dto -> objectEngine.createInventoryObject(otdService.getById(dto.getOtdId()), dto.getQuantity()))
+                .map(dto -> objectEngine.createInventoryObjects(otdService.getById(dto.getOtdId()), dto.getQuantity()))
                 .flatMap(List::stream)
                 .toList();
     }

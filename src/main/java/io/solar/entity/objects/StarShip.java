@@ -5,7 +5,9 @@ import io.solar.entity.User;
 import io.solar.entity.interfaces.SpaceTech;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -22,6 +24,8 @@ import java.util.List;
 @Table(name = "star_ships")
 @PrimaryKeyJoinColumn(name = "id")
 @ToString
+@SuperBuilder
+@NoArgsConstructor
 public class StarShip extends BasicObject implements SpaceTech {
 
     @OneToMany(mappedBy = "owner", orphanRemoval = true, cascade = CascadeType.ALL)

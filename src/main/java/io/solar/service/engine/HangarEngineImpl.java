@@ -31,4 +31,11 @@ public class HangarEngineImpl implements HangarEngine {
         user.setLocation(starShip);
         userService.save(user);
     }
+
+//    @Override
+//    public void moveToHangar(StarShip starShip) {
+//        if (isThereEnoughtSpaseInHangar) {
+//
+//        }
+//    }
 }

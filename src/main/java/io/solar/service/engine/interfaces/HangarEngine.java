@@ -10,4 +10,6 @@ public interface HangarEngine {
     boolean isUserAndShipAreInTheSameHangar(User user, StarShip starShip);
 
     void boardStarShip(StarShip starShip, User user);
+
+//    void moveToHangar(StarShip starShip);
 }

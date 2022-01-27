@@ -6,6 +6,7 @@ import io.solar.dto.shop.StationShopDto;
 import io.solar.entity.User;
 import io.solar.facade.shop.InventoryShopFacade;
 import io.solar.facade.shop.ProductShopFacade;
+import io.solar.facade.shop.StarShipShopFacade;
 import io.solar.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +30,7 @@ public class StationShopController {
 
     private final InventoryShopFacade inventoryShopFacade;
     private final ProductShopFacade productShopFacade;
+    private final StarShipShopFacade starShipShopFacade;
     private final UserService userService;
 
     @GetMapping("/{stationId}")
@@ -88,5 +90,13 @@ public class StationShopController {
         User user = userService.findByLogin(principal.getName());
 
         return productShopFacade.getProductsSellPrices(user, productsIds);
+    }
+
+    @PostMapping("/buy/starship")
+    @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
+    @Transactional
+    public void buyStarShip(@RequestBody ShopDto dto, Principal principal) {
+        User user = userService.findByLogin(principal.getName());
+        starShipShopFacade.buyStarShip(user, dto);
     }
 }
