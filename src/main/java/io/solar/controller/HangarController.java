@@ -31,7 +31,7 @@ public class HangarController {
     public List<StarShipDto> getStarshipsInHangar(@PathVariable Long stationId, Principal principal) {
         User user = userService.findByLogin(principal.getName());
 
-        return null;
+        return hangarFacade.getAllStarships(stationId, user);
     }
 
     @PatchMapping("/{stationId}/starship/{starshipId}")
