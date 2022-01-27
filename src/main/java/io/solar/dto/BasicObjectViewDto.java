@@ -24,7 +24,6 @@ public class BasicObjectViewDto {
     private Float angle;
     private Float rotationAngle;
     private Long hullId;
-    private Long userId;
     private Boolean active;
     private Integer durability;
     private Long attachedToShip;

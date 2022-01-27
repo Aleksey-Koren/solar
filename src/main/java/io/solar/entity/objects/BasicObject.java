@@ -43,7 +43,6 @@ public class BasicObject implements Serializable {
     @JoinColumn(name = "hull_id")
     protected ObjectTypeDescription objectTypeDescription;
 
-    protected Long userId;
     protected Boolean active;
 
     protected Integer durability;

@@ -10,6 +10,6 @@ import java.util.List;
 @Data
 @SuperBuilder
 public class StarShipDto extends BasicObjectViewDto {
-
-        List<GoodsDto> goods;
+    private List<GoodsDto> goods;
+    private Long userId;
 }
