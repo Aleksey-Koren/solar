@@ -49,4 +49,8 @@ public class StarShipService {
     public void delete(StarShip starShip) {
         starShipRepository.delete(starShip);
     }
+
+    public boolean existsById(Long id) {
+        return starShipRepository.existsById(id);
+    }
 }
