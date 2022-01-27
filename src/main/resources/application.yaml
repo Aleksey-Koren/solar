@@ -24,7 +24,7 @@ spring:
     jpa:
         properties:
             hibernate:
-                show_sql: true
+                show_sql: false
                 format_sql: true
                 use_sql_comments: false
                 ddl-auto: validate
@@ -53,7 +53,7 @@ app:
     hack_block_time_min: 5
     admin_not_exists: "yes"
     goods_generation_delay_minutes: 60
-    goods_initial_delay_minutes: 60
+    goods_initial_delay_minutes: 0
     view_distance_without_radar: 5
     time_flow_modifier: 12
     station_sell_modifier: 0.7
@@ -102,9 +102,9 @@ log4jdbc:
 logging:
     level:
         jdbc:
-            sqlonly: "INFO"
+            sqlonly: "OFF"
             sqltiming: "OFF"
             audit: "OFF"
             resultset: "OFF"
-            resultsettable: "INFO"
+            resultsettable: "OFF"
             connection: "OFF"

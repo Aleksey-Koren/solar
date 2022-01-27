@@ -109,8 +109,8 @@ public class RoomService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "It is impossible to invite somebody else to existing private room");
         }
 
-        boolean inviterIsInRoom = userRoomRepository.existsById(new UserRoom.UserRoomPK(inviter, room));
-        boolean invitedIsAlreadyInRoom = userRoomRepository.existsById(new UserRoom.UserRoomPK(invited, room));
+        boolean inviterIsInRoom = userRoomRepository.findByUserAndRoom(inviter, room).isPresent();
+        boolean invitedIsAlreadyInRoom = userRoomRepository.findByUserAndRoom(invited, room).isPresent();
 
         if (!inviterIsInRoom) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
@@ -173,8 +173,7 @@ public class RoomService {
 
     private void addUserToRoom(User user, Room room) {
         UserRoom userRoom = new UserRoom(user, room);
-        user.getUserRooms().add(userRoom);
-        userRepository.save(user);
+        userRoomRepository.save(userRoom);
     }
 
     private void sendInviteNotification(User user, Room room) {

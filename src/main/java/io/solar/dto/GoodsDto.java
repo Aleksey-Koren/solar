@@ -5,6 +5,7 @@ import lombok.Data;
 @Data
 public class GoodsDto {
 
+    private Long id;
     private Long station;
     private Long product;
     private Long amount;
