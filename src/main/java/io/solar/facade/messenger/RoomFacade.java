@@ -75,14 +75,14 @@ public class RoomFacade {
         if (roomOpt.isEmpty()) {
             return HttpStatus.NOT_FOUND;
         }
-        Optional<UserRoom> userRoomOpt = userRoomService.findById(new UserRoom.UserRoomPK(user, roomOpt.get()));
+        Optional<UserRoom> userRoomOpt = userRoomService.findByUserAndRoom(user, roomOpt.get());
         if (userRoomOpt.isEmpty()) {
             return HttpStatus.NOT_FOUND;
         }
 
         UserRoom userRoom = userRoomOpt.get();
         userRoom.setLastSeenAt(now);
-        userRoomService.updateNative(userRoom);
+        userRoomService.save(userRoom);
         return HttpStatus.OK;
     }
 

@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
 import javax.persistence.JoinColumn;
@@ -19,7 +21,6 @@ import java.time.Instant;
 
 @Entity
 @Data
-@IdClass(UserRoom.UserRoomPK.class)
 @Table(name = "users_rooms")
 @AllArgsConstructor
 @NoArgsConstructor
@@ -27,11 +28,13 @@ import java.time.Instant;
 public class UserRoom {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Id
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_id")
     private Room room;
@@ -47,13 +50,5 @@ public class UserRoom {
         this.room = room;
         this.subscribedAt = Instant.now();
         this.lastSeenAt = Instant.now();
-    }
-
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class UserRoomPK implements Serializable {
-        private User user;
-        private Room room;
     }
 }

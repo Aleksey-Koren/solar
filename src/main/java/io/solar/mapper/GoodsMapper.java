@@ -4,14 +4,11 @@ import io.solar.dto.GoodsDto;
 import io.solar.entity.Goods;
 import io.solar.entity.Product;
 import io.solar.entity.objects.BasicObject;
-import io.solar.repository.BasicObjectRepository;
 import io.solar.service.GoodsService;
 import io.solar.service.ProductService;
 import io.solar.service.object.BasicObjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +20,7 @@ public class GoodsMapper {
 
     public GoodsDto toDto(Goods goods) {
         GoodsDto dto = new GoodsDto();
+        dto.setId(goods.getId());
         dto.setStation(goods.getOwner() != null ? goods.getOwner().getId() : null);
         dto.setProduct(goods.getProduct() != null ? goods.getProduct().getId() : null);
         dto.setAmount(goods.getAmount());
@@ -34,10 +32,8 @@ public class GoodsMapper {
         BasicObject owner = basicObjectService.getById(dto.getStation());
         Product product = productService.getById(dto.getProduct());
         Goods goods;
-        Optional<Goods> goodsOpt = goodsService
-                .findByOwnerAndProduct(owner, product);
-        if(goodsOpt.isPresent()) {
-            goods = goodsOpt.get();
+        if(dto.getId() != null) {
+            goods = goodsService.getById(dto.getId());
         }else{
             goods = new Goods();
             goods.setOwner(owner);
