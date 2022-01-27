@@ -93,8 +93,4 @@ public class BasicObject implements Serializable {
         return Math.sqrt(Math.pow(this.speedX, 2) + Math.pow(this.speedY, 2));
     }
 
-    @Transient
-    public Double getAcceleration() {
-        return Math.sqrt(Math.pow(this.accelerationX, 2) + Math.pow(this.accelerationY, 2));
-    }
 }
