@@ -75,10 +75,10 @@ public class RoomController {
     @PatchMapping("/{roomId}/leave")
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
     @Transactional
-    public ResponseEntity<Void> leaveFromRoom(@PathVariable Long roomId, Principal principal) {
+    public void leaveFromRoom(@PathVariable Long roomId, Principal principal) {
         User user = userService.findByLogin(principal.getName());
 
-        return ResponseEntity.status(roomFacade.leaveFromRoom(user, roomId)).build();
+        roomFacade.leaveFromRoom(user, roomId);
     }
 
     @GetMapping("/{roomId}/participants")

@@ -29,13 +29,12 @@ import static java.util.stream.Collectors.toList;
 @Component
 @RequiredArgsConstructor
 public class RoomFacade {
-    private final RoomMapper roomMapper;
-    private final RoomRepository roomRepository;
-    private final UserMapper userMapper;
+    private final WebSocketFacade webSocketFacade;
     private final RoomService roomService;
     private final UserRoomService userRoomService;
-    private final WebSocketFacade webSocketFacade;
     private final NotificationEngine notificationEngine;
+    private final RoomMapper roomMapper;
+    private final UserMapper userMapper;
 
     public List<SearchRoomDto> findAllRooms(User user, RoomFilter roomFilter) {
         roomFilter.setUserId(user.getId());
@@ -47,16 +46,17 @@ public class RoomFacade {
     }
 
     public List<RoomDtoImpl> getUserRooms(Long userId) {
-        return roomRepository.findAllUserRoomsWithUnreadMessages(userId)
+
+        return roomService.findAllUserRoomsWithUnreadMessages(userId)
                 .stream()
                 .map(roomMapper::toDtoListFromInterface)
                 .toList();
     }
 
     public List<UserDto> findAllByRoomId(Long roomId) {
-        return roomRepository.findById(roomId).orElseThrow(
-                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "There is no room in database with id = " + roomId)
-                ).getUsers().stream()
+
+        return roomService.getById(roomId)
+                .getUsers().stream()
                 .map(userMapper::toDtoWithIdAndTitle)
                 .collect(toList());
     }
@@ -72,7 +72,7 @@ public class RoomFacade {
 
     public HttpStatus updateLastSeenAt(Long roomId, User user) {
         Instant now = Instant.now();
-        Optional<Room> roomOpt = roomRepository.findById(roomId);
+        Optional<Room> roomOpt = roomService.findById(roomId);
 
         if (roomOpt.isEmpty()) {
             return HttpStatus.NOT_FOUND;
@@ -92,26 +92,25 @@ public class RoomFacade {
         roomService.inviteToExistingRoom(inviter, invitedId, roomId);
     }
 
-    public HttpStatus leaveFromRoom(User user, Long roomId) {
+    public void leaveFromRoom(User user, Long roomId) {
         Room room = roomService.getById(roomId);
 
-
-        if (room.getUsers().size() == 1) {
-            //todo: remove all messages and room
+        if (room.getUsers().size() != 1) {
+            roomService.removeUserFromRoom(room, user);
+            regenerateTitleIfNeeded(room);
+            roomService.save(room);
+            sendLeaveRoomNotifications(room.getUsers(), user);
+        } else {
+            roomService.deleteRoom(room);
         }
+    }
 
-        roomService.removeUserFromRoom(room, user);
-
+    private void regenerateTitleIfNeeded(Room room) {
         if (room.getDefaultTitle()) {
             List<String> usersTitles = room.getUsers().stream().map(User::getTitle).toList();
 
             room.setTitle(roomService.generatePublicTitle(usersTitles));
         }
-
-        roomService.save(room);
-        sendLeaveRoomNotifications(room.getUsers(), user);
-
-        return HttpStatus.OK;
     }
 
     private void sendLeaveRoomNotifications(List<User> roomParticipants, User departedUser) {

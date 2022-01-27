@@ -2,6 +2,8 @@ package io.solar.service.messenger;
 
 import io.solar.dto.messenger.CreateRoomDto;
 import io.solar.dto.messenger.NotificationDto;
+import io.solar.dto.messenger.RoomDto;
+import io.solar.dto.messenger.RoomDtoImpl;
 import io.solar.entity.User;
 import io.solar.entity.messenger.Message;
 import io.solar.entity.messenger.MessageType;
@@ -36,7 +38,7 @@ public class RoomService {
     private final RoomMapper roomMapper;
     private final UserRepository userRepository;
     private final SimpMessagingTemplate simpMessagingTemplate;
-    private final UserRoomRepository userRoomRepository;
+    private final UserRoomService userRoomService;
     private final MessageRepository messageRepository;
 
     public Optional<Room> findById(Long id) {
@@ -48,6 +50,11 @@ public class RoomService {
                 new ResponseStatusException(HttpStatus.NOT_FOUND,
                         String.format("there is no %s with id = %d in database", Room.class.getSimpleName(), id)
                 ));
+    }
+
+    public List<RoomDto> findAllUserRoomsWithUnreadMessages(Long userId) {
+
+        return roomRepository.findAllUserRoomsWithUnreadMessages(userId);
     }
 
     public Room createRoom(CreateRoomDto dto, User owner) {
@@ -109,8 +116,8 @@ public class RoomService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "It is impossible to invite somebody else to existing private room");
         }
 
-        boolean inviterIsInRoom = userRoomRepository.findByUserAndRoom(inviter, room).isPresent();
-        boolean invitedIsAlreadyInRoom = userRoomRepository.findByUserAndRoom(invited, room).isPresent();
+        boolean inviterIsInRoom = userRoomService.findByUserAndRoom(inviter, room).isPresent();
+        boolean invitedIsAlreadyInRoom = userRoomService.findByUserAndRoom(invited, room).isPresent();
 
         if (!inviterIsInRoom) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
@@ -139,10 +146,7 @@ public class RoomService {
         user.getRooms()
                 .stream()
                 .filter(room -> room.getUsers().size() == 1)
-                .forEach(room -> {
-                    messageRepository.deleteAllByRoom(room);
-                    roomRepository.delete(room);
-                });
+                .forEach(this::deleteRoom);
     }
 
     public List<Room> findAll(RoomSpecification roomSpecification) {
@@ -155,11 +159,14 @@ public class RoomService {
         return roomRepository.save(room);
     }
 
+    public void deleteRoom(Room room) {
+        messageRepository.deleteAllByRoom(room);
+        roomRepository.delete(room);
+    }
+
     public void removeUserFromRoom(Room room, User user) {
-        //todo: implement delete userRoom
-//        UserRoom.UserRoomPK userRoom = new UserRoom.UserRoomPK(user, room);
-//        userRoomRepository.deleteById(userRoom);
-//        user.getUserRooms().remove(userRoom);
+        UserRoom userRoom = userRoomService.getByUserAndRoom(user, room);
+        userRoomService.delete(userRoom);
     }
 
     private boolean isPrivateRoomAlreadyExists(Long user1Id, Long user2Id) {
@@ -173,7 +180,7 @@ public class RoomService {
 
     private void addUserToRoom(User user, Room room) {
         UserRoom userRoom = new UserRoom(user, room);
-        userRoomRepository.save(userRoom);
+        userRoomService.save(userRoom);
     }
 
     private void sendInviteNotification(User user, Room room) {
