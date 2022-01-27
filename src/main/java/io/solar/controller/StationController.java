@@ -1,7 +1,7 @@
 package io.solar.controller;
 
 import io.solar.dto.Option;
-import io.solar.dto.StationDto;
+import io.solar.dto.object.StationDto;
 import io.solar.facade.StationFacade;
 import io.solar.service.StationService;
 import io.solar.service.scheduler.GoodsGeneration;
