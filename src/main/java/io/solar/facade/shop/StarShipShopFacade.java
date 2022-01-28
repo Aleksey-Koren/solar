@@ -6,7 +6,6 @@ import io.solar.entity.objects.ObjectTypeDescription;
 import io.solar.entity.objects.StarShip;
 import io.solar.entity.objects.Station;
 import io.solar.facade.UserFacade;
-import io.solar.service.StarShipService;
 import io.solar.service.StationService;
 import io.solar.service.engine.interfaces.HangarEngine;
 import io.solar.service.engine.interfaces.ObjectEngine;
