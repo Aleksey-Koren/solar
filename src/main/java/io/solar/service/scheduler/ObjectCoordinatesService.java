@@ -251,7 +251,7 @@ public class ObjectCoordinatesService {
     }
 
     private boolean isAccelerationInvalid(BasicObject object, Course course) {
-        Double courseAcceleration = calculateAcceleration(course.getAccelerationX(), course.getAccelerationY());
+        Float courseAcceleration = calculateAcceleration(course.getAccelerationX(), course.getAccelerationY());
 
         return courseAcceleration > spaceTechEngine.calculateMaxAcceleration((SpaceTech) object);
     }
@@ -261,9 +261,9 @@ public class ObjectCoordinatesService {
         return Math.PI * 2 * schedulerDuration * appProperties.getTimeFlowModifier() / (1000 * 60 * 60 * 24);
     }
 
-    private Double calculateAcceleration(Float accelerationX, Float accelerationY) {
+    private Float calculateAcceleration(Float accelerationX, Float accelerationY) {
 
-        return Math.sqrt(Math.pow(accelerationX, 2) + Math.pow(accelerationY, 2));
+        return (float) Math.sqrt(Math.pow(accelerationX, 2) + Math.pow(accelerationY, 2));
     }
 
     private Float calculateSpeed(Float speed, Float acceleration, long time) {

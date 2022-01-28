@@ -57,7 +57,7 @@ public class NavigatorController {
             if (userService.isUserNotLocatedInObject(authUser, dto.getObjectId())) {
                 userCantException(authUser.getLocation().getId(), dto.getObjectId());
             }
-            courseFacade.updateCourseChain(dto);
+            courseFacade.updateCourseChain(dto, authUser);
         }
     }
 

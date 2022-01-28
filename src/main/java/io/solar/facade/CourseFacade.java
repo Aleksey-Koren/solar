@@ -3,8 +3,13 @@ package io.solar.facade;
 import io.solar.dto.CourseDto;
 import io.solar.entity.Course;
 import io.solar.entity.CourseType;
+import io.solar.entity.User;
+import io.solar.entity.objects.BasicObject;
+import io.solar.entity.objects.StarShip;
 import io.solar.mapper.CourseMapper;
 import io.solar.service.CourseService;
+import io.solar.service.StarShipService;
+import io.solar.service.engine.interfaces.SpaceTechEngine;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -19,13 +24,27 @@ public class CourseFacade {
 
     private final CourseService courseService;
     private final CourseMapper courseMapper;
+    private final StarShipService starShipService;
+    private final SpaceTechEngine spaceTechEngine;
 
-    public void updateCourseChain(CourseDto dto) {
+    public void updateCourseChain(CourseDto dto, User user) {
+        Course course = courseMapper.toEntity(dto);
+        checkAccelLimit(course, starShipService.getById(user.getLocation().getId()));
         if (dto.getNextId() == null) {
             extendCourseChain(dto);
         } else {
             adjustCourseChain(dto);
         }
+    }
+
+    private void checkAccelLimit(Course course, StarShip starship) {
+        Float maxAccel = spaceTechEngine.calculateMaxAcceleration(starship);
+//        Float courseAccel = (float) calculateAcceleration(course.getAccelerationX(), course.getAccelerationY());
+    }
+
+    private Double calculateAcceleration(Float accelerationX, Float accelerationY) {
+
+        return Math.sqrt(Math.pow(accelerationX, 2) + Math.pow(accelerationY, 2));
     }
 
     private void extendCourseChain(CourseDto dto) {

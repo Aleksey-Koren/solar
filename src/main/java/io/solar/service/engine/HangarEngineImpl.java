@@ -33,7 +33,7 @@ public class HangarEngineImpl implements HangarEngine {
     }
 
     public boolean isItEnoughSpaceForeShipAtThisStation(User user, Station station, StarShip starShip) {
-        return starShipService.findAllUserStarshipsInHangar(user, starShip, station).size() >= appProperties.getBasicHangarSize();
+        return starShipService.findAllUserStarshipsInHangar(user, starShip, station).size() <= appProperties.getBasicHangarSize();
     }
 
     @Override
