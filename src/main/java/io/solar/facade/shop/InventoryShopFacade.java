@@ -83,17 +83,15 @@ public class InventoryShopFacade {
         return calculateSellPrice(object);
     }
 
-
+    public long calculateSellPrice(BasicObject inventoryObject) {
+        double durabilityModifier = (double) inventoryObject.getDurability() / inventoryObject.getObjectTypeDescription().getDurability();
+        return (long) (inventoryObject.getObjectTypeDescription().getPrice().longValue() * stationSellModifier * durabilityModifier);
+    }
 
     private long calculateAmountPrice(List<ShopDto> shopDto) {
         return shopDto.stream()
                 .map(dto -> ((long) otdService.getById(dto.getOtdId()).getPrice() * dto.getQuantity()))
                 .mapToLong(Long::longValue).sum();
-    }
-
-    private long calculateSellPrice(BasicObject inventoryObject) {
-        double durabilityModifier = (double) inventoryObject.getDurability() / inventoryObject.getObjectTypeDescription().getDurability();
-        return (long) (inventoryObject.getObjectTypeDescription().getPrice().longValue() * stationSellModifier * durabilityModifier);
     }
 
     private List<BasicObject> createObjects(List<ShopDto> shopDto) {
