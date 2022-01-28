@@ -1,21 +1,21 @@
 package io.solar.facade.marketplace;
 
 import io.solar.config.properties.MarketplaceProperties;
-import io.solar.config.properties.MessengerProperties;
 import io.solar.dto.marketplace.MarketplaceLotDto;
-import io.solar.dto.messenger.NotificationDto;
 import io.solar.entity.User;
 import io.solar.entity.marketplace.MarketplaceBet;
 import io.solar.entity.marketplace.MarketplaceLot;
-import io.solar.entity.messenger.NotificationType;
 import io.solar.entity.objects.BasicObject;
+import io.solar.entity.objects.ObjectType;
 import io.solar.entity.objects.StarShip;
-import io.solar.facade.HangarFacade;
+import io.solar.entity.objects.Station;
 import io.solar.facade.UserFacade;
 import io.solar.mapper.marketplace.MarketplaceLotMapper;
 import io.solar.service.StarShipService;
+import io.solar.service.StationService;
 import io.solar.service.engine.interfaces.HangarEngine;
 import io.solar.service.engine.interfaces.InventoryEngine;
+import io.solar.service.engine.interfaces.NotificationEngine;
 import io.solar.service.engine.interfaces.SpaceTechEngine;
 import io.solar.service.marketplace.MarketplaceLotService;
 import io.solar.specification.MarketplaceLotSpecification;
@@ -24,7 +24,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -36,17 +35,16 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class MarketplaceLotFacade {
 
+    private final UserFacade userFacade;
     private final MarketplaceLotService marketplaceLotService;
+    private final StationService stationService;
+    private final StarShipService starShipService;
+    private final InventoryEngine inventoryEngine;
+    private final NotificationEngine notificationEngine;
+    private final HangarEngine hangarEngine;
+    private final SpaceTechEngine spaceTechEngine;
     private final MarketplaceLotMapper marketplaceLotMapper;
     private final MarketplaceProperties marketplaceProperties;
-    private final UserFacade userFacade;
-    private final InventoryEngine inventoryEngine;
-    private final MessengerProperties messengerProperties;
-    private final SimpMessagingTemplate simpMessagingTemplate;
-    private final StarShipService starShipService;
-    private final HangarEngine hangarEngine;
-    private final HangarFacade hangarFacade;
-    private final SpaceTechEngine spaceTechEngine;
 
 
     public Page<MarketplaceLotDto> findAll(Pageable pageable, MarketplaceLotFilter filter) {
@@ -60,7 +58,7 @@ public class MarketplaceLotFacade {
         StarShip starship = starShipService.getById(user.getLocation().getId());
 
         if (isUserCanPickUpLot(user, lot)) {
-            inventoryEngine.putToInventory(starship, List.of(lot.getObject()));
+            transferLot(user, lot, starship);
             lot.setIsBuyerHasTaken(true);
         } else {
             return HttpStatus.FORBIDDEN;
@@ -107,7 +105,7 @@ public class MarketplaceLotFacade {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                         "User can't sell this ship because ship and user are not at the same station");
             }
-            if(!spaceTechEngine.isUserOwnsThisSpaceTech(owner, ship)) {
+            if (!spaceTechEngine.isUserOwnsThisSpaceTech(owner, ship)) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                         "User can't sell this ship because it isn't his");
             }
@@ -136,7 +134,7 @@ public class MarketplaceLotFacade {
         userFacade.decreaseUserBalance(buyer, lot.getInstantPrice());
         userFacade.increaseUserBalance(lot.getOwner(), lot.getInstantPrice());
         inventoryEngine.putToInventory(starShipService.getById(buyer.getLocation().getId()), List.of(lot.getObject()));
-        sendInstantPurchaseNotification(lot);
+        notificationEngine.sendInstantPurchaseNotification(lot.getOwner(), marketplaceLotMapper.toDto(lot));
         marketplaceLotService.delete(lot);
         return HttpStatus.OK;
     }
@@ -153,12 +151,16 @@ public class MarketplaceLotFacade {
         return HttpStatus.OK;
     }
 
-    private void sendInstantPurchaseNotification(MarketplaceLot lot) {
-        simpMessagingTemplate.convertAndSendToUser(lot.getOwner().getLogin()
-                , messengerProperties.getNotificationDestination()
-                , new NotificationDto<>(NotificationType.INSTANT_PURCHASE.name(), marketplaceLotMapper.toDto(lot)));
-    }
+    private void transferLot(User user, MarketplaceLot lot, StarShip starship) {
+        if (isTheLotStarship(lot)) {
+            StarShip starshipLot = starShipService.getById(lot.getObject().getId());
+            Station station = stationService.getById(user.getLocation().getAttachedToShip().getId());
 
+            hangarEngine.moveToHangar(user, starshipLot, station);
+        } else {
+            inventoryEngine.putToInventory(starship, List.of(lot.getObject()));
+        }
+    }
 
     private void createLotWithDelay(MarketplaceLotDto dto, MarketplaceLot lot) {
         lot.setStartDate(dto.getStartDate());
@@ -193,5 +195,8 @@ public class MarketplaceLotFacade {
         return owner.getLocation().equals(object.getAttachedToShip());
     }
 
+    private boolean isTheLotStarship(MarketplaceLot lot) {
+        return lot.getObject().getObjectTypeDescription().getType().equals(ObjectType.SHIP);
+    }
 
 }

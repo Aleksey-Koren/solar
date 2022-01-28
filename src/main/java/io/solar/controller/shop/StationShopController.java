@@ -97,6 +97,7 @@ public class StationShopController {
     @Transactional
     public void buyStarShip(@RequestBody ShopDto dto, Principal principal) {
         User user = userService.findByLogin(principal.getName());
+
         starShipShopFacade.buyStarShip(user, dto);
     }
 }

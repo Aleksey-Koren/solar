@@ -24,6 +24,7 @@ import java.util.List;
 @Entity
 @Table(name = "star_ships")
 @PrimaryKeyJoinColumn(name = "id")
+@EqualsAndHashCode(callSuper = true)
 @ToString
 @SuperBuilder
 @NoArgsConstructor

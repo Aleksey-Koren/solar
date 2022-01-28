@@ -2,14 +2,13 @@ package io.solar.facade.shop;
 
 import io.solar.dto.shop.ShopDto;
 import io.solar.entity.User;
-import io.solar.entity.objects.BasicObject;
-import io.solar.entity.objects.ObjectType;
 import io.solar.entity.objects.ObjectTypeDescription;
 import io.solar.entity.objects.StarShip;
 import io.solar.entity.objects.Station;
 import io.solar.facade.UserFacade;
 import io.solar.service.StarShipService;
 import io.solar.service.StationService;
+import io.solar.service.engine.interfaces.HangarEngine;
 import io.solar.service.engine.interfaces.ObjectEngine;
 import io.solar.service.object.ObjectTypeDescriptionService;
 import lombok.RequiredArgsConstructor;
@@ -24,29 +23,20 @@ public class StarShipShopFacade {
     private final ObjectTypeDescriptionService objectTypeDescriptionService;
     private final UserFacade userFacade;
     private final ObjectEngine objectEngine;
-    private final StarShipService starShipService;
+    private final HangarEngine hangarEngine;
     private final StationService stationService;
 
-    public HttpStatus buyStarShip(User user, ShopDto shopDto) {
+    public void buyStarShip(User user, ShopDto shopDto) {
         Station currentStation = stationService.getById(user.getLocation().getAttachedToShip().getId());
-        StarShip currentStarShip = starShipService.getById(user.getLocation().getId());
 
-        if (!isItEnoughSpaceForeShipAtThisStation(user, currentStation, currentStarShip)) {
+        if (!hangarEngine.isEnoughSpaceForShipAtStation(user, currentStation)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Can't buy Starship. There in no place in hangar");
         }
 
         ObjectTypeDescription otd = objectTypeDescriptionService.getById(shopDto.getOtdId());
         userFacade.decreaseUserBalance(user, otd.getPrice().longValue());
         StarShip newStarShip = objectEngine.createStarship(otd);
-        newStarShip.setUser(user);
-        newStarShip.setAttachedToShip(currentStation);
-        starShipService.save(newStarShip);
-        return HttpStatus.OK;
-    }
-
-    private boolean isItEnoughSpaceForeShipAtThisStation(User user, Station station, StarShip starShip) {
-        return starShipService.findAllUserStarshipsInHangar(user, starShip, station).size() >= 2;
-
+        hangarEngine.moveToHangar(user, newStarShip, currentStation);
     }
 
 }

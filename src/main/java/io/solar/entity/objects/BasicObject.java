@@ -17,6 +17,7 @@ import java.util.List;
 @Entity
 @Table(name = "objects")
 @Inheritance(strategy = InheritanceType.JOINED)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -24,6 +25,7 @@ public class BasicObject implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     protected Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)

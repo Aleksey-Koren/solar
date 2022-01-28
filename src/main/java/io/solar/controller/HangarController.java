@@ -1,6 +1,7 @@
 package io.solar.controller;
 
 import io.solar.dto.object.StarShipDto;
+import io.solar.dto.object.StarshipObjectsDto;
 import io.solar.entity.User;
 import io.solar.facade.HangarFacade;
 import io.solar.service.UserService;
@@ -11,6 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -41,5 +44,16 @@ public class HangarController {
                                               Principal principal) {
         User user = userService.findByLogin(principal.getName());
         return ResponseEntity.status(hangarFacade.boardStarShip(starshipId, user)).build();
+    }
+
+    @PutMapping("/starship/{destStarshipId}/inventory")
+    @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
+    @Transactional
+    public void moveStarshipObjects(@PathVariable Long destStarshipId,
+                                    @RequestBody StarshipObjectsDto starshipObjectsDto,
+                                    Principal principal) {
+        User user = userService.findByLogin(principal.getName());
+
+        hangarFacade.moveObjects(destStarshipId, user, starshipObjectsDto);
     }
 }
