@@ -3,8 +3,12 @@ package io.solar.facade;
 import io.solar.dto.CourseDto;
 import io.solar.entity.Course;
 import io.solar.entity.CourseType;
+import io.solar.entity.User;
+import io.solar.entity.objects.StarShip;
 import io.solar.mapper.CourseMapper;
 import io.solar.service.CourseService;
+import io.solar.service.StarShipService;
+import io.solar.service.engine.interfaces.SpaceTechEngine;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -19,17 +23,40 @@ public class CourseFacade {
 
     private final CourseService courseService;
     private final CourseMapper courseMapper;
+    private final StarShipService starShipService;
+    private final SpaceTechEngine spaceTechEngine;
 
-    public void updateCourseChain(CourseDto dto) {
+    public void updateCourseChain(CourseDto dto, User user) {
+        Course course = courseMapper.toEntity(dto);
+        checkAccelLimit(course, starShipService.getById(user.getLocation().getId()));
         if (dto.getNextId() == null) {
-            extendCourseChain(dto);
+            extendCourseChain(course);
         } else {
-            adjustCourseChain(dto);
+            adjustCourseChain(course);
         }
     }
 
-    private void extendCourseChain(CourseDto dto) {
-        Course last = courseMapper.toEntity(dto);
+    private void checkAccelLimit(Course course, StarShip starship) {
+        float maxAccel = spaceTechEngine.calculateMaxAcceleration(starship);
+        float courseAccel = (float) calculateAcceleration(course.getAccelerationX(), course.getAccelerationY());
+        if (courseAccel > maxAccel) {
+            float accelDelta = maxAccel/courseAccel;
+            decreaseCourseAcceleration(course, accelDelta);
+        }
+    }
+
+    private void decreaseCourseAcceleration(Course course, float accelDelta) {
+        course.setAccelerationX(course.getAccelerationX() * accelDelta);
+        course.setAccelerationY(course.getAccelerationY() * accelDelta);
+    }
+
+    private double calculateAcceleration(Float accelerationX, Float accelerationY) {
+
+        return Math.sqrt(Math.pow(accelerationX, 2) + Math.pow(accelerationY, 2));
+    }
+
+    private void extendCourseChain(Course last) {
+
         if (CourseType.ATTACH_TO_ORBIT.equals(last.getCourseType())) {
             last.setTime(0L);
         }
@@ -47,17 +74,16 @@ public class CourseFacade {
         }
     }
 
-    private void adjustCourseChain(CourseDto dto) {
-        Course newCourse = courseMapper.toEntity(dto);
+    private void adjustCourseChain(Course newCourse) {
 
         if (CourseType.ATTACH_TO_ORBIT.equals(newCourse.getCourseType())) {
             newCourse.setTime(0L);
         }
 
-        Optional<Course> previousOptional = courseService.findByNext(courseService.findById(dto.getNextId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("There is no course with such id in database. id = %d", dto.getNextId()))));
-
         Course next = newCourse.getNext();
+
+        Optional<Course> previousOptional = courseService.findByNext(next);
+
         if (previousOptional.isPresent()) {
             Course previous = previousOptional.get();
             newCourse.setPrevious(previous);

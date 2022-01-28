@@ -18,8 +18,8 @@ import org.springframework.web.server.ResponseStatusException;
 public class HangarEngineImpl implements HangarEngine {
 
     private final UserService userService;
-    private final StarShipService starShipService;
     private final AppProperties appProperties;
+    private final StarShipService starShipService;
 
     @Override
     public void moveToMarketplace(StarShip starship, User user) {

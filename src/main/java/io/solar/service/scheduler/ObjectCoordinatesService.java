@@ -172,11 +172,6 @@ public class ObjectCoordinatesService {
                 break;
             }
 
-            if (isAccelerationInvalid(object, activeCourse)) {
-                throw new ServiceException(
-                        String.format("Starship/Station with id = %d acceleration > maxAcceleration", object.getId())
-                );
-            }
             courseDuration = calculateCourseDuration(activeCourse, schedulerDuration, Instant.ofEpochMilli(schedulerStartTime));
 
             updateObjectFields(object, activeCourse, courseDuration);
@@ -250,20 +245,9 @@ public class ObjectCoordinatesService {
         return (float)(coordinate + distanceCovered);
     }
 
-    private boolean isAccelerationInvalid(BasicObject object, Course course) {
-        Double courseAcceleration = calculateAcceleration(course.getAccelerationX(), course.getAccelerationY());
-
-        return courseAcceleration > spaceTechEngine.calculateMaxAcceleration((SpaceTech) object);
-    }
-
     private Double calculateDelta(Long schedulerDuration) {
 
         return Math.PI * 2 * schedulerDuration * appProperties.getTimeFlowModifier() / (1000 * 60 * 60 * 24);
-    }
-
-    private Double calculateAcceleration(Float accelerationX, Float accelerationY) {
-
-        return Math.sqrt(Math.pow(accelerationX, 2) + Math.pow(accelerationY, 2));
     }
 
     private Float calculateSpeed(Float speed, Float acceleration, long time) {
