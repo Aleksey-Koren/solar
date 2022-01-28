@@ -57,6 +57,7 @@ app:
     view_distance_without_radar: 5
     time_flow_modifier: 12
     station_sell_modifier: 0.7
+    basic_hangar_size: 2
 
     images:
         path: src/main/resources/images

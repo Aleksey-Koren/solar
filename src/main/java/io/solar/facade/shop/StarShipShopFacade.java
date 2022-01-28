@@ -1,15 +1,15 @@
 package io.solar.facade.shop;
 
+import io.solar.config.properties.AppProperties;
 import io.solar.dto.shop.ShopDto;
 import io.solar.entity.User;
-import io.solar.entity.objects.BasicObject;
-import io.solar.entity.objects.ObjectType;
 import io.solar.entity.objects.ObjectTypeDescription;
 import io.solar.entity.objects.StarShip;
 import io.solar.entity.objects.Station;
 import io.solar.facade.UserFacade;
 import io.solar.service.StarShipService;
 import io.solar.service.StationService;
+import io.solar.service.engine.interfaces.HangarEngine;
 import io.solar.service.engine.interfaces.ObjectEngine;
 import io.solar.service.object.ObjectTypeDescriptionService;
 import lombok.RequiredArgsConstructor;
@@ -26,12 +26,13 @@ public class StarShipShopFacade {
     private final ObjectEngine objectEngine;
     private final StarShipService starShipService;
     private final StationService stationService;
+    private final HangarEngine hangarEngine;
 
-    public HttpStatus buyStarShip(User user, ShopDto shopDto) {
+    public void buyStarShip(User user, ShopDto shopDto) {
         Station currentStation = stationService.getById(user.getLocation().getAttachedToShip().getId());
         StarShip currentStarShip = starShipService.getById(user.getLocation().getId());
 
-        if (!isItEnoughSpaceForeShipAtThisStation(user, currentStation, currentStarShip)) {
+        if (!hangarEngine.isItEnoughSpaceForeShipAtThisStation(user, currentStation, currentStarShip)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Can't buy Starship. There in no place in hangar");
         }
 
@@ -41,12 +42,7 @@ public class StarShipShopFacade {
         newStarShip.setUser(user);
         newStarShip.setAttachedToShip(currentStation);
         starShipService.save(newStarShip);
-        return HttpStatus.OK;
     }
 
-    private boolean isItEnoughSpaceForeShipAtThisStation(User user, Station station, StarShip starShip) {
-        return starShipService.findAllUserStarshipsInHangar(user, starShip, station).size() >= 2;
-
-    }
 
 }

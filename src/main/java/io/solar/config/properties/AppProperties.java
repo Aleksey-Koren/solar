@@ -19,4 +19,5 @@ public class AppProperties {
     private String goodsInitialDelayMinutes;
     private Float viewDistanceWithoutRadar;
     private Integer timeFlowModifier;
+    private Integer basicHangarSize;
 }
