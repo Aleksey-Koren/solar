@@ -12,6 +12,7 @@ public interface HangarEngine {
 
     void boardStarShip(StarShip starShip, User user);
 
-    boolean isItEnoughSpaceForeShipAtThisStation(User user, Station station, StarShip starShip);
+    void moveToHangar(User user, StarShip starShip, Station station);
 
+    boolean isEnoughSpaceForShipAtStation(User user, Station station);
 }

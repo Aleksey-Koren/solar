@@ -29,11 +29,7 @@ public class HangarEngineImpl implements HangarEngine {
 
     @Override
     public boolean isUserAndShipAreInTheSameHangar(User user, StarShip starShip) {
-        return user.getLocation().getAttachedToShip().equals(starShip.getAttachedToShip());
-    }
-
-    public boolean isItEnoughSpaceForeShipAtThisStation(User user, Station station, StarShip starShip) {
-        return starShipService.findAllUserStarshipsInHangar(user, starShip, station).size() <= appProperties.getBasicHangarSize();
+        return user.getLocation().getAttachedToShip().getId().equals(starShip.getAttachedToShip().getId());
     }
 
     @Override
@@ -42,4 +38,21 @@ public class HangarEngineImpl implements HangarEngine {
         userService.save(user);
     }
 
+    @Override
+    public void moveToHangar(User user, StarShip starShip, Station station) {
+        if (isEnoughSpaceForShipAtStation(user, station)) {
+            starShip.setStatus(ObjectStatus.ATTACHED_TO);
+            starShip.setAttachedToShip(station);
+            starShip.setUser(user);
+
+            starShipService.save(starShip);
+        } else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Not enough space for ship in hangar");
+        }
+    }
+
+    @Override
+    public boolean isEnoughSpaceForShipAtStation(User user, Station station) {
+        return starShipService.findAllUserStarshipsInHangar(user, station).size() < appProperties.getHangarShipAmount();
+    }
 }
