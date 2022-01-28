@@ -83,7 +83,7 @@ public class BasicObject implements Serializable {
     @Column(name = "volume")
     protected Float volume;
 
-    @OneToMany(mappedBy = "attachedToShip")
+    @OneToMany(mappedBy = "attachedToShip", cascade = CascadeType.ALL)
     @EqualsAndHashCode.Exclude
     protected List<BasicObject> attachedObjects;
 

@@ -13,4 +13,6 @@ public interface ObjectEngine {
     List<BasicObject> createInventoryObjects(ObjectTypeDescription otd, int quantity);
 
     StarShip createStarship(ObjectTypeDescription otd);
+
+    boolean isObjectAStarship(BasicObject object);
 }

@@ -32,9 +32,9 @@ public class ObjectEngineImpl implements ObjectEngine {
                     .status(ObjectStatus.NOT_DEFINED)
                     .build();
             return basicObjectService.save(basicObject);
-        }else {
+        } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    String.format("Can't create Item. %s type is not 'ITEM'",ObjectTypeDescription.class.getSimpleName())
+                    String.format("Can't create Item. %s type is not 'ITEM'", ObjectTypeDescription.class.getSimpleName())
             );
         }
     }
@@ -42,7 +42,7 @@ public class ObjectEngineImpl implements ObjectEngine {
     @Override
     public List<BasicObject> createInventoryObjects(ObjectTypeDescription otd, int quantity) {
         List<BasicObject> objects = new ArrayList<>();
-        for(int i = 0; i < quantity; i++) {
+        for (int i = 0; i < quantity; i++) {
             objects.add(createInventoryObjects(otd));
         }
         return objects;
@@ -57,10 +57,16 @@ public class ObjectEngineImpl implements ObjectEngine {
                     .status(ObjectStatus.NOT_DEFINED)
                     .build();
             return starShipService.save(ship);
-        }else {
+        } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    String.format("Can't create StarShip. %s type is not 'SHIP'",ObjectTypeDescription.class.getSimpleName())
+                    String.format("Can't create StarShip. %s type is not 'SHIP'", ObjectTypeDescription.class.getSimpleName())
             );
         }
+    }
+
+    @Override
+    public boolean isObjectAStarship(BasicObject object) {
+
+        return object.getObjectTypeDescription().getType().equals(ObjectType.SHIP);
     }
 }

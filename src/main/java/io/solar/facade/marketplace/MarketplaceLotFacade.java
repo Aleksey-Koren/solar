@@ -16,6 +16,7 @@ import io.solar.service.StationService;
 import io.solar.service.engine.interfaces.HangarEngine;
 import io.solar.service.engine.interfaces.InventoryEngine;
 import io.solar.service.engine.interfaces.NotificationEngine;
+import io.solar.service.engine.interfaces.ObjectEngine;
 import io.solar.service.engine.interfaces.SpaceTechEngine;
 import io.solar.service.marketplace.MarketplaceLotService;
 import io.solar.specification.MarketplaceLotSpecification;
@@ -43,6 +44,7 @@ public class MarketplaceLotFacade {
     private final NotificationEngine notificationEngine;
     private final HangarEngine hangarEngine;
     private final SpaceTechEngine spaceTechEngine;
+    private final ObjectEngine objectEngine;
     private final MarketplaceLotMapper marketplaceLotMapper;
     private final MarketplaceProperties marketplaceProperties;
 
@@ -152,7 +154,7 @@ public class MarketplaceLotFacade {
     }
 
     private void transferLot(User user, MarketplaceLot lot, StarShip starship) {
-        if (isTheLotStarship(lot)) {
+        if (objectEngine.isObjectAStarship(lot.getObject())) {
             StarShip starshipLot = starShipService.getById(lot.getObject().getId());
             Station station = stationService.getById(user.getLocation().getAttachedToShip().getId());
 
@@ -194,9 +196,4 @@ public class MarketplaceLotFacade {
     private boolean isOwnerIsAbleToSellThisItem(User owner, BasicObject object) {
         return owner.getLocation().equals(object.getAttachedToShip());
     }
-
-    private boolean isTheLotStarship(MarketplaceLot lot) {
-        return lot.getObject().getObjectTypeDescription().getType().equals(ObjectType.SHIP);
-    }
-
 }

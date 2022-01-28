@@ -32,6 +32,11 @@ public class StarShipService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cannot find starship with id = " + starshipId));
     }
 
+    public List<StarShip> findAllStarshipsById(List<Long> shipsIds) {
+
+        return starShipRepository.findAllById(shipsIds);
+    }
+
     public List<StarShip> findAllUserStarshipsInHangar(User user, Station station) {
 
         return starShipRepository.findAllByUserAndAttachedToShipAndObjectTypeDescription_TypeAndIdNot(user,

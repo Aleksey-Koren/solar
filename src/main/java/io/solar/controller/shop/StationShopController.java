@@ -2,6 +2,7 @@ package io.solar.controller.shop;
 
 import io.solar.dto.shop.ProductPriceDto;
 import io.solar.dto.shop.ShopDto;
+import io.solar.dto.shop.StarshipPriceDto;
 import io.solar.dto.shop.StationShopDto;
 import io.solar.entity.User;
 import io.solar.facade.shop.InventoryShopFacade;
@@ -99,5 +100,23 @@ public class StationShopController {
         User user = userService.findByLogin(principal.getName());
 
         starShipShopFacade.buyStarShip(user, dto);
+    }
+
+    @PatchMapping("/sell/starship/{starshipId}")
+    @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
+    @Transactional
+    public void sellStarShip(@PathVariable Long starshipId, Principal principal) {
+        User user = userService.findByLogin(principal.getName());
+
+        starShipShopFacade.sellStarship(user, starshipId);
+    }
+
+    @GetMapping("/sell/starship/price")
+    @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
+    @Transactional
+    public List<StarshipPriceDto> getStarshipsSellPrices(@RequestBody ShopDto shopDto, Principal principal) {
+        User user = userService.findByLogin(principal.getName());
+
+        return starShipShopFacade.getSellPrices(user, shopDto);
     }
 }
