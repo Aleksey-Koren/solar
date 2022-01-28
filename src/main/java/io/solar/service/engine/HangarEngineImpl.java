@@ -8,10 +8,10 @@ import io.solar.entity.objects.Station;
 import io.solar.service.StarShipService;
 import io.solar.service.UserService;
 import io.solar.service.engine.interfaces.HangarEngine;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.web.server.ResponseStatusException;
 
 @Component
 @RequiredArgsConstructor
