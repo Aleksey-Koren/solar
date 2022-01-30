@@ -52,7 +52,7 @@ public class User {
     private String password;
     private Long money;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "location")
     @ToString.Exclude
     private BasicObject location;

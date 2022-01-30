@@ -3,7 +3,6 @@ package io.solar.facade.shop;
 import io.solar.dto.shop.ShopDto;
 import io.solar.dto.shop.StarshipPriceDto;
 import io.solar.entity.User;
-import io.solar.entity.objects.BasicObject;
 import io.solar.entity.objects.ObjectTypeDescription;
 import io.solar.entity.objects.StarShip;
 import io.solar.entity.objects.Station;
@@ -17,11 +16,9 @@ import io.solar.service.object.BasicObjectService;
 import io.solar.service.object.ObjectTypeDescriptionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -53,13 +50,9 @@ public class StarShipShopFacade {
 
     public void sellStarship(User user, Long starshipId) {
         StarShip starship = starShipService.getById(starshipId);
-
         if (spaceTechEngine.isUserOwnsThisSpaceTech(user, starship) && hangarEngine.isUserAndShipAreInTheSameHangar(user, starship)) {
             long starshipPrice = calculateStarshipPrice(starship);
             userFacade.increaseUserBalance(user, starshipPrice);
-
-            starship.getAttachedObjects().clear();
-            basicObjectService.deleteAll(starship.getAttachedObjects());
             starShipService.delete(starship);
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
@@ -67,9 +60,10 @@ public class StarShipShopFacade {
         }
     }
 
+
+
     public List<StarshipPriceDto> getSellPrices(User user, ShopDto shopDto) {
         List<StarShip> starShips = starShipService.findAllStarshipsById(shopDto.getObjectIds());
-
         boolean isUserOwnerAndUserAndStarshipsAtStation = starShips.stream().allMatch(starship ->
                 spaceTechEngine.isUserOwnsThisSpaceTech(user, starship)
                         && hangarEngine.isUserAndShipAreInTheSameHangar(user, starship)
@@ -93,6 +87,8 @@ public class StarShipShopFacade {
                 .sum();
 
         return starshipPrice + attachedObjectsPrice;
+
+
     }
 
 }

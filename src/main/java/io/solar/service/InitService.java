@@ -27,6 +27,7 @@ public class InitService {
     private final StarShipRepository starShipRepository;
     private final ObjectTypeDescriptionRepository objectTypeDescriptionRepository;
     private final BasicObjectRepository basicObjectRepository;
+    private final StationService stationService;
 
     private final String LOGIN = "admin";
     private final String PASSWORD = "admin";
@@ -69,6 +70,7 @@ public class InitService {
         adminStarShip.setPositionIteration(0L);
         adminStarShip.setUser(admin);
         adminStarShip.setDurability(5000);
+        adminStarShip.setAttachedToShip(stationService.getById(1L));
         adminStarShip.setObjectTypeDescription(objectTypeDescriptionRepository.findById(66L)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Couldn't find ObjectTypeDescription with such id")));
         adminStarShip.setStatus(ObjectStatus.IN_SPACE);

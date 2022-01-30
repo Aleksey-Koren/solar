@@ -50,7 +50,7 @@ public class BasicObject implements Serializable {
 
     protected Integer durability;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "attached_to_ship")
     protected BasicObject attachedToShip;
 
@@ -83,11 +83,11 @@ public class BasicObject implements Serializable {
     @Column(name = "volume")
     protected Float volume;
 
-    @OneToMany(mappedBy = "attachedToShip", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "attachedToShip")
     @EqualsAndHashCode.Exclude
     protected List<BasicObject> attachedObjects;
 
-    @OneToMany(mappedBy = "object", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "object", cascade = CascadeType.ALL)
     @EqualsAndHashCode.Exclude
     protected List<Course> courses;
 
