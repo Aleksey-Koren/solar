@@ -1,5 +1,6 @@
 package io.solar.facade.exchange;
 
+import io.solar.dto.exchange.ExchangeDto;
 import io.solar.dto.exchange.ExchangeInvitationDto;
 import io.solar.entity.User;
 import io.solar.entity.messenger.NotificationType;
@@ -28,5 +29,8 @@ public class ExchangeFacade {
         User inviter = userService.getById(dto.getUserId());
         notificationEngine.notificationToUser(NotificationType.valueOf(dto.getNotificationType())
                 , inviter, userMapper.toDtoWithIdAndTitle(invited));
+    }
+
+    public void createExchange(ExchangeDto dto, String userName) {
     }
 }

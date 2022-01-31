@@ -1,19 +1,22 @@
 package io.solar.entity.exchange;
 
+import groovy.transform.builder.Builder;
 import io.solar.entity.User;
 import lombok.Data;
-import lombok.ToString;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import java.time.Instant;
+import java.util.List;
 
 @Entity
-@Data
 @Table(name = "exchanges")
+@Data
+@Builder
 public class Exchange {
 
     @Id
@@ -30,4 +33,12 @@ public class Exchange {
     private Boolean firstAccepted;
     private Boolean secondAccepted;
     private Instant startTime;
+
+    @OneToMany(mappedBy = "exchange")
+    private List<ExchangeOffer> exchangeOffers;
+
+    public void addOffer(ExchangeOffer exchangeOffer) {
+        exchangeOffers.add(exchangeOffer);
+        exchangeOffer.setExchange(this);
+    }
 }
