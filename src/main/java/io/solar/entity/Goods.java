@@ -37,22 +37,4 @@ public class Goods {
 
     private Long amount;
     private Long price;
-
-//    @EqualsAndHashCode
-//    @Getter
-//    @Setter
-//    public static class Key implements Serializable {
-//
-//        private BasicObject owner;
-//        private Product product;
-//
-//        public Key() {
-//
-//        }
-//
-//        public Key(BasicObject owner, Product product) {
-//            this.owner = owner;
-//            this.product = product;
-//        }
-//    }
 }

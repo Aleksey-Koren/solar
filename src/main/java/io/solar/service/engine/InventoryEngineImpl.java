@@ -70,7 +70,7 @@ public class InventoryEngineImpl implements InventoryEngine {
     @Override
     public void dropToSpace(StarShip starShip, List<BasicObject> objects) {
         objects.forEach(s -> setInSpaceParameters(s, generateRandomCoordinatesInDropRadius(starShip)));
-        basicObjectRepository.saveAllAndFlush(objects);
+        basicObjectRepository.saveAll(objects);
     }
 
     private CoordinatePoint generateRandomCoordinatesInDropRadius(StarShip starShip) {

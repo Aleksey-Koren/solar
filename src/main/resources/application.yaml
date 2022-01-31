@@ -24,7 +24,7 @@ spring:
     jpa:
         properties:
             hibernate:
-                show_sql: false
+                show_sql: true
                 format_sql: true
                 use_sql_comments: false
                 ddl-auto: validate
