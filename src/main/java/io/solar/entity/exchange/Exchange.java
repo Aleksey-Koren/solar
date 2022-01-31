@@ -1,8 +1,10 @@
 package io.solar.entity.exchange;
 
-import groovy.transform.builder.Builder;
 import io.solar.entity.User;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -17,6 +19,8 @@ import java.util.List;
 @Table(name = "exchanges")
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Exchange {
 
     @Id

@@ -3,6 +3,7 @@ package io.solar.facade.exchange;
 import io.solar.dto.exchange.ExchangeDto;
 import io.solar.dto.exchange.ExchangeInvitationDto;
 import io.solar.entity.User;
+import io.solar.entity.exchange.Exchange;
 import io.solar.entity.messenger.NotificationType;
 import io.solar.mapper.UserMapper;
 import io.solar.service.UserService;
@@ -31,6 +32,14 @@ public class ExchangeFacade {
                 , inviter, userMapper.toDtoWithIdAndTitle(invited));
     }
 
-    public void createExchange(ExchangeDto dto, String userName) {
+    public void createExchange(ExchangeDto dto, String login) {
+        User secondUser = userService.getById(dto.getId());
+        User firstUser = userService.findByLogin(login);
+        Exchange.builder()
+                .firstUser(firstUser)
+                .secondUser(secondUser)
+                .firstAccepted(false)
+                .secondAccepted(false)
+                .build();
     }
 }

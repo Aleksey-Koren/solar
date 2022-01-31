@@ -7,8 +7,10 @@ import io.solar.entity.objects.ObjectTypeDescription;
 import io.solar.entity.objects.StarShip;
 import io.solar.entity.objects.Station;
 import io.solar.facade.UserFacade;
+import io.solar.repository.UserRepository;
 import io.solar.service.StarShipService;
 import io.solar.service.StationService;
+import io.solar.service.UserService;
 import io.solar.service.engine.interfaces.HangarEngine;
 import io.solar.service.engine.interfaces.ObjectEngine;
 import io.solar.service.engine.interfaces.SpaceTechEngine;
@@ -34,6 +36,7 @@ public class StarShipShopFacade {
     private final StationService stationService;
     private final StarShipService starShipService;
     private final BasicObjectService basicObjectService;
+    private final UserRepository userRepository;
 
     public void buyStarShip(User user, ShopDto shopDto) {
         Station currentStation = stationService.getById(user.getLocation().getAttachedToShip().getId());
@@ -53,7 +56,6 @@ public class StarShipShopFacade {
         if (spaceTechEngine.isUserOwnsThisSpaceTech(user, starship) && hangarEngine.isUserAndShipAreInTheSameHangar(user, starship)) {
             long starshipPrice = calculateStarshipPrice(starship);
             userFacade.increaseUserBalance(user, starshipPrice);
-            starShipService.delete(starship);
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Fail to get object price because user isn't owner or user not locate at the station");
