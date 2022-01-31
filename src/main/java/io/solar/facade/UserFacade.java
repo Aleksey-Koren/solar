@@ -63,14 +63,14 @@ public class UserFacade {
         } else {
             user.setMoney(user.getMoney() - amount);
             userService.update(user);
-            notificationEngine.simpleNotification(NotificationType.MONEY_UPDATED, user);
+            notificationEngine.notificationToUser(NotificationType.MONEY_UPDATED, user, null);
         }
     }
 
     public void increaseUserBalance(User user, Long amount) {
         user.setMoney(user.getMoney() + amount);
         userService.update(user);
-        notificationEngine.simpleNotification(NotificationType.MONEY_UPDATED, user);
+        notificationEngine.notificationToUser(NotificationType.MONEY_UPDATED, user, null);
     }
 
     public UserDto getById(Long id) {

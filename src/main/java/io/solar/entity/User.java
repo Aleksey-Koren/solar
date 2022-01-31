@@ -1,5 +1,6 @@
 package io.solar.entity;
 
+import io.solar.entity.exchange.ExchangeOffer;
 import io.solar.entity.messenger.Room;
 import io.solar.entity.messenger.UserRoom;
 import io.solar.entity.objects.BasicObject;
@@ -78,6 +79,9 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @ToString.Exclude
     private List<UserRoom> userRooms;
+
+    @OneToMany
+    private List<ExchangeOffer> exchangeOffers;
 
 
     public static UserDetails retrieveUserDetails(User user) {
