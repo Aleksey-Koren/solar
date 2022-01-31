@@ -6,5 +6,8 @@ public enum NotificationType {
     BET_OVERBID,
     INSTANT_PURCHASE,
     MONEY_UPDATED,
-    LEAVE_ROOM
+    LEAVE_ROOM,
+    EXCHANGE_INVITATION,
+    ACCEPTED,
+    REJECTED
 }

@@ -7,7 +7,7 @@ import io.solar.entity.messenger.NotificationType;
 
 public interface NotificationEngine {
 
-    void simpleNotification(NotificationType type, User user);
+    void notificationToUser(NotificationType type, User destinationUser, Object payload);
 
     void sendLeaveRoomNotification(User userDestination, UserDto payload);
 

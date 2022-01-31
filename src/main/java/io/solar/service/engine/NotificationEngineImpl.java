@@ -19,9 +19,9 @@ public class NotificationEngineImpl implements NotificationEngine {
     private final MessengerProperties messengerProperties;
 
     @Override
-    public void simpleNotification(NotificationType type, User user) {
+    public void notificationToUser(NotificationType type, User destinationUser, Object payload) {
 
-        simpMessagingTemplate.convertAndSendToUser(user.getLogin(),
+        simpMessagingTemplate.convertAndSendToUser(destinationUser.getLogin(),
                 messengerProperties.getNotificationDestination(),
                 new NotificationDto<Void>(NotificationType.MONEY_UPDATED.name(), null));
     }
