@@ -3,6 +3,8 @@ package io.solar.dto.exchange;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 @Builder
 public class ExchangeDto {
@@ -13,4 +15,5 @@ public class ExchangeDto {
     private Boolean firstAccepted;
     private Boolean secondAccepted;
 
+    private List<ExchangeOfferDto> offers;
 }

@@ -6,13 +6,12 @@ import io.solar.entity.User;
 import io.solar.entity.marketplace.MarketplaceBet;
 import io.solar.entity.marketplace.MarketplaceLot;
 import io.solar.entity.objects.BasicObject;
-import io.solar.entity.objects.ObjectType;
 import io.solar.entity.objects.StarShip;
 import io.solar.entity.objects.Station;
-import io.solar.facade.UserFacade;
 import io.solar.mapper.marketplace.MarketplaceLotMapper;
 import io.solar.service.StarShipService;
 import io.solar.service.StationService;
+import io.solar.service.UserService;
 import io.solar.service.engine.interfaces.HangarEngine;
 import io.solar.service.engine.interfaces.InventoryEngine;
 import io.solar.service.engine.interfaces.NotificationEngine;
@@ -36,7 +35,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class MarketplaceLotFacade {
 
-    private final UserFacade userFacade;
+    private final UserService userService;
     private final MarketplaceLotService marketplaceLotService;
     private final StationService stationService;
     private final StarShipService starShipService;
@@ -76,7 +75,7 @@ public class MarketplaceLotFacade {
 
         if (isSellerCanTakeMoney(user, lot)) {
             MarketplaceBet winningBet = marketplaceLotService.getCurrentBet(lot);
-            userFacade.increaseUserBalance(user, winningBet.getAmount());
+            userService.increaseUserBalance(user, winningBet.getAmount());
             lot.setIsSellerHasTaken(true);
         } else {
             return HttpStatus.BAD_REQUEST;
@@ -120,7 +119,7 @@ public class MarketplaceLotFacade {
             inventoryEngine.moveToMarketplace(lot.getObject());
         }
 
-        userFacade.decreaseUserBalance(owner, calculateCommission(lot));
+        userService.decreaseUserBalance(owner, calculateCommission(lot));
         marketplaceLotService.save(lot);
         return HttpStatus.OK;
     }
@@ -133,8 +132,8 @@ public class MarketplaceLotFacade {
             return HttpStatus.BAD_REQUEST;
         }
 
-        userFacade.decreaseUserBalance(buyer, lot.getInstantPrice());
-        userFacade.increaseUserBalance(lot.getOwner(), lot.getInstantPrice());
+        userService.decreaseUserBalance(buyer, lot.getInstantPrice());
+        userService.increaseUserBalance(lot.getOwner(), lot.getInstantPrice());
         inventoryEngine.putToInventory(starShipService.getById(buyer.getLocation().getId()), List.of(lot.getObject()));
         notificationEngine.sendInstantPurchaseNotification(lot.getOwner(), marketplaceLotMapper.toDto(lot));
         marketplaceLotService.delete(lot);

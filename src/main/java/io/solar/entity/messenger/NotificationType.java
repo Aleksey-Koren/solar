@@ -9,5 +9,6 @@ public enum NotificationType {
     LEAVE_ROOM,
     EXCHANGE_INVITATION,
     ACCEPTED,
-    REJECTED
+    REJECTED,
+    OFFER_UPDATED
 }

@@ -3,6 +3,7 @@ package io.solar.dto.exchange;
 import io.solar.dto.BasicObjectViewDto;
 import io.solar.dto.ProductDto;
 import io.solar.dto.UserDto;
+import io.solar.entity.exchange.OfferType;
 import lombok.Builder;
 import lombok.Data;
 
@@ -17,5 +18,5 @@ public class ExchangeOfferDto {
     private Long moneyAmount;
     private ProductDto product;
     private Long productAmount;
-    private String offerType;
+    private OfferType offerType;
 }

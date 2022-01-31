@@ -5,9 +5,9 @@ import io.solar.dto.shop.StationShopDto;
 import io.solar.entity.User;
 import io.solar.entity.objects.BasicObject;
 import io.solar.entity.shop.StationShop;
-import io.solar.facade.UserFacade;
 import io.solar.mapper.shop.StationShopMapper;
 import io.solar.service.StarShipService;
+import io.solar.service.UserService;
 import io.solar.service.engine.interfaces.InventoryEngine;
 import io.solar.service.engine.interfaces.ObjectEngine;
 import io.solar.service.object.BasicObjectService;
@@ -28,13 +28,13 @@ import java.util.List;
 public class InventoryShopFacade {
 
     private final StationShopService stationShopService;
-    private final UserFacade userFacade;
-    private final StationShopMapper stationShopMapper;
-    private final InventoryEngine inventoryEngine;
-    private final ObjectEngine objectEngine;
+    private final UserService userService;
     private final ObjectTypeDescriptionService otdService;
     private final BasicObjectService basicObjectService;
     private final StarShipService starShipService;
+    private final ObjectEngine objectEngine;
+    private final InventoryEngine inventoryEngine;
+    private final StationShopMapper stationShopMapper;
 
     @Value("${station_sell_modifier:0.7}")
     private Double stationSellModifier;
@@ -48,7 +48,7 @@ public class InventoryShopFacade {
     public HttpStatus buyInventory(User user, List<ShopDto> shopDto) {
 
         long amount = calculateAmountPrice(shopDto);
-        userFacade.decreaseUserBalance(user, amount);
+        userService.decreaseUserBalance(user, amount);
 
         List<BasicObject> objectsToBy = createObjects(shopDto);
         inventoryEngine.putToInventory(starShipService.getById(user.getLocation().getId()), objectsToBy);
@@ -67,7 +67,7 @@ public class InventoryShopFacade {
                     }
                 }).map(this::calculateSellPrice).mapToLong(Long::longValue).sum();
 
-        userFacade.increaseUserBalance(user, sellAmount);
+        userService.increaseUserBalance(user, sellAmount);
         basicObjectService.deleteAll(objects);
         return HttpStatus.OK;
     }

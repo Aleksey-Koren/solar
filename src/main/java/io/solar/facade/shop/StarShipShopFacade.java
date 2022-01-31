@@ -28,15 +28,13 @@ import java.util.List;
 public class StarShipShopFacade {
 
     private final ObjectTypeDescriptionService objectTypeDescriptionService;
-    private final UserFacade userFacade;
+    private final UserService userService;
     private final InventoryShopFacade inventoryShopFacade;
     private final ObjectEngine objectEngine;
     private final HangarEngine hangarEngine;
     private final SpaceTechEngine spaceTechEngine;
     private final StationService stationService;
     private final StarShipService starShipService;
-    private final BasicObjectService basicObjectService;
-    private final UserRepository userRepository;
 
     public void buyStarShip(User user, ShopDto shopDto) {
         Station currentStation = stationService.getById(user.getLocation().getAttachedToShip().getId());
@@ -46,7 +44,7 @@ public class StarShipShopFacade {
         }
 
         ObjectTypeDescription otd = objectTypeDescriptionService.getById(shopDto.getOtdId());
-        userFacade.decreaseUserBalance(user, otd.getPrice().longValue());
+        userService.decreaseUserBalance(user, otd.getPrice().longValue());
         StarShip newStarShip = objectEngine.createStarship(otd);
         hangarEngine.moveToHangar(user, newStarShip, currentStation);
     }
@@ -55,13 +53,12 @@ public class StarShipShopFacade {
         StarShip starship = starShipService.getById(starshipId);
         if (spaceTechEngine.isUserOwnsThisSpaceTech(user, starship) && hangarEngine.isUserAndShipAreInTheSameHangar(user, starship)) {
             long starshipPrice = calculateStarshipPrice(starship);
-            userFacade.increaseUserBalance(user, starshipPrice);
+            userService.increaseUserBalance(user, starshipPrice);
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Fail to get object price because user isn't owner or user not locate at the station");
         }
     }
-
 
 
     public List<StarshipPriceDto> getSellPrices(User user, ShopDto shopDto) {
