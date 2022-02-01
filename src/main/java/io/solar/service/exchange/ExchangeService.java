@@ -23,4 +23,5 @@ public class ExchangeService {
     public Exchange save(Exchange exchange) {
         return exchangeRepository.save(exchange);
     }
+
 }

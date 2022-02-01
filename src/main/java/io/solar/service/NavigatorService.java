@@ -56,7 +56,7 @@ public class NavigatorService {
         return starship.getSpeed() < maxSpeed && distance < maxDistance;
     }
 
-    private double calcDistance(BasicObject objectA, BasicObject objectB) {
+    public double calcDistance(BasicObject objectA, BasicObject objectB) {
         return sqrt(pow(objectB.getX() - objectA.getX(), 2) + pow(objectB.getY() - objectA.getY(), 2));
     }
 

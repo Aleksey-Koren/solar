@@ -68,6 +68,7 @@ app:
         max_speed: 1000
         update_coordinates_delay: PT155M
         num_update_object: 100
+        max_exchange_distance: 1
     email:
         token_lifetime_hours: 24
         forgot_password_template: http://localhost:8081/forgot-password.html?token=

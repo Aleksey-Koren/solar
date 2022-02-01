@@ -1,5 +1,6 @@
 package io.solar.dto.exchange;
 
+import io.solar.dto.UserDto;
 import lombok.Builder;
 import lombok.Data;
 
@@ -8,9 +9,9 @@ import lombok.Data;
 public class ExchangeDto {
 
     private Long id;
-    private Long firstUserId;
-    private Long secondUserId;
+    private UserDto firstUser;
+    private UserDto secondUser;
     private Boolean firstAccepted;
     private Boolean secondAccepted;
-
+    private Double distance;
 }
