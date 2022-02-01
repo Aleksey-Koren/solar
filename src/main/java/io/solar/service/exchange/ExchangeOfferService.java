@@ -23,4 +23,8 @@ public class ExchangeOfferService {
 
         exchangeOfferRepository.delete(offer);
     }
+
+    public ExchangeOffer save(ExchangeOffer exchangeOffer) {
+        return exchangeOfferRepository.save(exchangeOffer);
+    }
 }

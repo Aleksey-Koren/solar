@@ -11,8 +11,8 @@ import java.util.List;
 public class ExchangeDto {
 
     private Long id;
-    private Long firstUserId;
-    private Long secondUserId;
+    private UserDto firstUser;
+    private UserDto secondUser;
     private Boolean firstAccepted;
     private Boolean secondAccepted;
     private Double distance;

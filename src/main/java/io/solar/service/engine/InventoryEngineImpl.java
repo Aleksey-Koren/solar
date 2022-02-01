@@ -57,6 +57,7 @@ public class InventoryEngineImpl implements InventoryEngine {
     @Override
     public void moveToMarketplace(BasicObject object) {
         object.setAttachedToShip(null);
+        object.setAttachedToSocket(null);
         object.setStatus(ObjectStatus.AT_MARKETPLACE);
         basicObjectRepository.save(object);
     }
@@ -71,6 +72,18 @@ public class InventoryEngineImpl implements InventoryEngine {
     public void dropToSpace(StarShip starShip, List<BasicObject> objects) {
         objects.forEach(s -> setInSpaceParameters(s, generateRandomCoordinatesInDropRadius(starShip)));
         basicObjectRepository.saveAll(objects);
+    }
+
+    @Override
+    public void putToExchange(StarShip starship, BasicObject inventoryObject) {
+        if (!starship.getId().equals(inventoryObject.getAttachedToShip().getId())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST , "Object to put to exchange is not is user's starship");
+        }
+
+        inventoryObject.setAttachedToShip(null);
+        inventoryObject.setAttachedToSocket(null);
+        inventoryObject.setStatus(ObjectStatus.AT_EXCHANGE);
+        basicObjectRepository.save(inventoryObject);
     }
 
     private CoordinatePoint generateRandomCoordinatesInDropRadius(StarShip starShip) {

@@ -3,14 +3,12 @@ package io.solar.facade.exchange;
 import io.solar.config.properties.NavigatorProperties;
 import io.solar.dto.exchange.ExchangeDto;
 import io.solar.dto.exchange.ExchangeInvitationDto;
+import io.solar.dto.exchange.ExchangeOfferDto;
 import io.solar.entity.User;
 import io.solar.entity.exchange.Exchange;
 import io.solar.entity.exchange.ExchangeOffer;
 import io.solar.entity.messenger.NotificationType;
-import io.solar.mapper.ProductMapper;
 import io.solar.mapper.UserMapper;
-import io.solar.mapper.exchange.ExchangeMapper;
-import io.solar.mapper.object.BasicObjectMapper;
 import io.solar.mapper.exchange.ExchangeMapper;
 import io.solar.service.NavigatorService;
 import io.solar.service.UserService;
@@ -20,10 +18,8 @@ import io.solar.service.exchange.ExchangeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
-
-import java.util.Optional;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
@@ -36,8 +32,6 @@ public class ExchangeFacade {
     private final ExchangeEngine exchangeEngine;
     private final NotificationEngine notificationEngine;
     private final UserMapper userMapper;
-    private final ExchangeMapper exchangeMapper;
-    private final ExchangeService exchangeService;
     private final ExchangeMapper exchangeMapper;
     private final NavigatorService navigatorService;
     private final NavigatorProperties navigatorProperties;
@@ -69,10 +63,20 @@ public class ExchangeFacade {
         double distance = navigatorService.calcDistance(firstUser.getLocation(), secondUser.getLocation());
         if (distance <= navigatorProperties.getMaxExchangeDistance()) {
             exchangeService.save(exchange);
-            return exchangeDto;
         } else {
             exchangeDto.setDistance(distance);
-            return exchangeDto;
+        }
+        return exchangeDto;
+    }
+
+    public void createExchangeNotifications(ExchangeDto exchangeDto) {
+        if (exchangeDto.getDistance() == null) {
+            notificationEngine.notificationToUser(NotificationType.EXCHANGE_CREATED, exchangeDto.getFirstUser().getLogin(), exchangeDto);
+            notificationEngine.notificationToUser(NotificationType.EXCHANGE_CREATED, exchangeDto.getSecondUser().getLogin(), exchangeDto);
+        } else {
+            notificationEngine.notificationToUser(NotificationType.MESSAGE_TO_SCREEN, exchangeDto.getFirstUser().getLogin(),
+                    String.format("Exchange is not possible. Distance is too big. It's %f. You should get closer than %f to each other",
+                            exchangeDto.getDistance(), navigatorProperties.getMaxExchangeDistance()));
         }
     }
 

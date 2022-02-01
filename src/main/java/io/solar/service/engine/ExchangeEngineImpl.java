@@ -10,11 +10,15 @@ import io.solar.service.StarShipService;
 import io.solar.service.UserService;
 import io.solar.service.engine.interfaces.ExchangeEngine;
 import io.solar.service.engine.interfaces.InventoryEngine;
+import io.solar.service.engine.interfaces.ProductEngine;
 import io.solar.service.exchange.ExchangeOfferService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -25,6 +29,14 @@ public class ExchangeEngineImpl implements ExchangeEngine {
     private final GoodsService goodsService;
     private final UserService userService;
     private final InventoryEngine inventoryEngine;
+    private final ProductEngine productEngine;
+
+    @Override
+    public void putObject(ExchangeOffer offer) {
+        StarShip starship = starShipService.getById(offer.getUser().getLocation().getId());
+        inventoryEngine.putToExchange(starship, offer.getInventoryObject());
+    }
+
 
     @Override
     public void returnObjectToUser(ExchangeOffer offer) {
@@ -64,4 +76,25 @@ public class ExchangeEngineImpl implements ExchangeEngine {
         goodsService.save(goods);
     }
 
+    @Override
+    //TODO add check. If any money offers were created before?
+    public void createMoneyOffer(ExchangeOffer exchangeOffer) {
+        userService.decreaseUserBalance(exchangeOffer.getUser(), exchangeOffer.getMoneyAmount());
+    }
+
+    @Override
+    public void createGoodsOffer(ExchangeOffer exchangeOffer) {
+        StarShip starship = starShipService.getById(exchangeOffer.getUser().getLocation().getId());
+        Long productId = exchangeOffer.getProduct().getId();
+        Map<Long, Goods> productGoodsMap = productEngine.createProductGoodsMap(starship);
+        Goods goodsAtUsers = productGoodsMap.get(productId);
+
+        if (goodsAtUsers.getAmount() < exchangeOffer.getProductAmount()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    String.format("There is no enough %s product at user's starship", exchangeOffer.getProduct().getTitle()));
+        }
+
+        goodsAtUsers.setAmount(goodsAtUsers.getAmount() - exchangeOffer.getProductAmount());
+        goodsService.save(goodsAtUsers);
+    }
 }

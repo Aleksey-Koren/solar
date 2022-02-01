@@ -34,8 +34,8 @@ public class ExchangeMapper {
 
         return ExchangeDto.builder()
                 .id(entity.getId())
-                .firstUserId(entity.getFirstUser().getId())
-                .secondUserId(entity.getSecondUser().getId())
+                .firstUser(userMapper.toDtoWithIdAndTitle(entity.getFirstUser()))
+                .secondUser(userMapper.toDtoWithIdAndTitle(entity.getSecondUser()))
                 .firstAccepted(entity.getFirstAccepted())
                 .secondAccepted(entity.getSecondAccepted())
                 .offers(offerDtoList)
