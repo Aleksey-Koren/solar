@@ -19,7 +19,6 @@ public class ExchangeOfferMapper {
     private final UserMapper userMapper;
     private final BasicObjectViewMapper basicObjectViewMapper;
     private final ProductMapper productMapper;
-    private final ExchangeMapper exchangeMapper;
     private final ExchangeOfferService exchangeOfferService;
     private final ExchangeService exchangeService;
     private final ProductService productService;
@@ -29,7 +28,7 @@ public class ExchangeOfferMapper {
     public ExchangeOfferDto toDto(ExchangeOffer entity) {
         return ExchangeOfferDto.builder()
                 .id(entity.getId())
-                .exchange(exchangeMapper.toDto(entity.getExchange()))
+                .exchangeId(entity.getExchange().getId())
                 .user(userMapper.toDtoWithIdAndTitle(entity.getUser()))
                 .inventoryObject(entity.getInventoryObject() != null
                         ? basicObjectViewMapper.toDto(entity.getInventoryObject())

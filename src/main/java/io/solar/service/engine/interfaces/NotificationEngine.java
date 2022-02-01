@@ -17,4 +17,6 @@ public interface NotificationEngine {
     void sendInstantPurchaseNotification(User lotOwner, MarketplaceLotDto lotDto);
 
     void sendOfferUpdatedNotification(User userDestination, ExchangeOfferDto updatedOffer);
+
+    void sendLeaveExchangeNotification(User userDestination);
 }

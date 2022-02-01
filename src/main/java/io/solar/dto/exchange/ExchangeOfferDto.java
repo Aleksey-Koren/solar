@@ -12,7 +12,7 @@ import lombok.Data;
 public class ExchangeOfferDto {
 
     private Long id;
-    private ExchangeDto exchange;
+    private Long exchangeId;
     private UserDto user;
     private BasicObjectViewDto inventoryObject;
     private Long moneyAmount;

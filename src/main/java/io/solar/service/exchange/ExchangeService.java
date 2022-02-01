@@ -25,7 +25,7 @@ public class ExchangeService {
 
     public Optional<Exchange> findByUser(User user) {
 
-        return exchangeRepository.findByFirstUserOrSecondUser(user);
+        return exchangeRepository.findByFirstUserOrSecondUser(user, user);
     }
 
     public Exchange getByUser(User user) {

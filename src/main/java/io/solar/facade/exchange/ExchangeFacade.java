@@ -95,6 +95,8 @@ public class ExchangeFacade {
 
         exchange.getExchangeOffers().forEach(this::returnItemToOwner);
 
+        notificationEngine.sendLeaveExchangeNotification(exchangeEngine.retrieveAnotherExchangeUser(user, exchange));
+
         exchangeService.delete(exchange);
     }
 
