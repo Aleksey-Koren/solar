@@ -2,6 +2,7 @@ package io.solar.service.engine;
 
 import io.solar.config.properties.MessengerProperties;
 import io.solar.dto.UserDto;
+import io.solar.dto.exchange.ExchangeOfferDto;
 import io.solar.dto.marketplace.MarketplaceLotDto;
 import io.solar.dto.messenger.NotificationDto;
 import io.solar.entity.User;
@@ -46,5 +47,12 @@ public class NotificationEngineImpl implements NotificationEngine {
         simpMessagingTemplate.convertAndSendToUser(lotOwner.getLogin(),
                 messengerProperties.getNotificationDestination(),
                 new NotificationDto<>(NotificationType.INSTANT_PURCHASE.name(), lotDto));
+    }
+
+    @Override
+    public void sendOfferUpdatedNotification(User userDestination, ExchangeOfferDto updatedOffer) {
+        simpMessagingTemplate.convertAndSendToUser(userDestination.getLogin(),
+                messengerProperties.getNotificationDestination(),
+                new NotificationDto<>(NotificationType.OFFER_UPDATED.name(), updatedOffer));
     }
 }

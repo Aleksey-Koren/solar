@@ -2,6 +2,7 @@ package io.solar.service;
 
 import io.solar.entity.Goods;
 import io.solar.entity.Product;
+import io.solar.entity.User;
 import io.solar.entity.objects.BasicObject;
 import io.solar.repository.GoodsRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,14 @@ public class GoodsService {
         return goodsRepository.findByOwnerAndProduct(owner, product);
     }
 
+    public Goods getByOwnerAndProduct(BasicObject owner, Product product) {
+
+        return goodsRepository.findByOwnerAndProduct(owner, product)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        String.format("Cannot found goods with owner id = %d and product id = %d", owner.getId(), product.getId()))
+                );
+    }
+
     public List<Goods> saveAll(List<Goods> goods) {
         return goodsRepository.saveAll(goods);
     }
@@ -39,5 +48,10 @@ public class GoodsService {
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         String.format("There is no %s object with id = %d in database", Goods.class.getSimpleName(), id)
                 ));
+    }
+
+    public void delete(Goods goods) {
+
+        goodsRepository.delete(goods);
     }
 }

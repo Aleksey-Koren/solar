@@ -57,22 +57,6 @@ public class UserFacade {
         });
     }
 
-    public void decreaseUserBalance(User user, Long amount) {
-        if (user.getMoney() < amount) {
-            throw new ResponseStatusException(HttpStatus.PAYMENT_REQUIRED, "Not enough credits at user's balance");
-        } else {
-            user.setMoney(user.getMoney() - amount);
-            userService.update(user);
-            notificationEngine.notificationToUser(NotificationType.MONEY_UPDATED, user, null);
-        }
-    }
-
-    public void increaseUserBalance(User user, Long amount) {
-        user.setMoney(user.getMoney() + amount);
-        userService.update(user);
-        notificationEngine.notificationToUser(NotificationType.MONEY_UPDATED, user, null);
-    }
-
     public UserDto getById(Long id) {
         return userMapper.toDto(userService.getById(id));
     }
