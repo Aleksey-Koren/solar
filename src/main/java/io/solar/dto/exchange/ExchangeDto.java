@@ -18,5 +18,4 @@ public class ExchangeDto {
     private Double distance;
 
     private List<ExchangeOfferDto> offers;
-
 }

@@ -1,6 +1,8 @@
 package io.solar.facade.exchange;
 
+import io.solar.dto.UserDto;
 import io.solar.dto.exchange.ExchangeOfferDto;
+import io.solar.dto.exchange.LayerTransferDto;
 import io.solar.entity.User;
 import io.solar.entity.exchange.ExchangeOffer;
 import io.solar.entity.messenger.NotificationType;
@@ -9,11 +11,15 @@ import io.solar.service.UserService;
 import io.solar.service.engine.interfaces.ExchangeEngine;
 import io.solar.service.engine.interfaces.NotificationEngine;
 import io.solar.service.exchange.ExchangeOfferService;
+import io.solar.service.exchange.ExchangeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.time.Instant;
+
 
 @Component
 @RequiredArgsConstructor
@@ -24,10 +30,11 @@ public class ExchangeOfferFacade {
     private final NotificationEngine notificationEngine;
     private final UserService userService;
     private final ExchangeOfferMapper exchangeOfferMapper;
+    private final ExchangeService exchangeService;
 
     public void updateOffer(ExchangeOfferDto exchangeOfferDto, User user) {
-        ExchangeOffer offer = exchangeOfferService.getById(exchangeOfferDto.getId());
 
+        ExchangeOffer offer = exchangeOfferService.getById(exchangeOfferDto.getId());
         if (!offer.getUser().equals(user)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "The user is not the owner of the offer");
         }
@@ -45,26 +52,40 @@ public class ExchangeOfferFacade {
     }
 
     @Transactional
-    public ExchangeOfferDto createOffer(ExchangeOfferDto exchangeOfferDto, String userLogin) {
+    public LayerTransferDto createOffer(ExchangeOfferDto exchangeOfferDto, String userLogin) {
         User offerPublisher = userService.findByLogin(userLogin);
+        User secondUser = exchangeEngine.retrieveAnotherExchangeUser(offerPublisher,
+                exchangeService.getById(exchangeOfferDto.getExchangeId()));
         ExchangeOffer exchangeOffer = exchangeOfferMapper.toEntity(exchangeOfferDto);
         exchangeOffer.setUser(offerPublisher);
-        switch (exchangeOffer.getOfferType()) {
+        exchangeOffer.setCreatedAt(Instant.now());
 
+        switch (exchangeOffer.getOfferType()) {
             case INVENTORY -> exchangeEngine.putObject(exchangeOffer);
             case MONEY -> exchangeEngine.createMoneyOffer(exchangeOffer);
             case GOODS -> exchangeEngine.createGoodsOffer(exchangeOffer);
         }
+
         exchangeOfferService.save(exchangeOffer);
 
         ExchangeOfferDto dto = exchangeOfferMapper.toDto(exchangeOffer);
-        dto.getExchange().getFirstUser().setLogin(exchangeOffer.getExchange().getFirstUser().getLogin());
-        dto.getExchange().getSecondUser().setLogin(exchangeOffer.getExchange().getSecondUser().getLogin());
-        return dto;
+        UserDto first = UserDto.builder().id(offerPublisher.getId())
+                .login(offerPublisher.getLogin())
+                .build();
+
+        UserDto second = UserDto.builder()
+                .id(secondUser.getId())
+                .login(secondUser.getLogin())
+                .build();
+
+        return LayerTransferDto.builder().offerDto(dto)
+                .firstUser(first)
+                .secondUser(second)
+                .build();
     }
 
-    public void sendCreateOfferNotifications(ExchangeOfferDto dto) {
-        notificationEngine.notificationToUser(NotificationType.EXCHANGE_CREATED, dto.getExchange().getFirstUser().getLogin(), dto);
-        notificationEngine.notificationToUser(NotificationType.EXCHANGE_CREATED, dto.getExchange().getSecondUser().getLogin(), dto);
+    public void sendCreateOfferNotifications(LayerTransferDto dto) {
+        notificationEngine.notificationToUser(NotificationType.EXCHANGE_CREATED, dto.getFirstUser().getLogin(), dto.getOfferDto());
+        notificationEngine.notificationToUser(NotificationType.EXCHANGE_CREATED, dto.getSecondUser().getLogin(), dto.getOfferDto());
     }
 }

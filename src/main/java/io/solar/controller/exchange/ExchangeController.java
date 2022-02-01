@@ -3,6 +3,7 @@ package io.solar.controller.exchange;
 import io.solar.dto.exchange.ExchangeDto;
 import io.solar.dto.exchange.ExchangeInvitationDto;
 import io.solar.dto.exchange.ExchangeOfferDto;
+import io.solar.dto.exchange.LayerTransferDto;
 import io.solar.entity.User;
 import io.solar.facade.exchange.ExchangeFacade;
 import io.solar.facade.exchange.ExchangeOfferFacade;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -45,8 +47,8 @@ public class ExchangeController {
 
         exchangeFacade.respondToInvitation(dto, principal.getName());
     }
+
     @PostMapping
-    @Transactional
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
     public void createExchange(@RequestBody ExchangeDto dto, Principal principal) {
         ExchangeDto exchangeDto = exchangeFacade.createExchange(dto, principal.getName());
@@ -76,15 +78,13 @@ public class ExchangeController {
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
     public void updateOffer(@RequestBody ExchangeOfferDto exchangeOfferDto, Principal principal) {
         User user = userService.findByLogin(principal.getName());
-
         exchangeOfferFacade.updateOffer(exchangeOfferDto, user);
     }
 
     @PostMapping("/offer")
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
     public void createOffer(@RequestBody ExchangeOfferDto exchangeOfferDto, Principal principal) {
-
-      ExchangeOfferDto dto =  exchangeOfferFacade.createOffer(exchangeOfferDto, principal.getName());
-      exchangeOfferFacade.sendCreateOfferNotifications(dto);
+        LayerTransferDto dto = exchangeOfferFacade.createOffer(exchangeOfferDto, principal.getName());
+        exchangeOfferFacade.sendCreateOfferNotifications(dto);
     }
 }

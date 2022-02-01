@@ -49,7 +49,7 @@ public class ExchangeOfferMapper {
             entity = new ExchangeOffer();
         }
 
-        entity.setExchange(exchangeService.getById(dto.getExchange().getId()));
+//        entity.setExchange(exchangeService.getById(dto.getExchange().getId()));
         entity.setUser(dto.getUser() != null ? userService.getById(dto.getUser().getId()) : null);
         entity.setMoneyAmount(dto.getMoneyAmount());
         entity.setProduct(dto.getProduct() != null ? productService.getById(dto.getProduct().getId()) : null);
