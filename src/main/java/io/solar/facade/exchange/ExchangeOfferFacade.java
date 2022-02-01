@@ -2,7 +2,6 @@ package io.solar.facade.exchange;
 
 import io.solar.dto.exchange.ExchangeOfferDto;
 import io.solar.entity.User;
-import io.solar.entity.exchange.Exchange;
 import io.solar.entity.exchange.ExchangeOffer;
 import io.solar.service.engine.interfaces.ExchangeEngine;
 import io.solar.service.engine.interfaces.NotificationEngine;
@@ -33,14 +32,10 @@ public class ExchangeOfferFacade {
             case GOODS -> exchangeEngine.updateGoods(offer, exchangeOfferDto.getProductAmount());
         }
 
-        notificationEngine.sendOfferUpdatedNotification(retrieveAnotherExchangeUser(user, offer.getExchange()), exchangeOfferDto);
-    }
-
-    private User retrieveAnotherExchangeUser(User user, Exchange exchange) {
-
-        return exchange.getFirstUser().equals(user)
-                ? exchange.getSecondUser()
-                : exchange.getFirstUser();
+        notificationEngine.sendOfferUpdatedNotification(
+                exchangeEngine.retrieveAnotherExchangeUser(user, offer.getExchange()),
+                exchangeOfferDto
+        );
     }
 
 }

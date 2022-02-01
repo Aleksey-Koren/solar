@@ -1,5 +1,7 @@
 package io.solar.service.engine.interfaces;
 
+import io.solar.entity.User;
+import io.solar.entity.exchange.Exchange;
 import io.solar.entity.exchange.ExchangeOffer;
 
 public interface ExchangeEngine {
@@ -9,5 +11,7 @@ public interface ExchangeEngine {
     void updateUserBalance(ExchangeOffer offer, Long updatedMoneyAmount);
 
     void updateGoods(ExchangeOffer offer, Long updatedGoodsAmount);
+
+    User retrieveAnotherExchangeUser(User user, Exchange exchange);
 
 }

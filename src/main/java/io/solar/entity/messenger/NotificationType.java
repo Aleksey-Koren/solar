@@ -10,5 +10,6 @@ public enum NotificationType {
     EXCHANGE_INVITATION,
     ACCEPTED,
     REJECTED,
-    OFFER_UPDATED
+    OFFER_UPDATED,
+    LEAVE_EXCHANGE
 }

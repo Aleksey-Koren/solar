@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
@@ -24,6 +26,7 @@ import java.util.List;
 public class Exchange {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @OneToOne
@@ -31,7 +34,7 @@ public class Exchange {
     private User firstUser;
 
     @OneToOne
-    @JoinColumn(name ="second_user_id")
+    @JoinColumn(name = "second_user_id")
     private User secondUser;
 
     private Boolean firstAccepted;

@@ -2,17 +2,25 @@ package io.solar;
 
 
 import io.solar.dto.messenger.CreateRoomDto;
+import io.solar.entity.Goods;
+import io.solar.entity.Product;
 import io.solar.entity.User;
+import io.solar.entity.exchange.Exchange;
+import io.solar.entity.exchange.ExchangeOffer;
+import io.solar.entity.exchange.OfferType;
 import io.solar.entity.marketplace.MarketplaceBet;
 import io.solar.entity.marketplace.MarketplaceLot;
 import io.solar.entity.messenger.Message;
 import io.solar.entity.messenger.MessageType;
 import io.solar.entity.messenger.Room;
 import io.solar.entity.objects.BasicObject;
+import io.solar.entity.objects.StarShip;
 import io.solar.facade.messenger.RoomFacade;
 import io.solar.repository.BasicObjectRepository;
 import io.solar.repository.StarShipRepository;
 import io.solar.repository.UserRepository;
+import io.solar.repository.exchange.ExchangeOfferRepository;
+import io.solar.repository.exchange.ExchangeRepository;
 import io.solar.repository.marketplace.MarketplaceBetRepository;
 import io.solar.repository.marketplace.MarketplaceLotRepository;
 import io.solar.repository.messenger.MessageRepository;
@@ -52,6 +60,9 @@ public class FillDatabaseTest {
     private final MarketplaceLotRepository marketplaceLotRepository;
     private final MarketplaceBetRepository marketplaceBetRepository;
     private final BasicObjectRepository basicObjectRepository;
+    private final ExchangeRepository exchangeRepository;
+    private final StarShipRepository starShipRepository;
+    private final ExchangeOfferRepository exchangeOfferRepository;
     private final RoomFacade roomFacade;
     private final UserService userService;
 
@@ -60,17 +71,23 @@ public class FillDatabaseTest {
                             RoomRepository roomRepository,
                             MessageRepository messageRepository,
                             MarketplaceBetRepository marketplaceBetRepository,
+                            ExchangeRepository exchangeRepository,
+                            ExchangeOfferRepository exchangeOfferRepository,
                             UserService userService,
                             MarketplaceLotRepository marketplaceLotRepository,
                             BasicObjectRepository basicObjectRepository,
+                            StarShipRepository starShipRepository,
                             RoomFacade roomFacade) {
         this.userRepository = userRepository;
         this.roomRepository = roomRepository;
         this.messageRepository = messageRepository;
         this.marketplaceBetRepository = marketplaceBetRepository;
+        this.exchangeRepository = exchangeRepository;
+        this.exchangeOfferRepository = exchangeOfferRepository;
         this.userService = userService;
         this.marketplaceLotRepository = marketplaceLotRepository;
         this.basicObjectRepository = basicObjectRepository;
+        this.starShipRepository = starShipRepository;
         this.roomFacade = roomFacade;
     }
 
@@ -143,27 +160,82 @@ public class FillDatabaseTest {
         marketplaceBetRepository.save(bet);
     }
 
+    @Order(6)
+    @RepeatedTest(1)
+    public void createExchanges() {
+        List<User> users = userRepository.findAll();
+
+        int iteration = 0;
+        while (iteration < users.size() - 1) {
+
+            exchangeRepository.save(
+                    Exchange.builder()
+                            .firstUser(users.get(iteration))
+                            .secondUser(users.get(iteration + 1))
+                            .startTime(Instant.now())
+                            .firstAccepted(false)
+                            .secondAccepted(false)
+                            .build()
+            );
+
+            iteration += 2;
+        }
+    }
+
+    @Order(7)
+    @RepeatedTest(100)
+    public void createExchangeOffers() {
+        Exchange randomExchange = findRandomExchange();
+        User user = RANDOM.nextBoolean() ? randomExchange.getFirstUser() : randomExchange.getSecondUser();
+
+        ExchangeOffer offer = ExchangeOffer.builder()
+                .exchange(randomExchange)
+                .createdAt(Instant.now())
+                .user(user)
+                .offerType(OfferType.values()[Math.abs(RANDOM.nextInt(0, 2))])
+                .moneyAmount((long) RANDOM.nextInt(0, 5000))
+                .inventoryObject(findRandomObject())
+                .build();
+
+        exchangeOfferRepository.save(offer);
+    }
+
     private User findRandomUser() {
         List<User> users = userRepository.findAll();
 
-        return users.get(Math.abs(RANDOM.nextInt(users.size())));
+        return users.get(RANDOM.nextInt(0, users.size()));
     }
 
     private Room findRandomRoom() {
         List<Room> rooms = roomRepository.findAll();
 
-        return rooms.get(Math.abs(RANDOM.nextInt(rooms.size())));
+        return rooms.get(RANDOM.nextInt(0, rooms.size()));
     }
 
     private MarketplaceLot findRandomLot() {
         List<MarketplaceLot> lots = marketplaceLotRepository.findAll();
 
-        return lots.get(Math.abs(RANDOM.nextInt(lots.size())));
+        return lots.get(RANDOM.nextInt(0, lots.size()));
     }
 
     private BasicObject findRandomObject() {
         List<BasicObject> objects = basicObjectRepository.findAll();
 
-        return objects.get(Math.abs(RANDOM.nextInt(objects.size())));
+        return objects.get(RANDOM.nextInt(0, objects.size()));
+    }
+
+    private Exchange findRandomExchange() {
+        List<Exchange> exchanges = exchangeRepository.findAll();
+
+        return exchanges.get(RANDOM.nextInt(0, exchanges.size()));
+    }
+
+    private Product findRandomUserProduct(User user) {
+        StarShip userStarship = starShipRepository.getById(user.getLocation().getId());
+        List<Goods> goods = userStarship.getGoods();
+
+        Goods randomGoods = goods.get(RANDOM.nextInt(0, goods.size()));
+
+        return randomGoods.getProduct();
     }
 }

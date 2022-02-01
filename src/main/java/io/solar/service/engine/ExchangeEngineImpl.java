@@ -3,6 +3,7 @@ package io.solar.service.engine;
 
 import io.solar.entity.Goods;
 import io.solar.entity.User;
+import io.solar.entity.exchange.Exchange;
 import io.solar.entity.exchange.ExchangeOffer;
 import io.solar.entity.objects.StarShip;
 import io.solar.service.GoodsService;
@@ -43,10 +44,14 @@ public class ExchangeEngineImpl implements ExchangeEngine {
         } else {
             userService.decreaseUserBalance(offer.getUser(), Math.abs(diffMoneyAmount));
         }
+
+        if (updatedMoneyAmount == 0) {
+            exchangeOfferService.delete(offer);
+        }
+
     }
 
     @Override
-    //TODO: need refactor
     public void updateGoods(ExchangeOffer offer, Long updatedGoodsAmount) {
         Goods goods = goodsService.getByOwnerAndProduct(offer.getUser().getLocation(), offer.getProduct());
 
@@ -59,9 +64,17 @@ public class ExchangeEngineImpl implements ExchangeEngine {
 
         if (goods.getAmount() == 0) {
             goodsService.delete(goods);
+        } else {
+            goodsService.save(goods);
         }
+    }
 
-        goodsService.save(goods);
+    @Override
+    public User retrieveAnotherExchangeUser(User user, Exchange exchange) {
+
+        return exchange.getFirstUser().equals(user)
+                ? exchange.getSecondUser()
+                : exchange.getFirstUser();
     }
 
 }

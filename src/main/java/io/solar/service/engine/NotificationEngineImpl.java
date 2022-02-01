@@ -48,4 +48,11 @@ public class NotificationEngineImpl implements NotificationEngine {
                 messengerProperties.getNotificationDestination(),
                 new NotificationDto<>(NotificationType.OFFER_UPDATED.name(), updatedOffer));
     }
+
+    @Override
+    public void sendLeaveExchangeNotification(User userDestination) {
+        simpMessagingTemplate.convertAndSendToUser(userDestination.getLogin(),
+                messengerProperties.getNotificationDestination(),
+                new NotificationDto<>(NotificationType.LEAVE_EXCHANGE.name(), null));
+    }
 }

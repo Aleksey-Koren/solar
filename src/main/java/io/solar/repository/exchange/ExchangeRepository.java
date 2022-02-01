@@ -10,6 +10,6 @@ import java.util.Optional;
 @Repository
 public interface ExchangeRepository extends JpaRepository<Exchange, Long> {
 
-    Optional<Exchange> findByFirstUserOrSecondUser(User user);
+    Optional<Exchange> findByFirstUserOrSecondUser(User firstUser, User secondUser);
 
 }

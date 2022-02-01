@@ -15,12 +15,11 @@ public class ExchangeOfferMapper {
     private final UserMapper userMapper;
     private final BasicObjectViewMapper basicObjectViewMapper;
     private final ProductMapper productMapper;
-    private final ExchangeMapper exchangeMapper;
 
     public ExchangeOfferDto toDto(ExchangeOffer entity) {
         return ExchangeOfferDto.builder()
                 .id(entity.getId())
-                .exchange(exchangeMapper.toDto(entity.getExchange()))
+                .exchangeId(entity.getExchange().getId())
                 .user(userMapper.toDtoWithIdAndTitle(entity.getUser()))
                 .inventoryObject(entity.getInventoryObject() != null
                         ? basicObjectViewMapper.toDto(entity.getInventoryObject())
@@ -28,7 +27,7 @@ public class ExchangeOfferMapper {
                 .moneyAmount(entity.getMoneyAmount())
                 .product(productMapper.toDto(entity.getProduct()))
                 .productAmount(entity.getProductAmount())
-                .offerType(entity.getOfferType().name())
+                .offerType(entity.getOfferType())
                 .build();
     }
 }
