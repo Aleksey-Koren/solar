@@ -24,14 +24,14 @@ public class NotificationEngineImpl implements NotificationEngine {
 
         simpMessagingTemplate.convertAndSendToUser(destinationUser.getLogin(),
                 messengerProperties.getNotificationDestination(),
-                new NotificationDto<Void>(NotificationType.MONEY_UPDATED.name(), null));
+                new NotificationDto<Void>(NotificationType.MONEY_UPDATED.name()));
     }
 
     @Override
     public void notificationToUser(NotificationType type, String userName, Object payload) {
         simpMessagingTemplate.convertAndSendToUser(userName,
                 messengerProperties.getNotificationDestination(),
-                new NotificationDto<Void>(NotificationType.MONEY_UPDATED.name(), null));
+                new NotificationDto<Void>(NotificationType.MONEY_UPDATED.name()));
     }
 
     @Override
@@ -60,6 +60,13 @@ public class NotificationEngineImpl implements NotificationEngine {
     public void sendLeaveExchangeNotification(User userDestination) {
         simpMessagingTemplate.convertAndSendToUser(userDestination.getLogin(),
                 messengerProperties.getNotificationDestination(),
-                new NotificationDto<>(NotificationType.LEAVE_EXCHANGE.name(), null));
+                new NotificationDto<>(NotificationType.LEAVE_EXCHANGE.name()));
+    }
+
+    @Override
+    public void sendCannotAttachToOrbitNotification(User userDestination) {
+        simpMessagingTemplate.convertAndSendToUser(userDestination.getLogin(),
+                messengerProperties.getNotificationDestination(),
+                new NotificationDto<>(NotificationType.CANNOT_ATTACH_TO_ORBIT.name()));
     }
 }

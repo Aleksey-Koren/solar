@@ -6,12 +6,17 @@ import io.solar.entity.Planet;
 import io.solar.entity.interfaces.SpaceTech;
 import io.solar.entity.objects.BasicObject;
 import io.solar.entity.objects.ObjectType;
+import io.solar.entity.objects.StarShip;
 import io.solar.repository.BasicObjectRepository;
 import io.solar.service.CourseService;
 import io.solar.service.NavigatorService;
 import io.solar.service.PlanetService;
+import io.solar.service.StarShipService;
 import io.solar.service.UtilityService;
+import io.solar.service.engine.StarShipEngineImpl;
+import io.solar.service.engine.interfaces.NotificationEngine;
 import io.solar.service.engine.interfaces.SpaceTechEngine;
+import io.solar.service.engine.interfaces.StarShipEngine;
 import io.solar.service.exception.ServiceException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,9 +45,11 @@ public class ObjectCoordinatesService {
     private final UtilityService utilityService;
     private final BasicObjectRepository basicObjectRepository;
     private final PlanetService planetService;
+    private final StarShipService starShipService;
     private final CourseService courseService;
-    private final SpaceTechEngine spaceTechEngine;
+    private final StarShipEngine starShipEngine;
     private final NavigatorService navigatorService;
+    private final NotificationEngine notificationEngine;
     private final AppProperties appProperties;
 
     @Transactional
@@ -130,7 +137,7 @@ public class ObjectCoordinatesService {
         int rounds = (int) objectAngleDegrees / 360;
         if (objectAngleDegrees <= 0) {
             objectAngleDegrees += 360.00 * (rounds + 1);
-        }else if (objectAngleDegrees >= 360) {
+        } else if (objectAngleDegrees >= 360) {
             objectAngleDegrees -= 360.00 * (rounds + 1);
         }
 
@@ -162,13 +169,19 @@ public class ObjectCoordinatesService {
         while (true) {
 
             if (activeCourse.getPlanet() != null) {
-                navigatorService.attachToOrbit(object, activeCourse);
+                StarShip starship = starShipService.getById(object.getId());
+                if (starShipEngine.isShipCanDockOrbit(starship, activeCourse.getPlanet())) {
+                    navigatorService.attachToOrbit(object, activeCourse);
 
-                long flyDuration = activeCourse.getPrevious() == null
-                        ? schedulerDuration
-                        : Duration.between(activeCourse.getPrevious().getExpireAt(), endSchedulerInstant).toMillis();
+                    long flyDuration = activeCourse.getPrevious() == null
+                            ? schedulerDuration
+                            : Duration.between(activeCourse.getPrevious().getExpireAt(), endSchedulerInstant).toMillis();
 
-                updateOrbitalObject(object, calculateDelta(flyDuration), schedulerStartTime, schedulerDuration);
+                    updateOrbitalObject(object, calculateDelta(flyDuration), schedulerStartTime, schedulerDuration);
+                } else {
+                    notificationEngine.sendCannotAttachToOrbitNotification(starship.getUser());
+                    courseService.deleteById(activeCourse.getId());
+                }
                 break;
             }
 
@@ -242,7 +255,7 @@ public class ObjectCoordinatesService {
         double dividedTime = (time / 3_600_000d) * appProperties.getTimeFlowModifier();
         double distanceCovered = (speed * dividedTime + (acceleration * Math.pow(dividedTime, 2)) / 2);
 
-        return (float)(coordinate + distanceCovered);
+        return (float) (coordinate + distanceCovered);
     }
 
     private Double calculateDelta(Long schedulerDuration) {

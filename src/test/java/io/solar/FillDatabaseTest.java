@@ -193,7 +193,7 @@ public class FillDatabaseTest {
                 .createdAt(Instant.now())
                 .user(user)
                 .offerType(OfferType.values()[Math.abs(RANDOM.nextInt(0, 2))])
-                .moneyAmount((long) RANDOM.nextInt(0, 5000))
+                .moneyAmount(RANDOM.nextLong(0, 5000))
                 .inventoryObject(findRandomObject())
                 .build();
 
@@ -228,14 +228,5 @@ public class FillDatabaseTest {
         List<Exchange> exchanges = exchangeRepository.findAll();
 
         return exchanges.get(RANDOM.nextInt(0, exchanges.size()));
-    }
-
-    private Product findRandomUserProduct(User user) {
-        StarShip userStarship = starShipRepository.getById(user.getLocation().getId());
-        List<Goods> goods = userStarship.getGoods();
-
-        Goods randomGoods = goods.get(RANDOM.nextInt(0, goods.size()));
-
-        return randomGoods.getProduct();
     }
 }

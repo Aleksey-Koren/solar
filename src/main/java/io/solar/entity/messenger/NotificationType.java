@@ -14,4 +14,5 @@ public enum NotificationType {
     LEAVE_EXCHANGE,
     OFFER_CREATED,
     OFFER_UPDATED,
+    CANNOT_ATTACH_TO_ORBIT
 }

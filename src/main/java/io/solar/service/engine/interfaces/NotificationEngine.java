@@ -19,4 +19,6 @@ public interface NotificationEngine {
     void sendOfferUpdatedNotification(User userDestination, ExchangeOfferDto updatedOffer);
 
     void sendLeaveExchangeNotification(User userDestination);
+
+    void sendCannotAttachToOrbitNotification(User userDestination);
 }
