@@ -14,6 +14,7 @@ import io.solar.service.NavigatorService;
 import io.solar.service.UserService;
 import io.solar.service.engine.interfaces.ExchangeEngine;
 import io.solar.service.engine.interfaces.NotificationEngine;
+import io.solar.service.engine.interfaces.StarMapEngine;
 import io.solar.service.exchange.ExchangeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -31,9 +32,9 @@ public class ExchangeFacade {
     private final ExchangeService exchangeService;
     private final ExchangeEngine exchangeEngine;
     private final NotificationEngine notificationEngine;
+    private final StarMapEngine starMapEngine;
     private final UserMapper userMapper;
     private final ExchangeMapper exchangeMapper;
-    private final NavigatorService navigatorService;
     private final NavigatorProperties navigatorProperties;
 
     public void sendInvitation(ExchangeInvitationDto dto, String inviterLogin) {
@@ -60,7 +61,7 @@ public class ExchangeFacade {
                 .secondAccepted(false)
                 .build();
         ExchangeDto exchangeDto = exchangeMapper.toDto(exchange);
-        double distance = navigatorService.calcDistance(firstUser.getLocation(), secondUser.getLocation());
+        double distance = starMapEngine.calculateDistanceBetweenObjects(firstUser.getLocation(), secondUser.getLocation());
         if (distance <= navigatorProperties.getMaxExchangeDistance()) {
             exchangeService.save(exchange);
         } else {

@@ -6,12 +6,17 @@ import io.solar.entity.Planet;
 import io.solar.entity.interfaces.SpaceTech;
 import io.solar.entity.objects.BasicObject;
 import io.solar.entity.objects.ObjectType;
+import io.solar.entity.objects.StarShip;
 import io.solar.repository.BasicObjectRepository;
 import io.solar.service.CourseService;
 import io.solar.service.NavigatorService;
 import io.solar.service.PlanetService;
+import io.solar.service.StarShipService;
 import io.solar.service.UtilityService;
+import io.solar.service.engine.StarShipEngineImpl;
+import io.solar.service.engine.interfaces.NotificationEngine;
 import io.solar.service.engine.interfaces.SpaceTechEngine;
+import io.solar.service.engine.interfaces.StarShipEngine;
 import io.solar.service.exception.ServiceException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,18 +41,19 @@ public class ObjectCoordinatesService {
     @Value("${app.navigator.update_coordinates_delay}")
     private String schedulerDelaySeconds;
 
-
     private final UtilityService utilityService;
     private final BasicObjectRepository basicObjectRepository;
     private final PlanetService planetService;
+    private final StarShipService starShipService;
     private final CourseService courseService;
-    private final SpaceTechEngine spaceTechEngine;
+    private final StarShipEngine starShipEngine;
     private final NavigatorService navigatorService;
+    private final NotificationEngine notificationEngine;
     private final AppProperties appProperties;
 
     @Transactional
-    public void update() {
-        long now = System.currentTimeMillis();
+    public void update(long now) {
+        System.out.println("SCHEDULER START TIME: " + now);
         long schedulerDuration = Duration.parse(schedulerDelaySeconds).toMillis();
         long currentIteration = Long.parseLong(utilityService.getValue(POSITION_ITERATION_UTILITY_KEY, "1"));
         double delta = calculateDelta(schedulerDuration);
@@ -86,10 +92,9 @@ public class ObjectCoordinatesService {
     }
 
     private void updateObjects(List<BasicObject> objects,
-                               long currentIteration,
-                               long now,
-                               long schedulerDuration,
-                               double delta) {
+                               long currentIteration, long now,
+                               long schedulerDuration, double delta) {
+
         objects.forEach(object -> {
             if (object.getPlanet() != null && object.getAphelion() != null
                     && object.getAngle() != null && object.getOrbitalPeriod() != null) {
@@ -100,7 +105,7 @@ public class ObjectCoordinatesService {
                 updateUnattachedObject(object, now, schedulerDuration);
             }
             object.setPositionIterationTs(now);
-            object.setPositionIteration(currentIteration + 1);
+            object.setPositionIteration(object.getPositionIteration() + 1);
         });
     }
 
@@ -130,7 +135,7 @@ public class ObjectCoordinatesService {
         int rounds = (int) objectAngleDegrees / 360;
         if (objectAngleDegrees <= 0) {
             objectAngleDegrees += 360.00 * (rounds + 1);
-        }else if (objectAngleDegrees >= 360) {
+        } else if (objectAngleDegrees >= 360) {
             objectAngleDegrees -= 360.00 * (rounds + 1);
         }
 
@@ -162,13 +167,19 @@ public class ObjectCoordinatesService {
         while (true) {
 
             if (activeCourse.getPlanet() != null) {
-                navigatorService.attachToOrbit(object, activeCourse);
+                StarShip starship = starShipService.getById(object.getId());
+                if (starShipEngine.isShipCanDockOrbit(starship, activeCourse.getPlanet())) {
+                    navigatorService.attachToOrbit(object, activeCourse);
 
-                long flyDuration = activeCourse.getPrevious() == null
-                        ? schedulerDuration
-                        : Duration.between(activeCourse.getPrevious().getExpireAt(), endSchedulerInstant).toMillis();
+                    long flyDuration = activeCourse.getPrevious() == null
+                            ? schedulerDuration
+                            : Duration.between(activeCourse.getPrevious().getExpireAt(), endSchedulerInstant).toMillis();
 
-                updateOrbitalObject(object, calculateDelta(flyDuration), schedulerStartTime, schedulerDuration);
+                    updateOrbitalObject(object, calculateDelta(flyDuration), schedulerStartTime, schedulerDuration);
+                } else {
+                    notificationEngine.sendCannotAttachToOrbitNotification(starship.getUser());
+                    courseService.deleteById(activeCourse.getId());
+                }
                 break;
             }
 
@@ -215,6 +226,8 @@ public class ObjectCoordinatesService {
                     : timeBetweenCourseAndEndScheduler;
         }
 
+        System.out.println("COURSE DURATION: " + courseDuration);
+
         return courseDuration;
     }
 
@@ -222,6 +235,8 @@ public class ObjectCoordinatesService {
         object.setX(determinePosition(object.getX(), object.getSpeedX(), courseDuration, activeCourse.getAccelerationX()));
         object.setY(determinePosition(object.getY(), object.getSpeedY(), courseDuration, activeCourse.getAccelerationY()));
 
+
+        System.out.println("EXPIRED AT COURSE : " + activeCourse.getExpireAt());
         object.setSpeedX(calculateSpeed(object.getSpeedX(), activeCourse.getAccelerationX(), courseDuration));
         object.setSpeedY(calculateSpeed(object.getSpeedY(), activeCourse.getAccelerationY(), courseDuration));
 
@@ -242,7 +257,7 @@ public class ObjectCoordinatesService {
         double dividedTime = (time / 3_600_000d) * appProperties.getTimeFlowModifier();
         double distanceCovered = (speed * dividedTime + (acceleration * Math.pow(dividedTime, 2)) / 2);
 
-        return (float)(coordinate + distanceCovered);
+        return (float) (coordinate + distanceCovered);
     }
 
     private Double calculateDelta(Long schedulerDuration) {
@@ -251,7 +266,7 @@ public class ObjectCoordinatesService {
     }
 
     private Float calculateSpeed(Float speed, Float acceleration, long time) {
-
+        System.out.println("CALCULATING SPEED...");
         return speed + (acceleration * time * appProperties.getTimeFlowModifier() / (1000 * 60 * 60));
     }
 }

@@ -42,6 +42,9 @@ public class CourseService {
     }
 
     public void deleteAllExpiredCourses(Instant now) {
+
+        System.out.println("DELETE NOW: " + now + "\n");
+
         courseRepository.deleteAllByExpireAtBefore(now);
     }
 }

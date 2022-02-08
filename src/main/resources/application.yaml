@@ -26,7 +26,7 @@ spring:
     jpa:
         properties:
             hibernate:
-                show_sql: true
+                show_sql: false
                 format_sql: true
                 use_sql_comments: false
                 ddl-auto: validate
@@ -57,7 +57,7 @@ app:
     goods_generation_delay_minutes: 60
     goods_initial_delay_minutes: 0
     view_distance_without_radar: 5
-    time_flow_modifier: 12
+    time_flow_modifier: 1
     station_sell_modifier: 0.7
     hangar_ship_amount: 3
 
@@ -68,7 +68,7 @@ app:
     navigator:
         max_distance: 10
         max_speed: 1000
-        update_coordinates_delay: PT155M
+        update_coordinates_delay: PT5S
         num_update_object: 100
         max_exchange_distance: 1
     email:
@@ -81,6 +81,8 @@ app:
         notification_destination: "/notifications"
     star_map:
         capture_distance: 100
+        min_percent_radius_for_orbit: 106
+        max_percent_radius_for_orbit: 647
     object:
         types:
             radar: radar
