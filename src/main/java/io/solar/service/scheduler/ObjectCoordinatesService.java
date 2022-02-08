@@ -3,7 +3,6 @@ package io.solar.service.scheduler;
 import io.solar.config.properties.AppProperties;
 import io.solar.entity.Course;
 import io.solar.entity.Planet;
-import io.solar.entity.interfaces.SpaceTech;
 import io.solar.entity.objects.BasicObject;
 import io.solar.entity.objects.ObjectType;
 import io.solar.entity.objects.StarShip;
@@ -13,11 +12,8 @@ import io.solar.service.NavigatorService;
 import io.solar.service.PlanetService;
 import io.solar.service.StarShipService;
 import io.solar.service.UtilityService;
-import io.solar.service.engine.StarShipEngineImpl;
 import io.solar.service.engine.interfaces.NotificationEngine;
-import io.solar.service.engine.interfaces.SpaceTechEngine;
 import io.solar.service.engine.interfaces.StarShipEngine;
-import io.solar.service.exception.ServiceException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
@@ -62,11 +58,11 @@ public class ObjectCoordinatesService {
         updatePlanets(delta);
 
         while (!(objects = retrieveObjectsForUpdate(currentIteration)).isEmpty()) {
-            updateObjects(objects, currentIteration, now, schedulerDuration, delta);
+            updateObjects(objects, now, schedulerDuration, delta);
             basicObjectRepository.saveAllAndFlush(objects);
         }
 
-        courseService.deleteAllExpiredCourses(Instant.ofEpochMilli(now + schedulerDuration));
+        courseService.deleteAllExpiredCourses(now + schedulerDuration);
         utilityService.updateValueByKey(POSITION_ITERATION_UTILITY_KEY, String.valueOf(currentIteration + 1));
         utilityService.updateValueByKey(SCHEDULER_TIME_UTILITY_KEY, String.valueOf(System.currentTimeMillis() - now));
     }
@@ -91,9 +87,7 @@ public class ObjectCoordinatesService {
         planetService.saveAll(planets);
     }
 
-    private void updateObjects(List<BasicObject> objects,
-                               long currentIteration, long now,
-                               long schedulerDuration, double delta) {
+    private void updateObjects(List<BasicObject> objects, long now, long schedulerDuration, double delta) {
 
         objects.forEach(object -> {
             if (object.getPlanet() != null && object.getAphelion() != null
@@ -173,7 +167,7 @@ public class ObjectCoordinatesService {
 
                     long flyDuration = activeCourse.getPrevious() == null
                             ? schedulerDuration
-                            : Duration.between(activeCourse.getPrevious().getExpireAt(), endSchedulerInstant).toMillis();
+                            : Duration.between(Instant.ofEpochMilli(activeCourse.getPrevious().getExpireAt()), endSchedulerInstant).toMillis();
 
                     updateOrbitalObject(object, calculateDelta(flyDuration), schedulerStartTime, schedulerDuration);
                 } else {
@@ -187,13 +181,15 @@ public class ObjectCoordinatesService {
 
             updateObjectFields(object, activeCourse, courseDuration);
 
-            if (activeCourse.hasNext() && activeCourse.getExpireAt().isBefore(endSchedulerInstant)) {
+            Instant activeCourseExpireAtInstant = Instant.ofEpochMilli(activeCourse.getExpireAt());
+
+            if (activeCourse.hasNext() && activeCourseExpireAtInstant.isBefore(endSchedulerInstant)) {
                 activeCourse = activeCourse.getNext();
-                activeCourse.setExpireAt(activeCourse.getPrevious().getExpireAt().plusMillis(activeCourse.getTime()));
+                activeCourse.setExpireAt(activeCourse.getPrevious().getExpireAt() + activeCourse.getTime());
 
             } else {
-                if (activeCourse.getExpireAt().isBefore(endSchedulerInstant)) {
-                    long staticMotionDuration = Duration.between(activeCourse.getExpireAt(), endSchedulerInstant).toMillis();
+                if (activeCourseExpireAtInstant.isBefore(endSchedulerInstant)) {
+                    long staticMotionDuration = Duration.between(activeCourseExpireAtInstant, endSchedulerInstant).toMillis();
                     staticObjectMotion(object, staticMotionDuration);
                 }
                 break;
@@ -212,22 +208,24 @@ public class ObjectCoordinatesService {
                         ? schedulerInterval
                         : activeCourse.getTime();
 
-//                activeCourse.setExpireAt(schedulerStartTime.plusMillis(activeCourse.getTime()));
-                System.out.println(activeCourse.getExpireAt().toEpochMilli());
-                System.out.println("FIRST COURSE CALCULATED TIME: " + (schedulerStartTime.toEpochMilli() - activeCourse.getExpireAt().toEpochMilli()));
+                activeCourse.setExpireAt(schedulerStartTime.toEpochMilli() + activeCourse.getTime());
+                System.out.println("FIRST COURSE EXPIRE AT: " + activeCourse.getExpireAt());
+//                System.out.println("FIRST COURSE CALCULATED TIME: " + (schedulerStartTime.toEpochMilli() - activeCourse.getExpireAt().toEpochMilli()));
 
             } else {
 
-                if (activeCourse.getExpireAt().isBefore(endSchedulerInstant)) {
-                    courseDuration = Duration.between(schedulerStartTime, activeCourse.getExpireAt()).toMillis();
+                if (Instant.ofEpochMilli(activeCourse.getExpireAt()).isBefore(endSchedulerInstant)) {
+//                    courseDuration = Duration.between(schedulerStartTime, Instant.ofEpochMilli(activeCourse.getExpireAt())).toMillis();
+                    courseDuration = activeCourse.getExpireAt() - schedulerStartTime.toEpochMilli();
                     System.out.println("221 " + courseDuration + "COURSE ID: " + activeCourse.getId());
                 } else {
                     courseDuration = Duration.between(schedulerStartTime, endSchedulerInstant).toMillis();
+                    System.out.println("222 " + courseDuration + " COURSE ID: " + activeCourse.getId());
                 }
             }
 
         } else {
-            long timeBetweenCourseAndEndScheduler = Duration.between(activeCourse.getPrevious().getExpireAt(), endSchedulerInstant).toMillis();
+            long timeBetweenCourseAndEndScheduler = Duration.between(Instant.ofEpochMilli(activeCourse.getPrevious().getExpireAt()), endSchedulerInstant).toMillis();
 
             courseDuration = timeBetweenCourseAndEndScheduler > activeCourse.getTime()
                     ? activeCourse.getTime()
@@ -244,7 +242,7 @@ public class ObjectCoordinatesService {
         object.setY(determinePosition(object.getY(), object.getSpeedY(), courseDuration, activeCourse.getAccelerationY()));
 
 
-        System.out.println("EXPIRED AT COURSE : " + activeCourse.getExpireAt().toEpochMilli());
+        System.out.println("EXPIRED AT COURSE : " + activeCourse.getExpireAt());
         object.setSpeedX(calculateSpeed(object.getSpeedX(), activeCourse.getAccelerationX(), courseDuration));
         object.setSpeedY(calculateSpeed(object.getSpeedY(), activeCourse.getAccelerationY(), courseDuration));
 
@@ -279,7 +277,7 @@ public class ObjectCoordinatesService {
 
         System.out.println("CALCULATING SPEED...");
         double dividedTime = (time / 3_600_000d) * appProperties.getTimeFlowModifier();
-        return (float)(speed + (acceleration * dividedTime));
+        return (float) (speed + (acceleration * dividedTime));
 
     }
 }

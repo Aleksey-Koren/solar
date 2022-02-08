@@ -16,7 +16,7 @@ public class CourseDto {
     private Float accelerationY;
     private Long nextId;
     private Instant createdAt;
-    private Instant expireAt;
+    private Long expireAt;
     private Long planetId;
     private String courseType;
 }

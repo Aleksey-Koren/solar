@@ -41,10 +41,10 @@ public class CourseService {
         return courseRepository.findByObjectAndNextIsNull(object);
     }
 
-    public void deleteAllExpiredCourses(Instant now) {
+    public void deleteAllExpiredCourses(Long now) {
 
         System.out.println("DELETE NOW: " + now + "\n");
 
-        courseRepository.deleteAllByExpireAtBefore(now);
+        courseRepository.deleteAllByExpireAtLessThan(now);
     }
 }
