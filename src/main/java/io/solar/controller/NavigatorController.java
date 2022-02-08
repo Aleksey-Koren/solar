@@ -78,7 +78,7 @@ public class NavigatorController {
     }
 
 
-    @Scheduled(fixedRateString = "${app.navigator.update_coordinates_delay}")
+    @Scheduled(fixedRateString = "${app.navigator.update_coordinates_delay}", initialDelay = 10000)
     public void updateObjectsCoordinate() {
         objectCoordinatesService.update(System.currentTimeMillis());
     }

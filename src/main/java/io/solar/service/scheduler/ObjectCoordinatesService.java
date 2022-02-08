@@ -212,10 +212,18 @@ public class ObjectCoordinatesService {
                         ? schedulerInterval
                         : activeCourse.getTime();
 
-                activeCourse.setExpireAt(schedulerStartTime.plusMillis(activeCourse.getTime()));
+//                activeCourse.setExpireAt(schedulerStartTime.plusMillis(activeCourse.getTime()));
+                System.out.println(activeCourse.getExpireAt().toEpochMilli());
+                System.out.println("FIRST COURSE CALCULATED TIME: " + (schedulerStartTime.toEpochMilli() - activeCourse.getExpireAt().toEpochMilli()));
 
             } else {
-                courseDuration = Duration.between(schedulerStartTime, activeCourse.getExpireAt()).toMillis();
+
+                if (activeCourse.getExpireAt().isBefore(endSchedulerInstant)) {
+                    courseDuration = Duration.between(schedulerStartTime, activeCourse.getExpireAt()).toMillis();
+                    System.out.println("221 " + courseDuration + "COURSE ID: " + activeCourse.getId());
+                } else {
+                    courseDuration = Duration.between(schedulerStartTime, endSchedulerInstant).toMillis();
+                }
             }
 
         } else {
@@ -226,7 +234,7 @@ public class ObjectCoordinatesService {
                     : timeBetweenCourseAndEndScheduler;
         }
 
-        System.out.println("COURSE DURATION: " + courseDuration);
+        System.out.println("COURSE ID: " + activeCourse.getId() + " COURSE DURATION: " + courseDuration);
 
         return courseDuration;
     }
@@ -236,7 +244,7 @@ public class ObjectCoordinatesService {
         object.setY(determinePosition(object.getY(), object.getSpeedY(), courseDuration, activeCourse.getAccelerationY()));
 
 
-        System.out.println("EXPIRED AT COURSE : " + activeCourse.getExpireAt());
+        System.out.println("EXPIRED AT COURSE : " + activeCourse.getExpireAt().toEpochMilli());
         object.setSpeedX(calculateSpeed(object.getSpeedX(), activeCourse.getAccelerationX(), courseDuration));
         object.setSpeedY(calculateSpeed(object.getSpeedY(), activeCourse.getAccelerationY(), courseDuration));
 
@@ -266,7 +274,12 @@ public class ObjectCoordinatesService {
     }
 
     private Float calculateSpeed(Float speed, Float acceleration, long time) {
+//        System.out.println("CALCULATING SPEED...");
+//        return speed + (acceleration * time * appProperties.getTimeFlowModifier() / (1000 * 60 * 60));
+
         System.out.println("CALCULATING SPEED...");
-        return speed + (acceleration * time * appProperties.getTimeFlowModifier() / (1000 * 60 * 60));
+        double dividedTime = (time / 3_600_000d) * appProperties.getTimeFlowModifier();
+        return (float)(speed + (acceleration * dividedTime));
+
     }
 }
