@@ -41,7 +41,6 @@ public class ObjectCoordinatesService {
     @Value("${app.navigator.update_coordinates_delay}")
     private String schedulerDelaySeconds;
 
-
     private final UtilityService utilityService;
     private final BasicObjectRepository basicObjectRepository;
     private final PlanetService planetService;
@@ -53,8 +52,8 @@ public class ObjectCoordinatesService {
     private final AppProperties appProperties;
 
     @Transactional
-    public void update() {
-        long now = System.currentTimeMillis();
+    public void update(long now) {
+        System.out.println("SCHEDULER START TIME: " + now);
         long schedulerDuration = Duration.parse(schedulerDelaySeconds).toMillis();
         long currentIteration = Long.parseLong(utilityService.getValue(POSITION_ITERATION_UTILITY_KEY, "1"));
         double delta = calculateDelta(schedulerDuration);
@@ -93,10 +92,9 @@ public class ObjectCoordinatesService {
     }
 
     private void updateObjects(List<BasicObject> objects,
-                               long currentIteration,
-                               long now,
-                               long schedulerDuration,
-                               double delta) {
+                               long currentIteration, long now,
+                               long schedulerDuration, double delta) {
+
         objects.forEach(object -> {
             if (object.getPlanet() != null && object.getAphelion() != null
                     && object.getAngle() != null && object.getOrbitalPeriod() != null) {
@@ -107,7 +105,7 @@ public class ObjectCoordinatesService {
                 updateUnattachedObject(object, now, schedulerDuration);
             }
             object.setPositionIterationTs(now);
-            object.setPositionIteration(currentIteration + 1);
+            object.setPositionIteration(object.getPositionIteration() + 1);
         });
     }
 
@@ -228,6 +226,8 @@ public class ObjectCoordinatesService {
                     : timeBetweenCourseAndEndScheduler;
         }
 
+        System.out.println("COURSE DURATION: " + courseDuration);
+
         return courseDuration;
     }
 
@@ -235,6 +235,8 @@ public class ObjectCoordinatesService {
         object.setX(determinePosition(object.getX(), object.getSpeedX(), courseDuration, activeCourse.getAccelerationX()));
         object.setY(determinePosition(object.getY(), object.getSpeedY(), courseDuration, activeCourse.getAccelerationY()));
 
+
+        System.out.println("EXPIRED AT COURSE : " + activeCourse.getExpireAt());
         object.setSpeedX(calculateSpeed(object.getSpeedX(), activeCourse.getAccelerationX(), courseDuration));
         object.setSpeedY(calculateSpeed(object.getSpeedY(), activeCourse.getAccelerationY(), courseDuration));
 
@@ -264,7 +266,7 @@ public class ObjectCoordinatesService {
     }
 
     private Float calculateSpeed(Float speed, Float acceleration, long time) {
-
-        return speed + (acceleration * time * appProperties.getTimeFlowModifier() / 1000 * 60 * 60);
+        System.out.println("CALCULATING SPEED...");
+        return speed + (acceleration * time * appProperties.getTimeFlowModifier() / (1000 * 60 * 60));
     }
 }

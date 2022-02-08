@@ -24,7 +24,7 @@ spring:
     jpa:
         properties:
             hibernate:
-                show_sql: true
+                show_sql: false
                 format_sql: true
                 use_sql_comments: false
                 ddl-auto: validate
@@ -55,7 +55,7 @@ app:
     goods_generation_delay_minutes: 60
     goods_initial_delay_minutes: 0
     view_distance_without_radar: 5
-    time_flow_modifier: 12
+    time_flow_modifier: 1
     station_sell_modifier: 0.7
     hangar_ship_amount: 3
 
