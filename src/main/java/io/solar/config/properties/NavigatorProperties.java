@@ -13,5 +13,7 @@ import org.springframework.stereotype.Component;
 @Setter
 public class NavigatorProperties {
 
+    private Float explosionSpeedMin;
+    private Float explosionSpeedMax;
     private Double maxExchangeDistance;
 }

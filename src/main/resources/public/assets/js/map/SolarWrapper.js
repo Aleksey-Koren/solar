@@ -79,10 +79,14 @@ SolarWrapper.prototype.onStoreChange = function(obj, storeName) {
     } else if (storeName === this.context.stores.objects.name) {
         this.radar = obj.objects;
         for(var i = 0; i < obj.objects.length; i++) {
-            if(obj.objects[i].userId === this.context.stores.userStore.user.user_id) {
+            if (obj.objects[i].id === 744) {
                 this.context.spaceShip = obj.objects[i];
                 break;
             }
+            // if(obj.objects[i].userId === this.context.stores.userStore.user.user_id) {
+            //     this.context.spaceShip = obj.objects[i];
+            //     break;
+            // }
         }
     } else if(storeName === this.context.stores.inventory.name) {
         this.defineTypes()

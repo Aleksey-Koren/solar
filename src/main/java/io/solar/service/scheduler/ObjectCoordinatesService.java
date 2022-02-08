@@ -252,6 +252,6 @@ public class ObjectCoordinatesService {
 
     private Float calculateSpeed(Float speed, Float acceleration, long time) {
 
-        return speed + (acceleration * time * appProperties.getTimeFlowModifier() / 1000 * 60 * 60);
+        return speed + (acceleration * time * appProperties.getTimeFlowModifier() / (1000 * 60 * 60));
     }
 }

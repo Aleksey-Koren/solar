@@ -10,9 +10,7 @@ import io.solar.service.CourseService;
 import io.solar.service.StarShipService;
 import io.solar.service.engine.interfaces.SpaceTechEngine;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -28,7 +26,7 @@ public class CourseFacade {
 
     public void updateCourseChain(CourseDto dto, User user) {
         Course course = courseMapper.toEntity(dto);
-        checkAccelLimit(course, starShipService.getById(user.getLocation().getId()));
+//        checkAccelLimit(course, starShipService.getById(user.getLocation().getId()));
         if (dto.getNextId() == null) {
             extendCourseChain(course);
         } else {

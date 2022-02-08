@@ -2,6 +2,8 @@ package io.solar.service.engine;
 
 import io.solar.entity.objects.BasicObject;
 import io.solar.service.engine.interfaces.StarMapEngine;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -16,4 +18,14 @@ public class StarMapEngineImpl implements StarMapEngine {
 
         return (float) Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2));
     }
+
+    @Data
+    @AllArgsConstructor
+    public static class CoordinatePoint {
+
+        private Float x;
+        private Float y;
+
+    }
+
 }

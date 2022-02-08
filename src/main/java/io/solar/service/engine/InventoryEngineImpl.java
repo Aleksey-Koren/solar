@@ -1,5 +1,6 @@
 package io.solar.service.engine;
 
+import io.solar.config.properties.NavigatorProperties;
 import io.solar.config.properties.StarShipProperties;
 import io.solar.entity.interfaces.SpaceTech;
 import io.solar.entity.objects.BasicObject;
@@ -7,6 +8,7 @@ import io.solar.entity.objects.ObjectStatus;
 import io.solar.entity.objects.StarShip;
 import io.solar.repository.BasicObjectRepository;
 import io.solar.service.engine.interfaces.InventoryEngine;
+import io.solar.service.engine.interfaces.NavigationEngine;
 import io.solar.service.engine.interfaces.SpaceTechEngine;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,6 +27,8 @@ public class InventoryEngineImpl implements InventoryEngine {
     private final BasicObjectRepository basicObjectRepository;
     private final SpaceTechEngine spaceTechEngine;
     private final StarShipProperties starShipProperties;
+    private final NavigationEngine navigationEngine;
+    private final NavigatorProperties navigatorProperties;
 
     @Override
     public int putToInventory(SpaceTech location, List<BasicObject> items) {
@@ -64,7 +68,7 @@ public class InventoryEngineImpl implements InventoryEngine {
 
     @Override
     public void dropToSpace(StarShip starShip, BasicObject object) {
-        CoordinatePoint point = generateRandomCoordinatesInDropRadius(starShip);
+        StarMapEngineImpl.CoordinatePoint point = generateRandomCoordinatesInDropRadius(starShip);
         setInSpaceParameters(object, point);
     }
 
@@ -72,6 +76,13 @@ public class InventoryEngineImpl implements InventoryEngine {
     public void dropToSpace(StarShip starShip, List<BasicObject> objects) {
         objects.forEach(s -> setInSpaceParameters(s, generateRandomCoordinatesInDropRadius(starShip)));
         basicObjectRepository.saveAll(objects);
+    }
+
+    @Override
+    public void dropToSpaceExplosion(StarShip starShip, List<BasicObject> objects) {
+//        objects.stream()
+//                .peek(s -> setInSpaceParameters(s, new StarMapEngineImpl.CoordinatePoint(s.getX(), s.getY())))
+//                .forEach(setRandomSpeed());
     }
 
     @Override
@@ -86,8 +97,9 @@ public class InventoryEngineImpl implements InventoryEngine {
         basicObjectRepository.save(inventoryObject);
     }
 
-    private CoordinatePoint generateRandomCoordinatesInDropRadius(StarShip starShip) {
-        return new CoordinatePoint(randomCoordinateShift(starShip.getX()), randomCoordinateShift(starShip.getY()));
+    private StarMapEngineImpl.CoordinatePoint generateRandomCoordinatesInDropRadius(StarShip starShip) {
+        return new StarMapEngineImpl.CoordinatePoint(randomCoordinateShift(starShip.getX()),
+                randomCoordinateShift(starShip.getY()));
     }
 
     private Float randomCoordinateShift(Float value) {
@@ -97,19 +109,11 @@ public class InventoryEngineImpl implements InventoryEngine {
                 : random.nextFloat(value - starShipProperties.getDropRadius(), value );
     }
 
-    private void setInSpaceParameters(BasicObject object, CoordinatePoint point) {
+    private void setInSpaceParameters(BasicObject object, StarMapEngineImpl.CoordinatePoint point) {
         object.setX(point.getX());
         object.setY(point.getY());
         object.setAttachedToSocket(null);
         object.setAttachedToShip(null);
         object.setStatus(ObjectStatus.IN_SPACE);
-    }
-
-    @Data
-    @AllArgsConstructor
-    private static class CoordinatePoint {
-
-        private Float x;
-        private Float y;
     }
 }

@@ -2,6 +2,8 @@ spring:
     mvc:
         log-resolved-exception: true
 
+#    jdbc:mariadb://localhost/solar?useSSL=false&serverTimezone=UTC
+#    jdbc:mariadb://0.0.0.0:1050/solar
     datasource:
         url: ${solar_db_url}
         driver-class-name: org.mariadb.jdbc.Driver
@@ -90,6 +92,9 @@ app:
             battery: battery
     star_ship:
         drop_radius: 10
+    inventory:
+        explosion_speed_min: 0.5
+        explosion_speed_max: 0.7
 
 
 log4jdbc:
