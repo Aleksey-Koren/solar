@@ -1,17 +1,15 @@
 package io.solar.service.engine;
 
+import io.solar.entity.User;
 import io.solar.entity.interfaces.SpaceTech;
 import io.solar.entity.inventory.InventoryType;
 import io.solar.entity.objects.BasicObject;
 import io.solar.repository.BasicObjectRepository;
-import io.solar.repository.InventoryTypeRepository;
 import io.solar.service.engine.interfaces.SpaceTechEngine;
 import io.solar.service.inventory.InventoryTypeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -153,5 +151,9 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
     @Override
     public float calculateMaxAcceleration(SpaceTech spaceTech) {
         return calculateMaxThrust(spaceTech) / calculateMass(spaceTech);
+    }
+    @Override
+    public boolean isUserOwnsThisSpaceTech(User user, SpaceTech spaceTech) {
+        return user.equals(spaceTech.getUser());
     }
 }

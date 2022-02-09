@@ -45,7 +45,6 @@ public class BasicObjectViewMapper implements EntityDtoMapper<BasicObject, Basic
                 .angle(entity.getAngle())
                 .rotationAngle(entity.getRotationAngle())
                 .hullId(entity.getObjectTypeDescription().getId())
-                .userId(entity.getUserId())
                 .active(entity.getActive())
                 .durability(entity.getDurability())
                 .attachedToShip(entity.getAttachedToShip() != null ? entity.getAttachedToShip().getId() : null)
@@ -109,7 +108,6 @@ public class BasicObjectViewMapper implements EntityDtoMapper<BasicObject, Basic
         basicObject.setAccelerationY(dto.getAccelerationY());
         basicObject.setX(dto.getX());
         basicObject.setY(dto.getY());
-        basicObject.setUserId(dto.getUserId());
         basicObject.setStatus(dto.getStatus());
         basicObject.setSpeedX(dto.getSpeedX());
         basicObject.setSpeedY(dto.getSpeedY());

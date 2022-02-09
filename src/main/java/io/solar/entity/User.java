@@ -1,5 +1,6 @@
 package io.solar.entity;
 
+import io.solar.entity.exchange.ExchangeOffer;
 import io.solar.entity.messenger.Room;
 import io.solar.entity.messenger.UserRoom;
 import io.solar.entity.objects.BasicObject;
@@ -52,8 +53,9 @@ public class User {
     private String password;
     private Long money;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "location")
+    @ToString.Exclude
     private BasicObject location;
 
     private Instant hackBlock;
@@ -77,6 +79,9 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @ToString.Exclude
     private List<UserRoom> userRooms;
+
+    @OneToMany(mappedBy = "user")
+    private List<ExchangeOffer> exchangeOffers;
 
 
     public static UserDetails retrieveUserDetails(User user) {

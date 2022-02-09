@@ -1,5 +1,8 @@
-package io.solar.dto;
+package io.solar.dto.object;
 
+import io.solar.dto.BasicObjectViewDto;
+import io.solar.dto.GoodsDto;
+import io.solar.dto.ProductionDto;
 import io.solar.entity.Inventory;
 import io.solar.dto.inventory.InventorySocketDto;
 import lombok.Data;
@@ -7,7 +10,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class StationDto extends BasicObjectViewDto{
+public class StationDto extends BasicObjectViewDto {
 
     private List<ProductionDto> production;
     private List<GoodsDto> goods;

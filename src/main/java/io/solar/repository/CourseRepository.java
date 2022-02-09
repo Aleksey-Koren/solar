@@ -17,5 +17,5 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
 
     Optional<Course> findByObjectAndNextIsNull(BasicObject object);
 
-    void deleteAllByExpireAtBefore(Instant now);
+    void deleteAllByExpireAtLessThan(Long now);
 }

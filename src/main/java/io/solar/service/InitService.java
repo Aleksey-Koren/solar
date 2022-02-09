@@ -67,7 +67,9 @@ public class InitService {
         adminStarShip.setSpeedX(0f);
         adminStarShip.setSpeedY(0f);
         adminStarShip.setPositionIteration(0L);
-        adminStarShip.setUserId(admin.getId());
+        adminStarShip.setUser(admin);
+        adminStarShip.setDurability(5000);
+//        adminStarShip.setAttachedToShip(stationService.getById(1L));
         adminStarShip.setObjectTypeDescription(objectTypeDescriptionRepository.findById(66L)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Couldn't find ObjectTypeDescription with such id")));
         adminStarShip.setStatus(ObjectStatus.IN_SPACE);

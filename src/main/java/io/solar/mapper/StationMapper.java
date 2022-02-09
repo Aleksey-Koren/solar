@@ -2,7 +2,7 @@ package io.solar.mapper;
 
 import io.solar.dto.BasicObjectViewDto;
 import io.solar.dto.ProductionDto;
-import io.solar.dto.StationDto;
+import io.solar.dto.object.StationDto;
 import io.solar.entity.objects.Station;
 import io.solar.mapper.object.BasicObjectViewMapper;
 import io.solar.repository.BasicObjectRepository;

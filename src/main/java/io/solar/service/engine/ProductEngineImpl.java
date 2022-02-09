@@ -69,7 +69,7 @@ public class ProductEngineImpl implements ProductEngine {
         }
     }
 
-    private Map<Long, Goods> createProductGoodsMap(SpaceTech spaceTech) {
+    public Map<Long, Goods> createProductGoodsMap(SpaceTech spaceTech) {
 
         return spaceTech.getGoods()
                 .stream()
@@ -88,5 +88,4 @@ public class ProductEngineImpl implements ProductEngine {
 
         return isProductsInStock;
     }
-
 }

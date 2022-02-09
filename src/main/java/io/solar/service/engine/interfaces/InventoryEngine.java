@@ -20,4 +20,7 @@ public interface InventoryEngine {
 
     void dropToSpace(StarShip starShip, List<BasicObject> objects);
 
+    void dropToSpaceExplosion(StarShip starShip, List<BasicObject> objects);
+
+    void putToExchange(StarShip starship, BasicObject inventoryObject);
 }

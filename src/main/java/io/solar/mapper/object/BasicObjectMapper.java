@@ -73,7 +73,6 @@ public class BasicObjectMapper implements EntityDtoMapper<BasicObject, BasicObje
                 .status(entity.getStatus())
                 .population(entity.getPopulation())
                 .title(entity.getTitle())
-                .userId(entity.getUserId())
                 .attachedObjects(attachedObjects)
                 .socketList(socketList)
                 .positionIterationTs(entity.getPositionIterationTs())
@@ -142,7 +141,6 @@ public class BasicObjectMapper implements EntityDtoMapper<BasicObject, BasicObje
         entity.setStatus(dto.getStatus());
         entity.setPopulation(dto.getPopulation());
         entity.setTitle(dto.getTitle());
-        entity.setUserId(dto.getUserId());
         entity.setPositionIterationTs(dto.getPositionIterationTs());
         entity.setClockwiseRotation(dto.getClockwiseRotation() != null ? dto.getClockwiseRotation() : entity.getClockwiseRotation());
         entity.setVolume(dto.getVolume());

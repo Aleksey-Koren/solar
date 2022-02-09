@@ -79,6 +79,7 @@ public class MarketplaceController {
     @Transactional
     public ResponseEntity<Void> instantPurchase(@RequestBody MarketplaceLotDto dto, Principal principal) {
         User user = userService.findByLogin(principal.getName());
+
         return ResponseEntity.status(marketplaceLotFacade.instantPurchase(dto, user)).build();
     }
 

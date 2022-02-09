@@ -1,6 +1,9 @@
 package io.solar.service.engine;
 
 import io.solar.config.properties.MessengerProperties;
+import io.solar.dto.UserDto;
+import io.solar.dto.exchange.ExchangeOfferDto;
+import io.solar.dto.marketplace.MarketplaceLotDto;
 import io.solar.dto.messenger.NotificationDto;
 import io.solar.entity.User;
 import io.solar.entity.messenger.NotificationType;
@@ -17,9 +20,53 @@ public class NotificationEngineImpl implements NotificationEngine {
     private final MessengerProperties messengerProperties;
 
     @Override
-    public void simpleNotification(NotificationType type, User user) {
-        simpMessagingTemplate.convertAndSendToUser(user.getLogin(),
+    public void notificationToUser(NotificationType type, User destinationUser, Object payload) {
+
+        simpMessagingTemplate.convertAndSendToUser(destinationUser.getLogin(),
                 messengerProperties.getNotificationDestination(),
-                new NotificationDto<Void>(NotificationType.MONEY_UPDATED.name(), null));
+                new NotificationDto<Void>(NotificationType.MONEY_UPDATED.name()));
+    }
+
+    @Override
+    public void notificationToUser(NotificationType type, String userName, Object payload) {
+        simpMessagingTemplate.convertAndSendToUser(userName,
+                messengerProperties.getNotificationDestination(),
+                new NotificationDto<Void>(NotificationType.MONEY_UPDATED.name()));
+    }
+
+    @Override
+    public void sendLeaveRoomNotification(User userDestination, UserDto payload) {
+
+        simpMessagingTemplate.convertAndSendToUser(userDestination.getLogin(),
+                messengerProperties.getNotificationDestination(),
+                new NotificationDto<>(NotificationType.LEAVE_ROOM.name(), payload));
+    }
+
+    @Override
+    public void sendInstantPurchaseNotification(User lotOwner, MarketplaceLotDto lotDto) {
+        simpMessagingTemplate.convertAndSendToUser(lotOwner.getLogin(),
+                messengerProperties.getNotificationDestination(),
+                new NotificationDto<>(NotificationType.INSTANT_PURCHASE.name(), lotDto));
+    }
+
+    @Override
+    public void sendOfferUpdatedNotification(User userDestination, ExchangeOfferDto updatedOffer) {
+        simpMessagingTemplate.convertAndSendToUser(userDestination.getLogin(),
+                messengerProperties.getNotificationDestination(),
+                new NotificationDto<>(NotificationType.OFFER_UPDATED.name(), updatedOffer));
+    }
+
+    @Override
+    public void sendLeaveExchangeNotification(User userDestination) {
+        simpMessagingTemplate.convertAndSendToUser(userDestination.getLogin(),
+                messengerProperties.getNotificationDestination(),
+                new NotificationDto<>(NotificationType.LEAVE_EXCHANGE.name()));
+    }
+
+    @Override
+    public void sendCannotAttachToOrbitNotification(User userDestination) {
+        simpMessagingTemplate.convertAndSendToUser(userDestination.getLogin(),
+                messengerProperties.getNotificationDestination(),
+                new NotificationDto<>(NotificationType.CANNOT_ATTACH_TO_ORBIT.name()));
     }
 }

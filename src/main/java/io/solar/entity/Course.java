@@ -41,7 +41,7 @@ public class Course {
     private Course next;
 
     private Instant createdAt;
-    private Instant expireAt;
+    private Long expireAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "planet")
