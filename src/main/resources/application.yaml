@@ -71,6 +71,8 @@ app:
         update_coordinates_delay: PT5S
         num_update_object: 100
         max_exchange_distance: 1
+        explosion_speed_min: 0.5
+        explosion_speed_max: 0.7
     email:
         token_lifetime_hours: 24
         forgot_password_template: http://localhost:8081/forgot-password.html?token=
@@ -94,10 +96,6 @@ app:
             battery: battery
     star_ship:
         drop_radius: 10
-    inventory:
-        explosion_speed_min: 0.5
-        explosion_speed_max: 0.7
-
 
 log4jdbc:
     dump:

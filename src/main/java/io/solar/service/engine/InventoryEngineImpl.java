@@ -80,9 +80,10 @@ public class InventoryEngineImpl implements InventoryEngine {
 
     @Override
     public void dropToSpaceExplosion(StarShip starShip, List<BasicObject> objects) {
-//        objects.stream()
-//                .peek(s -> setInSpaceParameters(s, new StarMapEngineImpl.CoordinatePoint(s.getX(), s.getY())))
-//                .forEach(setRandomSpeed());
+        objects.stream()
+                .peek(s -> setInSpaceParameters(s, new StarMapEngineImpl.CoordinatePoint(starShip.getX(), starShip.getY())))
+                .forEach(s -> navigationEngine.setRandomSpeedInRange(s,
+                        navigatorProperties.getExplosionSpeedMin(), navigatorProperties.getExplosionSpeedMax()));
     }
 
     @Override

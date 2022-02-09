@@ -26,7 +26,7 @@ public class CourseFacade {
 
     public void updateCourseChain(CourseDto dto, User user) {
         Course course = courseMapper.toEntity(dto);
-//        checkAccelLimit(course, starShipService.getById(user.getLocation().getId()));
+        checkAccelLimit(course, starShipService.getById(user.getLocation().getId()));
         if (dto.getNextId() == null) {
             extendCourseChain(course);
         } else {

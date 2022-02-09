@@ -35,7 +35,7 @@ public class StarShipEngineImpl implements StarShipEngine {
         List<BasicObject> attachedObjects = starship.getAttachedObjects();
         destroyRandomObjects(attachedObjects);
         damageObjects(attachedObjects);
-        inventoryEngine.dropToSpace(starship, attachedObjects);
+        inventoryEngine.dropToSpaceExplosion(starship, attachedObjects);
         starShipService.delete(starship);
     }
 
