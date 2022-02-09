@@ -25,12 +25,14 @@ public class WebSocketController {
     @MessageMapping("/{roomId}")
     @SendTo("/room/{roomId}")
     public MessageDto processMessage(@DestinationVariable("roomId") Long roomId, @Payload MessageDto message) {
+        //todo - allow users send only "CHAT" messages
+        //todo - allow users only edit "own" messages
         message.setRoomId(roomId);
 
         if (message.getId() != null) {
-            messageService.editMessage(message);
+            message = webSocketFacade.editMessage(message);
         } else {
-            webSocketFacade.processMessage(message);
+            message = webSocketFacade.processMessage(message);
         }
         return message;
     }

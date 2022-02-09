@@ -36,6 +36,11 @@ function ChatMain(context) {
     this.invitationPopup = null;
     var socket = new SockJS('/api/ws');
     this.stompClient = Stomp.over(socket);
+
+    this.createChatList();
+    this.createChatBody();
+    this.createChatBodyControls();
+
     this.stompClient.connect({'auth_token': context.loginStorage.getItem('token')}, function() {
         me.stompClient.subscribe('/user/notifications', function(response) {
             var object = JSON.parse(response.body);
@@ -53,6 +58,7 @@ function ChatMain(context) {
         Notification.error("Fail connect to chat socket");
         console.error(response);
     });
+    this.searchCount = 0;
 
 }
 
@@ -62,9 +68,6 @@ ChatMain.prototype.showChat = function() {
         this.loadChats();
         return;
     }
-    this.createChatList();
-    this.createChatBody();
-    this.createChatBodyControls();
     this.chatPopup = new Popup({
         context: this.context,
         content: Dom.el('div', 'chat-content', [
@@ -128,7 +131,6 @@ ChatMain.prototype.createChatList = function() {
     }
 
     var thisUser = me.context.stores.userStore.user.user_id;
-
     function lookup(value) {
         value = (value || "").trim();
         Dom.clear(chatInviteList);
@@ -137,11 +139,18 @@ ChatMain.prototype.createChatList = function() {
         }
         var searchResults = {};
         searchResults[thisUser] = true;
+
+        me.searchCount++;
+        var searchCount = me.searchCount;
+
         return Rest.doGet("/api/chat/room?participants=2" +
             "&withParticipants=true" +
             "&title=" + encodeURIComponent(value) +
             "&userId=" + thisUser
         ).then(function(existingRooms) {
+            if(searchCount !== me.searchCount) {
+                throw new Error("interrupted")
+            }
             var added = false;
             existingRooms.forEach(function(room) {
                 var target = room.participants.filter(function(p) {
@@ -165,8 +174,14 @@ ChatMain.prototype.createChatList = function() {
             })
             return existingRooms;
         }).then(function() {
+            if(searchCount !== me.searchCount) {
+                throw new Error("interrupted")
+            }
             return Rest.doGet("/api/users?page=0&size=50&title=" + encodeURIComponent(value))}
         ).then(function(response) {
+            if(searchCount !== me.searchCount) {
+                throw new Error("interrupted")
+            }
             var users = response.content.filter(function(user){
                 return !searchResults[user.id];
             }).map(function(user){
@@ -189,6 +204,9 @@ ChatMain.prototype.createChatList = function() {
             }
             return response;
         }).catch(function(e){
+            if(e && e.message && e.message === "interrupted") {
+                return;
+            }
             console.log(e)
             Notification.error("Fail to load users")
         })
@@ -306,10 +324,12 @@ ChatMain.prototype.appendMessage = function(message) {
         return;
     }
     var me = this;
+    console.log(message);
+    console.log(this.currentMessages);
     for(var i = 0; i < this.currentMessages.length; i++) {
-        if(this.currentMessages[i].message.id === message.id) {
-            //@todo
-            this.currentMessages[i].update(message);
+        var m = this.currentMessages[i];
+        if(m.message.id && m.message.id === message.id) {
+            m.update(message);
             return;
         }
     }

@@ -1,0 +1,15 @@
+spring:
+    jpa:
+        properties:
+            hibernate:
+                show_sql: false
+
+logging:
+    level:
+        jdbc:
+            sqlonly: "OFF"
+            sqltiming: "OFF"
+            audit: "OFF"
+            resultset: "OFF"
+            resultsettable: "INFO"
+            connection: "OFF"

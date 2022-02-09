@@ -1,7 +1,8 @@
-function Register(context, openLogin) {
+function Register(context, openLogin, postAuth) {
     var w = wrapTableInput;
     var me = this;
     this.context = context;
+    this.postAuth = postAuth;
     this.errors = Dom.el('div');
     this.container = Dom.el('form', {submit: function(e){
         e.preventDefault();
@@ -45,11 +46,7 @@ Register.prototype.onSubmit = function() {
 
     Rest.doPost('/api/register', data).then(function (response) {
         if(response.success) {
-            Ajax.addStaticHeader('auth_token', response.token);
-            me.context.menu.runApp('dashboard', function(){
-                return new DashboardManagement(me.context);
-            });
-            me.context.stores.userStore.processToken(response.token);
+            me.postAuth(response.token);
         } else {
             me.errors.innerHTML = response.error;
         }

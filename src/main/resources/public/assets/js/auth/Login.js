@@ -1,6 +1,7 @@
-function Login(context, openRegister, changeStorage) {
+function Login(context, openRegister, changeStorage, postAuth) {
     var w = wrapTableInput;
     var me = this;
+    me.postAuth = postAuth;
     this.context = context;
     this.errors = Dom.el('div');
     this.blockedInterval = null;
@@ -64,12 +65,7 @@ Login.prototype.onSubmit = function () {
 
     Rest.doPost('/api/login', data).then(function (response) {
         if (response.data) {
-            Ajax.addStaticHeader('auth_token', response.data);
-            me.context.loginStorage.setItem('token', response.data);
-            me.context.stores.userStore.processToken(response.data);
-            me.context.menu.runApp('dashboard', function(){
-                return new DashboardManagement(me.context);
-            });
+            me.postAuth(response.data);
         } else {
             if(response.blocked) {
                 me.blockedInterval = setInterval(function(){

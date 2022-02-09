@@ -17,7 +17,7 @@ function ChatMessage(message, sender, currentUser, sendUpdate) {
             (currentUser === message.senderId ? "" : (sender||{}).title + " ")
             + this.renderDate(message.createdAt)
             + " ",
-            currentUser === message.senderId ? Dom.el('a', {
+            currentUser === message.senderId && message.id ? Dom.el('a', {
                 href: '/#',
                 class: 'edit-icon',
                 style: {width: '16px', height: '16px', display: 'inline-block'},

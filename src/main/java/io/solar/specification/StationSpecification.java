@@ -61,10 +61,12 @@ public class StationSpecification implements Specification<Station> {
 
 
             if(stationFilter.getGoodsPriceMax() != null) {
-                predicates.add(criteriaBuilder.lessThanOrEqualTo(join.get(Goods_.price), stationFilter.getGoodsPriceMax()));
+                //@todo check why longvalue?
+                predicates.add(criteriaBuilder.lessThanOrEqualTo(join.get(Goods_.price), stationFilter.getGoodsPriceMax().longValue()));
             }
             if(stationFilter.getGoodsPriceMin() != null) {
-                predicates.add(criteriaBuilder.greaterThanOrEqualTo(join.get(Goods_.price), stationFilter.getGoodsPriceMin()));
+                //@todo check why longvalue?
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo(join.get(Goods_.price), stationFilter.getGoodsPriceMin().longValue()));
             }
             if(stationFilter.getGoodsQuantityMin() != null) {
                 predicates.add(criteriaBuilder.greaterThanOrEqualTo(join.get(Goods_.amount), stationFilter.getGoodsQuantityMin()));

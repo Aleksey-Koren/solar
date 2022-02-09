@@ -26,6 +26,8 @@ AuthManagement.prototype.createLogin = function() {
         me.content.appendChild(me.app.container);
     }, function(isSession){
         me.context.loginStorage = isSession ? sessionStorage : localStorage;
+    }, function(token) {
+        me.postAuth(token);
     })
 };
 
@@ -35,6 +37,8 @@ AuthManagement.prototype.createRegister = function() {
         me.app = me.createLogin();
         me.content.innerHTML = '';
         me.content.appendChild(me.app.container);
+    }, function(token) {
+        me.postAuth(token);
     })
 };
 
@@ -42,12 +46,7 @@ AuthManagement.prototype.authorise = function(token) {
     var me = this;
     Rest.doGet('/api/refresh', {'auth_token': token}).then(function(response){
         if(response.data) {
-            me.context.loginStorage.setItem('token', response.data);
-            Ajax.addStaticHeader('auth_token', response.data);
-            me.context.menu.runApp('dashboard', function(){
-                return new DashboardManagement(me.context);
-            });
-            me.context.stores.userStore.processToken(response.data);
+            me.postAuth(response.data);
         } else {
             me.showLogin();
         }
@@ -56,6 +55,16 @@ AuthManagement.prototype.authorise = function(token) {
         me.showLogin();
     })
 };
+
+AuthManagement.prototype.postAuth = function(token) {
+    var me = this;
+    Ajax.addStaticHeader('auth_token', token);
+    me.context.loginStorage.setItem('token', token);
+    me.context.stores.userStore.processToken(token);
+    me.context.menu.runApp('solarWrapper', function(){
+        return new SolarWrapper(me.context);
+    });
+}
 
 AuthManagement.prototype.render = function() {
 

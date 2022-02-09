@@ -35,8 +35,11 @@ public class StarMapController {
     @Transactional
     public List<BasicObjectViewDto> getUsersView(Principal principal) {
         User user = userService.findByLogin(principal.getName());
+        if(user.getLocation() == null) {
+            return new ArrayList<>();
+        }
         Optional<StarShip> starShip = starShipService.findById(user.getLocation().getId());
-        if(!starShip.isPresent()) {
+        if(starShip.isEmpty()) {
             return new ArrayList<>();
         }
         return starMapFacade.getStarshipView(starShip.get());
