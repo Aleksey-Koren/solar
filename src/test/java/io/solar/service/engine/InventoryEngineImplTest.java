@@ -1,6 +1,7 @@
 package io.solar.service.engine;
 
 import io.solar.entity.objects.StarShip;
+import io.solar.facade.shop.StarShipShopFacade;
 import io.solar.service.InitService;
 import io.solar.service.StarShipService;
 import io.solar.service.UserService;
@@ -21,6 +22,9 @@ class InventoryEngineImplTest {
     private StarShipEngineImpl starShipEngine;
     @Autowired
     private InitService initService;
+    @Autowired
+    private StarShipShopFacade starShipShopFacade;
+
 
     @Test
     @Transactional
@@ -28,5 +32,19 @@ class InventoryEngineImplTest {
     void dropToSpaceList() {
         StarShip ship = starShipService.getById(userService.getById(2L).getLocation().getId());
         starShipEngine.blowUp(ship);
+    }
+
+    @Test
+    @Transactional
+    @Commit
+    void sellStarship() {
+        StarShip ship = starShipService.getById(userService.getById(2L).getLocation().getId());
+        starShipShopFacade.sellStarship(userService.getById(2L), ship.getId());
+    }
+
+    @Test
+    void t() {
+        StarShip ship = starShipService.getById(userService.getById(2L).getLocation().getId());
+        starShipService.delete(ship);
     }
 }

@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -16,13 +17,15 @@ import java.util.List;
 @Entity
 @Table(name = "objects")
 @Inheritance(strategy = InheritanceType.JOINED)
-@Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class BasicObject implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     protected Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -43,12 +46,11 @@ public class BasicObject implements Serializable {
     @JoinColumn(name = "hull_id")
     protected ObjectTypeDescription objectTypeDescription;
 
-    protected Long userId;
     protected Boolean active;
 
     protected Integer durability;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "attached_to_ship")
     protected BasicObject attachedToShip;
 
@@ -85,7 +87,7 @@ public class BasicObject implements Serializable {
     @EqualsAndHashCode.Exclude
     protected List<BasicObject> attachedObjects;
 
-    @OneToMany(mappedBy = "object", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "object", cascade = CascadeType.ALL)
     @EqualsAndHashCode.Exclude
     protected List<Course> courses;
 
@@ -94,8 +96,4 @@ public class BasicObject implements Serializable {
         return Math.sqrt(Math.pow(this.speedX, 2) + Math.pow(this.speedY, 2));
     }
 
-    @Transient
-    public Double getAcceleration() {
-        return Math.sqrt(Math.pow(this.accelerationX, 2) + Math.pow(this.accelerationY, 2));
-    }
 }

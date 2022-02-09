@@ -1,8 +1,13 @@
 package io.solar.repository;
 
 import io.solar.entity.Goods;
+import io.solar.entity.Product;
+import io.solar.entity.objects.BasicObject;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface GoodsRepository extends JpaRepository<Goods, Goods.Key> {
+import java.util.Optional;
 
+public interface GoodsRepository extends JpaRepository<Goods, Long> {
+
+    Optional<Goods> findByOwnerAndProduct(BasicObject ownew, Product product);
 }

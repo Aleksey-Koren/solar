@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
+import java.time.Instant;
 import java.util.List;
 
 @RestController
@@ -57,7 +58,7 @@ public class NavigatorController {
             if (userService.isUserNotLocatedInObject(authUser, dto.getObjectId())) {
                 userCantException(authUser.getLocation().getId(), dto.getObjectId());
             }
-            courseFacade.updateCourseChain(dto);
+            courseFacade.updateCourseChain(dto, authUser);
         }
     }
 
@@ -77,9 +78,9 @@ public class NavigatorController {
     }
 
 
-    @Scheduled(fixedDelayString = "${app.navigator.update_coordinates_delay}")
+    @Scheduled(fixedRateString = "${app.navigator.update_coordinates_delay}", initialDelay = 10000)
     public void updateObjectsCoordinate() {
-        objectCoordinatesService.update();
+        objectCoordinatesService.update(System.currentTimeMillis());
     }
 
 

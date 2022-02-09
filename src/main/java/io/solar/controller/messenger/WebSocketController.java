@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/chat")
 public class WebSocketController {
 
-    private final SimpMessagingTemplate messagingTemplate;
     private final MessageService messageService;
     private final WebSocketFacade webSocketFacade;
 

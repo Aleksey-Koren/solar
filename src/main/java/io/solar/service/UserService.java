@@ -6,11 +6,13 @@ import io.solar.entity.PasswordToken;
 import io.solar.entity.Permission;
 import io.solar.entity.User;
 import io.solar.entity.messenger.MessageType;
+import io.solar.entity.messenger.NotificationType;
 import io.solar.mapper.UserMapper;
 import io.solar.repository.PasswordTokenRepository;
 import io.solar.repository.PermissionRepository;
 import io.solar.repository.UserRepository;
 import io.solar.security.Role;
+import io.solar.service.engine.interfaces.NotificationEngine;
 import io.solar.service.exception.ServiceException;
 import io.solar.specification.UserSpecification;
 import io.solar.specification.filter.UserFilter;
@@ -43,10 +45,11 @@ import static java.util.stream.Collectors.toSet;
 public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
-    private final UserMapper userMapper;
     private final PermissionRepository permissionRepository;
-    private final PasswordEncoder passwordEncoder;
     private final PasswordTokenRepository passwordTokenRepository;
+    private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
+    private final NotificationEngine notificationEngine;
 
     @Value("${app.hack_block_time_min}")
     private Integer HACK_BLOCK_TIME_MIN;
@@ -102,6 +105,22 @@ public class UserService implements UserDetailsService {
         return updateUserPassword(passwordToken, changePasswordDto.getNewPassword());
     }
 
+    public void decreaseUserBalance(User user, Long amount) {
+        if (user.getMoney() < amount) {
+            throw new ResponseStatusException(HttpStatus.PAYMENT_REQUIRED, "Not enough credits at user's balance");
+        } else {
+            user.setMoney(user.getMoney() - amount);
+            update(user);
+            notificationEngine.notificationToUser(NotificationType.MONEY_UPDATED, user, null);
+        }
+    }
+
+    public void increaseUserBalance(User user, Long amount) {
+        user.setMoney(user.getMoney() + amount);
+        update(user);
+        notificationEngine.notificationToUser(NotificationType.MONEY_UPDATED, user, null);
+    }
+
     public List<MessageType> getMessageTypesToEmail(User user) {
         if (user.getEmailNotifications() == null) {
             return Collections.emptyList();
@@ -125,19 +144,20 @@ public class UserService implements UserDetailsService {
                 .toInstant(ZoneOffset.ofTotalSeconds(0)));
     }
 
-    public Page<UserDto> getAllUsers(Pageable pageable, UserFilter filter) {
-        Page<User> users = userRepository.findAll(new UserSpecification(filter), pageable);
 
-        return users.map(userMapper::toDto);
-    }
 
     public void saveEmailNotifications(User user, List<MessageType> messageTypes) {
         user.setEmailNotifications(calculateEmailNotifications(messageTypes));
         userRepository.save(user);
     }
 
-    public Optional<User> findUserByEmail(String email) {
+    public Page<UserDto> getAllUsers(Pageable pageable, UserFilter filter) {
+        Page<User> users = userRepository.findAll(new UserSpecification(filter), pageable);
 
+        return users.map(userMapper::toDto);
+    }
+
+    public Optional<User> findUserByEmail(String email) {
         return userRepository.findByEmail(email);
     }
 
@@ -185,5 +205,9 @@ public class UserService implements UserDetailsService {
         return user.getLogin().contains("@")
                 ? user.getLogin()
                 : null;
+    }
+
+    public User save(User user) {
+        return userRepository.save(user);
     }
 }

@@ -1,6 +1,6 @@
 package io.solar.facade;
 
-import io.solar.dto.StationDto;
+import io.solar.dto.object.StationDto;
 import io.solar.entity.objects.Station;
 import io.solar.mapper.StationMapper;
 import io.solar.service.StationService;

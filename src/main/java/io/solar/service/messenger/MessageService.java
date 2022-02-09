@@ -8,7 +8,6 @@ import io.solar.entity.messenger.Room;
 import io.solar.entity.messenger.UserRoom;
 import io.solar.repository.messenger.MessageRepository;
 import io.solar.repository.messenger.RoomRepository;
-import io.solar.repository.messenger.UserRoomRepository;
 import io.solar.service.mail.EmailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -27,8 +26,8 @@ import java.util.Optional;
 public class MessageService {
 
     private final RoomRepository roomRepository;
-    private final UserRoomRepository userRoomRepository;
     private final MessageRepository messageRepository;
+    private final UserRoomService userRoomService;
     private final EmailService emailService;
 
     public Message saveNew(Message message) {
@@ -54,9 +53,7 @@ public class MessageService {
         Room room = roomRepository.findById(roomId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND
                 , "There is no room with such id = " + roomId + " . Can't fetch message history"));
 
-        UserRoom userRoom = userRoomRepository.findById(new UserRoom.UserRoomPK(user, room))
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND
-                        , String.format("User with id = %d isn't subscribed on room id = %d", user.getId(), roomId)));
+        UserRoom userRoom = userRoomService.getByUserAndRoom(user, room);
 
         return messageRepository
                 .findByRoomAndCreatedAtGreaterThanEqualOrderByCreatedAtDesc(room, userRoom.getSubscribedAt(), pageable);

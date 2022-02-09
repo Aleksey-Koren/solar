@@ -4,6 +4,7 @@ import io.solar.entity.Course;
 import io.solar.entity.objects.BasicObject;
 import io.solar.entity.objects.StarShip;
 import io.solar.entity.objects.Station;
+import io.solar.service.engine.interfaces.StarMapEngine;
 import io.solar.service.exception.ServiceException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,6 +29,7 @@ public class NavigatorService {
 
     private final StationService stationService;
     private final StarShipService starshipService;
+    private final StarMapEngine starMapEngine;
 
     public void dockShip(Long stationId, Long starshipId) {
         Station station = stationService.findById(stationId)
@@ -51,18 +53,14 @@ public class NavigatorService {
     }
 
     private boolean isShipCanDockWithStation(StarShip starship, Station station) {
-        double distance = calcDistance(station, starship);
+        double distance = starMapEngine.calculateDistanceBetweenObjects(station, starship);
 
         return starship.getSpeed() < maxSpeed && distance < maxDistance;
     }
 
-    private double calcDistance(BasicObject objectA, BasicObject objectB) {
-        return sqrt(pow(objectB.getX() - objectA.getX(), 2) + pow(objectB.getY() - objectA.getY(), 2));
-    }
-
     public void attachToOrbit(BasicObject object, Course activeCourse) {
         object.setAngle((float) calcAngle(object, activeCourse.getPlanet()));
-        object.setAphelion((float) calcDistance(activeCourse.getPlanet(), object));
+        object.setAphelion(starMapEngine.calculateDistanceBetweenObjects(activeCourse.getPlanet(), object));
         object.setPlanet(activeCourse.getPlanet());
         object.setOrbitalPeriod(HARDCODED_ORBITAL_PERIOD);
         object.setAccelerationX(0f);

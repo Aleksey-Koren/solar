@@ -71,6 +71,15 @@ public class RoomController {
         roomFacade.inviteToExistingRoom(inviter, invitedId, roomId);
     }
 
+    @PatchMapping("/{roomId}/leave")
+    @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
+    @Transactional
+    public void leaveFromRoom(@PathVariable Long roomId, Principal principal) {
+        User user = userService.findByLogin(principal.getName());
+
+        roomFacade.leaveFromRoom(user, roomId);
+    }
+
     @GetMapping("/{roomId}/participants")
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
     @Transactional
