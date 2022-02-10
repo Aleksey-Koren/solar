@@ -304,7 +304,7 @@ public class ObjectCoordinatesService {
     }
 
     private Double determinePosition(Double coordinate, Double speed, Long time, Double acceleration) {
-        double dividedTime = (time / 3_600_000d) * appProperties.getTimeFlowModifier();
+        double dividedTime = (time / 1000D) * appProperties.getTimeFlowModifier();
         double distanceCovered = (speed * dividedTime + (acceleration * Math.pow(dividedTime, 2)) / 2);
 
         return (coordinate + distanceCovered);
@@ -320,7 +320,7 @@ public class ObjectCoordinatesService {
 //        return speed + (acceleration * time * appProperties.getTimeFlowModifier() / (1000 * 60 * 60));
 
 //        System.out.println("CALCULATING SPEED...");
-        double dividedTime = (time / 3_600_000d) * appProperties.getTimeFlowModifier();
+        double dividedTime = (time / 1_000D) * appProperties.getTimeFlowModifier();
         return (speed + (acceleration * dividedTime));
 
     }
