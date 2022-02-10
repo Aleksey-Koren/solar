@@ -68,7 +68,7 @@ app:
     navigator:
         max_distance: 10
         max_speed: 1000
-        update_coordinates_delay: PT2S
+        update_coordinates_delay: PT5S
         num_update_object: 100
         max_exchange_distance: 1
         explosion_speed_min: 0.5

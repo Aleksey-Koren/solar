@@ -287,8 +287,8 @@ public class ObjectCoordinatesService {
         System.out.println("Course ID : " + activeCourse.getId());
         System.out.println("Course time : " + activeCourse.getTime());
         System.out.println("courseDuration : " + courseDuration);
-        object.setSpeedX(round(calculateSpeed(object.getSpeedX(), activeCourse.getAccelerationX(), courseDuration), 7));
-        object.setSpeedY(round(calculateSpeed(object.getSpeedY(), activeCourse.getAccelerationY(), courseDuration), 7));
+        object.setSpeedX(calculateSpeed(object.getSpeedX(), activeCourse.getAccelerationX(), courseDuration));
+        object.setSpeedY(calculateSpeed(object.getSpeedY(), activeCourse.getAccelerationY(), courseDuration));
 
         object.setAccelerationX(activeCourse.getAccelerationX());
         object.setAccelerationY(activeCourse.getAccelerationY());
