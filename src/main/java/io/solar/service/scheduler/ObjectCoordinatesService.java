@@ -260,7 +260,7 @@ public class ObjectCoordinatesService {
     }
 
     private Float determinePosition(Float coordinate, Float speed, Long time, Float acceleration) {
-        double dividedTime = (time / 3_600_000d) * appProperties.getTimeFlowModifier();
+        double dividedTime = (time / 1000D) * appProperties.getTimeFlowModifier();
         double distanceCovered = (speed * dividedTime + (acceleration * Math.pow(dividedTime, 2)) / 2);
 
         return (float) (coordinate + distanceCovered);
@@ -276,7 +276,7 @@ public class ObjectCoordinatesService {
 //        return speed + (acceleration * time * appProperties.getTimeFlowModifier() / (1000 * 60 * 60));
 
         System.out.println("CALCULATING SPEED...");
-        double dividedTime = (time / 3_600_000d) * appProperties.getTimeFlowModifier();
+        double dividedTime = (time / 1_000D) * appProperties.getTimeFlowModifier();
         return (float) (speed + (acceleration * dividedTime));
 
     }
