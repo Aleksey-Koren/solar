@@ -36,10 +36,10 @@ public class Course {
     private Long time;
 
     @Column(name = "acceleration_x")
-    private Float accelerationX;
+    private Double accelerationX;
 
     @Column(name = "acceleration_y")
-    private Float accelerationY;
+    private Double accelerationY;
 
     @ToString.Exclude
     @OneToOne(fetch = FetchType.LAZY)

@@ -1,5 +1,6 @@
 package io.solar.dto;
 
+import io.solar.dto.object.BasicObjectViewDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

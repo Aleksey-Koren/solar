@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 public class AppProperties {
     private String goodsGenerationDelayMinutes;
     private String goodsInitialDelayMinutes;
-    private Float viewDistanceWithoutRadar;
+    private Double viewDistanceWithoutRadar;
     private Integer timeFlowModifier;
     private Integer hangarShipAmount;
 }

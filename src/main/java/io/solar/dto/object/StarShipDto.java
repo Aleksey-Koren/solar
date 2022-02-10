@@ -1,6 +1,5 @@
 package io.solar.dto.object;
 
-import io.solar.dto.BasicObjectViewDto;
 import io.solar.dto.GoodsDto;
 import lombok.Data;
 import lombok.experimental.SuperBuilder;

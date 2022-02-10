@@ -1,7 +1,7 @@
 package io.solar.controller.inventory;
 
-import io.solar.dto.BasicObjectDto;
-import io.solar.dto.BasicObjectViewDto;
+import io.solar.dto.object.BasicObjectDto;
+import io.solar.dto.object.BasicObjectViewDto;
 import io.solar.facade.BasicObjectFacade;
 import io.solar.specification.filter.BasicObjectFilter;
 import lombok.RequiredArgsConstructor;

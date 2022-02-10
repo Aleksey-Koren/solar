@@ -1,4 +1,4 @@
-package io.solar.dto;
+package io.solar.dto.object;
 
 import io.solar.entity.objects.ObjectStatus;
 import lombok.AllArgsConstructor;
@@ -17,8 +17,8 @@ public class BasicObjectViewDto {
     private Long population;
     private String fraction;
     private String title;
-    private Float x;
-    private Float y;
+    private Double x;
+    private Double y;
     private Float aphelion;
     private Float orbitalPeriod;
     private Float angle;
@@ -29,10 +29,10 @@ public class BasicObjectViewDto {
     private Long attachedToShip;
     private Long attachedToSocket;
     private ObjectStatus status;
-    private Float speedX;
-    private Float speedY;
-    private Float accelerationX;
-    private Float accelerationY;
+    private Double speedX;
+    private Double speedY;
+    private Double accelerationX;
+    private Double accelerationY;
     private Long positionIterationTs;
     private Boolean clockwiseRotation;
     private Float volume;

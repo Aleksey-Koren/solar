@@ -1,4 +1,4 @@
-package io.solar.dto;
+package io.solar.dto.object;
 
 import io.solar.dto.inventory.InventorySocketDto;
 import lombok.AllArgsConstructor;

@@ -62,7 +62,7 @@ public class ObjectCoordinatesService {
             basicObjectRepository.saveAllAndFlush(objects);
         }
 
-        courseService.deleteAllExpiredCourses(now + schedulerDuration);
+//        courseService.deleteAllExpiredCourses(now + schedulerDuration);
         utilityService.updateValueByKey(POSITION_ITERATION_UTILITY_KEY, String.valueOf(currentIteration + 1));
         utilityService.updateValueByKey(SCHEDULER_TIME_UTILITY_KEY, String.valueOf(System.currentTimeMillis() - now));
     }
@@ -150,16 +150,15 @@ public class ObjectCoordinatesService {
     }
 
     private void staticObjectMotion(BasicObject object, Long staticMotionLength) {
-        object.setX(determinePosition(object.getX(), object.getSpeedX(), staticMotionLength, 0f));
-        object.setY(determinePosition(object.getY(), object.getSpeedY(), staticMotionLength, 0f));
+        object.setX(determinePosition(object.getX(), object.getSpeedX(), staticMotionLength, 0.0));
+        object.setY(determinePosition(object.getY(), object.getSpeedY(), staticMotionLength, 0.0));
     }
 
     private void completeObjectCourses(Course activeCourse, BasicObject object, Long schedulerStartTime, Long schedulerDuration) {
         Instant endSchedulerInstant = Instant.ofEpochMilli(schedulerStartTime + schedulerDuration);
         long courseDuration;
 
-        while (true) {
-
+        while (schedulerDuration > 0) {
             if (activeCourse.getPlanet() != null) {
                 StarShip starship = starShipService.getById(object.getId());
                 if (starShipEngine.isShipCanDockOrbit(starship, activeCourse.getPlanet())) {
@@ -177,23 +176,66 @@ public class ObjectCoordinatesService {
                 break;
             }
 
-            courseDuration = calculateCourseDuration(activeCourse, schedulerDuration, Instant.ofEpochMilli(schedulerStartTime));
+//            courseDuration = calculateCourseDuration(activeCourse, schedulerDuration, Instant.ofEpochMilli(schedulerStartTime));
+
+            if (activeCourse.getTime() >= schedulerDuration) {
+                courseDuration = schedulerDuration;
+                schedulerDuration = 0L;
+            } else {
+                courseDuration = activeCourse.getTime();
+                schedulerDuration -= activeCourse.getTime();
+            }
+            activeCourse.setTime(activeCourse.getTime() - courseDuration);
 
             updateObjectFields(object, activeCourse, courseDuration);
 
-            Instant activeCourseExpireAtInstant = Instant.ofEpochMilli(activeCourse.getExpireAt());
-
-            if (activeCourse.hasNext() && activeCourseExpireAtInstant.isBefore(endSchedulerInstant)) {
-                activeCourse = activeCourse.getNext();
-                activeCourse.setExpireAt(activeCourse.getPrevious().getExpireAt() + activeCourse.getTime());
-
-            } else {
-                if (activeCourseExpireAtInstant.isBefore(endSchedulerInstant)) {
-                    long staticMotionDuration = Duration.between(activeCourseExpireAtInstant, endSchedulerInstant).toMillis();
-                    staticObjectMotion(object, staticMotionDuration);
+            if (schedulerDuration == 0L) {
+                if (activeCourse.getTime() == 0) {
+                    courseService.deleteById(activeCourse.getId());
                 }
                 break;
             }
+
+            if(activeCourse.hasNext()) {
+                Course current = activeCourse;
+                activeCourse = current.getNext();
+                courseService.deleteById(current.getId());
+                activeCourse.setPrevious(null);
+            } else {
+                staticObjectMotion(object, schedulerDuration);
+                courseService.deleteById(activeCourse.getId());
+                schedulerDuration = 0L;
+            }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//            Instant activeCourseExpireAtInstant = Instant.ofEpochMilli(activeCourse.getExpireAt());
+
+//            if (activeCourse.hasNext() && activeCourseExpireAtInstant.isBefore(endSchedulerInstant)) {
+//                activeCourse = activeCourse.getNext();
+//                activeCourse.setExpireAt(activeCourse.getPrevious().getExpireAt() + activeCourse.getTime());
+//
+//            } else {
+//                if (activeCourseExpireAtInstant.isBefore(endSchedulerInstant)) {
+//                    long staticMotionDuration = Duration.between(activeCourseExpireAtInstant, endSchedulerInstant).toMillis();
+//                    staticObjectMotion(object, staticMotionDuration);
+//                }
+//                break;
+//            }
         }
     }
 
@@ -232,7 +274,7 @@ public class ObjectCoordinatesService {
                     : timeBetweenCourseAndEndScheduler;
         }
 
-        System.out.println("COURSE ID: " + activeCourse.getId() + " COURSE DURATION: " + courseDuration);
+//        System.out.println("COURSE ID: " + activeCourse.getId() + " COURSE DURATION: " + courseDuration);
 
         return courseDuration;
     }
@@ -242,7 +284,9 @@ public class ObjectCoordinatesService {
         object.setY(determinePosition(object.getY(), object.getSpeedY(), courseDuration, activeCourse.getAccelerationY()));
 
 
-        System.out.println("EXPIRED AT COURSE : " + activeCourse.getExpireAt());
+        System.out.println("Course ID : " + activeCourse.getId());
+        System.out.println("Course time : " + activeCourse.getTime());
+        System.out.println("courseDuration : " + courseDuration);
         object.setSpeedX(calculateSpeed(object.getSpeedX(), activeCourse.getAccelerationX(), courseDuration));
         object.setSpeedY(calculateSpeed(object.getSpeedY(), activeCourse.getAccelerationY(), courseDuration));
 
@@ -259,11 +303,11 @@ public class ObjectCoordinatesService {
         );
     }
 
-    private Float determinePosition(Float coordinate, Float speed, Long time, Float acceleration) {
+    private Double determinePosition(Double coordinate, Double speed, Long time, Double acceleration) {
         double dividedTime = (time / 1000D) * appProperties.getTimeFlowModifier();
         double distanceCovered = (speed * dividedTime + (acceleration * Math.pow(dividedTime, 2)) / 2);
 
-        return (float) (coordinate + distanceCovered);
+        return (coordinate + distanceCovered);
     }
 
     private Double calculateDelta(Long schedulerDuration) {
@@ -271,13 +315,19 @@ public class ObjectCoordinatesService {
         return Math.PI * 2 * schedulerDuration * appProperties.getTimeFlowModifier() / (1000 * 60 * 60 * 24);
     }
 
-    private Float calculateSpeed(Float speed, Float acceleration, long time) {
+    private Double calculateSpeed(Double speed, Double acceleration, long time) {
 //        System.out.println("CALCULATING SPEED...");
 //        return speed + (acceleration * time * appProperties.getTimeFlowModifier() / (1000 * 60 * 60));
 
-        System.out.println("CALCULATING SPEED...");
+//        System.out.println("CALCULATING SPEED...");
         double dividedTime = (time / 1_000D) * appProperties.getTimeFlowModifier();
-        return (float) (speed + (acceleration * dividedTime));
+        return (speed + (acceleration * dividedTime));
 
+    }
+
+    private Double round(Double value, int scale) {
+        double temp = value * (Math.pow(10, scale));
+        temp = Math.round(temp);
+        return temp / (Math.pow(10, scale));
     }
 }
