@@ -4,6 +4,7 @@ import io.solar.entity.Goods;
 import io.solar.entity.Goods_;
 import io.solar.entity.Product_;
 import io.solar.entity.objects.BasicObject_;
+import io.solar.entity.objects.Station;
 import io.solar.entity.objects.Station_;
 import io.solar.specification.filter.StationFilter;
 import org.apache.logging.log4j.util.Strings;
