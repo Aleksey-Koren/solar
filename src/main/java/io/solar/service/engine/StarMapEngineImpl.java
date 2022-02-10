@@ -23,8 +23,8 @@ public class StarMapEngineImpl implements StarMapEngine {
     @AllArgsConstructor
     public static class CoordinatePoint {
 
-        private Float x;
-        private Float y;
+        private Double x;
+        private Double y;
 
     }
 

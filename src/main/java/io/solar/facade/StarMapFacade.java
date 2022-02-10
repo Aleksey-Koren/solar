@@ -1,6 +1,6 @@
 package io.solar.facade;
 
-import io.solar.dto.BasicObjectViewDto;
+import io.solar.dto.object.BasicObjectViewDto;
 import io.solar.entity.User;
 import io.solar.entity.objects.BasicObject;
 import io.solar.entity.objects.StarShip;
@@ -8,7 +8,6 @@ import io.solar.mapper.object.BasicObjectViewMapper;
 import io.solar.service.StarMapService;
 import io.solar.service.StarShipService;
 import io.solar.service.engine.interfaces.InventoryEngine;
-import io.solar.service.engine.interfaces.SpaceTechEngine;
 import io.solar.service.object.BasicObjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

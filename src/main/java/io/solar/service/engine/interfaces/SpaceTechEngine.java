@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface SpaceTechEngine {
 
-    Float retrieveViewDistance(SpaceTech spaceTech);
+    Double retrieveViewDistance(SpaceTech spaceTech);
 
     Integer calculateMass(SpaceTech spaceTech);
 

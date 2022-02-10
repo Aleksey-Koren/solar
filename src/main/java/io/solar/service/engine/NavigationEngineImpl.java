@@ -22,7 +22,7 @@ public class NavigationEngineImpl implements NavigationEngine {
         double speedY = Math.sqrt(Math.pow(randomSpeed, 2) - Math.pow(speedX, 2));
         Random random = new Random();
         speedY = random.nextBoolean() ? speedY : -speedY;
-        basicObject.setSpeedX((float) speedX);
-        basicObject.setSpeedY((float) speedY);
+        basicObject.setSpeedX(speedX);
+        basicObject.setSpeedY(speedY);
     }
 }

@@ -48,7 +48,7 @@ public class CourseFacade {
         course.setAccelerationY(course.getAccelerationY() * accelDelta);
     }
 
-    private double calculateAcceleration(Float accelerationX, Float accelerationY) {
+    private double calculateAcceleration(Double accelerationX, Double accelerationY) {
 
         return Math.sqrt(Math.pow(accelerationX, 2) + Math.pow(accelerationY, 2));
     }

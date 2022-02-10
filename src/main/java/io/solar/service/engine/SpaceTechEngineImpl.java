@@ -36,7 +36,7 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
     private final InventoryTypeService inventoryTypeService;
 
     @Override
-    public Float retrieveViewDistance(SpaceTech spaceTech) {
+    public Double retrieveViewDistance(SpaceTech spaceTech) {
         BasicObject spaceTechAsObject = (BasicObject) spaceTech;
         InventoryType radar = inventoryTypeService.getByTitle(radarObjectTypeTitle);
 
@@ -47,7 +47,7 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
                 .distinct()
                 .max()
                 .orElse(0);
-        return (float) distance;
+        return distance;
     }
 
     @Override

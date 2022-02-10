@@ -63,15 +63,15 @@ public class NavigatorService {
         object.setAphelion(starMapEngine.calculateDistanceBetweenObjects(activeCourse.getPlanet(), object));
         object.setPlanet(activeCourse.getPlanet());
         object.setOrbitalPeriod(HARDCODED_ORBITAL_PERIOD);
-        object.setAccelerationX(0f);
-        object.setAccelerationY(0f);
-        object.setSpeedX(0f);
-        object.setSpeedY(0f);
+        object.setAccelerationX(0.0);
+        object.setAccelerationY(0.0);
+        object.setSpeedX(0.0);
+        object.setSpeedY(0.0);
     }
 
     private double calcAngle(BasicObject atOrbit, BasicObject atCenter) {
-        float relativeX = atOrbit.getX() - atCenter.getX();
-        float relativeY = atOrbit.getY() - atCenter.getY();
+        double relativeX = atOrbit.getX() - atCenter.getX();
+        double relativeY = atOrbit.getY() - atCenter.getY();
         double angle = atan2(relativeY, relativeX);
         return angle >= 0 ? angle : PI * 2 + angle;
     }
@@ -81,9 +81,9 @@ public class NavigatorService {
         object.setAphelion(null);
         object.setPlanet(null);
         object.setOrbitalPeriod(null);
-        object.setSpeedX(0f);
-        object.setSpeedY(0f);
-        object.setAccelerationX(0f);
-        object.setAccelerationY(0f);
+        object.setSpeedX(0.0);
+        object.setSpeedY(0.0);
+        object.setAccelerationX(0.0);
+        object.setAccelerationY(0.0);
     }
 }

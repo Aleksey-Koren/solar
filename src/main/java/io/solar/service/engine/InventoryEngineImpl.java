@@ -103,11 +103,11 @@ public class InventoryEngineImpl implements InventoryEngine {
                 randomCoordinateShift(starShip.getY()));
     }
 
-    private Float randomCoordinateShift(Float value) {
+    private Double randomCoordinateShift(Double value) {
         Random random = new Random();
         boolean positive = random.nextBoolean();
-        return positive ? random.nextFloat(value, value + starShipProperties.getDropRadius())
-                : random.nextFloat(value - starShipProperties.getDropRadius(), value );
+        return positive ? random.nextDouble(value, value + starShipProperties.getDropRadius())
+                : random.nextDouble(value - starShipProperties.getDropRadius(), value );
     }
 
     private void setInSpaceParameters(BasicObject object, StarMapEngineImpl.CoordinatePoint point) {

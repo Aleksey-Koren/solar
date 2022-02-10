@@ -62,10 +62,10 @@ public class InitService {
     private void createDefaultShip(User admin) {
         StarShip adminStarShip = new StarShip();
         adminStarShip.setTitle("Admin Starship");
-        adminStarShip.setX(10f);
-        adminStarShip.setY(10f);
-        adminStarShip.setSpeedX(0f);
-        adminStarShip.setSpeedY(0f);
+        adminStarShip.setX(10.0);
+        adminStarShip.setY(10.0);
+        adminStarShip.setSpeedX(0.0);
+        adminStarShip.setSpeedY(0.0);
         adminStarShip.setPositionIteration(0L);
         adminStarShip.setUser(admin);
         adminStarShip.setDurability(5000);

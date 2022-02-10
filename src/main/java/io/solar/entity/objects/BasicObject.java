@@ -35,8 +35,8 @@ public class BasicObject implements Serializable {
     protected Long population;
     protected String fraction;
     protected String title;
-    protected Float x;
-    protected Float y;
+    protected Double x;
+    protected Double y;
     protected Float aphelion;
     protected Float orbitalPeriod;
     protected Float angle;
@@ -60,16 +60,16 @@ public class BasicObject implements Serializable {
     protected ObjectStatus status;
 
     @Column(name = "speed_x")
-    protected Float speedX;
+    protected Double speedX;
 
     @Column(name = "speed_y")
-    protected Float speedY;
+    protected Double speedY;
 
     @Column(name = "acceleration_x")
-    protected Float accelerationX;
+    protected Double accelerationX;
 
     @Column(name = "acceleration_y")
-    protected Float accelerationY;
+    protected Double accelerationY;
 
     @Column(name = "position_iteration")
     protected Long positionIteration;

@@ -1,7 +1,7 @@
 package io.solar.facade;
 
-import io.solar.dto.BasicObjectDto;
-import io.solar.dto.BasicObjectViewDto;
+import io.solar.dto.object.BasicObjectDto;
+import io.solar.dto.object.BasicObjectViewDto;
 import io.solar.entity.objects.BasicObject;
 import io.solar.mapper.object.BasicObjectMapper;
 import io.solar.mapper.object.BasicObjectViewMapper;
@@ -11,9 +11,7 @@ import io.solar.specification.filter.BasicObjectFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.springframework.web.server.ResponseStatusException;
 
 @Component
 @RequiredArgsConstructor

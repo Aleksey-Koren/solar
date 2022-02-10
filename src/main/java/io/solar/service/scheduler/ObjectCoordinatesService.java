@@ -150,8 +150,8 @@ public class ObjectCoordinatesService {
     }
 
     private void staticObjectMotion(BasicObject object, Long staticMotionLength) {
-        object.setX(determinePosition(object.getX(), object.getSpeedX(), staticMotionLength, 0f));
-        object.setY(determinePosition(object.getY(), object.getSpeedY(), staticMotionLength, 0f));
+        object.setX(determinePosition(object.getX(), object.getSpeedX(), staticMotionLength, 0.0));
+        object.setY(determinePosition(object.getY(), object.getSpeedY(), staticMotionLength, 0.0));
     }
 
     private void completeObjectCourses(Course activeCourse, BasicObject object, Long schedulerStartTime, Long schedulerDuration) {
@@ -259,11 +259,11 @@ public class ObjectCoordinatesService {
         );
     }
 
-    private Float determinePosition(Float coordinate, Float speed, Long time, Float acceleration) {
+    private Double determinePosition(Double coordinate, Double speed, Long time, Double acceleration) {
         double dividedTime = (time / 3_600_000d) * appProperties.getTimeFlowModifier();
         double distanceCovered = (speed * dividedTime + (acceleration * Math.pow(dividedTime, 2)) / 2);
 
-        return (float) (coordinate + distanceCovered);
+        return (coordinate + distanceCovered);
     }
 
     private Double calculateDelta(Long schedulerDuration) {
@@ -271,13 +271,19 @@ public class ObjectCoordinatesService {
         return Math.PI * 2 * schedulerDuration * appProperties.getTimeFlowModifier() / (1000 * 60 * 60 * 24);
     }
 
-    private Float calculateSpeed(Float speed, Float acceleration, long time) {
+    private Double calculateSpeed(Double speed, Double acceleration, long time) {
 //        System.out.println("CALCULATING SPEED...");
 //        return speed + (acceleration * time * appProperties.getTimeFlowModifier() / (1000 * 60 * 60));
 
         System.out.println("CALCULATING SPEED...");
         double dividedTime = (time / 3_600_000d) * appProperties.getTimeFlowModifier();
-        return (float) (speed + (acceleration * dividedTime));
+        return (speed + (acceleration * dividedTime));
 
+    }
+
+    private Double round(Double value, int scale) {
+        double temp = value * (Math.pow(10, scale));
+        temp = Math.round(temp);
+        return temp / (Math.pow(10, scale));
     }
 }
