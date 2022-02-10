@@ -39,8 +39,8 @@ var NavigationUtils = {
             return;
         }
         var tasks = [
-            {accelerationX: vectorPositiveSpeed.x, accelerationY: vectorPositiveSpeed.y, time: time, objectId: spaceShip.id},
-            {accelerationX: -vectorPositiveSpeed.x, accelerationY: -vectorPositiveSpeed.y, time: time, objectId: spaceShip.id},
+            {accelerationX: vectorPositiveSpeed.x, accelerationY: vectorPositiveSpeed.y, time: time * 1000, objectId: spaceShip.id},
+            {accelerationX: -vectorPositiveSpeed.x, accelerationY: -vectorPositiveSpeed.y, time: time * 1000, objectId: spaceShip.id},
         ];
         Rest.doPost("api/navigate/course", tasks);
     }

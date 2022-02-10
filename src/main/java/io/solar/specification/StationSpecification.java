@@ -4,16 +4,13 @@ import io.solar.entity.Goods;
 import io.solar.entity.Goods_;
 import io.solar.entity.Product_;
 import io.solar.entity.objects.BasicObject_;
+import io.solar.entity.objects.Station;
 import io.solar.entity.objects.Station_;
 import io.solar.specification.filter.StationFilter;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.data.jpa.domain.Specification;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.ListJoin;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.*;
 import java.util.ArrayList;
 import java.util.List;
 
