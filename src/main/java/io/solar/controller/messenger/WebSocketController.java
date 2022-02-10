@@ -22,7 +22,6 @@ public class WebSocketController {
     @MessageMapping("/{roomId}")
     @SendTo("/room/{roomId}")
     public MessageDto processMessage(@DestinationVariable("roomId") Long roomId, @Payload MessageDto message, Principal principal) {
-        //todo - allow users send only "CHAT" messages
         message.setRoomId(roomId);
 
         if (message.getId() != null) {
