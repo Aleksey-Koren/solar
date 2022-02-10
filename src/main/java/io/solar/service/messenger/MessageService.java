@@ -1,6 +1,7 @@
 package io.solar.service.messenger;
 
 import io.solar.dto.messenger.MessageDto;
+import io.solar.entity.Permission;
 import io.solar.entity.User;
 import io.solar.entity.messenger.Message;
 import io.solar.entity.messenger.MessageType;
@@ -8,6 +9,8 @@ import io.solar.entity.messenger.Room;
 import io.solar.entity.messenger.UserRoom;
 import io.solar.repository.messenger.MessageRepository;
 import io.solar.repository.messenger.RoomRepository;
+import io.solar.security.PermissionEnum;
+import io.solar.service.UserService;
 import io.solar.service.mail.EmailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -29,6 +32,7 @@ public class MessageService {
     private final MessageRepository messageRepository;
     private final UserRoomService userRoomService;
     private final EmailService emailService;
+    private final UserService userService;
 
     public Message saveNew(Message message) {
         message.setCreatedAt(Instant.now());
@@ -60,21 +64,29 @@ public class MessageService {
     }
 
     @Transactional
-    public Message editMessage(MessageDto messageDto) {
-        Message message = messageRepository.findById(messageDto.getId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cannot find message with id = " + messageDto.getId()));
+    public Message editMessage(MessageDto messageDto, String userLogin) {
+        Message message = getById(messageDto.getId());
+        User user = userService.findByLogin(userLogin);
 
-        message.setMessage(messageDto.getMessage());
-        message.setEditedAt(Instant.now());
-        return messageRepository.saveAndFlush(message);
+        if (message.getSender().equals(user)) {
+            message.setMessage(messageDto.getMessage());
+            message.setEditedAt(Instant.now());
+            return messageRepository.saveAndFlush(message);
+        } else {
+            return message;
+        }
     }
 
-    public Message create(Message message) {
+    public Message create(Message message, String userLogin) {
+        User user = userService.findByLogin(userLogin);
+
         if (MessageType.CHAT.equals(message.getMessageType())) {
             return saveNew(message);
-        } else {
+        } else if (isUserCanSendNonChatMessage(user)) {
             return processNonChatMessage(message);
         }
+        //todo: replace null with smth
+        return null;
     }
 
 
@@ -88,5 +100,12 @@ public class MessageService {
                         && (user.getEmailNotifications() & message.getMessageType().getIndex()) == message.getMessageType().getIndex()))
                 .forEach(user -> emailService.sendSimpleEmail(user, message.getTitle(), message.getMessage()));
         return out;
+    }
+
+    private boolean isUserCanSendNonChatMessage(User user) {
+
+        return user.getPermissions()
+                .stream()
+                .anyMatch(permission -> permission.getTitle().equals(PermissionEnum.SEND_ALL_MESSAGE_TYPES.name()));
     }
 }
