@@ -3,13 +3,18 @@ package io.solar.service.engine.inventory.socket;
 import io.solar.entity.interfaces.SpaceTech;
 import io.solar.entity.objects.BasicObject;
 import io.solar.service.engine.interfaces.inventory.socket.SocketEngine;
+import io.solar.service.inventory.socket.SpaceTechSocketService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.Column;
 import java.util.Optional;
 
 @Component
+@RequiredArgsConstructor
 public class SocketEngineImpl implements SocketEngine {
+
+    private final SpaceTechSocketService spaceTechSocketService;
 
     @Override
     public void attachToSocket(Long SocketId, long ObjectId) {
@@ -27,6 +32,7 @@ public class SocketEngineImpl implements SocketEngine {
     public void detachFromSocket(BasicObject object) {
         object.setAttachedToSocket(null);
         object.setIsEnabled(false);
+//        spaceTechSocketService.getById()
     }
 
     @Override

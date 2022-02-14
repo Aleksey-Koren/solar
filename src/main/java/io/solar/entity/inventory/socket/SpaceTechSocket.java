@@ -13,6 +13,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -35,4 +36,8 @@ public class SpaceTechSocket {
     private InventorySocket inventorySocket;
 
     private Integer energyConsumptionPriority;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "object_id")
+    private BasicObject object;
 }

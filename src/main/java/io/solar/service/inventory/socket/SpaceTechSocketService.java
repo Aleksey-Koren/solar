@@ -1,6 +1,7 @@
 package io.solar.service.inventory.socket;
 
 import io.solar.entity.inventory.socket.SpaceTechSocket;
+import io.solar.entity.objects.BasicObject;
 import io.solar.repository.inventory.socket.SpaceTechSocketRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,10 +19,16 @@ public class SpaceTechSocketService {
     public SpaceTechSocket getById(Long id) {
         return spaceTechSocketRepository.findById(id).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        String.format("There is no object of %s class with id = %n in database", SpaceTechSocket.class.getSimpleName(), id)));
+                        String.format("There is no object of %s class with id = %d in database", SpaceTechSocket.class.getSimpleName(), id)));
     }
 
     public Optional<SpaceTechSocket> findById(Long id) {
         return spaceTechSocketRepository.findById(id);
+    }
+
+    public SpaceTechSocket getByObject(BasicObject object) {
+        return spaceTechSocketRepository.findByObject(object).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        String.format("BasicObject with id = %d is not attached to any slot", object.getId())));
     }
 }
