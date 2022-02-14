@@ -4,6 +4,7 @@ import io.solar.entity.inventory.InventorySocket;
 import io.solar.entity.objects.BasicObject;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
@@ -17,6 +18,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "space_tech_sockets")
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
