@@ -136,14 +136,10 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
 
     @Override
     public boolean isThereEnoughEnergyForObject(SpaceTech ship, BasicObject object) {
-        BasicObject shipObject = (BasicObject) ship;
 
-        double currentEnergyConsumption = shipObject.getAttachedObjects()
-                .stream()
-                .mapToDouble(attachedObject -> attachedObject.getObjectTypeDescription().getEnergyConsumption())
-                .sum();
+        double currentEnergyConsumption = calculateCurrentEnergyConsumption(ship);
 
-        double objectEnergyConsumption = object.getObjectTypeDescription().getEnergyConsumption();
+        double objectEnergyConsumption = object.getEnergyConsumption();
 
         return ((currentEnergyConsumption + objectEnergyConsumption) <= calculateEnergyAmount(ship));
     }
@@ -152,7 +148,7 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
     public double calculateCurrentEnergyConsumption(SpaceTech spaceTech) {
         return spaceTech.getAttachedObjects()
                 .stream()
-                .mapToDouble(attachedObject -> attachedObject.getObjectTypeDescription().getEnergyConsumption())
+                .mapToDouble(BasicObject::getEnergyConsumption)
                 .sum();
     }
 
