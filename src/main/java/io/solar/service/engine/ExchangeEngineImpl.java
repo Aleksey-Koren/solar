@@ -10,7 +10,7 @@ import io.solar.service.GoodsService;
 import io.solar.service.StarShipService;
 import io.solar.service.UserService;
 import io.solar.service.engine.interfaces.ExchangeEngine;
-import io.solar.service.engine.interfaces.InventoryEngine;
+import io.solar.service.engine.interfaces.inventory.InventoryEngine;
 import io.solar.service.engine.interfaces.ProductEngine;
 import io.solar.service.exchange.ExchangeOfferService;
 import lombok.RequiredArgsConstructor;

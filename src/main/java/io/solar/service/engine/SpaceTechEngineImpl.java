@@ -97,14 +97,14 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
 
     @Override
     //todo: What are batteries for?
-    public float calculateEnergyAmount(SpaceTech spaceTech) {
+    public double calculateEnergyAmount(SpaceTech spaceTech) {
         BasicObject ship = (BasicObject) spaceTech;
 
         List<InventoryType> energyTypes = inventoryTypeService.findAllByTitleIn(
                 List.of(generatorObjectTypeTitle, largeGeneratorObjectTypeTitle, batteryObjectTypeTitle)
         );
 
-        return (float) ship.getAttachedObjects()
+        return  ship.getAttachedObjects()
                 .stream()
                 .filter(object -> energyTypes.contains(object.getObjectTypeDescription().getInventoryType()))
                 .mapToDouble(object -> object.getObjectTypeDescription().getPowerMin())
@@ -146,6 +146,14 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
         double objectEnergyConsumption = object.getObjectTypeDescription().getEnergyConsumption();
 
         return ((currentEnergyConsumption + objectEnergyConsumption) <= calculateEnergyAmount(ship));
+    }
+
+    @Override
+    public double calculateCurrentEnergyConsumption(SpaceTech spaceTech) {
+        return spaceTech.getAttachedObjects()
+                .stream()
+                .mapToDouble(attachedObject -> attachedObject.getObjectTypeDescription().getEnergyConsumption())
+                .sum();
     }
 
     @Override

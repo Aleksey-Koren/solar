@@ -1,4 +1,4 @@
-package io.solar.service.engine.interfaces;
+package io.solar.service.engine.interfaces.inventory;
 
 import io.solar.entity.interfaces.SpaceTech;
 import io.solar.entity.objects.BasicObject;
