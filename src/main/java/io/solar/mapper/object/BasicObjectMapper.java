@@ -78,6 +78,9 @@ public class BasicObjectMapper implements EntityDtoMapper<BasicObject, BasicObje
                 .positionIterationTs(entity.getPositionIterationTs())
                 .clockwiseRotation(entity.getClockwiseRotation())
                 .volume(entity.getVolume())
+                .energyConsumption(entity.getEnergyConsumption())
+                .energyConsumptionPriority(entity.getEnergyConsumptionPriority())
+                .enabled(entity.getEnabled())
                 .build();
     }
 
@@ -144,5 +147,8 @@ public class BasicObjectMapper implements EntityDtoMapper<BasicObject, BasicObje
         entity.setPositionIterationTs(dto.getPositionIterationTs());
         entity.setClockwiseRotation(dto.getClockwiseRotation() != null ? dto.getClockwiseRotation() : entity.getClockwiseRotation());
         entity.setVolume(dto.getVolume());
+        entity.setEnergyConsumption(dto.getEnergyConsumption());
+        entity.setEnergyConsumptionPriority(dto.getEnergyConsumptionPriority());
+        entity.setEnabled(dto.getEnabled());
     }
 }
