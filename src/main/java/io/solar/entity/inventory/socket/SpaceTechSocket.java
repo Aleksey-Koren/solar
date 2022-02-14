@@ -1,0 +1,38 @@
+package io.solar.entity.inventory.socket;
+
+import io.solar.entity.inventory.InventorySocket;
+import io.solar.entity.objects.BasicObject;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "space_tech_sockets")
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class SpaceTechSocket {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "space_tech_id")
+    private BasicObject spaceTech;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "socket_id")
+    private InventorySocket inventorySocket;
+
+    private Integer energyConsumptionPriority;
+}

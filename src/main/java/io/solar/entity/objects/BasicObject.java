@@ -86,10 +86,7 @@ public class BasicObject implements Serializable {
     @Column(name = "energy_consumption")
     protected Long energyConsumption;
 
-    @Column(name = "energy_consumption_priority")
-    protected Integer energyConsumptionPriority;
-
-    protected Boolean enabled;
+    protected Boolean isEnabled;
 
     @OneToMany(mappedBy = "attachedToShip")
     @EqualsAndHashCode.Exclude

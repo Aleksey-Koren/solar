@@ -57,8 +57,7 @@ public class BasicObjectViewMapper implements EntityDtoMapper<BasicObject, Basic
                 .clockwiseRotation(entity.getClockwiseRotation())
                 .volume(entity.getVolume())
                 .energyConsumption(entity.getEnergyConsumption())
-                .energyConsumptionPriority(entity.getEnergyConsumptionPriority())
-                .enabled(entity.getEnabled())
+                .isEnabled(entity.getIsEnabled())
                 .build();
     }
 
@@ -121,7 +120,6 @@ public class BasicObjectViewMapper implements EntityDtoMapper<BasicObject, Basic
         basicObject.setClockwiseRotation(dto.getClockwiseRotation() != null ? dto.getClockwiseRotation() : basicObject.getClockwiseRotation());
         basicObject.setVolume(dto.getVolume());
         basicObject.setEnergyConsumption(dto.getEnergyConsumption());
-        basicObject.setEnergyConsumptionPriority(dto.getEnergyConsumptionPriority());
-        basicObject.setEnabled(dto.getEnabled());
+        basicObject.setIsEnabled(dto.getIsEnabled());
     }
 }
