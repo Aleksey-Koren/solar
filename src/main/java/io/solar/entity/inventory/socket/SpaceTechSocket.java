@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -31,6 +32,7 @@ public class SpaceTechSocket {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "space_tech_id")
+    @ToString.Exclude
     private BasicObject spaceTech;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -41,5 +43,6 @@ public class SpaceTechSocket {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "object_id")
+    @ToString.Exclude
     private BasicObject object;
 }

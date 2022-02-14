@@ -32,6 +32,7 @@ public class SpaceTechSocketMapper implements EntityDtoMapper<SpaceTechSocket, S
                 .spaceTechId(entity.getSpaceTech().getId())
                 .inventorySocketId(entity.getInventorySocket().getId())
                 .energyConsumptionPriority(entity.getEnergyConsumptionPriority())
+                .objectId(entity.getObject() != null ? entity.getObject().getId() : null)
                 .build();
     }
 
@@ -41,6 +42,7 @@ public class SpaceTechSocketMapper implements EntityDtoMapper<SpaceTechSocket, S
                 .spaceTech(basicObjectService.getById(dto.getSpaceTechId()))
                 .inventorySocket(inventorySocketService.getById(dto.getInventorySocketId()))
                 .energyConsumptionPriority(dto.getEnergyConsumptionPriority())
+                .object(dto.getObjectId() != null ? basicObjectService.getById(dto.getObjectId()) : null)
                 .build();
     }
 
@@ -58,6 +60,8 @@ public class SpaceTechSocketMapper implements EntityDtoMapper<SpaceTechSocket, S
         );
 
         spaceTechSocket.setEnergyConsumptionPriority(dto.getEnergyConsumptionPriority());
+
+        spaceTechSocket.setObject(dto.getObjectId() != null ? basicObjectService.getById(dto.getObjectId()) : null);
 
         return spaceTechSocket;
     }

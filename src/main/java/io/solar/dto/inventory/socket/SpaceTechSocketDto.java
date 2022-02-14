@@ -9,5 +9,6 @@ public class SpaceTechSocketDto {
     private Long id;
     private Long spaceTechId;
     private Long inventorySocketId;
+    private Long objectId;
     private Integer energyConsumptionPriority;
 }

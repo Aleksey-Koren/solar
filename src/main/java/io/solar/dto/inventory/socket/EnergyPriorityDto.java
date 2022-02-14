@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class EnergyPriorityDto {
-    private Long socketId;
+    private Long inventorySocketId;
     private Integer energyConsumptionPriority;
 }
