@@ -83,6 +83,14 @@ public class BasicObject implements Serializable {
     @Column(name = "volume")
     protected Float volume;
 
+    @Column(name = "energy_consumption")
+    protected Long energyConsumption;
+
+    @Column(name = "energy_consumption_priority")
+    protected Integer energyConsumptionPriority;
+
+    protected Boolean enabled;
+
     @OneToMany(mappedBy = "attachedToShip")
     @EqualsAndHashCode.Exclude
     protected List<BasicObject> attachedObjects;
