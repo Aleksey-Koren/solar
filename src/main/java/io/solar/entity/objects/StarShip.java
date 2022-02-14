@@ -3,6 +3,7 @@ package io.solar.entity.objects;
 import io.solar.entity.Goods;
 import io.solar.entity.User;
 import io.solar.entity.interfaces.SpaceTech;
+import io.solar.entity.inventory.socket.SpaceTechSocket;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -39,4 +40,7 @@ public class StarShip extends BasicObject implements SpaceTech {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "spaceTech")
+    private List<SpaceTechSocket> sockets;
 }

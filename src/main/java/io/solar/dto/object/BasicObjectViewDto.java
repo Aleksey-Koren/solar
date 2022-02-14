@@ -37,6 +37,5 @@ public class BasicObjectViewDto {
     private Boolean clockwiseRotation;
     private Float volume;
     private Long energyConsumption;
-    private Integer energyConsumptionPriority;
-    private Boolean enabled;
+    private Boolean isEnabled;
 }
