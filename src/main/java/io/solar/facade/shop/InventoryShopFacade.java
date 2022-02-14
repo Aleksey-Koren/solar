@@ -8,7 +8,7 @@ import io.solar.entity.shop.StationShop;
 import io.solar.mapper.shop.StationShopMapper;
 import io.solar.service.StarShipService;
 import io.solar.service.UserService;
-import io.solar.service.engine.interfaces.InventoryEngine;
+import io.solar.service.engine.interfaces.inventory.InventoryEngine;
 import io.solar.service.engine.interfaces.ObjectEngine;
 import io.solar.service.object.BasicObjectService;
 import io.solar.service.object.ObjectTypeDescriptionService;

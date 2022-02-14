@@ -18,12 +18,14 @@ public interface SpaceTechEngine {
 
     float calculateSpaceTechVolume(SpaceTech spaceTech);
 
-    float calculateEnergyAmount(SpaceTech spaceTech);
+    double calculateEnergyAmount(SpaceTech spaceTech);
 
     boolean isThereEnoughSpaceForObjects(SpaceTech ship, List<BasicObject> objects);
 
     boolean isThereEnoughEnergyForObject(SpaceTech ship, BasicObject object);
 
     boolean isUserOwnsThisSpaceTech(User user, SpaceTech spaceTech);
+
+    double calculateCurrentEnergyConsumption(SpaceTech spaceTech);
 
 }

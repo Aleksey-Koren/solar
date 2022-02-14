@@ -37,7 +37,7 @@ public class GoodsGeneration {
                 goods = goodOpt.get();
                 goods.setAmount(amount);
                 goods.setPrice(price);
-            }else {
+            } else {
                 goods = Goods.builder()
                         .owner(station)
                         .product(product)

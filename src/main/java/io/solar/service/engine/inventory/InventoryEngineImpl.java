@@ -1,4 +1,4 @@
-package io.solar.service.engine;
+package io.solar.service.engine.inventory;
 
 import io.solar.config.properties.NavigatorProperties;
 import io.solar.config.properties.StarShipProperties;
@@ -7,11 +7,10 @@ import io.solar.entity.objects.BasicObject;
 import io.solar.entity.objects.ObjectStatus;
 import io.solar.entity.objects.StarShip;
 import io.solar.repository.BasicObjectRepository;
-import io.solar.service.engine.interfaces.InventoryEngine;
+import io.solar.service.engine.StarMapEngineImpl;
+import io.solar.service.engine.interfaces.inventory.InventoryEngine;
 import io.solar.service.engine.interfaces.NavigationEngine;
 import io.solar.service.engine.interfaces.SpaceTechEngine;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
