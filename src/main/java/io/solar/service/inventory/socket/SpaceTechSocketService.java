@@ -27,8 +27,9 @@ public class SpaceTechSocketService {
         return spaceTechSocketRepository.findById(id);
     }
 
-    public void deleteAllBySpaceTech(BasicObject spaceTech) {
-        spaceTechSocketRepository.deleteAllBySpaceTech(spaceTech);
+    public void delete(SpaceTechSocket spaceTechSocket) {
+
+        spaceTechSocketRepository.delete(spaceTechSocket);
     }
 
     public void saveAll(List<SpaceTechSocket> spaceTechSocketList) {

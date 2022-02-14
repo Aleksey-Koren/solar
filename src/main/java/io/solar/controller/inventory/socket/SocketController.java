@@ -8,6 +8,8 @@ import io.solar.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -40,5 +42,14 @@ public class SocketController {
         User user = userService.findByLogin(principal.getName());
 
         socketFacade.updateEnergyConsumptionPriority(user, energyPriorityDtoList);
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
+    @Transactional
+    public void detachFromSocket(@PathVariable("id") Long socketId, Principal principal) {
+        User user = userService.findByLogin(principal.getName());
+
+        socketFacade.detachFromSocket(socketId, user);
     }
 }

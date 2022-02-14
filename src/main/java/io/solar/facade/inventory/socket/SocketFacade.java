@@ -3,6 +3,7 @@ package io.solar.facade.inventory.socket;
 import io.solar.dto.inventory.socket.EnergyPriorityDto;
 import io.solar.dto.inventory.socket.SocketControllerDto;
 import io.solar.entity.User;
+import io.solar.entity.inventory.socket.SpaceTechSocket;
 import io.solar.entity.objects.BasicObject;
 import io.solar.entity.objects.StarShip;
 import io.solar.service.StarShipService;
@@ -65,4 +66,13 @@ public class SocketFacade {
         //TODO Implement this method, when Station control will be implemented
     }
 
+    public void detachFromSocket(Long socketId, User user) {
+        StarShip starship = starShipService.getById(user.getLocation().getId());
+        SpaceTechSocket socket = spaceTechSocketService.getById(socketId);
+
+        socketEngine.detachFromSocket(socket.getObject());
+        spaceTechSocketService.delete(socket);
+
+        energyEngine.recalculateEnergy(starship);
+    }
 }
