@@ -1,6 +1,7 @@
 package io.solar.service.inventory.socket;
 
 import io.solar.entity.inventory.socket.SpaceTechSocket;
+import io.solar.entity.objects.BasicObject;
 import io.solar.repository.inventory.socket.SpaceTechSocketRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -28,5 +29,11 @@ public class SpaceTechSocketService {
 
     public void deleteAllByIds(List<Long> socketIds) {
         spaceTechSocketRepository.deleteAllByIdIn(socketIds);
+    }
+
+    public SpaceTechSocket getByObject(BasicObject object) {
+        return spaceTechSocketRepository.findByObject(object).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        String.format("BasicObject with id = %d is not attached to any slot", object.getId())));
     }
 }
