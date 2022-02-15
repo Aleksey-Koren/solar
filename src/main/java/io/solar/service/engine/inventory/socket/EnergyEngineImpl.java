@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Function;
 
 @Component
 @RequiredArgsConstructor
@@ -24,15 +25,15 @@ public class EnergyEngineImpl implements EnergyEngine {
 
     @Override
     public void recalculateEnergy(SpaceTech spaceTech) {
-        double required = spaceTechEngine.calculateRequiredAmountOfEnergy(spaceTech);
-        double current = spaceTechEngine.calculateCurrentEnergyAmount(spaceTech);
+        double usedEnergyAmount = spaceTechEngine.calculateAmountOfEnergyUsed(spaceTech);
+        double generalEnergyAmount = spaceTechEngine.calculateGeneralEnergyAmount(spaceTech);
 
-        if (current < required) {
-            disableAccordingPriorities(spaceTech, (long) required, (long) current);
+        if (generalEnergyAmount < usedEnergyAmount) {
+            disableAccordingPriorities(spaceTech, (long) usedEnergyAmount, (long) generalEnergyAmount);
         }
     }
 
-    private void disableAccordingPriorities(SpaceTech spaceTech, long required, long current) {
+    private void disableAccordingPriorities(SpaceTech spaceTech, long usedEnergyAmount, long generalEnergyAmount) {
         List<InventoryType> energyTypes = spaceTechEngine.retrieveEnergyTypes();
         List<BasicObject> notGeneratorItems = new ArrayList<>();
 
@@ -49,20 +50,20 @@ public class EnergyEngineImpl implements EnergyEngine {
         List<SpaceTechSocket> disabled = new ArrayList<>();
 
         Collections.reverse(sortedAndEnabled);
-        for(SpaceTechSocket socket : sortedAndEnabled) {
-            if(socket.getObject() != null && !energyTypes.contains(socket.getObject().getObjectTypeDescription().getInventoryType())) {
+        for (SpaceTechSocket socket : sortedAndEnabled) {
+            if (socket.getObject() != null && !energyTypes.contains(socket.getObject().getObjectTypeDescription().getInventoryType())) {
                 socket.getObject().setIsEnabled(false);
-                required -= socket.getObject().getEnergyConsumption();
+                usedEnergyAmount -= socket.getObject().getEnergyConsumption();
                 disabled.add(socket);
-                if (required <= current) {
+                if (usedEnergyAmount <= generalEnergyAmount) {
                     break;
                 }
             }
         }
 
-        long restOfEnergy = current - required;
+        long restOfEnergy = generalEnergyAmount - usedEnergyAmount;
 
-        if(restOfEnergy == 0) {
+        if (restOfEnergy == 0) {
             return;
         }
 

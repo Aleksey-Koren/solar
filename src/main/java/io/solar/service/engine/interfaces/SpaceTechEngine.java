@@ -19,16 +19,13 @@ public interface SpaceTechEngine {
 
     float calculateSpaceTechVolume(SpaceTech spaceTech);
 
-    double calculateCurrentEnergyAmount(SpaceTech spaceTech);
+    double calculateGeneralEnergyAmount(SpaceTech spaceTech);
 
-    public double calculateRequiredAmountOfEnergy(SpaceTech spaceTech);
+    double calculateAmountOfEnergyUsed(SpaceTech spaceTech);
 
     boolean isThereEnoughSpaceForObjects(SpaceTech ship, List<BasicObject> objects);
 
-    //todo I suppose it doesn't needed
-    boolean isThereEnoughEnergyForObject(SpaceTech ship, BasicObject object);
-
     boolean isUserOwnsThisSpaceTech(User user, SpaceTech spaceTech);
 
-    public List<InventoryType> retrieveEnergyTypes();
+    List<InventoryType> retrieveEnergyTypes();
 }

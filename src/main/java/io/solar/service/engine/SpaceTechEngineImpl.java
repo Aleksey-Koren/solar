@@ -3,7 +3,6 @@ package io.solar.service.engine;
 import io.solar.entity.User;
 import io.solar.entity.interfaces.SpaceTech;
 import io.solar.entity.inventory.InventoryType;
-import io.solar.entity.inventory.socket.SpaceTechSocket;
 import io.solar.entity.objects.BasicObject;
 import io.solar.repository.BasicObjectRepository;
 import io.solar.service.engine.interfaces.SpaceTechEngine;
@@ -13,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.util.Comparator;
 import java.util.List;
 
 @Component
@@ -99,41 +97,31 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
                 .sum();
     }
 
+
+    /**
+     * ObjectTypeDescription.powerMin is energy generation volume
+     */
     @Override
     //todo: What are batteries for?
-    //todo why double?
-    public double calculateCurrentEnergyAmount(SpaceTech spaceTech) {
-
+    public double calculateGeneralEnergyAmount(SpaceTech spaceTech) {
         List<InventoryType> energyTypes = retrieveEnergyTypes();
 
         return spaceTech.getSockets().stream()
                 .filter(s -> s.getObject() != null &&
-                        energyTypes.contains(s.getObject().getObjectTypeDescription().getInventoryType()))
-                .mapToDouble(socket -> socket.getObject().getEnergyConsumption())
+                        energyTypes.contains(s.getObject().getObjectTypeDescription().getInventoryType())
+                )
+                .mapToDouble(socket -> socket.getObject().getObjectTypeDescription().getPowerMin())
                 .sum();
-
-//        BasicObject ship = (BasicObject) spaceTech;
-//
-//        List<InventoryType> energyTypes = inventoryTypeService.findAllByTitleIn(
-//                List.of(generatorObjectTypeTitle, largeGeneratorObjectTypeTitle, batteryObjectTypeTitle)
-//        );
-//
-//        return  ship.getAttachedObjects()
-//                .stream()
-//                .filter(object -> energyTypes.contains(object.getObjectTypeDescription().getInventoryType()))
-//                .mapToDouble(object -> object.getObjectTypeDescription().getPowerMin())
-//                .sum();
     }
 
     @Override
-    //todo why double?
-    public double calculateRequiredAmountOfEnergy(SpaceTech spaceTech) {
-
+    public double calculateAmountOfEnergyUsed(SpaceTech spaceTech) {
         List<InventoryType> energyTypes = retrieveEnergyTypes();
 
         return spaceTech.getSockets().stream()
                 .filter(s -> (s.getObject() != null &&
-                        !energyTypes.contains(s.getObject().getObjectTypeDescription().getInventoryType())))
+                        !energyTypes.contains(s.getObject().getObjectTypeDescription().getInventoryType()))
+                )
                 .mapToDouble(socket -> socket.getObject().getEnergyConsumption())
                 .sum();
     }
@@ -162,20 +150,10 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
     }
 
     @Override
-    //todo I suppose, we don't need this
-    public boolean isThereEnoughEnergyForObject(SpaceTech ship, BasicObject object) {
-
-        double currentEnergyConsumption = calculateCurrentEnergyAmount(ship);
-
-        double objectEnergyConsumption = object.getEnergyConsumption();
-
-        return ((currentEnergyConsumption + objectEnergyConsumption) <= calculateCurrentEnergyAmount(ship));
-    }
-
-    @Override
     public float calculateMaxAcceleration(SpaceTech spaceTech) {
         return calculateMaxThrust(spaceTech) / calculateMass(spaceTech);
     }
+
     @Override
     public boolean isUserOwnsThisSpaceTech(User user, SpaceTech spaceTech) {
         return user.equals(spaceTech.getUser());
