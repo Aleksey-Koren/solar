@@ -3,8 +3,10 @@ package io.solar.service.engine.inventory.socket;
 import io.solar.entity.interfaces.SpaceTech;
 import io.solar.entity.inventory.InventoryType;
 import io.solar.entity.inventory.socket.SpaceTechSocket;
+import io.solar.entity.objects.BasicObject;
 import io.solar.service.engine.interfaces.SpaceTechEngine;
 import io.solar.service.engine.interfaces.inventory.socket.EnergyEngine;
+import io.solar.service.object.BasicObjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -18,6 +20,7 @@ import java.util.List;
 public class EnergyEngineImpl implements EnergyEngine {
 
     private final SpaceTechEngine spaceTechEngine;
+    private final BasicObjectService basicObjectService;
 
     @Override
     public void recalculateEnergy(SpaceTech spaceTech) {
@@ -31,12 +34,14 @@ public class EnergyEngineImpl implements EnergyEngine {
 
     private void disableAccordingPriorities(SpaceTech spaceTech, long required, long current) {
         List<InventoryType> energyTypes = spaceTechEngine.retrieveEnergyTypes();
+        List<BasicObject> notGeneratorItems = new ArrayList<>();
 
         List<SpaceTechSocket> sortedAndEnabled = spaceTech.getSockets().stream()
                 .sorted(Comparator.comparingInt(SpaceTechSocket::getEnergyConsumptionPriority))
                 .peek(s -> {
-                    if (!energyTypes.contains(s.getObject().getObjectTypeDescription().getInventoryType())) {
+                    if (s.getObject() != null && !energyTypes.contains(s.getObject().getObjectTypeDescription().getInventoryType())) {
                         s.getObject().setIsEnabled(true);
+                        notGeneratorItems.add(s.getObject());
                     }
                 })
                 .toList();
@@ -44,9 +49,8 @@ public class EnergyEngineImpl implements EnergyEngine {
         List<SpaceTechSocket> disabled = new ArrayList<>();
 
         Collections.reverse(sortedAndEnabled);
-
         for(SpaceTechSocket socket : sortedAndEnabled) {
-            if(!energyTypes.contains(socket.getObject().getObjectTypeDescription().getInventoryType())) {
+            if(socket.getObject() != null && !energyTypes.contains(socket.getObject().getObjectTypeDescription().getInventoryType())) {
                 socket.getObject().setIsEnabled(false);
                 required -= socket.getObject().getEnergyConsumption();
                 disabled.add(socket);
@@ -70,5 +74,7 @@ public class EnergyEngineImpl implements EnergyEngine {
                 restOfEnergy -= socket.getObject().getEnergyConsumption();
             }
         }
+
+        basicObjectService.saveAll(notGeneratorItems);
     }
 }

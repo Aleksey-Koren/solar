@@ -1,27 +1,8 @@
 
 TODO
-    ++1. Endpoint to update UserRoom.lastSeenAt
-    ++2. Endpoint for Put api/chat/room/{roomId}/title
-            2.1 We need to send system message telling about changing chat title.
-    ++3. For private rooms I should return "JSON style" title to front (example: "[\"1:вася\", \"5:петя\"]")
 
-
-   attachToSocket(Integer socketId, Integer objectId, Integer energyConsumptionPriority, Principal principal)
-        проверить, свободен ли сокет. Если нет:
-             engine.detachFromSocket() предыдущий предмет,
-        проверяет, хватает ли энергии для предмета.
-        да, нет,
-        добавляет в сокет с флагом enabled  true/false
-
-   detachFromSocket(Integer objectId, Principal principal)
-        energyConsumptionPriority = null,
-        флаг enabled = false
-        проверяет:
-            1 есть ли в слотах неработающие предметы, которым не хватает энергии.
-            2 Если есть, то хватает ли энергии для включения следующего по приоритету.
-
-
-   changePriority()
+   1. todoo marks in SpaceTechEngineImpl.class
+   2. ObjectTypeDescription.inventoryType (refactoring to InventoryType.class is needed)
 
 
 

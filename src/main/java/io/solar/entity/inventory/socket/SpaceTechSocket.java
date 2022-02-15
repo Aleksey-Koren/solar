@@ -1,6 +1,5 @@
 package io.solar.entity.inventory.socket;
 
-import io.solar.entity.interfaces.SpaceTech;
 import io.solar.entity.inventory.InventorySocket;
 import io.solar.entity.objects.BasicObject;
 import lombok.AllArgsConstructor;

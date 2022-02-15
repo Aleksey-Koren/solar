@@ -68,4 +68,8 @@ public class BasicObjectService {
     public void deleteAll(List<BasicObject> objects) {
         basicObjectRepository.deleteAll(objects);
     }
+
+    public List<BasicObject> saveAll(List<BasicObject> basicObjects) {
+       return basicObjectRepository.saveAll(basicObjects);
+    }
 }

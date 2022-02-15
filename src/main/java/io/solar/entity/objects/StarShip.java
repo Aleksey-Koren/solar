@@ -40,7 +40,4 @@ public class StarShip extends BasicObject implements SpaceTech {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "spaceTech")
-    private List<SpaceTechSocket> sockets;
 }

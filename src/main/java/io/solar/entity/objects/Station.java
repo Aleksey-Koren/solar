@@ -33,9 +33,6 @@ public class Station extends BasicObject implements SpaceTech {
     @OneToOne(mappedBy = "station", fetch = FetchType.LAZY)
     private StationShop shop;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "spaceTech")
-    private List<SpaceTechSocket> sockets;
-
     @Override
     public String toString() {
         return "Station{" +

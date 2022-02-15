@@ -101,12 +101,14 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
 
     @Override
     //todo: What are batteries for?
+    //todo why double?
     public double calculateCurrentEnergyAmount(SpaceTech spaceTech) {
 
         List<InventoryType> energyTypes = retrieveEnergyTypes();
 
         return spaceTech.getSockets().stream()
-                .filter(s -> (energyTypes.contains(s.getObject().getObjectTypeDescription().getInventoryType())) && s.getObject().getIsEnabled())
+                .filter(s -> s.getObject() != null &&
+                        energyTypes.contains(s.getObject().getObjectTypeDescription().getInventoryType()))
                 .mapToDouble(socket -> socket.getObject().getEnergyConsumption())
                 .sum();
 
@@ -124,12 +126,14 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
     }
 
     @Override
+    //todo why double?
     public double calculateRequiredAmountOfEnergy(SpaceTech spaceTech) {
 
         List<InventoryType> energyTypes = retrieveEnergyTypes();
 
         return spaceTech.getSockets().stream()
-                .filter(s -> (!energyTypes.contains(s.getObject().getObjectTypeDescription().getInventoryType())))
+                .filter(s -> (s.getObject() != null &&
+                        !energyTypes.contains(s.getObject().getObjectTypeDescription().getInventoryType())))
                 .mapToDouble(socket -> socket.getObject().getEnergyConsumption())
                 .sum();
     }
@@ -158,7 +162,7 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
     }
 
     @Override
-    //todo I suppose it doesn't needed
+    //todo I suppose, we don't need this
     public boolean isThereEnoughEnergyForObject(SpaceTech ship, BasicObject object) {
 
         double currentEnergyConsumption = calculateCurrentEnergyAmount(ship);

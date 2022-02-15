@@ -2,6 +2,7 @@ package io.solar.entity.objects;
 
 import io.solar.entity.Course;
 import io.solar.entity.Planet;
+import io.solar.entity.inventory.socket.SpaceTechSocket;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -92,6 +93,9 @@ public class BasicObject implements Serializable {
     @OneToMany(mappedBy = "attachedToShip")
     @EqualsAndHashCode.Exclude
     protected List<BasicObject> attachedObjects;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "spaceTech")
+    private List<SpaceTechSocket> sockets;
 
     @OneToMany(mappedBy = "object", cascade = CascadeType.ALL)
     @EqualsAndHashCode.Exclude
