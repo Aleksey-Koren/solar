@@ -1,5 +1,7 @@
 package io.solar.service.inventory.socket;
 
+import io.solar.entity.interfaces.SpaceTech;
+import io.solar.entity.inventory.InventorySocket;
 import io.solar.entity.inventory.socket.SpaceTechSocket;
 import io.solar.entity.objects.BasicObject;
 import io.solar.repository.inventory.socket.SpaceTechSocketRepository;
@@ -27,6 +29,10 @@ public class SpaceTechSocketService {
         return spaceTechSocketRepository.findById(id);
     }
 
+    public List<SpaceTechSocket> findAllBySpaceTechOrderByEnergyPriority(BasicObject spaceTech) {
+        return spaceTechSocketRepository.findAllBySpaceTechOrderByEnergyConsumptionPriority(spaceTech);
+    }
+
     public void delete(SpaceTechSocket spaceTechSocket) {
 
         spaceTechSocketRepository.delete(spaceTechSocket);
@@ -36,9 +42,21 @@ public class SpaceTechSocketService {
         spaceTechSocketRepository.saveAll(spaceTechSocketList);
     }
 
+    public SpaceTechSocket save(SpaceTechSocket spaceTechSocket) {
+        return spaceTechSocketRepository.save(spaceTechSocket);
+    }
+
     public SpaceTechSocket getByObject(BasicObject object) {
         return spaceTechSocketRepository.findByObject(object).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        String.format("BasicObject with id = %d is not attached to any slot", object.getId())));
+                        String.format("%s with id = %d is not attached to any socket", BasicObject.class.getSimpleName(), object.getId())));
+    }
+
+    public SpaceTechSocket getBySpaceTechAndInventorySocket(BasicObject spaceTech, InventorySocket inventorySocket) {
+        return spaceTechSocketRepository.findBySpaceTechAndInventorySocket(spaceTech, inventorySocket).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        String.format("SpaceTech with id = %d doesn't contain %s with id = %d",spaceTech.getId(),
+                                SpaceTechSocket.class.getSimpleName(),
+                                inventorySocket.getId())));
     }
 }

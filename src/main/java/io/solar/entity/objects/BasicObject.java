@@ -54,6 +54,7 @@ public class BasicObject implements Serializable {
     @JoinColumn(name = "attached_to_ship")
     protected BasicObject attachedToShip;
 
+    //todo refactor to InventorySocket.class
     protected Long attachedToSocket;
 
     @Enumerated(EnumType.STRING)

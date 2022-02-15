@@ -3,14 +3,17 @@ package io.solar.service.engine;
 import io.solar.entity.User;
 import io.solar.entity.interfaces.SpaceTech;
 import io.solar.entity.inventory.InventoryType;
+import io.solar.entity.inventory.socket.SpaceTechSocket;
 import io.solar.entity.objects.BasicObject;
 import io.solar.repository.BasicObjectRepository;
 import io.solar.service.engine.interfaces.SpaceTechEngine;
 import io.solar.service.inventory.InventoryTypeService;
+import io.solar.service.inventory.socket.SpaceTechSocketService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Component
@@ -34,6 +37,7 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
 
     private final BasicObjectRepository basicObjectRepository;
     private final InventoryTypeService inventoryTypeService;
+    private final SpaceTechSocketService spaceTechSocketService;
 
     @Override
     public Double retrieveViewDistance(SpaceTech spaceTech) {
@@ -97,17 +101,36 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
 
     @Override
     //todo: What are batteries for?
-    public double calculateEnergyAmount(SpaceTech spaceTech) {
-        BasicObject ship = (BasicObject) spaceTech;
+    public double calculateCurrentEnergyAmount(SpaceTech spaceTech) {
 
-        List<InventoryType> energyTypes = inventoryTypeService.findAllByTitleIn(
-                List.of(generatorObjectTypeTitle, largeGeneratorObjectTypeTitle, batteryObjectTypeTitle)
-        );
+        List<InventoryType> energyTypes = retrieveEnergyTypes();
 
-        return  ship.getAttachedObjects()
-                .stream()
-                .filter(object -> energyTypes.contains(object.getObjectTypeDescription().getInventoryType()))
-                .mapToDouble(object -> object.getObjectTypeDescription().getPowerMin())
+        return spaceTech.getSockets().stream()
+                .filter(s -> (energyTypes.contains(s.getObject().getObjectTypeDescription().getInventoryType())) && s.getObject().getIsEnabled())
+                .mapToDouble(socket -> socket.getObject().getEnergyConsumption())
+                .sum();
+
+//        BasicObject ship = (BasicObject) spaceTech;
+//
+//        List<InventoryType> energyTypes = inventoryTypeService.findAllByTitleIn(
+//                List.of(generatorObjectTypeTitle, largeGeneratorObjectTypeTitle, batteryObjectTypeTitle)
+//        );
+//
+//        return  ship.getAttachedObjects()
+//                .stream()
+//                .filter(object -> energyTypes.contains(object.getObjectTypeDescription().getInventoryType()))
+//                .mapToDouble(object -> object.getObjectTypeDescription().getPowerMin())
+//                .sum();
+    }
+
+    @Override
+    public double calculateRequiredAmountOfEnergy(SpaceTech spaceTech) {
+
+        List<InventoryType> energyTypes = retrieveEnergyTypes();
+
+        return spaceTech.getSockets().stream()
+                .filter(s -> (!energyTypes.contains(s.getObject().getObjectTypeDescription().getInventoryType())))
+                .mapToDouble(socket -> socket.getObject().getEnergyConsumption())
                 .sum();
     }
 
@@ -135,21 +158,14 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
     }
 
     @Override
+    //todo I suppose it doesn't needed
     public boolean isThereEnoughEnergyForObject(SpaceTech ship, BasicObject object) {
 
-        double currentEnergyConsumption = calculateCurrentEnergyConsumption(ship);
+        double currentEnergyConsumption = calculateCurrentEnergyAmount(ship);
 
         double objectEnergyConsumption = object.getEnergyConsumption();
 
-        return ((currentEnergyConsumption + objectEnergyConsumption) <= calculateEnergyAmount(ship));
-    }
-
-    @Override
-    public double calculateCurrentEnergyConsumption(SpaceTech spaceTech) {
-        return spaceTech.getAttachedObjects()
-                .stream()
-                .mapToDouble(BasicObject::getEnergyConsumption)
-                .sum();
+        return ((currentEnergyConsumption + objectEnergyConsumption) <= calculateCurrentEnergyAmount(ship));
     }
 
     @Override
@@ -159,5 +175,12 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
     @Override
     public boolean isUserOwnsThisSpaceTech(User user, SpaceTech spaceTech) {
         return user.equals(spaceTech.getUser());
+    }
+
+    @Override
+    public List<InventoryType> retrieveEnergyTypes() {
+        return inventoryTypeService.findAllByTitleIn(
+                List.of(generatorObjectTypeTitle, largeGeneratorObjectTypeTitle, batteryObjectTypeTitle)
+        );
     }
 }

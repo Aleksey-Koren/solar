@@ -1,5 +1,6 @@
 package io.solar.repository.inventory.socket;
 
+import io.solar.entity.inventory.InventorySocket;
 import io.solar.entity.inventory.socket.SpaceTechSocket;
 import io.solar.entity.objects.BasicObject;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,5 +15,9 @@ public interface SpaceTechSocketRepository extends JpaRepository<SpaceTechSocket
     Optional<SpaceTechSocket> findByObject(BasicObject object);
 
     void deleteAllBySpaceTech(BasicObject spaceTech);
+
+    List<SpaceTechSocket> findAllBySpaceTechOrderByEnergyConsumptionPriority(BasicObject spaceTech);
+
+    Optional<SpaceTechSocket> findBySpaceTechAndInventorySocket(BasicObject spaceTech, InventorySocket inventorySocket);
 
 }

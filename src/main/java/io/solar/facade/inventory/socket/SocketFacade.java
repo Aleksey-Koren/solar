@@ -3,13 +3,16 @@ package io.solar.facade.inventory.socket;
 import io.solar.dto.inventory.socket.EnergyPriorityDto;
 import io.solar.dto.inventory.socket.SocketControllerDto;
 import io.solar.entity.User;
+import io.solar.entity.inventory.InventorySocket;
 import io.solar.entity.inventory.socket.SpaceTechSocket;
 import io.solar.entity.objects.BasicObject;
 import io.solar.entity.objects.StarShip;
 import io.solar.service.StarShipService;
 import io.solar.service.engine.interfaces.inventory.socket.EnergyEngine;
 import io.solar.service.engine.interfaces.inventory.socket.SocketEngine;
+import io.solar.service.inventory.InventorySocketService;
 import io.solar.service.inventory.socket.SpaceTechSocketService;
+import io.solar.service.object.BasicObjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +29,8 @@ public class SocketFacade {
     private final SpaceTechSocketService spaceTechSocketService;
     private final SocketEngine socketEngine;
     private final EnergyEngine energyEngine;
+    private final BasicObjectService basicObjectService;
+    private final InventorySocketService inventorySocketService;
 
     public void attachToSocket(SocketControllerDto dto, User user, Long socketId) {
         switch (dto.getSpaceTechType()) {
@@ -58,7 +63,7 @@ public class SocketFacade {
         Optional<BasicObject> object = socketEngine.hasAttachedObject(socketId, starShip);
         object.ifPresent(socketEngine::detachFromSocket);
 
-        socketEngine.attachToSocket(socketId, dto.getObjectId());
+        socketEngine.attachToSocket(inventorySocketService.getById(socketId), starShip, basicObjectService.getById(dto.getObjectId()));
         energyEngine.recalculateEnergy(starShip);
     }
 

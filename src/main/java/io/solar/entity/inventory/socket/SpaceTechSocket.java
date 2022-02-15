@@ -1,5 +1,6 @@
 package io.solar.entity.inventory.socket;
 
+import io.solar.entity.interfaces.SpaceTech;
 import io.solar.entity.inventory.InventorySocket;
 import io.solar.entity.objects.BasicObject;
 import lombok.AllArgsConstructor;
@@ -45,4 +46,14 @@ public class SpaceTechSocket {
     @JoinColumn(name = "object_id")
     @ToString.Exclude
     private BasicObject object;
+
+    public void attachItem(BasicObject item) {
+        this.object = item;
+        item.setAttachedToSocket(this.inventorySocket.getId());
+    }
+
+    public void detachItem() {
+        this.object.setAttachedToSocket(null);
+        this.object = null;
+    }
 }

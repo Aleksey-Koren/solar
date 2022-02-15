@@ -8,6 +8,9 @@ import io.solar.entity.objects.BasicObject;
 import java.util.List;
 
 public interface SpaceTech {
+
+    Long getId();
+
     List<Goods> getGoods();
 
     User getUser();
@@ -15,4 +18,6 @@ public interface SpaceTech {
     List<BasicObject> getAttachedObjects();
 
     List<SpaceTechSocket> getSockets();
+
+    void setSockets(List<SpaceTechSocket> sockets);
 }
