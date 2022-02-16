@@ -11,6 +11,7 @@ import io.solar.mapper.SocketMapper;
 import io.solar.repository.BasicObjectRepository;
 import io.solar.repository.ObjectTypeDescriptionRepository;
 import io.solar.repository.PlanetRepository;
+import io.solar.service.inventory.InventorySocketService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,7 @@ public class BasicObjectMapper implements EntityDtoMapper<BasicObject, BasicObje
     private final PlanetRepository planetRepository;
     private final BasicObjectViewMapper basicObjectViewMapper;
     private final SocketMapper socketMapper;
+    private final InventorySocketService inventorySocketService;
 
     @Override
     public BasicObject toEntity(BasicObjectDto dto) {
@@ -60,7 +62,7 @@ public class BasicObjectMapper implements EntityDtoMapper<BasicObject, BasicObje
                 .angle(entity.getAngle())
                 .rotationAngle(entity.getRotationAngle())
                 .attachedToShip(entity.getAttachedToShip() == null ? null : entity.getAttachedToShip().getId())
-                .attachedToSocket(entity.getAttachedToSocket())
+                .attachedToSocket(entity.getAttachedToSocket().getId())
                 .durability(entity.getDurability())
                 .fraction(entity.getFraction())
                 .hullId(entity.getObjectTypeDescription().getId())
@@ -130,7 +132,7 @@ public class BasicObjectMapper implements EntityDtoMapper<BasicObject, BasicObje
         entity.setAngle(dto.getAngle());
         entity.setRotationAngle(dto.getRotationAngle());
         entity.setAttachedToShip(attachedToShip);
-        entity.setAttachedToSocket(dto.getAttachedToSocket());
+        entity.setAttachedToSocket(dto.getAttachedToSocket() != null ? inventorySocketService.getById(dto.getId()) : null);
         entity.setDurability(dto.getDurability());
         entity.setFraction(dto.getFraction());
         entity.setObjectTypeDescription(objectTypeDescription);

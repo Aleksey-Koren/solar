@@ -8,6 +8,7 @@ import io.solar.mapper.EntityDtoMapper;
 import io.solar.repository.BasicObjectRepository;
 import io.solar.repository.ObjectTypeDescriptionRepository;
 import io.solar.repository.PlanetRepository;
+import io.solar.service.inventory.InventorySocketService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ public class BasicObjectViewMapper implements EntityDtoMapper<BasicObject, Basic
     private final ObjectTypeDescriptionRepository objectTypeDescriptionRepository;
     private final BasicObjectRepository basicObjectRepository;
     private final PlanetRepository planetRepository;
+    private final InventorySocketService inventorySocketService;
 
     @Override
     public BasicObject toEntity(BasicObjectViewDto dto) {
@@ -48,7 +50,7 @@ public class BasicObjectViewMapper implements EntityDtoMapper<BasicObject, Basic
                 .active(entity.getActive())
                 .durability(entity.getDurability())
                 .attachedToShip(entity.getAttachedToShip() != null ? entity.getAttachedToShip().getId() : null)
-                .attachedToSocket(entity.getAttachedToSocket())
+                .attachedToSocket(entity.getAttachedToSocket().getId())
                 .status(entity.getStatus())
                 .speedX(entity.getSpeedX())
                 .speedY(entity.getSpeedY())
@@ -114,7 +116,7 @@ public class BasicObjectViewMapper implements EntityDtoMapper<BasicObject, Basic
         basicObject.setSpeedX(dto.getSpeedX());
         basicObject.setSpeedY(dto.getSpeedY());
         basicObject.setPlanet(planet);
-        basicObject.setAttachedToSocket(dto.getAttachedToSocket());
+        basicObject.setAttachedToSocket(dto.getAttachedToSocket() != null ? inventorySocketService.getById(dto.getId()) : null);
         basicObject.setObjectTypeDescription(objectTypeDescription);
         basicObject.setAttachedToShip(attachedToShip);
         basicObject.setClockwiseRotation(dto.getClockwiseRotation() != null ? dto.getClockwiseRotation() : basicObject.getClockwiseRotation());

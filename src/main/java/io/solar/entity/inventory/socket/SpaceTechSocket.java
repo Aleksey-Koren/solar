@@ -48,7 +48,7 @@ public class SpaceTechSocket {
 
     public void attachItem(BasicObject item) {
         this.object = item;
-        item.setAttachedToSocket(this.inventorySocket.getId());
+        item.setAttachedToSocket(this.inventorySocket);
     }
 
     public void detachItem() {
