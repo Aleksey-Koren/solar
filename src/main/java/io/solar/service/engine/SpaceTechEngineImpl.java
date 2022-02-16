@@ -6,7 +6,6 @@ import io.solar.entity.inventory.InventoryType;
 import io.solar.entity.objects.BasicObject;
 import io.solar.repository.BasicObjectRepository;
 import io.solar.service.engine.interfaces.SpaceTechEngine;
-import io.solar.service.engine.interfaces.inventory.InventoryEngine;
 import io.solar.service.inventory.InventoryTypeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,12 +36,11 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
 
         List<BasicObject> radars = basicObjectRepository.getObjectsInSlotsByType(spaceTechAsObject.getId(), radar);
 
-        double distance = radars.stream()
+        return radars.stream()
                 .map(s -> s.getObjectTypeDescription().getDistance()).mapToDouble(Float::doubleValue)
                 .distinct()
                 .max()
                 .orElse(0);
-        return distance;
     }
 
     @Override
@@ -90,25 +88,24 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
                 .sum();
     }
 
-
     /**
-     * ObjectTypeDescription.powerMin is energy generation volume
+     * Object.energyConsumption for objects of generator types is amount of energy generator produces
      */
     @Override
     //todo: What are batteries for?
-    public double calculateGeneralEnergyAmount(SpaceTech spaceTech) {
+    public long calculateGeneralEnergyAmount(SpaceTech spaceTech) {
         return spaceTech.getSockets().stream()
                 .filter(s -> s.getObject() != null && inventoryTypeService.isGenerator(s.getObject()))
-                .mapToDouble(socket -> socket.getObject().getObjectTypeDescription().getPowerMin())
+                .mapToLong(socket -> socket.getObject().getEnergyConsumption())
                 .sum();
     }
 
     @Override
-    public double calculateAmountOfEnergyUsed(SpaceTech spaceTech) {
+    public long calculateAmountOfEnergyUsed(SpaceTech spaceTech) {
 
         return spaceTech.getSockets().stream()
                 .filter(s -> (s.getObject() != null && !inventoryTypeService.isGenerator(s.getObject())))
-                .mapToDouble(socket -> socket.getObject().getEnergyConsumption())
+                .mapToLong(socket -> socket.getObject().getEnergyConsumption())
                 .sum();
     }
 
@@ -144,5 +141,4 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
     public boolean isUserOwnsThisSpaceTech(User user, SpaceTech spaceTech) {
         return user.equals(spaceTech.getUser());
     }
-
 }

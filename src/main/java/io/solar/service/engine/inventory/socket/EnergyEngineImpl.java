@@ -25,11 +25,11 @@ public class EnergyEngineImpl implements EnergyEngine {
 
     @Override
     public void recalculateEnergy(SpaceTech spaceTech) {
-        double usedEnergyAmount = spaceTechEngine.calculateAmountOfEnergyUsed(spaceTech);
-        double generalEnergyAmount = spaceTechEngine.calculateGeneralEnergyAmount(spaceTech);
+        long usedEnergyAmount = spaceTechEngine.calculateAmountOfEnergyUsed(spaceTech);
+        long generalEnergyAmount = spaceTechEngine.calculateGeneralEnergyAmount(spaceTech);
 
         if (generalEnergyAmount < usedEnergyAmount) {
-            disableAccordingPriorities(spaceTech, (long) usedEnergyAmount, (long) generalEnergyAmount);
+            disableAccordingPriorities(spaceTech, usedEnergyAmount, generalEnergyAmount);
         }
     }
 
