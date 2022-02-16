@@ -9,6 +9,7 @@ import io.solar.repository.ObjectTypeDescriptionRepository;
 import io.solar.repository.StarShipRepository;
 import io.solar.security.Role;
 
+import io.solar.service.inventory.InventorySocketService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -24,6 +25,7 @@ public class InitService {
 
     private final UtilityService utilityService;
     private final UserService userService;
+    private final InventorySocketService inventorySocketService;
     private final StarShipRepository starShipRepository;
     private final ObjectTypeDescriptionRepository objectTypeDescriptionRepository;
     private final BasicObjectRepository basicObjectRepository;
@@ -75,11 +77,11 @@ public class InitService {
         adminStarShip.setStatus(ObjectStatus.IN_SPACE);
         adminStarShip = starShipRepository.save(adminStarShip);
         BasicObject radar = createDefaultRadar();
-        radar.setAttachedToSocket(1109L);
+        radar.setAttachedToSocket(inventorySocketService.getById(1109L));
         radar.setAttachedToShip(adminStarShip);
         BasicObject engine = createDefaultEngine();
         engine.setAttachedToShip(adminStarShip);
-        engine.setAttachedToSocket(1089L);
+        engine.setAttachedToSocket(inventorySocketService.getById(1089L));
         admin.setLocation(adminStarShip);
     }
 

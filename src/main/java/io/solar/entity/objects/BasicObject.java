@@ -2,6 +2,8 @@ package io.solar.entity.objects;
 
 import io.solar.entity.Course;
 import io.solar.entity.Planet;
+import io.solar.entity.inventory.InventorySocket;
+import io.solar.entity.inventory.InventoryType;
 import io.solar.entity.inventory.socket.SpaceTechSocket;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -55,8 +57,9 @@ public class BasicObject implements Serializable {
     @JoinColumn(name = "attached_to_ship")
     protected BasicObject attachedToShip;
 
-    //todo refactor to InventorySocket.class
-    protected Long attachedToSocket;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "attached_to_socket")
+    protected InventorySocket attachedToSocket;
 
     @Enumerated(EnumType.STRING)
     protected ObjectStatus status;
