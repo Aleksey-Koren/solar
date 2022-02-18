@@ -38,9 +38,9 @@ public class ProductShopFacade {
         Station station = stationService.getById(user.getLocation().getAttachedToShip().getId());
         StarShip spaceship = starshipService.getById(user.getLocation().getId());
 
-        productEngine.transferProducts(spaceship, station, products);
-
         userService.increaseUserBalance(user, calculateTotalSellPrice(station, products));
+
+        productEngine.transferProducts(spaceship, station, products);
     }
 
     public List<ProductPriceDto> getProductsSellPrices(User user, List<Long> productsIds) {

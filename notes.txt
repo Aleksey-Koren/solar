@@ -1,8 +1,15 @@
 
 TODO
 
-   1. todoo marks in SpaceTechEngineImpl.class
-   2. ObjectTypeDescription.inventoryType (refactoring to InventoryType.class is needed)
+    1. Refactor goods generation [AK]
+    2. Create putItemToStation endpoint //by owner [AK]
+    3. Send money to station owner after shop sale [AK]
+    4. Implement check station inventory volume before sale products [AV]
+    5. Refactor ProductEngine#transferProducts -> add check volume [AV]
+    6. Refactor InitService.class -> add station monitors initialization for existing stations [AV]
+
+
+    ** Create station monitor during creating station //todo need create
 
 
 

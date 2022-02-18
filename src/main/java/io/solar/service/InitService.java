@@ -37,7 +37,10 @@ public class InitService {
 
     @EventListener(ContextRefreshedEvent.class)
     public void onApplicationEvent(ContextRefreshedEvent event) {
-        event.getApplicationContext().getBean(InitService.class).defaultAdminInitialization();
+        InitService initService = event.getApplicationContext().getBean(InitService.class);
+
+        initService.defaultAdminInitialization();
+//        initService.fillStationMonitors();
     }
 
     @Transactional
