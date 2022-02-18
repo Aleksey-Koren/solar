@@ -2,7 +2,9 @@
 TODO
 
     1. Refactor goods generation [AK]
+
     2. Create putItemToStation endpoint //by owner [AK]
+
     3. Send money to station owner after shop sale [AK]
 
     4. Implement check station inventory volume before sale products [AV] \

@@ -29,18 +29,24 @@ public class ProductShopFacade {
         Station station = stationService.getById(user.getLocation().getAttachedToShip().getId());
         StarShip spaceship = starshipService.getById(user.getLocation().getId());
 
-        userService.decreaseUserBalance(user, calculatePurchasePrice(products));
+        long purchasePrice = calculatePurchasePrice(products);
 
         productEngine.transferProducts(station, spaceship, products);
+
+        userService.decreaseUserBalance(user, purchasePrice);
+
+        if (station.getUser() != null) {
+            userService.increaseUserBalance(station.getUser(), purchasePrice);
+        }
     }
 
     public void sellProducts(User user, List<ShopDto> products) {
         Station station = stationService.getById(user.getLocation().getAttachedToShip().getId());
         StarShip spaceship = starshipService.getById(user.getLocation().getId());
 
-        userService.increaseUserBalance(user, calculateTotalSellPrice(station, products));
-
         productEngine.transferProducts(spaceship, station, products);
+
+        userService.increaseUserBalance(user, calculateTotalSellPrice(station, products));
     }
 
     public List<ProductPriceDto> getProductsSellPrices(User user, List<Long> productsIds) {
@@ -83,5 +89,4 @@ public class ProductShopFacade {
                 .map(goods -> goods.getProduct().getId())
                 .toList();
     }
-
 }
