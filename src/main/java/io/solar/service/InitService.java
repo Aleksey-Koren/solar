@@ -4,9 +4,12 @@ import io.solar.entity.User;
 import io.solar.entity.objects.BasicObject;
 import io.solar.entity.objects.ObjectStatus;
 import io.solar.entity.objects.StarShip;
+import io.solar.entity.objects.Station;
+import io.solar.multithreading.StationMonitor;
 import io.solar.repository.BasicObjectRepository;
 import io.solar.repository.ObjectTypeDescriptionRepository;
 import io.solar.repository.StarShipRepository;
+import io.solar.repository.StationRepository;
 import io.solar.security.Role;
 
 import io.solar.service.inventory.InventorySocketService;
@@ -19,14 +22,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class InitService {
 
+    private final StationMonitor stationMonitor;
     private final UtilityService utilityService;
     private final UserService userService;
     private final InventorySocketService inventorySocketService;
     private final StarShipRepository starShipRepository;
+    private final StationRepository stationRepository;
     private final ObjectTypeDescriptionRepository objectTypeDescriptionRepository;
     private final BasicObjectRepository basicObjectRepository;
 
@@ -40,7 +47,7 @@ public class InitService {
         InitService initService = event.getApplicationContext().getBean(InitService.class);
 
         initService.defaultAdminInitialization();
-//        initService.fillStationMonitors();
+        initService.fillStationMonitors();
     }
 
     @Transactional
@@ -53,6 +60,15 @@ public class InitService {
         }
         createDefaultAdmin();
         utilityService.deleteByUtilKey("admin_not_exists");
+    }
+
+    /**
+     * Initialize monitors for each station
+     */
+    public void fillStationMonitors() {
+        List<Station> stations = stationRepository.findAll();
+
+        stations.forEach(station -> stationMonitor.createMonitor(station.getId()));
     }
 
     private void createDefaultAdmin() {

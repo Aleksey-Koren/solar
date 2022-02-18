@@ -81,6 +81,7 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
     @Override
     public float calculateTotalVolume(SpaceTech spaceTech) {
         BasicObject ship = (BasicObject) spaceTech;
+
         InventoryType container = inventoryTypeService.getByTitle(containerObjectTypeTitle);
         List<BasicObject> containers = basicObjectService.getObjectsInSlotsByType(ship.getId(), container);
 
@@ -89,16 +90,10 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
                 .sum();
     }
 
-    @Override
-    public float calculateFreeAvailableVolume(SpaceTech spaceTech) {
-        return calculateTotalVolume(spaceTech) - calculateUsedVolume(spaceTech);
-    }
-
+    //TODO: NEED FILL OBJECTS VOLUME FIELD
     @Override
     public float calculateUsedVolume(SpaceTech spaceTech) {
-        BasicObject object = (BasicObject) spaceTech;
-
-        double itemsVolume = object.getAttachedObjects()
+        double objectsVolume = spaceTech.getAttachedObjects()
                 .stream()
                 .mapToDouble(BasicObject::getVolume)
                 .sum();
@@ -108,12 +103,16 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
                 .mapToDouble(goods -> goods.getProduct().getVolume() * goods.getAmount())
                 .sum();
 
-        return  (float) (itemsVolume + goodsVolume);
+        return (float) (objectsVolume + goodsVolume);
+    }
+
+    @Override
+    public float calculateFreeAvailableVolume(SpaceTech spaceTech) {
+        return calculateTotalVolume(spaceTech) - calculateUsedVolume(spaceTech);
     }
 
     @Override
     public boolean isThereEnoughSpaceForObjects(SpaceTech spaceTech, List<BasicObject> objects) {
-        BasicObject object = (BasicObject) spaceTech;
 
         float shipVolume = calculateTotalVolume(spaceTech);
 
