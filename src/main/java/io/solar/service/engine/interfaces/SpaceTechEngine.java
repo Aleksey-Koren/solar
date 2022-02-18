@@ -16,7 +16,7 @@ public interface SpaceTechEngine {
 
     float calculateMaxAcceleration(SpaceTech spaceTech);
 
-    float calculateSpaceTechVolume(SpaceTech spaceTech);
+    float calculateTotalVolume(SpaceTech spaceTech);
 
     long calculateGeneralEnergyAmount(SpaceTech spaceTech);
 

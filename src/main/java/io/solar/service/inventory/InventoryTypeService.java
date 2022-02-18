@@ -25,6 +25,8 @@ public class InventoryTypeService {
     private String largeGeneratorObjectTypeTitle;
     @Value("${app.object.types.battery}")
     private String batteryObjectTypeTitle;
+    @Value("${app.object.types.container}")
+    private String containerObjectTypeTitle;
 
     private final InventoryTypeRepository inventoryTypeRepository;
 
@@ -61,5 +63,10 @@ public class InventoryTypeService {
         );
 
         return generatorTypes.contains(item.getObjectTypeDescription().getInventoryType());
+    }
+
+    public boolean isContainer(BasicObject item) {
+        InventoryType container = getByTitle(containerObjectTypeTitle);
+        return container.equals(item.getObjectTypeDescription().getInventoryType());
     }
 }

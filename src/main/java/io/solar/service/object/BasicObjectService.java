@@ -1,5 +1,6 @@
 package io.solar.service.object;
 
+import io.solar.entity.inventory.InventoryType;
 import io.solar.entity.objects.BasicObject;
 import io.solar.entity.objects.StarShip;
 import io.solar.repository.BasicObjectRepository;
@@ -71,5 +72,9 @@ public class BasicObjectService {
 
     public List<BasicObject> saveAll(List<BasicObject> basicObjects) {
        return basicObjectRepository.saveAll(basicObjects);
+    }
+
+    public List<BasicObject> getObjectsInSlotsByType(Long spaceTechId, InventoryType inventoryType) {
+        return basicObjectRepository.getObjectsInSlotsByType(spaceTechId, inventoryType);
     }
 }

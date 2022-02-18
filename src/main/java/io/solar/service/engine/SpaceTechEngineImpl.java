@@ -7,6 +7,7 @@ import io.solar.entity.objects.BasicObject;
 import io.solar.repository.BasicObjectRepository;
 import io.solar.service.engine.interfaces.SpaceTechEngine;
 import io.solar.service.inventory.InventoryTypeService;
+import io.solar.service.object.BasicObjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -28,6 +29,7 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
 
     private final BasicObjectRepository basicObjectRepository;
     private final InventoryTypeService inventoryTypeService;
+    private final BasicObjectService basicObjectService;
 
     @Override
     public Double retrieveViewDistance(SpaceTech spaceTech) {
@@ -77,15 +79,41 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
      * ObjectTypeDescription.powerMin is container capacity
      */
     @Override
-    public float calculateSpaceTechVolume(SpaceTech spaceTech) {
+    public float calculateTotalVolume(SpaceTech spaceTech) {
         BasicObject ship = (BasicObject) spaceTech;
-
         InventoryType container = inventoryTypeService.getByTitle(containerObjectTypeTitle);
+        List<BasicObject> containers = basicObjectService.getObjectsInSlotsByType(ship.getId(), container);
 
-        return (float) ship.getAttachedObjects().stream()
-                .filter(object -> object.getObjectTypeDescription().getInventoryType().equals(container))
+        return (float) containers.stream()
                 .mapToDouble(object -> object.getObjectTypeDescription().getPowerMin())
                 .sum();
+    }
+
+    public float calculateFreeAvailableVolume(SpaceTech spaceTech) {
+        return 0f;
+    }
+
+    @Override
+    public boolean isThereEnoughSpaceForObjects(SpaceTech spaceTech, List<BasicObject> objects) {
+        BasicObject object = (BasicObject) spaceTech;
+
+        float shipVolume = calculateTotalVolume(spaceTech);
+
+        double objectsVolume = objects.stream()
+                .mapToDouble(BasicObject::getVolume)
+                .sum();
+
+        double currentUsedVolume = object.getAttachedObjects()
+                .stream()
+                .mapToDouble(BasicObject::getVolume)
+                .sum();
+
+        double goodsVolume = spaceTech.getGoods()
+                .stream()
+                .mapToDouble(goods -> goods.getProduct().getVolume() * goods.getAmount())
+                .sum();
+
+        return ((currentUsedVolume + objectsVolume + goodsVolume) <= shipVolume);
     }
 
     /**
@@ -107,29 +135,6 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
                 .filter(s -> (s.getObject() != null && !inventoryTypeService.isGenerator(s.getObject())))
                 .mapToLong(socket -> socket.getObject().getEnergyConsumption())
                 .sum();
-    }
-
-    @Override
-    public boolean isThereEnoughSpaceForObjects(SpaceTech spaceTech, List<BasicObject> objects) {
-        BasicObject object = (BasicObject) spaceTech;
-
-        float shipVolume = calculateSpaceTechVolume(spaceTech);
-
-        double objectsVolume = objects.stream()
-                .mapToDouble(BasicObject::getVolume)
-                .sum();
-
-        double currentUsedVolume = object.getAttachedObjects()
-                .stream()
-                .mapToDouble(BasicObject::getVolume)
-                .sum();
-
-        double goodsVolume = spaceTech.getGoods()
-                .stream()
-                .mapToDouble(goods -> goods.getProduct().getVolume() * goods.getAmount())
-                .sum();
-
-        return ((currentUsedVolume + objectsVolume + goodsVolume) <= shipVolume);
     }
 
     @Override
