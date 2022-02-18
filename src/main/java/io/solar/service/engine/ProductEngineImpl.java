@@ -2,11 +2,13 @@ package io.solar.service.engine;
 
 import io.solar.dto.shop.ShopDto;
 import io.solar.entity.Goods;
+import io.solar.entity.Product;
 import io.solar.entity.interfaces.SpaceTech;
 import io.solar.entity.objects.BasicObject;
-import io.solar.repository.GoodsRepository;
+import io.solar.multithreading.StationMonitor;
 import io.solar.service.ProductService;
 import io.solar.service.engine.interfaces.ProductEngine;
+import io.solar.service.engine.interfaces.SpaceTechEngine;
 import io.solar.service.object.BasicObjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -24,26 +26,32 @@ public class ProductEngineImpl implements ProductEngine {
 
     private final ProductService productService;
     private final BasicObjectService basicObjectService;
+    private final SpaceTechEngine spaceTechEngine;
+    private final StationMonitor stationMonitor;
 
     @Override
     public void transferProducts(SpaceTech from, SpaceTech to, List<ShopDto> products) {
         Map<Long, Goods> fromProductsGoods = createProductGoodsMap(from);
         Map<Long, Goods> toProductsGoods = createProductGoodsMap(to);
 
-        if (isProductsInStock(products, fromProductsGoods)) {
+        synchronized (stationMonitor.getMonitor(to.getId())) {
 
-            products.forEach(product -> {
-                Goods goodsToDecrease = fromProductsGoods.get(product.getProductId());
-                decreaseGoods(product, goodsToDecrease, from);
+            if (isProductsInStock(products, fromProductsGoods) && isSpaceTechHaveEnoughSpace(to, products)) {
 
-                Goods goodsToIncrease = toProductsGoods.get(product.getProductId());
-                increaseGoods(product, goodsToIncrease, to);
-            });
+                products.forEach(product -> {
+                    Goods goodsToDecrease = fromProductsGoods.get(product.getProductId());
+                    decreaseGoods(product, goodsToDecrease, from);
 
-            basicObjectService.save((BasicObject) from);
-            basicObjectService.save((BasicObject) to);
-        } else {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Not enough goods");
+                    Goods goodsToIncrease = toProductsGoods.get(product.getProductId());
+                    increaseGoods(product, goodsToIncrease, to);
+                });
+
+                basicObjectService.save((BasicObject) from);
+                basicObjectService.save((BasicObject) to);
+            } else {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Not enough goods");
+            }
+
         }
     }
 
@@ -76,6 +84,18 @@ public class ProductEngineImpl implements ProductEngine {
                 .collect(Collectors.toMap(goods -> goods.getProduct().getId(), Function.identity()));
     }
 
+    private boolean isSpaceTechHaveEnoughSpace(SpaceTech spaceTech, List<ShopDto> products) {
+        float spaceTechVolume = spaceTechEngine.calculateVolume(spaceTech);
+        float usedVolume = spaceTechEngine.calculateUsedVolume(spaceTech);
+
+        double productsVolume = products.stream()
+                .map(product -> productService.getById(product.getProductId()))
+                .mapToDouble(Product::getBulk)
+                .sum();
+
+        return ((usedVolume + productsVolume) <= spaceTechVolume);
+    }
+
     private boolean isProductsInStock(List<ShopDto> products, Map<Long, Goods> productGoodsMap) {
         boolean isProductsInStock = true;
 
@@ -83,6 +103,7 @@ public class ProductEngineImpl implements ProductEngine {
             Goods goods = productGoodsMap.get(product.getProductId());
             if (goods == null || goods.getAmount() < product.getQuantity()) {
                 isProductsInStock = false;
+                break;
             }
         }
 

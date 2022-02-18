@@ -77,7 +77,7 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
      * ObjectTypeDescription.powerMin is container capacity
      */
     @Override
-    public float calculateSpaceTechVolume(SpaceTech spaceTech) {
+    public float calculateVolume(SpaceTech spaceTech) {
         BasicObject ship = (BasicObject) spaceTech;
 
         InventoryType container = inventoryTypeService.getByTitle(containerObjectTypeTitle);
@@ -86,6 +86,22 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
                 .filter(object -> object.getObjectTypeDescription().getInventoryType().equals(container))
                 .mapToDouble(object -> object.getObjectTypeDescription().getPowerMin())
                 .sum();
+    }
+
+    //TODO: NEED FILL OBJECTS VOLUME FIELD
+    @Override
+    public float calculateUsedVolume(SpaceTech spaceTech) {
+        double objectsVolume = spaceTech.getAttachedObjects()
+                .stream()
+                .mapToDouble(BasicObject::getVolume)
+                .sum();
+
+        double goodsVolume = spaceTech.getGoods()
+                .stream()
+                .mapToDouble(goods -> goods.getProduct().getVolume() * goods.getAmount())
+                .sum();
+
+        return (float) (objectsVolume + goodsVolume);
     }
 
     /**
@@ -111,25 +127,15 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
 
     @Override
     public boolean isThereEnoughSpaceForObjects(SpaceTech spaceTech, List<BasicObject> objects) {
-        BasicObject object = (BasicObject) spaceTech;
+        float shipVolume = calculateVolume(spaceTech);
 
-        float shipVolume = calculateSpaceTechVolume(spaceTech);
+        float usedSpaceTechVolume = calculateUsedVolume(spaceTech);
 
         double objectsVolume = objects.stream()
                 .mapToDouble(BasicObject::getVolume)
                 .sum();
 
-        double currentUsedVolume = object.getAttachedObjects()
-                .stream()
-                .mapToDouble(BasicObject::getVolume)
-                .sum();
-
-        double goodsVolume = spaceTech.getGoods()
-                .stream()
-                .mapToDouble(goods -> goods.getProduct().getVolume() * goods.getAmount())
-                .sum();
-
-        return ((currentUsedVolume + objectsVolume + goodsVolume) <= shipVolume);
+        return ((usedSpaceTechVolume + objectsVolume) <= shipVolume);
     }
 
     @Override
