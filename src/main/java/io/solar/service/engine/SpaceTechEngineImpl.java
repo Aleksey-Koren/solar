@@ -7,7 +7,6 @@ import io.solar.entity.objects.BasicObject;
 import io.solar.repository.BasicObjectRepository;
 import io.solar.service.engine.interfaces.SpaceTechEngine;
 import io.solar.service.inventory.InventoryTypeService;
-import io.solar.service.inventory.socket.SpaceTechSocketService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -20,12 +19,6 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
 
     @Value("${app.object.types.container}")
     private String containerObjectTypeTitle;
-    @Value("${app.object.types.generator}")
-    private String generatorObjectTypeTitle;
-    @Value("${app.object.types.large_generator}")
-    private String largeGeneratorObjectTypeTitle;
-    @Value("${app.object.types.battery}")
-    private String batteryObjectTypeTitle;
     @Value("${app.object.types.radar}")
     private String radarObjectTypeTitle;
     @Value("${app.object.types.engine}")
@@ -35,7 +28,6 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
 
     private final BasicObjectRepository basicObjectRepository;
     private final InventoryTypeService inventoryTypeService;
-    private final SpaceTechSocketService spaceTechSocketService;
 
     @Override
     public Double retrieveViewDistance(SpaceTech spaceTech) {
@@ -44,12 +36,11 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
 
         List<BasicObject> radars = basicObjectRepository.getObjectsInSlotsByType(spaceTechAsObject.getId(), radar);
 
-        double distance = radars.stream()
+        return radars.stream()
                 .map(s -> s.getObjectTypeDescription().getDistance()).mapToDouble(Float::doubleValue)
                 .distinct()
                 .max()
                 .orElse(0);
-        return distance;
     }
 
     @Override
@@ -97,32 +88,24 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
                 .sum();
     }
 
-
     /**
-     * ObjectTypeDescription.powerMin is energy generation volume
+     * Object.energyConsumption for objects of generator types is amount of energy generator produces
      */
     @Override
     //todo: What are batteries for?
-    public double calculateGeneralEnergyAmount(SpaceTech spaceTech) {
-        List<InventoryType> energyTypes = retrieveEnergyTypes();
-
+    public long calculateGeneralEnergyAmount(SpaceTech spaceTech) {
         return spaceTech.getSockets().stream()
-                .filter(s -> s.getObject() != null &&
-                        energyTypes.contains(s.getObject().getObjectTypeDescription().getInventoryType())
-                )
-                .mapToDouble(socket -> socket.getObject().getObjectTypeDescription().getPowerMin())
+                .filter(s -> s.getObject() != null && inventoryTypeService.isGenerator(s.getObject()))
+                .mapToLong(socket -> socket.getObject().getEnergyConsumption())
                 .sum();
     }
 
     @Override
-    public double calculateAmountOfEnergyUsed(SpaceTech spaceTech) {
-        List<InventoryType> energyTypes = retrieveEnergyTypes();
+    public long calculateAmountOfEnergyUsed(SpaceTech spaceTech) {
 
         return spaceTech.getSockets().stream()
-                .filter(s -> (s.getObject() != null &&
-                        !energyTypes.contains(s.getObject().getObjectTypeDescription().getInventoryType()))
-                )
-                .mapToDouble(socket -> socket.getObject().getEnergyConsumption())
+                .filter(s -> (s.getObject() != null && !inventoryTypeService.isGenerator(s.getObject())))
+                .mapToLong(socket -> socket.getObject().getEnergyConsumption())
                 .sum();
     }
 
@@ -157,12 +140,5 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
     @Override
     public boolean isUserOwnsThisSpaceTech(User user, SpaceTech spaceTech) {
         return user.equals(spaceTech.getUser());
-    }
-
-    @Override
-    public List<InventoryType> retrieveEnergyTypes() {
-        return inventoryTypeService.findAllByTitleIn(
-                List.of(generatorObjectTypeTitle, largeGeneratorObjectTypeTitle, batteryObjectTypeTitle)
-        );
     }
 }

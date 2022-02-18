@@ -3,6 +3,7 @@ package io.solar.service.engine.inventory;
 import io.solar.config.properties.NavigatorProperties;
 import io.solar.config.properties.StarShipProperties;
 import io.solar.entity.interfaces.SpaceTech;
+import io.solar.entity.inventory.InventoryType;
 import io.solar.entity.objects.BasicObject;
 import io.solar.entity.objects.ObjectStatus;
 import io.solar.entity.objects.StarShip;
@@ -11,7 +12,9 @@ import io.solar.service.engine.StarMapEngineImpl;
 import io.solar.service.engine.interfaces.inventory.InventoryEngine;
 import io.solar.service.engine.interfaces.NavigationEngine;
 import io.solar.service.engine.interfaces.SpaceTechEngine;
+import io.solar.service.inventory.InventoryTypeService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
@@ -63,18 +66,6 @@ public class InventoryEngineImpl implements InventoryEngine {
         object.setAttachedToSocket(null);
         object.setStatus(ObjectStatus.AT_MARKETPLACE);
         basicObjectRepository.save(object);
-    }
-
-    @Override
-    public void dropToSpace(StarShip starShip, BasicObject object) {
-        StarMapEngineImpl.CoordinatePoint point = generateRandomCoordinatesInDropRadius(starShip);
-        setInSpaceParameters(object, point);
-    }
-
-    @Override
-    public void dropToSpace(StarShip starShip, List<BasicObject> objects) {
-        objects.forEach(s -> setInSpaceParameters(s, generateRandomCoordinatesInDropRadius(starShip)));
-        basicObjectRepository.saveAll(objects);
     }
 
     @Override

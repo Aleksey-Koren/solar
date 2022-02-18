@@ -24,8 +24,6 @@ public class InventoryType {
 
     @Column(name = "title")
     private String title;
-
-
 //        pseudo field, used when inventory type used as many-to-many
 //    private String alias;
 }

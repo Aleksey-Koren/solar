@@ -16,10 +16,6 @@ public interface InventoryEngine {
 
     boolean isInShipInventory(BasicObject ship, List<BasicObject> objects);
 
-    void dropToSpace(StarShip starShip, BasicObject object);
-
-    void dropToSpace(StarShip starShip, List<BasicObject> objects);
-
     void dropToSpaceExplosion(StarShip starShip, List<BasicObject> objects);
 
     void putToExchange(StarShip starship, BasicObject inventoryObject);

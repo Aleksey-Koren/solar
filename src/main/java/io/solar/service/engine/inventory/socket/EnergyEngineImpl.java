@@ -1,11 +1,11 @@
 package io.solar.service.engine.inventory.socket;
 
 import io.solar.entity.interfaces.SpaceTech;
-import io.solar.entity.inventory.InventoryType;
 import io.solar.entity.inventory.socket.SpaceTechSocket;
 import io.solar.entity.objects.BasicObject;
 import io.solar.service.engine.interfaces.SpaceTechEngine;
 import io.solar.service.engine.interfaces.inventory.socket.EnergyEngine;
+import io.solar.service.inventory.InventoryTypeService;
 import io.solar.service.object.BasicObjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.function.Function;
 
 @Component
 @RequiredArgsConstructor
@@ -22,25 +21,25 @@ public class EnergyEngineImpl implements EnergyEngine {
 
     private final SpaceTechEngine spaceTechEngine;
     private final BasicObjectService basicObjectService;
+    private final InventoryTypeService inventoryTypeService;
 
     @Override
     public void recalculateEnergy(SpaceTech spaceTech) {
-        double usedEnergyAmount = spaceTechEngine.calculateAmountOfEnergyUsed(spaceTech);
-        double generalEnergyAmount = spaceTechEngine.calculateGeneralEnergyAmount(spaceTech);
+        long usedEnergyAmount = spaceTechEngine.calculateAmountOfEnergyUsed(spaceTech);
+        long generalEnergyAmount = spaceTechEngine.calculateGeneralEnergyAmount(spaceTech);
 
         if (generalEnergyAmount < usedEnergyAmount) {
-            disableAccordingPriorities(spaceTech, (long) usedEnergyAmount, (long) generalEnergyAmount);
+            disableAccordingPriorities(spaceTech, usedEnergyAmount, generalEnergyAmount);
         }
     }
 
     private void disableAccordingPriorities(SpaceTech spaceTech, long usedEnergyAmount, long generalEnergyAmount) {
-        List<InventoryType> energyTypes = spaceTechEngine.retrieveEnergyTypes();
         List<BasicObject> notGeneratorItems = new ArrayList<>();
 
         List<SpaceTechSocket> sortedAndEnabled = spaceTech.getSockets().stream()
                 .sorted(Comparator.comparingInt(SpaceTechSocket::getEnergyConsumptionPriority))
                 .peek(s -> {
-                    if (s.getObject() != null && !energyTypes.contains(s.getObject().getObjectTypeDescription().getInventoryType())) {
+                    if (s.getObject() != null && !inventoryTypeService.isGenerator(s.getObject())) {
                         s.getObject().setIsEnabled(true);
                         notGeneratorItems.add(s.getObject());
                     }
@@ -51,7 +50,7 @@ public class EnergyEngineImpl implements EnergyEngine {
 
         Collections.reverse(sortedAndEnabled);
         for (SpaceTechSocket socket : sortedAndEnabled) {
-            if (socket.getObject() != null && !energyTypes.contains(socket.getObject().getObjectTypeDescription().getInventoryType())) {
+            if (socket.getObject() != null && !inventoryTypeService.isGenerator(socket.getObject())) {
                 socket.getObject().setIsEnabled(false);
                 usedEnergyAmount -= socket.getObject().getEnergyConsumption();
                 disabled.add(socket);
