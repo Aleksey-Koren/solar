@@ -89,21 +89,16 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
                 .sum();
     }
 
+    @Override
     public float calculateFreeAvailableVolume(SpaceTech spaceTech) {
-        return 0f;
+        return calculateTotalVolume(spaceTech) - calculateUsedVolume(spaceTech);
     }
 
     @Override
-    public boolean isThereEnoughSpaceForObjects(SpaceTech spaceTech, List<BasicObject> objects) {
+    public float calculateUsedVolume(SpaceTech spaceTech) {
         BasicObject object = (BasicObject) spaceTech;
 
-        float shipVolume = calculateTotalVolume(spaceTech);
-
-        double objectsVolume = objects.stream()
-                .mapToDouble(BasicObject::getVolume)
-                .sum();
-
-        double currentUsedVolume = object.getAttachedObjects()
+        double itemsVolume = object.getAttachedObjects()
                 .stream()
                 .mapToDouble(BasicObject::getVolume)
                 .sum();
@@ -113,7 +108,22 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
                 .mapToDouble(goods -> goods.getProduct().getVolume() * goods.getAmount())
                 .sum();
 
-        return ((currentUsedVolume + objectsVolume + goodsVolume) <= shipVolume);
+        return  (float) (itemsVolume + goodsVolume);
+    }
+
+    @Override
+    public boolean isThereEnoughSpaceForObjects(SpaceTech spaceTech, List<BasicObject> objects) {
+        BasicObject object = (BasicObject) spaceTech;
+
+        float shipVolume = calculateTotalVolume(spaceTech);
+
+        float objectsVolume = (float) objects.stream()
+                .mapToDouble(BasicObject::getVolume)
+                .sum();
+
+        float usedVolume = calculateUsedVolume(spaceTech);
+
+        return ((usedVolume + objectsVolume) <= shipVolume);
     }
 
     /**

@@ -18,6 +18,10 @@ public interface SpaceTechEngine {
 
     float calculateTotalVolume(SpaceTech spaceTech);
 
+    float calculateUsedVolume(SpaceTech spaceTech);
+
+    float calculateFreeAvailableVolume(SpaceTech spaceTech);
+
     long calculateGeneralEnergyAmount(SpaceTech spaceTech);
 
     long calculateAmountOfEnergyUsed(SpaceTech spaceTech);

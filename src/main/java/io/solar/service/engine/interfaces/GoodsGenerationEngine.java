@@ -1,7 +1,10 @@
-package io.solar.service.engine;
+package io.solar.service.engine.interfaces;
 
-public class GoodsGenerationEngine {
+import io.solar.entity.objects.Station;
 
+public interface GoodsGenerationEngine {
 
+    void generateGoods(Station station);
 
+    void recalculatePrice(Station station);
 }
