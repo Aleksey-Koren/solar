@@ -85,7 +85,7 @@ public class ProductEngineImpl implements ProductEngine {
     }
 
     private boolean isSpaceTechHaveEnoughSpace(SpaceTech spaceTech, List<ShopDto> products) {
-        float spaceTechVolume = spaceTechEngine.calculateVolume(spaceTech);
+        float spaceTechVolume = spaceTechEngine.calculateTotalVolume(spaceTech);
         float usedVolume = spaceTechEngine.calculateUsedVolume(spaceTech);
 
         double productsVolume = products.stream()

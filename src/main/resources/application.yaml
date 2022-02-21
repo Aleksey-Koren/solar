@@ -55,7 +55,7 @@ app:
     hack_block_time_min: 5
     admin_not_exists: "yes"
     goods_generation_delay_minutes: 60
-    goods_initial_delay_minutes: 0
+    goods_initial_delay_minutes: 100
     view_distance_without_radar: 5
     time_flow_modifier: 1
     station_sell_modifier: 0.7

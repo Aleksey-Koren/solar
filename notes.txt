@@ -1,7 +1,7 @@
 
 TODO
 
-    1. Refactor goods generation [AK]
+    1. Refactor goods generation [AK] +++
 
     2. Create putItemToStation endpoint //by owner [AK]
 

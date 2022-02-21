@@ -3,7 +3,6 @@ package io.solar.facade.inventory.socket;
 import io.solar.dto.inventory.socket.EnergyPriorityDto;
 import io.solar.dto.inventory.socket.SocketControllerDto;
 import io.solar.entity.User;
-import io.solar.entity.inventory.InventorySocket;
 import io.solar.entity.inventory.socket.SpaceTechSocket;
 import io.solar.entity.objects.BasicObject;
 import io.solar.entity.objects.StarShip;

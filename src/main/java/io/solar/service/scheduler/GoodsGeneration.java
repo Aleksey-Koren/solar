@@ -21,16 +21,4 @@ public class GoodsGeneration {
             goodsGenerationEngine.generateGoods(station);
         }
     }
-
-//    private Float retrievePriceModifier(double from, double to) {
-//        return (retrieveRandomInRange(from, to) + retrieveRandomInRange(from, to) + retrieveRandomInRange(from, to) +
-//                retrieveRandomInRange(from, to) + retrieveRandomInRange(from, to) + retrieveRandomInRange(from, to)) / 6;
-//    }
-//
-//    private static Float retrieveRandomInRange(double from, double to) {
-//        double f = Math.random() / Math.nextDown(1.0);
-//        double x = from * (1.0 - f) + to * f;
-//        return (float) x;
-//    }
-
 }

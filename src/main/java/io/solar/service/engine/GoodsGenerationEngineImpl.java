@@ -26,7 +26,7 @@ public class GoodsGenerationEngineImpl implements GoodsGenerationEngine {
 
     @Override
     public void generateGoods(Station station) {
-//        synchronized (stationMonitor.getMonitor(station.getId())) {
+        synchronized (stationMonitor.getMonitor(station.getId())) {
             for (Production production : station.getProduction()) {
                 Product product = production.getProduct();
                 Long amount = (long) (production.getPower() * retrieveRandomInRange(0.5, 1.0) + 10);
@@ -51,7 +51,7 @@ public class GoodsGenerationEngineImpl implements GoodsGenerationEngine {
             }
             goodsService.saveAll(station.getGoods());
         }
-//    }
+    }
 
     @Override
     //todo refactor this method to more natural volume proportions calculation algorithm
