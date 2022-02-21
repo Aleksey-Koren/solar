@@ -4,6 +4,7 @@ import io.solar.entity.User;
 import io.solar.entity.interfaces.SpaceTech;
 import io.solar.entity.inventory.InventoryType;
 import io.solar.entity.objects.BasicObject;
+import io.solar.entity.objects.Station;
 import io.solar.repository.BasicObjectRepository;
 import io.solar.service.engine.interfaces.SpaceTechEngine;
 import io.solar.service.inventory.InventoryTypeService;
@@ -154,5 +155,10 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
     @Override
     public boolean isUserOwnsThisSpaceTech(User user, SpaceTech spaceTech) {
         return user.equals(spaceTech.getUser());
+    }
+
+    @Override
+    public boolean isUserAtStation(User user, Station station) {
+        return station.equals(user.getLocation().getAttachedToShip());
     }
 }

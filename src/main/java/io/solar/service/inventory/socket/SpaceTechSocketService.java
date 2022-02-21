@@ -46,6 +46,10 @@ public class SpaceTechSocketService {
         return spaceTechSocketRepository.save(spaceTechSocket);
     }
 
+    public Optional<SpaceTechSocket> findByObject(BasicObject object) {
+        return spaceTechSocketRepository.findByObject(object);
+    }
+
     public SpaceTechSocket getByObject(BasicObject object) {
         return spaceTechSocketRepository.findByObject(object).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND,

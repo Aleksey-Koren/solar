@@ -61,7 +61,7 @@ public class InventoryShopFacade {
 
         long sellAmount = objects.stream()
                 .peek(obj -> {
-                    if (!inventoryEngine.isInShipInventory(user.getLocation(), obj)) {
+                    if (!inventoryEngine.isInSpaceTechInventory(user.getLocation(), obj)) {
                         throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                                 String.format("Fail to sell object id = %d. Reason: object isn't in ship inventory", obj.getId()));
                     }
@@ -75,7 +75,7 @@ public class InventoryShopFacade {
     public Long getSellPrice(User user, Long objectId) {
         BasicObject object = basicObjectService.getById(objectId);
 
-        if (!inventoryEngine.isInShipInventory(user.getLocation(), object)) {
+        if (!inventoryEngine.isInSpaceTechInventory(user.getLocation(), object)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     String.format("Fail to get sell price for object id = %d. Reason: object isn't in ship inventory", object.getId()));
         }

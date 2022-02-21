@@ -83,12 +83,18 @@ public class StationController {
     @PatchMapping("/{id}/inventory/attachment")
     @PreAuthorize("hasAnyAuthority('PLAY_THE_GAME')")
     @Transactional
-    public void putToInventory(@PathVariable("id") Long stationId ,BasicObjectViewDto dto, Principal principal) {
+    public void putToInventory(@PathVariable("id") Long stationId ,List<BasicObjectViewDto> dto, Principal principal) {
 
-        stationFacade.putToInventory(stationId, dto, principal);
+        stationFacade.moveFromOwnerToStation(stationId, dto, principal);
     }
 
+    @PatchMapping("/{id}/inventory/detachment")
+    @PreAuthorize("hasAnyAuthority('PLAY_THE_GAME')")
+    @Transactional
+    public void takeFromInventory(@PathVariable("id") Long stationId ,List<BasicObjectViewDto> dto, Principal principal) {
 
+        stationFacade.moveFromStationToOwner(stationId, dto, principal);
+    }
 
     @Scheduled(fixedDelayString = "#{@appProperties.getGoodsGenerationDelayMinutes()}",
             initialDelayString = "#{@appProperties.getGoodsInitialDelayMinutes()}",

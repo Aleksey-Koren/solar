@@ -73,7 +73,7 @@ public class HangarFacade {
                     "User cannot move objects from starship with id = " + sourceStarship.getId());
         }
 
-        if (!inventoryEngine.isInShipInventory(sourceStarship, objectsToMove)) {
+        if (!inventoryEngine.isInSpaceTechInventory(sourceStarship, objectsToMove)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "There is an alien object among objects to move");
         }
 
