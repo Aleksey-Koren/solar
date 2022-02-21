@@ -144,8 +144,6 @@ public class UserService implements UserDetailsService {
                 .toInstant(ZoneOffset.ofTotalSeconds(0)));
     }
 
-
-
     public void saveEmailNotifications(User user, List<MessageType> messageTypes) {
         user.setEmailNotifications(calculateEmailNotifications(messageTypes));
         userRepository.save(user);

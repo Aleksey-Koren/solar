@@ -9,6 +9,7 @@ import io.solar.repository.BasicObjectRepository;
 import io.solar.repository.ObjectTypeDescriptionRepository;
 import io.solar.repository.PlanetRepository;
 import io.solar.service.inventory.InventorySocketService;
+import io.solar.service.modification.ModificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ public class BasicObjectViewMapper implements EntityDtoMapper<BasicObject, Basic
     private final BasicObjectRepository basicObjectRepository;
     private final PlanetRepository planetRepository;
     private final InventorySocketService inventorySocketService;
+    private final ModificationService modificationService;
 
     @Override
     public BasicObject toEntity(BasicObjectViewDto dto) {
@@ -50,7 +52,7 @@ public class BasicObjectViewMapper implements EntityDtoMapper<BasicObject, Basic
                 .active(entity.getActive())
                 .durability(entity.getDurability())
                 .attachedToShip(entity.getAttachedToShip() != null ? entity.getAttachedToShip().getId() : null)
-                .attachedToSocket(entity.getAttachedToSocket().getId())
+                .attachedToSocket(entity.getAttachedToSocket() != null ? entity.getAttachedToSocket().getId() : null)
                 .status(entity.getStatus())
                 .speedX(entity.getSpeedX())
                 .speedY(entity.getSpeedY())
@@ -60,6 +62,7 @@ public class BasicObjectViewMapper implements EntityDtoMapper<BasicObject, Basic
                 .volume(entity.getVolume())
                 .energyConsumption(entity.getEnergyConsumption())
                 .isEnabled(entity.getIsEnabled())
+                .modificationId(entity.getModification() != null ? entity.getModification().getId() : null)
                 .build();
     }
 
@@ -123,5 +126,6 @@ public class BasicObjectViewMapper implements EntityDtoMapper<BasicObject, Basic
         basicObject.setVolume(dto.getVolume());
         basicObject.setEnergyConsumption(dto.getEnergyConsumption());
         basicObject.setIsEnabled(dto.getIsEnabled());
+        basicObject.setModification(dto.getModificationId() != null ? modificationService.getById(dto.getModificationId()) : null);
     }
 }

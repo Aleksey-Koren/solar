@@ -3,16 +3,32 @@ package io.solar.entity.objects;
 import io.solar.entity.Course;
 import io.solar.entity.Planet;
 import io.solar.entity.inventory.InventorySocket;
-import io.solar.entity.inventory.InventoryType;
 import io.solar.entity.inventory.socket.SpaceTechSocket;
+import io.solar.entity.modification.Modification;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.io.Serializable;
 import java.util.List;
 
@@ -93,6 +109,10 @@ public class BasicObject implements Serializable {
 
     protected Boolean isEnabled;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "modification_id")
+    private Modification modification;
+
     @OneToMany(mappedBy = "attachedToShip")
     @EqualsAndHashCode.Exclude
     protected List<BasicObject> attachedObjects;
@@ -108,5 +128,4 @@ public class BasicObject implements Serializable {
     public Double getSpeed() {
         return Math.sqrt(Math.pow(this.speedX, 2) + Math.pow(this.speedY, 2));
     }
-
 }

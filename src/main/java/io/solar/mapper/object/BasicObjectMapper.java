@@ -8,10 +8,12 @@ import io.solar.entity.objects.BasicObject;
 import io.solar.entity.objects.ObjectTypeDescription;
 import io.solar.mapper.EntityDtoMapper;
 import io.solar.mapper.SocketMapper;
+import io.solar.mapper.modification.ModificationMapper;
 import io.solar.repository.BasicObjectRepository;
 import io.solar.repository.ObjectTypeDescriptionRepository;
 import io.solar.repository.PlanetRepository;
 import io.solar.service.inventory.InventorySocketService;
+import io.solar.service.modification.ModificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -28,6 +30,7 @@ public class BasicObjectMapper implements EntityDtoMapper<BasicObject, BasicObje
     private final ObjectTypeDescriptionRepository objectTypeDescriptionRepository;
     private final PlanetRepository planetRepository;
     private final BasicObjectViewMapper basicObjectViewMapper;
+    private final ModificationService modificationService;
     private final SocketMapper socketMapper;
     private final InventorySocketService inventorySocketService;
 
@@ -82,6 +85,7 @@ public class BasicObjectMapper implements EntityDtoMapper<BasicObject, BasicObje
                 .volume(entity.getVolume())
                 .energyConsumption(entity.getEnergyConsumption())
                 .isEnabled(entity.getIsEnabled())
+                .modificationId(entity.getModification() != null ? entity.getModification().getId() : null)
                 .build();
     }
 
@@ -150,5 +154,6 @@ public class BasicObjectMapper implements EntityDtoMapper<BasicObject, BasicObje
         entity.setVolume(dto.getVolume());
         entity.setEnergyConsumption(dto.getEnergyConsumption());
         entity.setIsEnabled(dto.getIsEnabled());
+        entity.setModification(dto.getModificationId() != null ? modificationService.getById(dto.getModificationId()) : null);
     }
 }

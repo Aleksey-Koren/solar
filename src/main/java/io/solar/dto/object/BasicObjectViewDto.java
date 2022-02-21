@@ -38,4 +38,5 @@ public class BasicObjectViewDto {
     private Float volume;
     private Long energyConsumption;
     private Boolean isEnabled;
+    private Long modificationId;
 }
