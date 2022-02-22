@@ -6,16 +6,17 @@ TODO
     Для админа:
 
     CRUD
-    1. createModification()   "api/modification" POST
-    2. update                 "api/modification" POST
-    ...
-    5. applyModification()    "api/inventory-item/{id}/modification" PATCH
+    1. ModificationController with CRUD methods and 'EDIT_MODIFICATIONS' permission. Not for simple users.
+    5. applyModification()    "api/inventory-item/{id}/modification" PATCH...
     6. Create ModificationTypeController and CRUD methods in it. With 'EDIT_MODIFICATIONS' permission. Not for simple users.
+    7. Create ModificationPriceController with CRUD and findAll(Pageable, Filter filter).
+
     -----------------------------------------------------------------------------------
-    ++ 2. prices and price_products DDL
-    + 3. refactor calculateSellPrice in inventoryShopFacade(), StarShipShopFacade()
-    ++ 4. modification_types DDL  (id INT, title VARCHAR)
-    5.
+   (only entities created)         ++ 2. prices and price_products DDL
+                                   ++ 3. refactor calculateSellPrice in inventoryShopFacade(), StarShipShopFacade()
+                                   ++ 4. modification_types DDL  (id INT, title VARCHAR)
+   (mappers and dtos not created)  ++ 5. Create ModificationPrice DDL, entities, service and repo.
+
 
 
 
