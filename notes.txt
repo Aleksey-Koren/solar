@@ -1,20 +1,26 @@
 
 TODO
 
-    1. Refactor goods generation [AK] +++
-
-    2. Create putItemToStation endpoint //by owner [AK]
-
-    3. Send money to station owner after shop sale [AK]
-
-    4. Implement check station inventory volume before sale products [AV] \
-                                                                            it's seems equal things -> +++
-    5. Refactor ProductEngine#transferProducts -> add check volume [AV]   /
-
-    6. Refactor InitService.class -> add station monitors initialization for existing stations [AV] +++
-
-
     ** Create station monitor during creating station //todo need create
+
+    Для админа:
+
+    CRUD
+    1. createModification()   "api/modification" POST
+    2. update                 "api/modification" POST
+    ...
+    5. applyModification()    "api/inventory-item/{id}/modification" PATCH
+    6.
+    -----------------------------------------------------------------------------------
+    1. Create OTD type drawing
+    2. prices and price_products DDL
+    3. refactor calculateSellPrice in inventoryShopFacade(), StarShipShopFacade()
+    4. modification_types DDL  (id INT, title VARCHAR)
+    5.
+
+    BasicObjectUtil.getCooldown(BasicObject object)
+    object.getCooldo
+
 
 
 

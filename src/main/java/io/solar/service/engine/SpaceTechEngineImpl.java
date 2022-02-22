@@ -14,6 +14,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.function.Predicate;
+
+import static java.util.function.Predicate.*;
 
 @Component
 @RequiredArgsConstructor
@@ -76,9 +79,6 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
                 .sum();
     }
 
-    /**
-     * ObjectTypeDescription.powerMin is container capacity
-     */
     @Override
     public float calculateTotalVolume(SpaceTech spaceTech) {
         BasicObject ship = (BasicObject) spaceTech;
@@ -87,7 +87,7 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
         List<BasicObject> containers = basicObjectService.getObjectsInSlotsByType(ship.getId(), container);
 
         return (float) containers.stream()
-                .mapToDouble(object -> object.getObjectTypeDescription().getPowerMin())
+                .mapToDouble(object -> object.getObjectTypeDescription().getVolume())
                 .sum();
     }
 
@@ -96,6 +96,7 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
     public float calculateUsedVolume(SpaceTech spaceTech) {
         double objectsVolume = spaceTech.getAttachedObjects()
                 .stream()
+                .filter(not(inventoryTypeService::isContainer))
                 .mapToDouble(BasicObject::getVolume)
                 .sum();
 

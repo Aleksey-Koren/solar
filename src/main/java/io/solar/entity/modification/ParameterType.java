@@ -7,5 +7,6 @@ public enum ParameterType {
     COOLDOWN,
     DISTANCE,
     ENERGY_CONSUMPTION,
-    DURABILITY
+    DURABILITY,
+    VOLUME
 }
