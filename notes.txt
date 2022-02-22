@@ -10,11 +10,11 @@ TODO
     2. update                 "api/modification" POST
     ...
     5. applyModification()    "api/inventory-item/{id}/modification" PATCH
-    6.
+    6. Create ModificationTypeController and CRUD methods in it. With 'EDIT_MODIFICATIONS' permission. Not for simple users.
     -----------------------------------------------------------------------------------
-    ++2. prices and price_products DDL
-    3. refactor calculateSellPrice in inventoryShopFacade(), StarShipShopFacade()
-    4. modification_types DDL  (id INT, title VARCHAR)
+    ++ 2. prices and price_products DDL
+    + 3. refactor calculateSellPrice in inventoryShopFacade(), StarShipShopFacade()
+    ++ 4. modification_types DDL  (id INT, title VARCHAR)
     5.
 
 
