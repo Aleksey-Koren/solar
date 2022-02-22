@@ -10,7 +10,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.util.List;
@@ -27,6 +29,12 @@ public class Modification {
     private Long id;
 
     private String description;
+
+    @ManyToOne
+    @JoinColumn(name = "modification_type_id")
+    private ModificationType modificationType;
+
+    private Byte level;
 
     @OneToMany(mappedBy = "modification")
     private List<ParameterModification> parameterModifications;

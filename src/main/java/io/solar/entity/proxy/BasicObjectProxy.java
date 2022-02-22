@@ -8,14 +8,15 @@ import io.solar.entity.modification.Modification;
 import io.solar.entity.modification.ParameterModification;
 import io.solar.entity.modification.ParameterType;
 import io.solar.entity.objects.BasicObject;
-import io.solar.entity.objects.ObjectStatus;
 import io.solar.entity.objects.ObjectTypeDescription;
+import lombok.Getter;
 
 import java.util.List;
 import java.util.Optional;
 
 public class BasicObjectProxy extends BasicObject {
 
+    @Getter
     private BasicObject object;
 
     public BasicObjectProxy(BasicObject object) {

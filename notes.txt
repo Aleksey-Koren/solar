@@ -12,15 +12,10 @@ TODO
     5. applyModification()    "api/inventory-item/{id}/modification" PATCH
     6.
     -----------------------------------------------------------------------------------
-    1. Create OTD type drawing
-    2. prices and price_products DDL
+    ++2. prices and price_products DDL
     3. refactor calculateSellPrice in inventoryShopFacade(), StarShipShopFacade()
     4. modification_types DDL  (id INT, title VARCHAR)
     5.
-
-    BasicObjectUtil.getCooldown(BasicObject object)
-    object.getCooldo
-
 
 
 

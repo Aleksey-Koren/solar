@@ -9,6 +9,7 @@ import io.solar.entity.objects.BasicObject;
 import io.solar.entity.objects.ObjectStatus;
 import io.solar.entity.objects.StarShip;
 import io.solar.entity.objects.Station;
+import io.solar.entity.proxy.SpaceTechProxy;
 import io.solar.multithreading.StationMonitor;
 import io.solar.repository.BasicObjectRepository;
 import io.solar.service.StarShipService;
