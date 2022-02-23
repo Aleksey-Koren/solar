@@ -23,7 +23,7 @@ public class PriceMapper implements EntityDtoMapper<Price, PriceDto> {
     @Override
     public Price toEntity(PriceDto dto) {
 
-        return dto.getId() != null
+        return dto.getId() == null
                 ? createPrice(dto)
                 : updatePrice(dto);
     }

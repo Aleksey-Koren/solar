@@ -30,7 +30,7 @@ public class PriceProductMapper implements EntityDtoMapper<PriceProduct, PricePr
         return PriceProductDto.builder()
                 .id(entity.getId())
                 .priceId(entity.getPrice().getId())
-                .amount(entity.getAmount())
+                .amount(entity.getProductAmount())
                 .productId(entity.getProduct().getId())
                 .build();
     }
@@ -39,7 +39,7 @@ public class PriceProductMapper implements EntityDtoMapper<PriceProduct, PricePr
 
         return PriceProduct.builder()
                 .product(productService.getById(dto.getProductId()))
-                .amount(dto.getAmount())
+                .productAmount(dto.getAmount())
                 .price(priceService.getById(dto.getPriceId()))
                 .build();
     }
@@ -47,7 +47,7 @@ public class PriceProductMapper implements EntityDtoMapper<PriceProduct, PricePr
     private PriceProduct updatePriceProduct(PriceProductDto dto) {
         PriceProduct priceProduct = priceProductService.getById(dto.getId());
 
-        priceProduct.setAmount(dto.getAmount());
+        priceProduct.setProductAmount(dto.getAmount());
         priceProduct.setProduct(dto.getProductId() == null ? priceProduct.getProduct() : productService.getById(dto.getProductId()));
         priceProduct.setPrice(dto.getPriceId() == null ? priceProduct.getPrice() : priceService.getById(dto.getPriceId()));
 

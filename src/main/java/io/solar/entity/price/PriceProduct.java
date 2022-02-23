@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -28,11 +29,12 @@ public class PriceProduct {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "price_id")
+    @ToString.Exclude
     private Price price;
 
     @ManyToOne
     @JoinColumn(name = "product_id")
     private Product product;
 
-    private Integer amount;
+    private Integer productAmount;
 }

@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -33,6 +34,7 @@ public class ParameterModification {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "modification_id")
+    @ToString.Exclude
     private Modification modification;
 
     private Double modificationValue;
