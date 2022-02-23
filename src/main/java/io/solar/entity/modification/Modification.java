@@ -4,13 +4,17 @@ import io.solar.entity.objects.ObjectTypeDescription;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -36,9 +40,18 @@ public class Modification {
 
     private Byte level;
 
-    @OneToMany(mappedBy = "modification")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    @OneToMany(mappedBy = "modification", orphanRemoval = true, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     private List<ParameterModification> parameterModifications;
 
-    @ManyToMany(mappedBy = "availableModifications")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    @ManyToMany
+    @JoinTable(
+            name = "modification_otd",
+            joinColumns = @JoinColumn(name = "modification_id"),
+            inverseJoinColumns = @JoinColumn(name = "otd_id")
+    )
     private List<ObjectTypeDescription> availableObjectTypeDescriptions;
 }

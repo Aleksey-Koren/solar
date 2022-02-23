@@ -12,7 +12,9 @@ import io.solar.service.object.ObjectTypeDescriptionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -82,19 +84,30 @@ public class ModificationMapper implements EntityDtoMapper<Modification, Modific
 
     private Modification updateModification(ModificationDto dto) {
         Modification modification = modificationService.getById(dto.getId());
-        List<ParameterModification> parameterModifications = null;
+        modification.setDescription(dto.getDescription());
 
-        if (dto.getParameterModificationDtoList() != null) {
-            parameterModifications = dto.getParameterModificationDtoList()
-                    .stream()
-                    .map(parameterModificationMapper::toEntity)
-                    .toList();
-        }
+        List<ObjectTypeDescription> fromDto = dto.getAvailableObjectTypeDescriptionsIds() != null
+                ?
+                dto.getAvailableObjectTypeDescriptionsIds()
+                        .stream()
+                        .map(objectTypeDescriptionService::getById)
+                        .toList()
+                : new ArrayList<>();
 
-        modification.setDescription(dto.getDescription() != null ? dto.getDescription() : modification.getDescription());
-        modification.setParameterModifications(parameterModifications == null ? modification.getParameterModifications() : parameterModifications);
+        modification.getAvailableObjectTypeDescriptions().clear();
+        modification.getAvailableObjectTypeDescriptions().addAll(fromDto);
+
+        List<ParameterModification> parametersFromDto = dto.getParameterModificationDtoList() != null
+                ?
+                dto.getParameterModificationDtoList()
+                        .stream()
+                        .map(parameterModificationMapper::toEntity)
+                        .toList()
+                : new ArrayList<>();
+
+        modification.getParameterModifications().clear();
+        modification.getParameterModifications().addAll(parametersFromDto);
 
         return modification;
     }
-
 }

@@ -85,11 +85,6 @@ public class ObjectTypeDescription {
     @ToString.Exclude
     private List<InventorySocket> socketList;
 
-    @ManyToMany
-    @JoinTable(
-            name = "modification_otd",
-            joinColumns = @JoinColumn(name = "otd_id"),
-            inverseJoinColumns = @JoinColumn(name = "modification_id")
-    )
+    @ManyToMany(mappedBy = "availableObjectTypeDescriptions")
     private List<Modification> availableModifications;
 }

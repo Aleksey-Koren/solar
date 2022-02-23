@@ -6,7 +6,7 @@ TODO
     Для админа:
 
     CRUD
-    1. ModificationController with CRUD methods and 'EDIT_MODIFICATIONS' permission. Not for simple users.
+    1. io.solar.controller.modification.ModificationController with CRUD methods and 'EDIT_MODIFICATIONS' permission. Not for simple users.
     5. applyModification()    "api/inventory-item/{id}/modification" PATCH...
     6. Create ModificationTypeController and CRUD methods in it. With 'EDIT_MODIFICATIONS' permission. Not for simple users.
     7. Create ModificationPriceController with CRUD and findAll(Pageable, Filter filter). +++

@@ -12,6 +12,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class ModificationService {
+
     private final ModificationRepository modificationRepository;
 
     public Modification getById(Long modificationId) {
@@ -25,5 +26,9 @@ public class ModificationService {
     public Optional<Modification> findById(Long modificationId) {
 
         return modificationRepository.findById(modificationId);
+    }
+
+    public Modification save(Modification modification) {
+        return modificationRepository.save(modification);
     }
 }
