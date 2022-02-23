@@ -14,9 +14,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.function.Predicate;
 
-import static java.util.function.Predicate.*;
+import static java.util.function.Predicate.not;
 
 @Component
 @RequiredArgsConstructor
@@ -91,7 +90,6 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
                 .sum();
     }
 
-    //TODO: NEED FILL OBJECTS VOLUME FIELD
     @Override
     public float calculateUsedVolume(SpaceTech spaceTech) {
         double objectsVolume = spaceTech.getAttachedObjects()
