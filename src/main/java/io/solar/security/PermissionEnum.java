@@ -15,7 +15,8 @@ public enum PermissionEnum {
     EDIT_INVENTORY_TYPE,
     EDIT_STATION,
     EDIT_INVENTORY,
-    SEND_ALL_MESSAGE_TYPES;
+    SEND_ALL_MESSAGE_TYPES,
+    EDIT_MODIFICATIONS;
 
     public static Set<String> getAllPermissions() {
 
