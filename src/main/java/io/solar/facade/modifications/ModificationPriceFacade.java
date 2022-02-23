@@ -1,4 +1,4 @@
-package io.solar.facade.price;
+package io.solar.facade.modifications;
 
 import io.solar.dto.modification.ModificationPriceDto;
 import io.solar.entity.User;

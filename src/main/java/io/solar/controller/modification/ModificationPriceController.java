@@ -1,8 +1,8 @@
-package io.solar.controller.price;
+package io.solar.controller.modification;
 
 import io.solar.dto.modification.ModificationPriceDto;
 import io.solar.entity.User;
-import io.solar.facade.price.ModificationPriceFacade;
+import io.solar.facade.modifications.ModificationPriceFacade;
 import io.solar.service.UserService;
 import io.solar.specification.filter.ModificationPriceFilter;
 import lombok.RequiredArgsConstructor;

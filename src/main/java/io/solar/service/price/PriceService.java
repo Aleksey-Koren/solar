@@ -26,4 +26,8 @@ public class PriceService {
         return priceRepository.findById(priceId);
     }
 
+    public Price save(Price price) {
+
+        return priceRepository.save(price);
+    }
 }

@@ -27,28 +27,28 @@ public class ModificationTypeController {
 
     @PostMapping("api/modifications/type")
     @Transactional
-    @PreAuthorize("hasAuthority('EDIT_MODOFICATION')")
+    @PreAuthorize("hasAuthority('EDIT_MODIFICATION')")
     public ResponseEntity<ModificationTypeDto> save(@RequestBody ModificationTypeDto dto) {
         return ResponseEntity.ok(modificationTypeFacade.save(dto));
     }
 
     @GetMapping("/{id}")
     @Transactional
-    @PreAuthorize("hasAnyAuthority('EDIT_MODOFICATION', 'PLAY_THE_GAME')")
+    @PreAuthorize("hasAnyAuthority('EDIT_MODIFICATION', 'PLAY_THE_GAME')")
     public ModificationTypeDto findById(@PathVariable Long id) {
         return modificationTypeFacade.getById(id);
     }
 
     @GetMapping
     @Transactional
-    @PreAuthorize("hasAnyAuthority('EDIT_MODOFICATION', 'PLAY_THE_GAME')")
+    @PreAuthorize("hasAnyAuthority('EDIT_MODIFICATION', 'PLAY_THE_GAME')")
     public Page<ModificationTypeDto> findAll(@PageableDefault(size = 20) Pageable pageable, ModificationTypeFilter filter) {
         return modificationTypeFacade.getAll(pageable, filter);
     }
 
     @DeleteMapping("/{id}")
     @Transactional
-    @PreAuthorize("hasAuthority('EDIT_MODOFICATION')")
+    @PreAuthorize("hasAuthority('EDIT_MODIFICATION')")
     public void deleteById(@PathVariable Long id) {
         modificationTypeFacade.deleteById(id);
     }

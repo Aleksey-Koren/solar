@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -26,4 +27,16 @@ public class PriceProductService {
         return priceProductRepository.findById(priceProductId);
     }
 
+    public Optional<PriceProduct> findByPriceIdAndProductId(Long priceId, Long productId) {
+
+        return priceProductRepository.findByProductIdAndPriceId(productId, priceId);
+    }
+
+    public void saveAll(List<PriceProduct> priceProducts) {
+        priceProductRepository.saveAll(priceProducts);
+    }
+
+    public void deleteAllByPriceIdExceptExisting(Long priceId, List<Long> priceProductIds) {
+        priceProductRepository.deleteAllByPriceIdAndIdNotIn(priceId, priceProductIds);
+    }
 }
