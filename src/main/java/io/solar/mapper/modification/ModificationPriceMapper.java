@@ -64,7 +64,6 @@ public class ModificationPriceMapper implements EntityDtoMapper<ModificationPric
                 ? priceMapper.toEntity(dto.getPriceDto())
                 : modificationPrice.getPrice());
 
-
         return modificationPrice;
     }
 }

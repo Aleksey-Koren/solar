@@ -9,6 +9,8 @@ import io.solar.service.price.PriceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -23,7 +25,7 @@ public class PriceMapper implements EntityDtoMapper<Price, PriceDto> {
     @Override
     public Price toEntity(PriceDto dto) {
 
-        return dto.getId() != null
+        return dto.getId() == null
                 ? createPrice(dto)
                 : updatePrice(dto);
     }
@@ -46,7 +48,7 @@ public class PriceMapper implements EntityDtoMapper<Price, PriceDto> {
 
         return Price.builder()
                 .moneyAmount(dto.getMoneyAmount())
-                .priceProducts(retrievePriceProductList(dto))
+                .owners(new ArrayList<>())
                 .build();
     }
 
@@ -62,6 +64,7 @@ public class PriceMapper implements EntityDtoMapper<Price, PriceDto> {
 
     private List<PriceProduct> retrievePriceProductList(PriceDto dto) {
         if (dto.getPriceProductDtoList() != null) {
+
             return dto.getPriceProductDtoList()
                     .stream()
                     .map(priceProductMapper::toEntity)
