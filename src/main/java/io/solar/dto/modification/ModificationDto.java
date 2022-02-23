@@ -10,5 +10,9 @@ import java.util.List;
 public class ModificationDto {
     private Long id;
     private String description;
+    private Byte level;
+    private Long modificationTypeId;
+
     private List<ParameterModificationDto> parameterModificationDtoList;
+    private List<Long> availableObjectTypeDescriptionsIds;
 }
