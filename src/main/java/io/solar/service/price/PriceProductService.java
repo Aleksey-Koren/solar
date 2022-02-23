@@ -25,5 +25,4 @@ public class PriceProductService {
 
         return priceProductRepository.findById(priceProductId);
     }
-
 }
