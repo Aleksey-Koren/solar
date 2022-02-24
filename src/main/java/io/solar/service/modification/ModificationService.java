@@ -2,7 +2,10 @@ package io.solar.service.modification;
 
 import io.solar.entity.modification.Modification;
 import io.solar.repository.modification.ModificationRepository;
+import io.solar.specification.ModificationSpecification;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -28,7 +31,16 @@ public class ModificationService {
         return modificationRepository.findById(modificationId);
     }
 
+    public Page<Modification> findAll(ModificationSpecification specification, Pageable pageable) {
+
+        return modificationRepository.findAll(specification, pageable);
+    }
+
     public Modification save(Modification modification) {
         return modificationRepository.save(modification);
+    }
+
+    public void delete(Modification modification) {
+        modificationRepository.delete(modification);
     }
 }
