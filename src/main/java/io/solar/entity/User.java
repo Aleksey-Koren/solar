@@ -80,6 +80,7 @@ public class User {
     private List<UserRoom> userRooms;
 
     @OneToMany(mappedBy = "user")
+    @ToString.Exclude
     private List<ExchangeOffer> exchangeOffers;
 
 

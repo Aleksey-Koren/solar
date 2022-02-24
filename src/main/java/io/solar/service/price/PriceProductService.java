@@ -32,8 +32,8 @@ public class PriceProductService {
         return priceProductRepository.findByProductIdAndPriceId(productId, priceId);
     }
 
-    public void saveAll(List<PriceProduct> priceProducts) {
-        priceProductRepository.saveAll(priceProducts);
+    public List<PriceProduct> saveAll(List<PriceProduct> priceProducts) {
+        return priceProductRepository.saveAll(priceProducts);
     }
 
     public void deleteAllByPriceIdExceptExisting(Long priceId, List<Long> priceProductIds) {

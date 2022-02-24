@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -62,13 +63,16 @@ public class PriceMapper implements EntityDtoMapper<Price, PriceDto> {
         return price;
     }
 
+    //TODO: stream.toList() -> return IMMUTABLE list
+    //      stream.collect(Collectors.toList()) -> return MUTABLE list
+
     private List<PriceProduct> retrievePriceProductList(PriceDto dto) {
         if (dto.getPriceProductDtoList() != null) {
 
             return dto.getPriceProductDtoList()
                     .stream()
                     .map(priceProductMapper::toEntity)
-                    .toList();
+                    .collect(Collectors.toList());
         }
 
         return Collections.emptyList();

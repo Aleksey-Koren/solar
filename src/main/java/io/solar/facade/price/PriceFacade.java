@@ -39,7 +39,8 @@ public class PriceFacade {
                 .map(priceProductMapper::toEntity)
                 .toList();
 
-        priceProductService.saveAll(priceProducts);
+        List<PriceProduct> savedPriceProducts = priceProductService.saveAll(priceProducts);
+        savedPrice.setPriceProducts(savedPriceProducts);
 
         return priceMapper.toDto(savedPrice);
     }
