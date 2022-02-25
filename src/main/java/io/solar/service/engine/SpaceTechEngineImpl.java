@@ -74,6 +74,7 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
         engines.addAll(basicObjectRepository.getObjectsInSlotsByType(spaceTechAsObject.getId(), hugeEngine));
 
         return (float) engines.stream()
+                .filter(BasicObject::getIsEnabled)
                 .mapToDouble(s -> (double) s.getObjectTypeDescription().getPowerMax())
                 .sum();
     }

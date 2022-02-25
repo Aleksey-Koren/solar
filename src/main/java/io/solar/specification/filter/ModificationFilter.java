@@ -13,4 +13,5 @@ public class ModificationFilter {
     private Byte maxLevel;
     private List<Long> modificationTypeIds;
     private List<ParameterType> parameterTypes;
+    private List<Long> OTDIds;
 }

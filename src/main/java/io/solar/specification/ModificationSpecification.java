@@ -4,6 +4,8 @@ import io.solar.entity.modification.Modification;
 import io.solar.entity.modification.Modification_;
 import io.solar.entity.modification.ParameterModification;
 import io.solar.entity.modification.ParameterModification_;
+import io.solar.entity.objects.ObjectTypeDescription;
+import io.solar.entity.objects.ObjectTypeDescription_;
 import io.solar.specification.filter.ModificationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
@@ -24,8 +26,6 @@ public class ModificationSpecification implements Specification<Modification> {
     @Override
     public Predicate toPredicate(Root<Modification> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
         List<Predicate> predicates = new ArrayList<>();
-
-        ListJoin<Modification, ParameterModification> parameterModificationJoin = root.join(Modification_.parameterModifications);
 
         if (filter.getModificationId() != null) {
             predicates.add(criteriaBuilder.equal(root.get(Modification_.id), filter.getModificationId()));
@@ -48,11 +48,16 @@ public class ModificationSpecification implements Specification<Modification> {
         }
 
         if (filter.getParameterTypes() != null) {
+            ListJoin<Modification, ParameterModification> parameterModificationJoin = root.join(Modification_.parameterModifications);
             predicates.add(criteriaBuilder.isTrue(
                     parameterModificationJoin.get(ParameterModification_.parameterType).in(filter.getParameterTypes())
             ));
         }
 
+        if (filter.getOTDIds() != null) {
+            ListJoin<Modification, ObjectTypeDescription> OTDJoin = root.join(Modification_.availableObjectTypeDescriptions);
+            predicates.add(criteriaBuilder.isTrue(OTDJoin.get(ObjectTypeDescription_.id).in(filter.getOTDIds())));
+        }
         return criteriaBuilder.and(predicates.toArray(Predicate[]::new));
     }
 }

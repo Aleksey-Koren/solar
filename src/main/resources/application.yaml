@@ -26,9 +26,9 @@ spring:
     jpa:
         properties:
             hibernate:
-                show_sql: false
+                show_sql: true
                 format_sql: true
-                use_sql_comments: false
+                use_sql_comments: true
                 ddl-auto: validate
         open-in-view: false
 
@@ -68,7 +68,7 @@ app:
     navigator:
         max_distance: 10
         max_speed: 1000
-        update_coordinates_delay: PT5S
+        update_coordinates_delay: PT50M
         num_update_object: 100
         max_exchange_distance: 1
         explosion_speed_min: 0.5
@@ -109,7 +109,7 @@ log4jdbc:
 logging:
     level:
         jdbc:
-            sqlonly: "OFF"
+            sqlonly: "INFO"
             sqltiming: "OFF"
             audit: "OFF"
             resultset: "OFF"

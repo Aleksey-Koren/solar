@@ -10,6 +10,7 @@ import lombok.ToString;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -47,7 +48,7 @@ public class Modification {
 
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    @ManyToMany
+    @ManyToMany()
     @JoinTable(
             name = "modification_otd",
             joinColumns = @JoinColumn(name = "modification_id"),

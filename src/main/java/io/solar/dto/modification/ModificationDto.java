@@ -15,4 +15,6 @@ public class ModificationDto {
 
     private List<ParameterModificationDto> parameterModificationDtoList;
     private List<Long> availableObjectTypeDescriptionsIds;
+
+
 }

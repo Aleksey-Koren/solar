@@ -1,5 +1,6 @@
 package io.solar.controller.modification;
 
+import io.solar.dto.modification.ApplyModificationDto;
 import io.solar.dto.modification.ModificationDto;
 import io.solar.facade.modifications.ModificationFacade;
 import io.solar.specification.filter.ModificationFilter;
@@ -12,6 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -51,5 +53,12 @@ public class ModificationController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long modificationId) {
         modificationFacade.delete(modificationId);
+    }
+
+    @PatchMapping("/api/modification/object")
+    @Transactional
+    @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
+    public void applyModification(ApplyModificationDto dto, Principal principal) {
+        modificationFacade.applyModification(dto, principal);
     }
 }
