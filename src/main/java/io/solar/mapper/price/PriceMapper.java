@@ -63,9 +63,6 @@ public class PriceMapper implements EntityDtoMapper<Price, PriceDto> {
         return price;
     }
 
-    //TODO: stream.toList() -> return IMMUTABLE list
-    //      stream.collect(Collectors.toList()) -> return MUTABLE list
-
     private List<PriceProduct> retrievePriceProductList(PriceDto dto) {
         if (dto.getPriceProductDtoList() != null) {
 

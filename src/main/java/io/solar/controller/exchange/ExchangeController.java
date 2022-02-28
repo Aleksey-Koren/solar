@@ -33,16 +33,16 @@ public class ExchangeController {
     private final ExchangeOfferFacade exchangeOfferFacade;
 
     @PostMapping("/invitation/request")
-    @Transactional
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
+    @Transactional
     public void sendInvitation(@RequestBody ExchangeInvitationDto dto, Principal principal) {
 
         exchangeFacade.sendInvitation(dto, principal.getName());
     }
 
     @PostMapping("/invitation/response")
-    @Transactional
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
+    @Transactional
     public void respondToInvitation(@RequestBody ExchangeInvitationDto dto, Principal principal) {
 
         exchangeFacade.respondToInvitation(dto, principal.getName());
@@ -50,14 +50,24 @@ public class ExchangeController {
 
     @PostMapping
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
+    @Transactional
     public void createExchange(@RequestBody ExchangeDto dto, Principal principal) {
         ExchangeDto exchangeDto = exchangeFacade.createExchange(dto, principal.getName());
         exchangeFacade.createExchangeNotifications(exchangeDto);
     }
 
-    @GetMapping
-    @Transactional
+    @PatchMapping("/confirmation")
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
+    @Transactional
+    public void confirmExchange(Principal principal) {
+        User user = userService.findByLogin(principal.getName());
+
+        exchangeFacade.confirmExchange(user);
+    }
+
+    @GetMapping
+    @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
+    @Transactional
     public ResponseEntity<ExchangeDto> getUserExchange(Principal principal) {
         User user = userService.findByLogin(principal.getName());
 
@@ -65,8 +75,8 @@ public class ExchangeController {
     }
 
     @DeleteMapping
-    @Transactional
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
+    @Transactional
     public void leaveExchange(Principal principal) {
         User user = userService.findByLogin(principal.getName());
 
@@ -74,8 +84,8 @@ public class ExchangeController {
     }
 
     @PatchMapping("/offer")
-    @Transactional
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
+    @Transactional
     public void updateOffer(@RequestBody ExchangeOfferDto exchangeOfferDto, Principal principal) {
         User user = userService.findByLogin(principal.getName());
         exchangeOfferFacade.updateOffer(exchangeOfferDto, user);

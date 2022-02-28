@@ -5,7 +5,9 @@ import io.solar.entity.Goods;
 import io.solar.entity.Product;
 import io.solar.entity.interfaces.SpaceTech;
 import io.solar.entity.objects.BasicObject;
+import io.solar.entity.objects.StarShip;
 import io.solar.multithreading.StationMonitor;
+import io.solar.service.GoodsService;
 import io.solar.service.ProductService;
 import io.solar.service.engine.interfaces.ProductEngine;
 import io.solar.service.engine.interfaces.SpaceTechEngine;
@@ -17,6 +19,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -25,6 +28,7 @@ import java.util.stream.Collectors;
 public class ProductEngineImpl implements ProductEngine {
 
     private final ProductService productService;
+    private final GoodsService goodsService;
     private final BasicObjectService basicObjectService;
     private final SpaceTechEngine spaceTechEngine;
     private final StationMonitor stationMonitor;
@@ -55,6 +59,33 @@ public class ProductEngineImpl implements ProductEngine {
         }
     }
 
+    @Override
+    public void addProductToSpaceTech(StarShip starship, Product product, Long productAmount) {
+        Optional<Goods> goodsOptional = goodsService.findByOwnerAndProduct(starship, product);
+        Goods goods;
+
+        if (goodsOptional.isPresent()) {
+            goods = goodsOptional.get();
+            goods.setAmount(goods.getAmount() + productAmount);
+        } else {
+            goods = Goods.builder()
+                    .product(product)
+                    .amount(productAmount)
+                    .owner(starship)
+                    .build();
+        }
+
+        goodsService.save(goods);
+    }
+
+    @Override
+    public Map<Long, Goods> createProductGoodsMap(SpaceTech spaceTech) {
+
+        return spaceTech.getGoods()
+                .stream()
+                .collect(Collectors.toMap(goods -> goods.getProduct().getId(), Function.identity()));
+    }
+
     private void increaseGoods(ShopDto product, Goods goods, SpaceTech spaceTech) {
         if (goods != null) {
             goods.setAmount(goods.getAmount() + product.getQuantity());
@@ -75,13 +106,6 @@ public class ProductEngineImpl implements ProductEngine {
         if (goods.getAmount() == 0) {
             spaceTech.getGoods().remove(goods);
         }
-    }
-
-    public Map<Long, Goods> createProductGoodsMap(SpaceTech spaceTech) {
-
-        return spaceTech.getGoods()
-                .stream()
-                .collect(Collectors.toMap(goods -> goods.getProduct().getId(), Function.identity()));
     }
 
     private boolean isSpaceTechHaveEnoughSpace(SpaceTech spaceTech, List<ShopDto> products) {

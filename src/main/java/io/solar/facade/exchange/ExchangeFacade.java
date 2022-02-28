@@ -13,6 +13,7 @@ import io.solar.mapper.exchange.ExchangeMapper;
 import io.solar.service.NavigatorService;
 import io.solar.service.UserService;
 import io.solar.service.engine.interfaces.ExchangeEngine;
+import io.solar.service.engine.interfaces.ExchangeOfferEngine;
 import io.solar.service.engine.interfaces.NotificationEngine;
 import io.solar.service.engine.interfaces.StarMapEngine;
 import io.solar.service.exchange.ExchangeService;
@@ -31,6 +32,7 @@ public class ExchangeFacade {
     private final UserService userService;
     private final ExchangeService exchangeService;
     private final ExchangeEngine exchangeEngine;
+    private final ExchangeOfferEngine exchangeOfferEngine;
     private final NotificationEngine notificationEngine;
     private final StarMapEngine starMapEngine;
     private final UserMapper userMapper;
@@ -81,6 +83,22 @@ public class ExchangeFacade {
         }
     }
 
+    public void confirmExchange(User user) {
+        Exchange exchange = exchangeService.getByUser(user);
+
+        if (exchange.getFirstUser().equals(user)) {
+            exchange.setFirstAccepted(true);
+        } else {
+            exchange.setSecondAccepted(true);
+        }
+
+        if (exchange.getFirstAccepted() && exchange.getSecondAccepted()) {
+            transferItemsToUsers(exchange);
+            exchangeService.delete(exchange);
+            notificationEngine.sendExchangeCompletedNotification(exchange);
+        }
+    }
+
     public ExchangeDto getUserExchange(User user) {
         Optional<Exchange> exchangeOptional = exchangeService.findByUser(user);
 
@@ -109,4 +127,16 @@ public class ExchangeFacade {
             case INVENTORY -> exchangeEngine.returnObjectToUser(offer);
         }
     }
+
+    private void transferItemsToUsers(Exchange exchange) {
+        exchange.getExchangeOffers()
+                .forEach(offer -> {
+                    switch (offer.getOfferType()) {
+                        case MONEY -> exchangeOfferEngine.transferMoney(offer);
+                        case INVENTORY -> exchangeOfferEngine.transferObject(offer);
+                        case GOODS -> exchangeOfferEngine.transferGoods(offer);
+                    }
+                });
+    }
+
 }

@@ -6,6 +6,7 @@ import io.solar.dto.exchange.ExchangeOfferDto;
 import io.solar.dto.marketplace.MarketplaceLotDto;
 import io.solar.dto.messenger.NotificationDto;
 import io.solar.entity.User;
+import io.solar.entity.exchange.Exchange;
 import io.solar.entity.messenger.NotificationType;
 import io.solar.service.engine.interfaces.NotificationEngine;
 import lombok.RequiredArgsConstructor;
@@ -61,6 +62,17 @@ public class NotificationEngineImpl implements NotificationEngine {
         simpMessagingTemplate.convertAndSendToUser(userDestination.getLogin(),
                 messengerProperties.getNotificationDestination(),
                 new NotificationDto<>(NotificationType.LEAVE_EXCHANGE.name()));
+    }
+
+    @Override
+    public void sendExchangeCompletedNotification(Exchange exchange) {
+        simpMessagingTemplate.convertAndSendToUser(exchange.getFirstUser().getLogin(),
+                messengerProperties.getNotificationDestination(),
+                new NotificationDto<>(NotificationType.EXCHANGE_COMPLETED.name()));
+
+        simpMessagingTemplate.convertAndSendToUser(exchange.getSecondUser().getLogin(),
+                messengerProperties.getNotificationDestination(),
+                new NotificationDto<>(NotificationType.EXCHANGE_COMPLETED.name()));
     }
 
     @Override
