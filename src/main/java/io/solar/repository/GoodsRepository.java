@@ -10,4 +10,6 @@ import java.util.Optional;
 public interface GoodsRepository extends JpaRepository<Goods, Long> {
 
     Optional<Goods> findByOwnerAndProduct(BasicObject ownew, Product product);
+
+    Goods findByOwnerAndProductId(BasicObject owner, Long productId);
 }

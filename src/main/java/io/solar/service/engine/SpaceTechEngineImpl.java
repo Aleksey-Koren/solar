@@ -93,29 +93,23 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
 
     @Override
     public float calculateUsedVolume(SpaceTech spaceTech) {
+        double objectsVolume = spaceTech.getAttachedObjects()
+                .stream()
+                .filter(not(inventoryTypeService::isContainer))
+                .mapToDouble(BasicObject::getVolume)
+                .sum();
 
-        return 0.2f;
+        double goodsVolume = spaceTech.getGoods()
+                .stream()
+                .mapToDouble(goods -> goods.getProduct().getVolume() * goods.getAmount())
+                .sum();
 
-//        double objectsVolume = spaceTech.getAttachedObjects()
-//                .stream()
-//                .filter(not(inventoryTypeService::isContainer))
-//                .mapToDouble(BasicObject::getVolume)
-//                .sum();
-//
-//        double goodsVolume = spaceTech.getGoods()
-//                .stream()
-//                .mapToDouble(goods -> goods.getProduct().getVolume() * goods.getAmount())
-//                .sum();
-//
-//        return (float) (objectsVolume + goodsVolume);
+        return (float) (objectsVolume + goodsVolume);
     }
 
     @Override
     public float calculateFreeAvailableVolume(SpaceTech spaceTech) {
-
-        return 0.2f;
-
-//        return calculateTotalVolume(spaceTech) - calculateUsedVolume(spaceTech);
+        return calculateTotalVolume(spaceTech) - calculateUsedVolume(spaceTech);
     }
 
     @Override
