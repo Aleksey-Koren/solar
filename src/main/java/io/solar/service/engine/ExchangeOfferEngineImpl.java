@@ -90,11 +90,15 @@ public class ExchangeOfferEngineImpl implements ExchangeOfferEngine {
     }
 
     private Long getProductQuantityByFreeVolume(ExchangeOffer offer, Float freeSpaceshipVolume) {
-        float totalProductVolume = offer.getProduct().getBulk() * offer.getProductAmount();
-        float residualVolume = freeSpaceshipVolume - totalProductVolume;
+        if (freeSpaceshipVolume == 0) {
+            return 0L;
+        }
 
-        if (residualVolume < 0) {
-            long excessProductQuantity = (long) (residualVolume / offer.getProduct().getBulk());
+        float totalProductVolume = offer.getProduct().getBulk() * offer.getProductAmount();
+        float residualVolume = totalProductVolume - freeSpaceshipVolume;
+
+        if (residualVolume > 0) {
+            long excessProductQuantity = Math.round(residualVolume / offer.getProduct().getBulk());
             return offer.getProductAmount() - excessProductQuantity;
         }
 
