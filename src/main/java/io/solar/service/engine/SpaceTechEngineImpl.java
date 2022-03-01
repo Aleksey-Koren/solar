@@ -1,5 +1,6 @@
 package io.solar.service.engine;
 
+import io.solar.entity.Goods;
 import io.solar.entity.User;
 import io.solar.entity.interfaces.SpaceTech;
 import io.solar.entity.inventory.InventoryType;
@@ -119,7 +120,6 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
 
     @Override
     public boolean isThereEnoughSpaceForObjects(SpaceTech spaceTech, List<BasicObject> objects) {
-
         float shipVolume = calculateTotalVolume(spaceTech);
 
         float objectsVolume = (float) objects.stream()
@@ -129,6 +129,15 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
         float usedVolume = calculateUsedVolume(spaceTech);
 
         return ((usedVolume + objectsVolume) <= shipVolume);
+    }
+
+    @Override
+    public boolean isThereEnoughSpaceForGoods(SpaceTech spaceTech, List<Goods> goods) {
+        double goodsVolume = goods.stream()
+                .mapToDouble(goodProduct -> goodProduct.getProduct().getBulk() * goodProduct.getAmount())
+                .sum();
+
+        return goodsVolume <= calculateFreeAvailableVolume(spaceTech);
     }
 
     /**

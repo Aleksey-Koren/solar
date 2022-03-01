@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -31,10 +32,12 @@ public class Exchange {
 
     @OneToOne
     @JoinColumn(name = "first_user_id")
+    @ToString.Exclude
     private User firstUser;
 
     @OneToOne
     @JoinColumn(name = "second_user_id")
+    @ToString.Exclude
     private User secondUser;
 
     private Boolean firstAccepted;
@@ -42,6 +45,7 @@ public class Exchange {
     private Instant startTime;
 
     @OneToMany(mappedBy = "exchange")
+    @ToString.Exclude
     private List<ExchangeOffer> exchangeOffers;
 
     public void addOffer(ExchangeOffer exchangeOffer) {

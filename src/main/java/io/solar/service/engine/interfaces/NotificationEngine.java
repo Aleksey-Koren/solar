@@ -4,6 +4,7 @@ import io.solar.dto.UserDto;
 import io.solar.dto.exchange.ExchangeOfferDto;
 import io.solar.dto.marketplace.MarketplaceLotDto;
 import io.solar.entity.User;
+import io.solar.entity.exchange.Exchange;
 import io.solar.entity.messenger.NotificationType;
 
 public interface NotificationEngine {
@@ -21,6 +22,8 @@ public interface NotificationEngine {
     void sendOfferUpdatedNotification(User userDestination, ExchangeOfferDto updatedOffer);
 
     void sendLeaveExchangeNotification(User userDestination);
+
+    void sendExchangeCompletedNotification(Exchange exchange);
 
     void sendCannotAttachToOrbitNotification(User userDestination);
 }

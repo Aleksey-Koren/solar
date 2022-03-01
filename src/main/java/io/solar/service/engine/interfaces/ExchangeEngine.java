@@ -15,8 +15,4 @@ public interface ExchangeEngine {
     void updateGoods(ExchangeOffer offer, Long updatedGoodsAmount);
 
     User retrieveAnotherExchangeUser(User user, Exchange exchange);
-
-    void createMoneyOffer(ExchangeOffer exchangeOffer);
-
-    void createGoodsOffer(ExchangeOffer exchangeOffer);
 }

@@ -14,4 +14,5 @@ public class ShopDto {
     private Long productId;
     private Integer quantity;
     private List<Long> objectIds;
+    private Long price;
 }

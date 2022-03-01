@@ -1,5 +1,6 @@
 package io.solar.service.engine.interfaces;
 
+import io.solar.entity.Goods;
 import io.solar.entity.User;
 import io.solar.entity.interfaces.SpaceTech;
 import io.solar.entity.objects.BasicObject;
@@ -28,6 +29,8 @@ public interface SpaceTechEngine {
     long calculateAmountOfEnergyUsed(SpaceTech spaceTech);
 
     boolean isThereEnoughSpaceForObjects(SpaceTech ship, List<BasicObject> objects);
+
+    boolean isThereEnoughSpaceForGoods(SpaceTech spaceTech, List<Goods> goods);
 
     boolean isUserOwnsThisSpaceTech(User user, SpaceTech spaceTech);
 
