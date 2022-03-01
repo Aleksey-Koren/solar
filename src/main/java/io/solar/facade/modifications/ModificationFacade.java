@@ -92,11 +92,11 @@ public class ModificationFacade {
             return dto;
         }
 
-        createDto(modificationPrice);
         productEngine.transferProducts(starShip, station, createDto(modificationPrice));
-        TransferMoneyDto transferMoneyDto = moneyEngine.transferMoney(user, station, moneyAmount);
+        moneyEngine.transferMoney(user, station, moneyAmount);
         modificationEngine.applyModification(item, modification);
         dto.setModified(true);
+
         return dto;
     }
 

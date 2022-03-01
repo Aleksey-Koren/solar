@@ -59,7 +59,7 @@ public class InventoryTypeService {
 
     public boolean isGenerator(BasicObject item) {
         List<InventoryType> generatorTypes = findAllByTitleIn(
-                List.of(generatorObjectTypeTitle, largeGeneratorObjectTypeTitle, batteryObjectTypeTitle)
+                List.of(generatorObjectTypeTitle, largeGeneratorObjectTypeTitle)
         );
 
         return generatorTypes.contains(item.getObjectTypeDescription().getInventoryType());

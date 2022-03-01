@@ -93,7 +93,7 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
         List<BasicObject> containers = basicObjectService.getObjectsInSlotsByType(ship.getId(), container);
 
         return (float) containers.stream()
-                .mapToDouble(object -> object.getObjectTypeDescription().getVolume())
+                .mapToDouble(BasicObject::getVolume)
                 .sum();
     }
 
@@ -144,7 +144,6 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
      * Object.energyConsumption for objects of generator types is amount of energy generator produces
      */
     @Override
-    //todo: What are batteries for?
     public long calculateGeneralEnergyAmount(SpaceTech spaceTech) {
         return spaceTech.getSockets().stream()
                 .filter(s -> s.getObject() != null && inventoryTypeService.isGenerator(s.getObject()))

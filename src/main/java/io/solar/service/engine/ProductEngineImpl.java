@@ -59,7 +59,6 @@ public class ProductEngineImpl implements ProductEngine {
             } else {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Not enough goods");
             }
-
         }
     }
 
