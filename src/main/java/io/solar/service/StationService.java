@@ -1,11 +1,11 @@
 package io.solar.service;
 
 import io.solar.entity.objects.Station;
+import io.solar.multithreading.StationMonitor;
 import io.solar.repository.StationRepository;
 import io.solar.specification.StationSpecification;
-import io.solar.specification.filter.StationFilter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -17,9 +17,11 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class StationService {
 
     private final StationRepository stationRepository;
+    private final StationMonitor stationMonitor;
 
     public Optional<Station> findById(Long id) {
         return stationRepository.findById(id);
@@ -28,7 +30,11 @@ public class StationService {
     public Station getById(Long stationId) {
 
         return stationRepository.findById(stationId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cannot find station with id = " + stationId));
+                .orElseThrow(() -> {
+                    log.warn("Cannot find station with id = {}", stationId);
+                    throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                            String.format("Cannot find station with id = %d", stationId));
+                });
     }
 
     public Page<Station> findAll(StationSpecification stationSpecification, Pageable pageable) {
@@ -45,5 +51,13 @@ public class StationService {
 
     public void deleteById(Long id) {
         stationRepository.deleteById(id);
+    }
+
+    public Long increaseBalance(Station station, Long amount) {
+        synchronized (stationMonitor.getMonitor(station.getId())) {
+            station.setMoney(station.getMoney() + amount);
+            save(station);
+        }
+        return station.getMoney();
     }
 }

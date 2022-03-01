@@ -1,6 +1,6 @@
 package io.solar.controller;
 
-import io.solar.dto.BasicObjectViewDto;
+import io.solar.dto.object.BasicObjectViewDto;
 import io.solar.entity.User;
 import io.solar.entity.objects.StarShip;
 import io.solar.facade.StarMapFacade;

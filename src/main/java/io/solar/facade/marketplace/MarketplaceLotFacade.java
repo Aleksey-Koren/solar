@@ -13,7 +13,7 @@ import io.solar.service.StarShipService;
 import io.solar.service.StationService;
 import io.solar.service.UserService;
 import io.solar.service.engine.interfaces.HangarEngine;
-import io.solar.service.engine.interfaces.InventoryEngine;
+import io.solar.service.engine.interfaces.inventory.InventoryEngine;
 import io.solar.service.engine.interfaces.NotificationEngine;
 import io.solar.service.engine.interfaces.ObjectEngine;
 import io.solar.service.engine.interfaces.SpaceTechEngine;

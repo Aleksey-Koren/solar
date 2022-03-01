@@ -1,6 +1,6 @@
 package io.solar.dto.exchange;
 
-import io.solar.dto.BasicObjectViewDto;
+import io.solar.dto.object.BasicObjectViewDto;
 import io.solar.dto.ProductDto;
 import io.solar.dto.UserDto;
 import io.solar.entity.exchange.OfferType;

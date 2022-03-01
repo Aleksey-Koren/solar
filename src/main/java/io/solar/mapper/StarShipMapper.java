@@ -3,12 +3,14 @@ package io.solar.mapper;
 import io.solar.dto.GoodsDto;
 import io.solar.dto.object.StarShipDto;
 import io.solar.entity.Goods;
+import io.solar.entity.inventory.InventorySocket;
 import io.solar.entity.objects.ObjectStatus;
 import io.solar.entity.objects.StarShip;
 import io.solar.service.GoodsService;
 import io.solar.service.PlanetService;
 import io.solar.service.StarShipService;
 import io.solar.service.UserService;
+import io.solar.service.inventory.InventorySocketService;
 import io.solar.service.object.BasicObjectService;
 import io.solar.service.object.ObjectTypeDescriptionService;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +25,7 @@ public class StarShipMapper implements EntityDtoMapper<StarShip, StarShipDto> {
     private final StarShipService starShipService;
     private final PlanetService planetService;
     private final ObjectTypeDescriptionService objectTypeDescriptionService;
+    private final InventorySocketService inventorySocketService;
     private final BasicObjectService basicObjectService;
     private final UserService userService;
     private final GoodsMapper goodsMapper;
@@ -60,7 +63,7 @@ public class StarShipMapper implements EntityDtoMapper<StarShip, StarShipDto> {
                 .active(entity.getActive())
                 .durability(entity.getDurability())
                 .attachedToShip(entity.getAttachedToShip() != null ? entity.getAttachedToShip().getId() : null)
-                .attachedToSocket(entity.getAttachedToSocket())
+                .attachedToSocket(entity.getAttachedToSocket().getId())
                 .status(entity.getStatus())
                 .speedX(entity.getSpeedX())
                 .speedY(entity.getSpeedY())
@@ -94,7 +97,7 @@ public class StarShipMapper implements EntityDtoMapper<StarShip, StarShipDto> {
         starShip.setActive(dto.getActive());
         starShip.setDurability(dto.getDurability());
         starShip.setAttachedToShip(dto.getAttachedToShip() != null ? basicObjectService.getById(dto.getAttachedToShip()) : null);
-        starShip.setAttachedToSocket(dto.getAttachedToSocket());
+        starShip.setAttachedToSocket(dto.getAttachedToSocket() != null ? inventorySocketService.getById(dto.getId()) : null);
         starShip.setStatus(dto.getStatus());
         starShip.setSpeedX(dto.getSpeedX());
         starShip.setSpeedY(dto.getSpeedY());

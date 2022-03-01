@@ -38,7 +38,7 @@ public interface BasicObjectRepository extends JpaRepository<BasicObject, Long>,
             "(o.x between (:x - :distance) and (:x + :distance))" +
             "and " +
             "(o.y between (:y - :distance) and (:y + :distance))")
-    List<BasicObject> findAllInViewDistance(@Param("x") Float x, @Param("y") Float y, @Param("distance") Float distance);
+    List<BasicObject> findAllInViewDistance(@Param("x") Double x, @Param("y") Double y, @Param("distance") Double distance);
 
 
     @Query(value = "SELECT bs FROM BasicObject bs WHERE bs.status = 'IN_SPACE' " +

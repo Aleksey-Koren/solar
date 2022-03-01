@@ -18,8 +18,13 @@ public class WebSocketFacade {
     private final MessageService messageService;
 
     @Transactional
-    public MessageDto processMessage(MessageDto messageDto) {
-        return messageMapper.toDto(messageService.create(messageMapper.toEntity(messageDto)));
+    public MessageDto processMessage(MessageDto messageDto, String userLogin) {
+        return messageMapper.toDto(
+                messageService.create(
+                        messageMapper.toEntity(messageDto),
+                        userLogin
+                )
+        );
     }
 
     public void sendSystemMessage(Message message) {
@@ -28,7 +33,9 @@ public class WebSocketFacade {
                 , messageMapper.toDto(message));
     }
 
-    public MessageDto editMessage(MessageDto message) {
-        return messageMapper.toDto(messageService.editMessage(message));
+    public MessageDto editMessage(MessageDto message, String userLogin) {
+        return messageMapper.toDto(
+                messageService.editMessage(message, userLogin)
+        );
     }
 }

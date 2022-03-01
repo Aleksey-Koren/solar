@@ -4,7 +4,6 @@ import io.solar.entity.exchange.ExchangeOffer;
 import io.solar.entity.messenger.Room;
 import io.solar.entity.messenger.UserRoom;
 import io.solar.entity.objects.BasicObject;
-import io.solar.entity.objects.StarShip;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -81,6 +80,7 @@ public class User {
     private List<UserRoom> userRooms;
 
     @OneToMany(mappedBy = "user")
+    @ToString.Exclude
     private List<ExchangeOffer> exchangeOffers;
 
 

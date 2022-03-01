@@ -10,7 +10,7 @@ import io.solar.mapper.StarShipMapper;
 import io.solar.service.StarShipService;
 import io.solar.service.StationService;
 import io.solar.service.engine.interfaces.HangarEngine;
-import io.solar.service.engine.interfaces.InventoryEngine;
+import io.solar.service.engine.interfaces.inventory.InventoryEngine;
 import io.solar.service.engine.interfaces.SpaceTechEngine;
 import io.solar.service.object.BasicObjectService;
 import lombok.RequiredArgsConstructor;
@@ -73,7 +73,7 @@ public class HangarFacade {
                     "User cannot move objects from starship with id = " + sourceStarship.getId());
         }
 
-        if (!inventoryEngine.isInShipInventory(sourceStarship, objectsToMove)) {
+        if (!inventoryEngine.isInSpaceTechInventory(sourceStarship, objectsToMove)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "There is an alien object among objects to move");
         }
 

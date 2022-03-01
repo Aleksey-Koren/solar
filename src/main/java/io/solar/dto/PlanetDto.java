@@ -12,8 +12,8 @@ import lombok.NoArgsConstructor;
 public class PlanetDto {
 
     private Long id;
-    private Float x;
-    private Float y;
+    private Double x;
+    private Double y;
     private Long population;
     private Long parent;
     private Float aldebo;

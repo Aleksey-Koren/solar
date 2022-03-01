@@ -3,6 +3,7 @@ package io.solar.entity.objects;
 import io.solar.entity.Goods;
 import io.solar.entity.User;
 import io.solar.entity.interfaces.SpaceTech;
+import io.solar.entity.inventory.socket.SpaceTechSocket;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

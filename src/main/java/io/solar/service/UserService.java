@@ -105,20 +105,24 @@ public class UserService implements UserDetailsService {
         return updateUserPassword(passwordToken, changePasswordDto.getNewPassword());
     }
 
-    public void decreaseUserBalance(User user, Long amount) {
+    public Long decreaseUserBalance(User user, Long amount) {
         if (user.getMoney() < amount) {
             throw new ResponseStatusException(HttpStatus.PAYMENT_REQUIRED, "Not enough credits at user's balance");
         } else {
             user.setMoney(user.getMoney() - amount);
             update(user);
+            //TODO Remove it from here. Because we should send notifications after all potential-rollback events
             notificationEngine.notificationToUser(NotificationType.MONEY_UPDATED, user, null);
+            return user.getMoney();
         }
     }
 
-    public void increaseUserBalance(User user, Long amount) {
+    public Long increaseUserBalance(User user, Long amount) {
         user.setMoney(user.getMoney() + amount);
         update(user);
+        //TODO Remove it from here. Because we should send notifications after all potential-rollback events
         notificationEngine.notificationToUser(NotificationType.MONEY_UPDATED, user, null);
+        return user.getMoney();
     }
 
     public List<MessageType> getMessageTypesToEmail(User user) {
@@ -143,8 +147,6 @@ public class UserService implements UserDetailsService {
         user.setHackBlock(LocalDateTime.of(2010, 1, 1, 0, 0, 0)
                 .toInstant(ZoneOffset.ofTotalSeconds(0)));
     }
-
-
 
     public void saveEmailNotifications(User user, List<MessageType> messageTypes) {
         user.setEmailNotifications(calculateEmailNotifications(messageTypes));

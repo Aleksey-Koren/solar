@@ -4,7 +4,7 @@ import io.solar.entity.Planet;
 import io.solar.entity.objects.BasicObject;
 import io.solar.entity.objects.StarShip;
 import io.solar.service.StarShipService;
-import io.solar.service.engine.interfaces.InventoryEngine;
+import io.solar.service.engine.interfaces.inventory.InventoryEngine;
 import io.solar.service.engine.interfaces.StarMapEngine;
 import io.solar.service.engine.interfaces.StarShipEngine;
 import io.solar.service.object.BasicObjectService;

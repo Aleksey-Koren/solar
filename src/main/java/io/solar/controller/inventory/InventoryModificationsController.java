@@ -36,6 +36,8 @@ public class InventoryModificationsController {
     public List<ObjectModificationTypeDto> getAll() {
 
         return inventoryModificationFacade.getAll();
+
+
     }
 
     @DeleteMapping("{id}")

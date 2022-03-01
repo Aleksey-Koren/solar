@@ -4,6 +4,8 @@ import io.solar.entity.Goods;
 import io.solar.entity.Production;
 import io.solar.entity.User;
 import io.solar.entity.interfaces.SpaceTech;
+import io.solar.entity.inventory.socket.SpaceTechSocket;
+import io.solar.entity.modification.ModificationPrice;
 import io.solar.entity.shop.StationShop;
 import lombok.*;
 
@@ -32,8 +34,10 @@ public class Station extends BasicObject implements SpaceTech {
     @OneToOne(mappedBy = "station", fetch = FetchType.LAZY)
     private StationShop shop;
 
-//    private List<Inventory> inventory;
+    @OneToMany(mappedBy = "station")
+    private List<ModificationPrice> modificationPrices;
 
+    private Long money;
 
     @Override
     public String toString() {

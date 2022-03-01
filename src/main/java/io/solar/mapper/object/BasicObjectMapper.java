@@ -1,16 +1,19 @@
 package io.solar.mapper.object;
 
-import io.solar.dto.BasicObjectDto;
-import io.solar.dto.BasicObjectViewDto;
+import io.solar.dto.object.BasicObjectDto;
+import io.solar.dto.object.BasicObjectViewDto;
 import io.solar.dto.inventory.InventorySocketDto;
 import io.solar.entity.Planet;
 import io.solar.entity.objects.BasicObject;
 import io.solar.entity.objects.ObjectTypeDescription;
 import io.solar.mapper.EntityDtoMapper;
 import io.solar.mapper.SocketMapper;
+import io.solar.mapper.modification.ModificationMapper;
 import io.solar.repository.BasicObjectRepository;
 import io.solar.repository.ObjectTypeDescriptionRepository;
 import io.solar.repository.PlanetRepository;
+import io.solar.service.inventory.InventorySocketService;
+import io.solar.service.modification.ModificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -27,7 +30,9 @@ public class BasicObjectMapper implements EntityDtoMapper<BasicObject, BasicObje
     private final ObjectTypeDescriptionRepository objectTypeDescriptionRepository;
     private final PlanetRepository planetRepository;
     private final BasicObjectViewMapper basicObjectViewMapper;
+    private final ModificationService modificationService;
     private final SocketMapper socketMapper;
+    private final InventorySocketService inventorySocketService;
 
     @Override
     public BasicObject toEntity(BasicObjectDto dto) {
@@ -60,7 +65,7 @@ public class BasicObjectMapper implements EntityDtoMapper<BasicObject, BasicObje
                 .angle(entity.getAngle())
                 .rotationAngle(entity.getRotationAngle())
                 .attachedToShip(entity.getAttachedToShip() == null ? null : entity.getAttachedToShip().getId())
-                .attachedToSocket(entity.getAttachedToSocket())
+                .attachedToSocket(entity.getAttachedToSocket().getId())
                 .durability(entity.getDurability())
                 .fraction(entity.getFraction())
                 .hullId(entity.getObjectTypeDescription().getId())
@@ -78,6 +83,9 @@ public class BasicObjectMapper implements EntityDtoMapper<BasicObject, BasicObje
                 .positionIterationTs(entity.getPositionIterationTs())
                 .clockwiseRotation(entity.getClockwiseRotation())
                 .volume(entity.getVolume())
+                .energyConsumption(entity.getEnergyConsumption())
+                .isEnabled(entity.getIsEnabled())
+                .modificationId(entity.getModification() != null ? entity.getModification().getId() : null)
                 .build();
     }
 
@@ -128,7 +136,7 @@ public class BasicObjectMapper implements EntityDtoMapper<BasicObject, BasicObje
         entity.setAngle(dto.getAngle());
         entity.setRotationAngle(dto.getRotationAngle());
         entity.setAttachedToShip(attachedToShip);
-        entity.setAttachedToSocket(dto.getAttachedToSocket());
+        entity.setAttachedToSocket(dto.getAttachedToSocket() != null ? inventorySocketService.getById(dto.getId()) : null);
         entity.setDurability(dto.getDurability());
         entity.setFraction(dto.getFraction());
         entity.setObjectTypeDescription(objectTypeDescription);
@@ -144,5 +152,8 @@ public class BasicObjectMapper implements EntityDtoMapper<BasicObject, BasicObje
         entity.setPositionIterationTs(dto.getPositionIterationTs());
         entity.setClockwiseRotation(dto.getClockwiseRotation() != null ? dto.getClockwiseRotation() : entity.getClockwiseRotation());
         entity.setVolume(dto.getVolume());
+        entity.setEnergyConsumption(dto.getEnergyConsumption());
+        entity.setIsEnabled(dto.getIsEnabled());
+        entity.setModification(dto.getModificationId() != null ? modificationService.getById(dto.getModificationId()) : null);
     }
 }

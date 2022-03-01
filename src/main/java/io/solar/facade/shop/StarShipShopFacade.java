@@ -86,8 +86,6 @@ public class StarShipShopFacade {
                 .sum();
 
         return starshipPrice + attachedObjectsPrice;
-
-
     }
 
 }

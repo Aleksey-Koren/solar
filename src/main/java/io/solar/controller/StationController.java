@@ -1,9 +1,11 @@
 package io.solar.controller;
 
 import io.solar.dto.Option;
+import io.solar.dto.object.BasicObjectViewDto;
 import io.solar.dto.object.StationDto;
 import io.solar.facade.StationFacade;
 import io.solar.service.StationService;
+import io.solar.service.UserService;
 import io.solar.service.scheduler.GoodsGeneration;
 import io.solar.specification.filter.StationFilter;
 import lombok.RequiredArgsConstructor;
@@ -14,8 +16,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -31,6 +41,7 @@ public class StationController {
     private final StationFacade stationFacade;
     private final StationService stationService;
     private final GoodsGeneration goodsGeneration;
+    private final UserService userService;
 
     @PostMapping
     @PreAuthorize("hasAuthority('EDIT_STATION')")
@@ -67,6 +78,22 @@ public class StationController {
                 .stream()
                 .map(v -> new Option(v.getId(), v.getTitle()))
                 .collect(toList());
+    }
+
+    @PatchMapping("/{id}/inventory/attachment")
+    @PreAuthorize("hasAnyAuthority('PLAY_THE_GAME')")
+    @Transactional
+    public void putToInventory(@PathVariable("id") Long stationId ,List<BasicObjectViewDto> dto, Principal principal) {
+
+        stationFacade.moveFromOwnerToStation(stationId, dto, principal);
+    }
+
+    @PatchMapping("/{id}/inventory/detachment")
+    @PreAuthorize("hasAnyAuthority('PLAY_THE_GAME')")
+    @Transactional
+    public void takeFromInventory(@PathVariable("id") Long stationId ,List<BasicObjectViewDto> dto, Principal principal) {
+
+        stationFacade.moveFromStationToOwner(stationId, dto, principal);
     }
 
     @Scheduled(fixedDelayString = "#{@appProperties.getGoodsGenerationDelayMinutes()}",

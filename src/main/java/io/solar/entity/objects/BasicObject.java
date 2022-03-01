@@ -2,14 +2,31 @@ package io.solar.entity.objects;
 
 import io.solar.entity.Course;
 import io.solar.entity.Planet;
+import io.solar.entity.inventory.InventorySocket;
+import io.solar.entity.inventory.socket.SpaceTechSocket;
+import io.solar.entity.modification.Modification;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.io.Serializable;
 import java.util.List;
 
@@ -35,8 +52,8 @@ public class BasicObject implements Serializable {
     protected Long population;
     protected String fraction;
     protected String title;
-    protected Float x;
-    protected Float y;
+    protected Double x;
+    protected Double y;
     protected Float aphelion;
     protected Float orbitalPeriod;
     protected Float angle;
@@ -54,22 +71,24 @@ public class BasicObject implements Serializable {
     @JoinColumn(name = "attached_to_ship")
     protected BasicObject attachedToShip;
 
-    protected Long attachedToSocket;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "attached_to_socket")
+    protected InventorySocket attachedToSocket;
 
     @Enumerated(EnumType.STRING)
     protected ObjectStatus status;
 
     @Column(name = "speed_x")
-    protected Float speedX;
+    protected Double speedX;
 
     @Column(name = "speed_y")
-    protected Float speedY;
+    protected Double speedY;
 
     @Column(name = "acceleration_x")
-    protected Float accelerationX;
+    protected Double accelerationX;
 
     @Column(name = "acceleration_y")
-    protected Float accelerationY;
+    protected Double accelerationY;
 
     @Column(name = "position_iteration")
     protected Long positionIteration;
@@ -83,9 +102,21 @@ public class BasicObject implements Serializable {
     @Column(name = "volume")
     protected Float volume;
 
+    @Column(name = "energy_consumption")
+    protected Long energyConsumption;
+
+    protected Boolean isEnabled;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "modification_id")
+    private Modification modification;
+
     @OneToMany(mappedBy = "attachedToShip")
     @EqualsAndHashCode.Exclude
     protected List<BasicObject> attachedObjects;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "spaceTech")
+    private List<SpaceTechSocket> sockets;
 
     @OneToMany(mappedBy = "object", cascade = CascadeType.ALL)
     @EqualsAndHashCode.Exclude
@@ -95,5 +126,4 @@ public class BasicObject implements Serializable {
     public Double getSpeed() {
         return Math.sqrt(Math.pow(this.speedX, 2) + Math.pow(this.speedY, 2));
     }
-
 }

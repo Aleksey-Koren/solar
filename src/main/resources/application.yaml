@@ -26,9 +26,9 @@ spring:
     jpa:
         properties:
             hibernate:
-                show_sql: false
+                show_sql: true
                 format_sql: true
-                use_sql_comments: false
+                use_sql_comments: true
                 ddl-auto: validate
         open-in-view: false
 
@@ -55,7 +55,7 @@ app:
     hack_block_time_min: 5
     admin_not_exists: "yes"
     goods_generation_delay_minutes: 60
-    goods_initial_delay_minutes: 0
+    goods_initial_delay_minutes: 100
     view_distance_without_radar: 5
     time_flow_modifier: 1
     station_sell_modifier: 0.7
@@ -68,7 +68,7 @@ app:
     navigator:
         max_distance: 10
         max_speed: 1000
-        update_coordinates_delay: PT5S
+        update_coordinates_delay: PT50M
         num_update_object: 100
         max_exchange_distance: 1
         explosion_speed_min: 0.5
@@ -109,7 +109,7 @@ log4jdbc:
 logging:
     level:
         jdbc:
-            sqlonly: "OFF"
+            sqlonly: "INFO"
             sqltiming: "OFF"
             audit: "OFF"
             resultset: "OFF"

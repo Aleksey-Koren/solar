@@ -1,9 +1,11 @@
 package io.solar.service.inventory;
 
 import io.solar.entity.inventory.InventoryType;
+import io.solar.entity.objects.BasicObject;
 import io.solar.repository.InventoryTypeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -16,6 +18,15 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class InventoryTypeService {
+
+    @Value("${app.object.types.generator}")
+    private String generatorObjectTypeTitle;
+    @Value("${app.object.types.large_generator}")
+    private String largeGeneratorObjectTypeTitle;
+    @Value("${app.object.types.battery}")
+    private String batteryObjectTypeTitle;
+    @Value("${app.object.types.container}")
+    private String containerObjectTypeTitle;
 
     private final InventoryTypeRepository inventoryTypeRepository;
 
@@ -44,5 +55,18 @@ public class InventoryTypeService {
 
     public void delete(Long id) {
         inventoryTypeRepository.deleteById(id);
+    }
+
+    public boolean isGenerator(BasicObject item) {
+        List<InventoryType> generatorTypes = findAllByTitleIn(
+                List.of(generatorObjectTypeTitle, largeGeneratorObjectTypeTitle)
+        );
+
+        return generatorTypes.contains(item.getObjectTypeDescription().getInventoryType());
+    }
+
+    public boolean isContainer(BasicObject item) {
+        InventoryType container = getByTitle(containerObjectTypeTitle);
+        return container.equals(item.getObjectTypeDescription().getInventoryType());
     }
 }

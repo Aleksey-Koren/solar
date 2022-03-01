@@ -13,8 +13,8 @@ public class CourseDto {
     private Long objectId;
     //in milliseconds (should be float in seconds, because milliseconds may have too large fraction)
     private Long time;
-    private Float accelerationX;
-    private Float accelerationY;
+    private Double accelerationX;
+    private Double accelerationY;
     private Long nextId;
     private Instant createdAt;
     private Long expireAt;

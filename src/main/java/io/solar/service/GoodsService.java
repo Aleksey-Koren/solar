@@ -23,6 +23,11 @@ public class GoodsService {
         return goodsRepository.findByOwnerAndProduct(owner, product);
     }
 
+    public Goods getByOwnerAndProductId(BasicObject owner, Long productId) {
+
+        return goodsRepository.findByOwnerAndProductId(owner, productId);
+    }
+
     public Goods getByOwnerAndProduct(BasicObject owner, Product product) {
 
         return goodsRepository.findByOwnerAndProduct(owner, product)

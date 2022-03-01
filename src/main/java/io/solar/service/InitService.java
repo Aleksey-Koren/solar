@@ -4,11 +4,15 @@ import io.solar.entity.User;
 import io.solar.entity.objects.BasicObject;
 import io.solar.entity.objects.ObjectStatus;
 import io.solar.entity.objects.StarShip;
+import io.solar.entity.objects.Station;
+import io.solar.multithreading.StationMonitor;
 import io.solar.repository.BasicObjectRepository;
 import io.solar.repository.ObjectTypeDescriptionRepository;
 import io.solar.repository.StarShipRepository;
+import io.solar.repository.StationRepository;
 import io.solar.security.Role;
 
+import io.solar.service.inventory.InventorySocketService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -18,13 +22,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class InitService {
 
+    private final StationMonitor stationMonitor;
     private final UtilityService utilityService;
     private final UserService userService;
+    private final InventorySocketService inventorySocketService;
     private final StarShipRepository starShipRepository;
+    private final StationRepository stationRepository;
     private final ObjectTypeDescriptionRepository objectTypeDescriptionRepository;
     private final BasicObjectRepository basicObjectRepository;
 
@@ -35,7 +44,10 @@ public class InitService {
 
     @EventListener(ContextRefreshedEvent.class)
     public void onApplicationEvent(ContextRefreshedEvent event) {
-        event.getApplicationContext().getBean(InitService.class).defaultAdminInitialization();
+        InitService initService = event.getApplicationContext().getBean(InitService.class);
+
+        initService.defaultAdminInitialization();
+        initService.fillStationMonitors();
     }
 
     @Transactional
@@ -50,6 +62,15 @@ public class InitService {
         utilityService.deleteByUtilKey("admin_not_exists");
     }
 
+    /**
+     * Initialize monitors for each station
+     */
+    public void fillStationMonitors() {
+        List<Station> stations = stationRepository.findAll();
+
+        stations.forEach(station -> stationMonitor.createMonitor(station.getId()));
+    }
+
     private void createDefaultAdmin() {
         User admin = new User();
         admin.setLogin(LOGIN);
@@ -62,10 +83,10 @@ public class InitService {
     private void createDefaultShip(User admin) {
         StarShip adminStarShip = new StarShip();
         adminStarShip.setTitle("Admin Starship");
-        adminStarShip.setX(10f);
-        adminStarShip.setY(10f);
-        adminStarShip.setSpeedX(0f);
-        adminStarShip.setSpeedY(0f);
+        adminStarShip.setX(10.0);
+        adminStarShip.setY(10.0);
+        adminStarShip.setSpeedX(0.0);
+        adminStarShip.setSpeedY(0.0);
         adminStarShip.setPositionIteration(0L);
         adminStarShip.setUser(admin);
         adminStarShip.setDurability(5000);
@@ -75,11 +96,11 @@ public class InitService {
         adminStarShip.setStatus(ObjectStatus.IN_SPACE);
         adminStarShip = starShipRepository.save(adminStarShip);
         BasicObject radar = createDefaultRadar();
-        radar.setAttachedToSocket(1109L);
+        radar.setAttachedToSocket(inventorySocketService.getById(1109L));
         radar.setAttachedToShip(adminStarShip);
         BasicObject engine = createDefaultEngine();
         engine.setAttachedToShip(adminStarShip);
-        engine.setAttachedToSocket(1089L);
+        engine.setAttachedToSocket(inventorySocketService.getById(1089L));
         admin.setLocation(adminStarShip);
     }
 

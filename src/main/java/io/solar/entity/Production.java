@@ -20,7 +20,7 @@ public class Production {
     @EqualsAndHashCode.Exclude
     private Product product;
     private Float power;
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "station")
     @EqualsAndHashCode.Exclude
     private Station station;

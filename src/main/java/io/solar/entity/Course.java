@@ -4,7 +4,18 @@ import io.solar.entity.objects.BasicObject;
 import lombok.Data;
 import lombok.ToString;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
 import java.time.Instant;
 
 @Data
@@ -25,10 +36,10 @@ public class Course {
     private Long time;
 
     @Column(name = "acceleration_x")
-    private Float accelerationX;
+    private Double accelerationX;
 
     @Column(name = "acceleration_y")
-    private Float accelerationY;
+    private Double accelerationY;
 
     @ToString.Exclude
     @OneToOne(fetch = FetchType.LAZY)

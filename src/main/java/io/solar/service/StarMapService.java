@@ -26,7 +26,7 @@ public class StarMapService {
     private final AppProperties appProperties;
 
     public List<BasicObject> findAllInViewDistance(SpaceTech spaceTech) {
-        Float viewDistance = spaceTechEngine.retrieveViewDistance(spaceTech);
+        Double viewDistance = spaceTechEngine.retrieveViewDistance(spaceTech);
         BasicObject spaceTechAsObject = (BasicObject) spaceTech;
         if (viewDistance > 0) {
             return basicObjectRepository.findAllInViewDistance(spaceTechAsObject.getX(), spaceTechAsObject.getY(), viewDistance);
