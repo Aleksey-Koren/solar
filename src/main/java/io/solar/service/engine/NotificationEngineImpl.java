@@ -35,6 +35,14 @@ public class NotificationEngineImpl implements NotificationEngine {
     }
 
     @Override
+    public <T> void sendToUser(NotificationType type, User destinationUser, T payload) {
+
+        simpMessagingTemplate.convertAndSendToUser(destinationUser.getLogin(),
+                messengerProperties.getNotificationDestination(),
+                new NotificationDto<>(type.name(), payload));
+    }
+
+    @Override
     public void sendLeaveRoomNotification(User userDestination, UserDto payload) {
 
         simpMessagingTemplate.convertAndSendToUser(userDestination.getLogin(),

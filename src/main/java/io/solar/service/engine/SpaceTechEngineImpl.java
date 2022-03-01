@@ -6,6 +6,8 @@ import io.solar.entity.inventory.InventoryType;
 import io.solar.entity.objects.BasicObject;
 import io.solar.entity.objects.Station;
 import io.solar.repository.BasicObjectRepository;
+import io.solar.service.StationService;
+import io.solar.service.UserService;
 import io.solar.service.engine.interfaces.SpaceTechEngine;
 import io.solar.service.inventory.InventoryTypeService;
 import io.solar.service.object.BasicObjectService;
@@ -14,6 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 
 import static java.util.function.Predicate.not;
 
@@ -33,6 +36,8 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
     private final BasicObjectRepository basicObjectRepository;
     private final InventoryTypeService inventoryTypeService;
     private final BasicObjectService basicObjectService;
+    private final StationService stationService;
+    private final UserService userService;
 
     @Override
     public Double retrieveViewDistance(SpaceTech spaceTech) {
@@ -161,4 +166,15 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
     public boolean isUserAtStation(User user, Station station) {
         return station.equals(user.getLocation().getAttachedToShip());
     }
+
+    @Override
+    public boolean isUserAtStation(User user) {
+        if (user.getLocation().getAttachedToShip() == null) {
+            return false;
+        }
+        Optional<Station> stationOpt = stationService.findById(user.getLocation().getAttachedToShip().getId());
+        return stationOpt.isPresent();
+    }
+
+
 }

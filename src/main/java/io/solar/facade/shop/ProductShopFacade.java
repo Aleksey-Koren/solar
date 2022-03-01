@@ -2,6 +2,7 @@ package io.solar.facade.shop;
 
 import io.solar.dto.shop.ProductPriceDto;
 import io.solar.dto.shop.ShopDto;
+import io.solar.dto.transfer.TransferProductsDto;
 import io.solar.entity.User;
 import io.solar.entity.objects.StarShip;
 import io.solar.entity.objects.Station;
@@ -14,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -25,7 +27,14 @@ public class ProductShopFacade {
     private final UserService userService;
     private final ProductEngine productEngine;
 
-    public void buyProducts(User user, List<ShopDto> products) {
+    public void buyProducts(User user, List<ShopDto> dto) {
+        List<TransferProductsDto> products = dto
+                .stream()
+                .map(s -> TransferProductsDto.builder()
+                        .productId(s.getProductId())
+                        .productAmount(s.getQuantity()).build())
+                .toList();
+
         Station station = stationService.getById(user.getLocation().getAttachedToShip().getId());
         StarShip spaceship = starshipService.getById(user.getLocation().getId());
 
@@ -40,7 +49,14 @@ public class ProductShopFacade {
         }
     }
 
-    public void sellProducts(User user, List<ShopDto> products) {
+    public void sellProducts(User user, List<ShopDto> dto) {
+        List<TransferProductsDto> products = dto
+                .stream()
+                .map(s -> TransferProductsDto.builder()
+                        .productId(s.getProductId())
+                        .productAmount(s.getQuantity()).build())
+                .toList();
+
         Station station = stationService.getById(user.getLocation().getAttachedToShip().getId());
         StarShip spaceship = starshipService.getById(user.getLocation().getId());
 
@@ -58,7 +74,7 @@ public class ProductShopFacade {
                 .toList();
     }
 
-    private long calculateTotalSellPrice(Station station, List<ShopDto> products) {
+    private long calculateTotalSellPrice(Station station, List<TransferProductsDto> products) {
         List<Long> stationProductsIds = getStationGoodsIds(station);
 
         return products.stream()
@@ -74,10 +90,10 @@ public class ProductShopFacade {
                 : Math.floor(productService.getById(productId).getPrice() * 0.7));
     }
 
-    private long calculatePurchasePrice(List<ShopDto> products) {
+    private long calculatePurchasePrice(List<TransferProductsDto> products) {
 
         return products.stream()
-                .map(product -> productService.getById(product.getProductId()).getPrice() * product.getQuantity())
+                .map(product -> productService.getById(product.getProductId()).getPrice() * product.getProductAmount())
                 .mapToLong(Long::longValue)
                 .sum();
     }

@@ -37,6 +37,8 @@ public class Station extends BasicObject implements SpaceTech {
     @OneToMany(mappedBy = "station")
     private List<ModificationPrice> modificationPrices;
 
+    private Long money;
+
     @Override
     public String toString() {
         return "Station{" +

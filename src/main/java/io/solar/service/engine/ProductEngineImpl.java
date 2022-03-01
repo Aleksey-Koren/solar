@@ -1,6 +1,7 @@
 package io.solar.service.engine;
 
 import io.solar.dto.shop.ShopDto;
+import io.solar.dto.transfer.TransferProductsDto;
 import io.solar.entity.Goods;
 import io.solar.entity.Product;
 import io.solar.entity.interfaces.SpaceTech;
@@ -30,13 +31,16 @@ public class ProductEngineImpl implements ProductEngine {
     private final StationMonitor stationMonitor;
 
     @Override
-    public void transferProducts(SpaceTech from, SpaceTech to, List<ShopDto> products) {
+    public void transferProducts(SpaceTech from, SpaceTech to, List<TransferProductsDto> products) {
+        Map<Long, TransferProductsDto> productsToTransfer = products.stream()
+                .collect(Collectors.toMap(TransferProductsDto::getProductId, Function.identity()));
+
         Map<Long, Goods> fromProductsGoods = createProductGoodsMap(from);
         Map<Long, Goods> toProductsGoods = createProductGoodsMap(to);
 
         synchronized (stationMonitor.getMonitor(to.getId())) {
 
-            if (isProductsInStock(products, fromProductsGoods) && isSpaceTechHaveEnoughSpace(to, products)) {
+            if (isProductsInStock(products, fromProductsGoods) && isSpaceTechHaveEnoughSpace(to, productsToTransfer)) {
 
                 products.forEach(product -> {
                     Goods goodsToDecrease = fromProductsGoods.get(product.getProductId());
@@ -55,22 +59,22 @@ public class ProductEngineImpl implements ProductEngine {
         }
     }
 
-    private void increaseGoods(ShopDto product, Goods goods, SpaceTech spaceTech) {
+    private void increaseGoods(TransferProductsDto product, Goods goods, SpaceTech spaceTech) {
         if (goods != null) {
-            goods.setAmount(goods.getAmount() + product.getQuantity());
+            goods.setAmount(goods.getAmount() + product.getProductAmount());
         } else {
             goods = Goods.builder()
                     .product(productService.getById(product.getProductId()))
                     .owner((BasicObject) spaceTech)
-                    .amount(product.getQuantity().longValue())
+                    .amount(product.getProductAmount().longValue())
                     .build();
 
             spaceTech.getGoods().add(goods);
         }
     }
 
-    private void decreaseGoods(ShopDto product, Goods goods, SpaceTech spaceTech) {
-        goods.setAmount(goods.getAmount() - product.getQuantity());
+    private void decreaseGoods(TransferProductsDto product, Goods goods, SpaceTech spaceTech) {
+        goods.setAmount(goods.getAmount() - product.getProductAmount());
 
         if (goods.getAmount() == 0) {
             spaceTech.getGoods().remove(goods);
@@ -79,29 +83,28 @@ public class ProductEngineImpl implements ProductEngine {
 
     public Map<Long, Goods> createProductGoodsMap(SpaceTech spaceTech) {
 
-        return spaceTech.getGoods()
-                .stream()
+        return spaceTech.getGoods().stream()
                 .collect(Collectors.toMap(goods -> goods.getProduct().getId(), Function.identity()));
     }
 
-    private boolean isSpaceTechHaveEnoughSpace(SpaceTech spaceTech, List<ShopDto> products) {
+    private boolean isSpaceTechHaveEnoughSpace(SpaceTech spaceTech, Map<Long, TransferProductsDto> products) {
         float spaceTechVolume = spaceTechEngine.calculateTotalVolume(spaceTech);
         float usedVolume = spaceTechEngine.calculateUsedVolume(spaceTech);
 
-        double productsVolume = products.stream()
+        double productsVolume = products.values().stream()
                 .map(product -> productService.getById(product.getProductId()))
-                .mapToDouble(Product::getBulk)
+                .mapToDouble(s -> s.getBulk() * products.get(s.getId()).getProductAmount())
                 .sum();
 
         return ((usedVolume + productsVolume) <= spaceTechVolume);
     }
 
-    private boolean isProductsInStock(List<ShopDto> products, Map<Long, Goods> productGoodsMap) {
+    private boolean isProductsInStock(List<TransferProductsDto> products, Map<Long, Goods> productGoodsMap) {
         boolean isProductsInStock = true;
 
-        for (ShopDto product : products) {
+        for (TransferProductsDto product : products) {
             Goods goods = productGoodsMap.get(product.getProductId());
-            if (goods == null || goods.getAmount() < product.getQuantity()) {
+            if (goods == null || goods.getAmount() < product.getProductAmount()) {
                 isProductsInStock = false;
                 break;
             }

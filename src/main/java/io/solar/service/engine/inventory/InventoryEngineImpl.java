@@ -1,7 +1,6 @@
 package io.solar.service.engine.inventory;
 
 import io.solar.config.properties.NavigatorProperties;
-import io.solar.config.properties.StarShipProperties;
 import io.solar.entity.User;
 import io.solar.entity.interfaces.SpaceTech;
 import io.solar.entity.inventory.socket.SpaceTechSocket;
@@ -9,7 +8,6 @@ import io.solar.entity.objects.BasicObject;
 import io.solar.entity.objects.ObjectStatus;
 import io.solar.entity.objects.StarShip;
 import io.solar.entity.objects.Station;
-import io.solar.entity.proxy.SpaceTechProxy;
 import io.solar.multithreading.StationMonitor;
 import io.solar.repository.BasicObjectRepository;
 import io.solar.service.StarShipService;
@@ -37,7 +35,6 @@ public class InventoryEngineImpl implements InventoryEngine {
     private final BasicObjectService basicObjectService;
     private final StarShipService starShipService;
     private final SpaceTechEngine spaceTechEngine;
-    private final StarShipProperties starShipProperties;
     private final NavigationEngine navigationEngine;
     private final NavigatorProperties navigatorProperties;
     private final SpaceTechSocketService spaceTechSocketService;

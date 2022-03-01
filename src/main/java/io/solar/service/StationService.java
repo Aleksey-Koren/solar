@@ -46,4 +46,10 @@ public class StationService {
     public void deleteById(Long id) {
         stationRepository.deleteById(id);
     }
+
+    public Long increaseBalance(Station station, Long amount) {
+        station.setMoney(station.getMoney() + amount);
+        save(station);
+        return station.getMoney();
+    }
 }

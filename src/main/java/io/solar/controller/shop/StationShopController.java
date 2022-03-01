@@ -73,6 +73,7 @@ public class StationShopController {
         User user = userService.findByLogin(principal.getName());
 
         productShopFacade.buyProducts(user, products);
+
     }
 
     @PatchMapping("/sell/products")

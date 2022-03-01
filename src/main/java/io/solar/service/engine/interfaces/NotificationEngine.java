@@ -12,6 +12,8 @@ public interface NotificationEngine {
 
     void notificationToUser(NotificationType type, String userName, Object payload);
 
+    public <T> void sendToUser(NotificationType type, User destinationUser, T payload);
+
     void sendLeaveRoomNotification(User userDestination, UserDto payload);
 
     void sendInstantPurchaseNotification(User lotOwner, MarketplaceLotDto lotDto);

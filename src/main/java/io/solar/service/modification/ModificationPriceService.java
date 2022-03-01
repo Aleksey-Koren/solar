@@ -6,6 +6,7 @@ import io.solar.entity.objects.Station;
 import io.solar.repository.modification.ModificationPriceRepository;
 import io.solar.specification.ModificationPriceSpecification;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ModificationPriceService {
 
     private final ModificationPriceRepository modificationPriceRepository;
@@ -27,6 +29,12 @@ public class ModificationPriceService {
 
     public Optional<ModificationPrice> findByStationAndModification(Station station, Modification modification) {
         return modificationPriceRepository.findByStationAndModification(station, modification);
+    }
+
+    public ModificationPrice getByStationAndModification(Station station, Modification modification) {
+        return modificationPriceRepository.findByStationAndModification(station, modification).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Can't find ModificationPrice by Station id = %d and modification id = %d",
+                        station.getId(), modification.getId())));
     }
 
     public ModificationPrice getById(Long modificationPriceId) {

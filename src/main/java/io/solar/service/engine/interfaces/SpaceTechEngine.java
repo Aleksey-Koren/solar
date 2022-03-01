@@ -32,4 +32,6 @@ public interface SpaceTechEngine {
     boolean isUserOwnsThisSpaceTech(User user, SpaceTech spaceTech);
 
     boolean isUserAtStation(User user, Station station);
+
+    public boolean isUserAtStation(User user);
 }

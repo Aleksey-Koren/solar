@@ -19,7 +19,12 @@ TODO
 
 
 
-    ModificationFilter OTDids
+    Item is in inventory,
+    user's starship is at station.
+    station can do this modification
+    user has enough credits and resources.
+
+
 
 
 
