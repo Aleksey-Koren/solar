@@ -12,5 +12,5 @@ public class ApplyModificationDto {
     private Long modificationId;
     private Long itemId;
     private String message;
-    private boolean isModified;
+    private Boolean isModified;
 }

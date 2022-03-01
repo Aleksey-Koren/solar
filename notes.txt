@@ -3,26 +3,23 @@ TODO
 
     ** Create station monitor during creating station //todo need create
 
-    Для админа:
+    1   Station owner should be able to manage station goods shop:
+        1.1 Should be able to change buy/sell price for goods at station.
+        1.2 Should be able to put up for sale/remove from sale goods
 
-    CRUD
-    1. io.solar.controller.modification.ModificationController with CRUD methods and 'EDIT_MODIFICATIONS' permission. Not for simple users.
-    5. applyModification()    "api/inventory-item/{id}/modification" PATCH...
-    6. Create ModificationTypeController and CRUD methods in it. With 'EDIT_MODIFICATIONS' permission. Not for simple users.
-    7. Create ModificationPriceController with CRUD and findAll(Pageable, Filter filter). +++
+    2   2.1 Add columns to goods table: buy_price Long default 0 ; available for sale boolean ; available for buy boolean
+        2.2 Alter column price to sell_price
+        2.3. Refactor goods mapper, entity and dto
 
-    -----------------------------------------------------------------------------------
-                                   ++ 2. prices and price_products DDL
-                                   ++ 3. refactor calculateSellPrice in inventoryShopFacade(), StarShipShopFacade()
-                                   ++ 4. modification_types DDL  (id INT, title VARCHAR)
-                                   ++ 5. Create ModificationPrice DDL, entities, service and repo.
+    3   StationController.updateGoods().
+
+    4   Refactor productShopFacade logic after above changes.
 
 
 
-    Item is in inventory,
-    user's starship is at station.
-    station can do this modification
-    user has enough credits and resources.
+    Questions to Roma:
+    1. applyModification(). Where should be placed? (witch controller?).
+    2. fields validation. Can we use Hibernate validator?
 
 
 
