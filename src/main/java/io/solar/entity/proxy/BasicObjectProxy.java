@@ -134,6 +134,14 @@ public class BasicObjectProxy extends BasicObject {
                 .orElse(basicDistance);
     }
 
+    public int getMass() {
+        Optional<ParameterModification> paramOpt = getParameterModification(object, ParameterType.MASS);
+        int basicMass = object.getObjectTypeDescription().getMass();
+        return  paramOpt
+                .map(parameterModification -> basicMass * parameterModification.getModificationValue())
+                .orElse((double) basicMass).intValue();
+    }
+
     private Optional<ParameterModification> getParameterModification(BasicObject object, ParameterType type) {
         if(object.getModification() == null) {
             return Optional.empty();
