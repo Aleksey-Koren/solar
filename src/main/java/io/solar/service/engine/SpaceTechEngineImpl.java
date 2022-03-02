@@ -6,9 +6,9 @@ import io.solar.entity.interfaces.SpaceTech;
 import io.solar.entity.inventory.InventoryType;
 import io.solar.entity.objects.BasicObject;
 import io.solar.entity.objects.Station;
+import io.solar.entity.proxy.BasicObjectProxy;
 import io.solar.repository.BasicObjectRepository;
 import io.solar.service.StationService;
-import io.solar.service.UserService;
 import io.solar.service.engine.interfaces.SpaceTechEngine;
 import io.solar.service.inventory.InventoryTypeService;
 import io.solar.service.object.BasicObjectService;
@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static java.util.function.Predicate.not;
+import static java.util.stream.Collectors.*;
 
 @Component
 @RequiredArgsConstructor
@@ -38,17 +39,18 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
     private final InventoryTypeService inventoryTypeService;
     private final BasicObjectService basicObjectService;
     private final StationService stationService;
-    private final UserService userService;
 
     @Override
     public Double retrieveViewDistance(SpaceTech spaceTech) {
         BasicObject spaceTechAsObject = (BasicObject) spaceTech;
         InventoryType radar = inventoryTypeService.getByTitle(radarObjectTypeTitle);
 
-        List<BasicObject> radars = basicObjectRepository.getObjectsInSlotsByType(spaceTechAsObject.getId(), radar);
+        List<BasicObjectProxy> radars = basicObjectRepository.getObjectsInSlotsByType(spaceTechAsObject.getId(), radar).stream()
+                .map(BasicObjectProxy::new)
+                .collect(toList());
 
         return radars.stream()
-                .map(s -> s.getObjectTypeDescription().getDistance()).mapToDouble(Float::doubleValue)
+                .mapToDouble(BasicObjectProxy::getDistance)
                 .distinct()
                 .max()
                 .orElse(0);
@@ -58,11 +60,12 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
     public Integer calculateMass(SpaceTech spaceTech) {
         BasicObject spaceTechObject = (BasicObject) spaceTech;
 
-        int starshipMass = spaceTechObject.getObjectTypeDescription().getMass();
+        int starshipMass = new BasicObjectProxy(spaceTechObject).getMass();
 
         int attachedObjectsMass = spaceTechObject.getAttachedObjects()
                 .stream()
-                .mapToInt(object -> object.getObjectTypeDescription().getMass())
+                .map(BasicObjectProxy::new)
+                .mapToInt(BasicObjectProxy::getMass)
                 .sum();
 
 //        return starshipMass + attachedObjectsMass;
@@ -70,7 +73,7 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
     }
 
     @Override
-    public float calculateMaxThrust(SpaceTech spaceTech) {
+    public double calculateMaxThrust(SpaceTech spaceTech) {
         BasicObject spaceTechAsObject = (BasicObject) spaceTech;
         InventoryType engine = inventoryTypeService.getByTitle(engineObjectTypeTitle);
         InventoryType hugeEngine = inventoryTypeService.getByTitle(hugeEngineObjectTypeTitle);
@@ -79,21 +82,22 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
 
         engines.addAll(basicObjectRepository.getObjectsInSlotsByType(spaceTechAsObject.getId(), hugeEngine));
 
-        return (float) engines.stream()
+        return  engines.stream()
                 .filter(BasicObject::getIsEnabled)
-                .mapToDouble(s -> (double) s.getObjectTypeDescription().getPowerMax())
+                .mapToDouble(s -> new BasicObjectProxy(s).getPowerMax())
                 .sum();
     }
 
     @Override
     public float calculateTotalVolume(SpaceTech spaceTech) {
-        BasicObject ship = (BasicObject) spaceTech;
 
         InventoryType container = inventoryTypeService.getByTitle(containerObjectTypeTitle);
-        List<BasicObject> containers = basicObjectService.getObjectsInSlotsByType(ship.getId(), container);
+        List<BasicObjectProxy> containers = basicObjectService.getObjectsInSlotsByType(spaceTech.getId(), container).stream()
+                .map(BasicObjectProxy::new)
+                .collect(toList());
 
         return (float) containers.stream()
-                .mapToDouble(BasicObject::getVolume)
+                .mapToDouble(BasicObjectProxy::getVolume)
                 .sum();
     }
 
@@ -101,8 +105,9 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
     public float calculateUsedVolume(SpaceTech spaceTech) {
         double objectsVolume = spaceTech.getAttachedObjects()
                 .stream()
+                .map(BasicObjectProxy::new)
                 .filter(not(inventoryTypeService::isContainer))
-                .mapToDouble(BasicObject::getVolume)
+                .mapToDouble(BasicObjectProxy::getVolume)
                 .sum();
 
         double goodsVolume = spaceTech.getGoods()
@@ -147,7 +152,7 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
     public long calculateGeneralEnergyAmount(SpaceTech spaceTech) {
         return spaceTech.getSockets().stream()
                 .filter(s -> s.getObject() != null && inventoryTypeService.isGenerator(s.getObject()))
-                .mapToLong(socket -> socket.getObject().getEnergyConsumption())
+                .mapToLong(socket -> new BasicObjectProxy(socket.getObject()).getEnergyConsumption())
                 .sum();
     }
 
@@ -156,12 +161,12 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
 
         return spaceTech.getSockets().stream()
                 .filter(s -> (s.getObject() != null && !inventoryTypeService.isGenerator(s.getObject())))
-                .mapToLong(socket -> socket.getObject().getEnergyConsumption())
+                .mapToLong(socket -> new BasicObjectProxy(socket.getObject()).getEnergyConsumption())
                 .sum();
     }
 
     @Override
-    public float calculateMaxAcceleration(SpaceTech spaceTech) {
+    public double calculateMaxAcceleration(SpaceTech spaceTech) {
         return calculateMaxThrust(spaceTech) / calculateMass(spaceTech);
     }
 
@@ -183,6 +188,4 @@ public class SpaceTechEngineImpl implements SpaceTechEngine {
         Optional<Station> stationOpt = stationService.findById(user.getLocation().getAttachedToShip().getId());
         return stationOpt.isPresent();
     }
-
-
 }

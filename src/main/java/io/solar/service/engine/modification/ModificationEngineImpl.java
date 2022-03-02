@@ -29,7 +29,7 @@ public class ModificationEngineImpl implements ModificationEngine {
             case VOLUME:
                 item.setVolume((float)(item.getVolume() * parameterModification.getModificationValue()));
             case ENERGY_CONSUMPTION:
-                item.setVolume((float)(item.getVolume() * parameterModification.getModificationValue()));
+                item.setEnergyConsumption((long) (item.getVolume() * parameterModification.getModificationValue()));
         }
     }
 
