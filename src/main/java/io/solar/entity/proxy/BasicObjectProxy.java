@@ -94,6 +94,46 @@ public class BasicObjectProxy extends BasicObject {
                 .orElse(basicDurability);
     }
 
+    public double getPowerMin() {
+        Optional<ParameterModification> paramOpt = getParameterModification(object, ParameterType.POWER_MIN);
+        double basicPowerMin = object.getObjectTypeDescription().getPowerMin();
+        return paramOpt
+                .map(parameterModification -> basicPowerMin * parameterModification.getModificationValue())
+                .orElse(basicPowerMin);
+    }
+
+    public double getPowerMax() {
+        Optional<ParameterModification> paramOpt = getParameterModification(object, ParameterType.POWER_MAX);
+        double basicPowerMax = object.getObjectTypeDescription().getPowerMax();
+        return paramOpt
+                .map(parameterModification -> basicPowerMax * parameterModification.getModificationValue())
+                .orElse(basicPowerMax);
+    }
+
+    public double getPowerDegradation() {
+        Optional<ParameterModification> paramOpt = getParameterModification(object, ParameterType.POWER_DEGRADATION);
+        double basicPowerDegradation = object.getObjectTypeDescription().getPowerDegradation();
+        return paramOpt
+                .map(parameterModification -> basicPowerDegradation * parameterModification.getModificationValue())
+                .orElse(basicPowerDegradation);
+    }
+
+    public double getCooldown() {
+        Optional<ParameterModification> paramOpt = getParameterModification(object, ParameterType.COOLDOWN);
+        double basicCooldown = object.getObjectTypeDescription().getCooldown();
+        return paramOpt
+                .map(parameterModification -> basicCooldown * parameterModification.getModificationValue())
+                .orElse(basicCooldown);
+    }
+
+    public double getDistance() {
+        Optional<ParameterModification> paramOpt = getParameterModification(object, ParameterType.DISTANCE);
+        double basicDistance = object.getObjectTypeDescription().getDistance();
+        return paramOpt
+                .map(parameterModification -> basicDistance * parameterModification.getModificationValue())
+                .orElse(basicDistance);
+    }
+
     private Optional<ParameterModification> getParameterModification(BasicObject object, ParameterType type) {
         if(object.getModification() == null) {
             return Optional.empty();

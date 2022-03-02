@@ -2,7 +2,6 @@ package io.solar.facade.modifications;
 
 import io.solar.dto.modification.ApplyModificationDto;
 import io.solar.dto.modification.ModificationDto;
-import io.solar.dto.transfer.TransferMoneyDto;
 import io.solar.dto.transfer.TransferProductsDto;
 import io.solar.entity.User;
 import io.solar.entity.modification.Modification;
@@ -15,7 +14,6 @@ import io.solar.service.StarShipService;
 import io.solar.service.StationService;
 import io.solar.service.UserService;
 import io.solar.service.engine.interfaces.MoneyEngine;
-import io.solar.service.engine.interfaces.NotificationEngine;
 import io.solar.service.engine.interfaces.ProductEngine;
 import io.solar.service.engine.interfaces.SpaceTechEngine;
 import io.solar.service.engine.interfaces.inventory.InventoryEngine;
@@ -78,7 +76,7 @@ public class ModificationFacade {
         User user = userService.findByLogin(principal.getName());
         Modification modification = modificationService.getById(dto.getModificationId());
         BasicObject item = basicObjectService.getById(dto.getItemId());
-        applyingCheck(modification, item, user);
+//        applyingCheck(modification, item, user);
 
         StarShip starShip = starshipService.getById(user.getLocation().getId());
         Station station = stationService.getById(user.getLocation().getAttachedToShip().getId());
@@ -86,16 +84,16 @@ public class ModificationFacade {
         ModificationPrice modificationPrice = modificationPriceService.getByStationAndModification(station, modification);
         Long moneyAmount = modificationPrice.getPrice().getMoneyAmount();
 
-        if (user.getMoney() < moneyAmount && !modificationPriceEngine.isEnoughResources(starShip, modificationPrice)) {
-            dto.setModified(false);
-            dto.setMessage("There is not enough money or resources to apply modification");
-            return dto;
-        }
+//        if ((user.getMoney() < moneyAmount) || (!modificationPriceEngine.isEnoughResources(starShip, modificationPrice))) {
+//            dto.setIsModified(false);
+//            dto.setMessage("There is not enough money or resources to apply modification");
+//            return dto;
+//        }
 
-        productEngine.transferProducts(starShip, station, createDto(modificationPrice));
-        moneyEngine.transferMoney(user, station, moneyAmount);
+//        productEngine.transferProducts(starShip, station, createDto(modificationPrice));
+//        moneyEngine.transferMoney(user, station, moneyAmount);
         modificationEngine.applyModification(item, modification);
-        dto.setModified(true);
+        dto.setIsModified(true);
 
         return dto;
     }

@@ -55,9 +55,10 @@ public class ModificationController {
         modificationFacade.delete(modificationId);
     }
 
-    @PatchMapping("/api/modification/object")
+    @PatchMapping()
+    @Transactional
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
-    public ResponseEntity<ApplyModificationDto> applyModificationStarShip(ApplyModificationDto dto, Principal principal) {
+    public ResponseEntity<ApplyModificationDto> applyModificationStarShip(@RequestBody ApplyModificationDto dto, Principal principal) {
         dto = modificationFacade.applyModificationStarShip(dto, principal);
         return ResponseEntity.ok(dto);
     }
