@@ -36,5 +36,5 @@ public interface SpaceTechEngine {
 
     boolean isUserAtStation(User user, Station station);
 
-    public boolean isUserAtStation(User user);
+    boolean isUserAtStation(User user);
 }

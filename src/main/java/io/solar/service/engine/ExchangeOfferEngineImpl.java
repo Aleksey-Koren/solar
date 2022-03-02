@@ -50,7 +50,7 @@ public class ExchangeOfferEngineImpl implements ExchangeOfferEngine {
 
         productEngine.addProductToSpaceTech(starship, offer.getProduct(), productQuantity);
 
-        if (offer.getProductAmount() - productQuantity > 0) {
+        if (offer.getProductAmount() > productQuantity) {
             //TODO: implement drop to space product functionality
         }
     }
@@ -93,11 +93,10 @@ public class ExchangeOfferEngineImpl implements ExchangeOfferEngine {
         if (freeSpaceshipVolume == 0) {
             return 0L;
         }
-
         float totalProductVolume = offer.getProduct().getBulk() * offer.getProductAmount();
-        float residualVolume = totalProductVolume - freeSpaceshipVolume;
 
-        if (residualVolume > 0) {
+        if (totalProductVolume > freeSpaceshipVolume) {
+            float residualVolume = totalProductVolume - freeSpaceshipVolume;
             long excessProductQuantity = Math.round(residualVolume / offer.getProduct().getBulk());
             return offer.getProductAmount() - excessProductQuantity;
         }

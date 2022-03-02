@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -28,13 +29,21 @@ public class Goods {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "owner")
-    private BasicObject owner;
-
-    @ManyToOne
     @JoinColumn(name = "product")
     private Product product;
 
     private Long amount;
-    private Long price;
+
+    @ManyToOne
+    @JoinColumn(name = "owner")
+    private BasicObject owner;
+
+    private Long buyPrice;
+    private Long sellPrice;
+
+    @Column(name = "available_for_sale")
+    private Boolean isAvailableForSale;
+
+    @Column(name = "available_for_buy")
+    private Boolean isAvailableForBuy;
 }

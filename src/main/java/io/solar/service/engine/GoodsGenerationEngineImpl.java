@@ -37,15 +37,18 @@ public class GoodsGenerationEngineImpl implements GoodsGenerationEngine {
                             .owner(station)
                             .product(product)
                             .amount(0L)
-                            .price(0L)
+                            .buyPrice(0L)
+                            .sellPrice(0L)
+                            .isAvailableForSale(true)
+                            .isAvailableForBuy(true)
                             .build();
                     station.getGoods().add(goods);
-                }else{
+                } else {
                     goods = goodsOptional.get();
                 }
 
                 boolean stillEnoughVolume = addAmount(product, amount, goods, station);
-                if(!stillEnoughVolume) {
+                if (!stillEnoughVolume) {
                     break;
                 }
             }
@@ -64,10 +67,10 @@ public class GoodsGenerationEngineImpl implements GoodsGenerationEngine {
         float maxVolumeProportion = spaceTechEngine.calculateTotalVolume(station) / station.getGoods().size();
 
         for (Goods goods : station.getGoods()) {
-            float volumeRatio = maxVolumeValue/goods.getProduct().getVolume();
+            float volumeRatio = maxVolumeValue / goods.getProduct().getVolume();
             float maxVolumeCorrectedWithVolumeRatio = maxVolumeProportion / volumeRatio;
             long newPrice = recalculatePrice(goods, maxVolumeCorrectedWithVolumeRatio);
-            goods.setPrice(newPrice);
+            goods.setSellPrice(newPrice);
         }
     }
 
@@ -77,15 +80,15 @@ public class GoodsGenerationEngineImpl implements GoodsGenerationEngine {
     }
 
     private boolean addAmount(Product product, Long amount, Goods goods, Station station) {
-            float freeVolume = spaceTechEngine.calculateFreeAvailableVolume(station);
-            float producedGoodsVolume = product.getVolume() * amount;
-            if (freeVolume >= producedGoodsVolume) {
-                goods.setAmount(goods.getAmount() + amount);
-                return true;
-            } else {
-                goods.setAmount(goods.getAmount() + (int) (freeVolume/product.getVolume()));
-                return false;
-            }
+        float freeVolume = spaceTechEngine.calculateFreeAvailableVolume(station);
+        float producedGoodsVolume = product.getVolume() * amount;
+        if (freeVolume >= producedGoodsVolume) {
+            goods.setAmount(goods.getAmount() + amount);
+            return true;
+        } else {
+            goods.setAmount(goods.getAmount() + (int) (freeVolume / product.getVolume()));
+            return false;
+        }
     }
 
     private static Float retrieveRandomInRange(double from, double to) {

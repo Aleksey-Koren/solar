@@ -4,7 +4,6 @@ import io.solar.dto.shop.ProductPriceDto;
 import io.solar.dto.shop.ShopDto;
 import io.solar.dto.transfer.TransferProductsDto;
 import io.solar.entity.Goods;
-import io.solar.entity.Product;
 import io.solar.entity.User;
 import io.solar.entity.objects.StarShip;
 import io.solar.entity.objects.Station;
@@ -20,7 +19,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -38,17 +37,19 @@ public class ProductShopFacade {
                 .stream()
                 .map(s -> TransferProductsDto.builder()
                         .productId(s.getProductId())
-                        .productAmount(s.getQuantity()).build())
+                        .productAmount(s.getQuantity())
+                        .price(s.getPrice())
+                        .build())
                 .toList();
 
         Station station = stationService.getById(user.getLocation().getAttachedToShip().getId());
         StarShip spaceship = starshipService.getById(user.getLocation().getId());
 
-        if (!isProductsPriceActual(station, dto)) {
+        if (!productEngine.isProductsPriceActual(products, station)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Shop prices have been updated");
         }
 
-        long purchasePrice = calculatePurchasePrice(products);
+        long purchasePrice = calculatePurchasePrice(products, station);
 
         productEngine.transferProducts(station, spaceship, products);
 
@@ -60,6 +61,9 @@ public class ProductShopFacade {
     }
 
     public void sellProducts(User user, List<ShopDto> dto) {
+        Station station = stationService.getById(user.getLocation().getAttachedToShip().getId());
+        StarShip spaceship = starshipService.getById(user.getLocation().getId());
+
         List<TransferProductsDto> products = dto
                 .stream()
                 .map(s -> TransferProductsDto.builder()
@@ -67,63 +71,52 @@ public class ProductShopFacade {
                         .productAmount(s.getQuantity()).build())
                 .toList();
 
-        Station station = stationService.getById(user.getLocation().getAttachedToShip().getId());
-        StarShip spaceship = starshipService.getById(user.getLocation().getId());
+        if (!productEngine.isProductsAreBought(products, station)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Not all products are bought");
+        }
 
         productEngine.transferProducts(spaceship, station, products);
-
         userService.increaseUserBalance(user, calculateTotalSellPrice(station, products));
+
     }
 
     public List<ProductPriceDto> getProductsSellPrices(User user, List<Long> productsIds) {
         Station station = stationService.getById(user.getLocation().getAttachedToShip().getId());
-        List<Long> stationProductIds = getStationGoodsIds(station);
 
         return productsIds.stream()
-                .map(productId -> new ProductPriceDto(productId, calculateProductSellPrice(stationProductIds, productId)))
+                .map(productId -> new ProductPriceDto(productId, calculateProductSellPrice(station, productId)))
                 .toList();
     }
 
     private long calculateTotalSellPrice(Station station, List<TransferProductsDto> products) {
-        List<Long> stationProductsIds = getStationGoodsIds(station);
 
         return products.stream()
-                .map(product -> calculateProductSellPrice(stationProductsIds, product.getProductId()) * product.getProductAmount())
+                .map(product -> calculateProductSellPrice(station, product.getProductId()) * product.getProductAmount())
                 .mapToLong(Long::longValue)
                 .sum();
     }
 
-    private long calculateProductSellPrice(List<Long> stationProductsIds, Long productId) {
+    /**
+     * return -1 if the station does not buy this product
+     */
+    private long calculateProductSellPrice(Station station, Long productId) {
+        Optional<Goods> goodsOptional = goodsService.findByOwnerAndProductId(station, productId);
 
-        return (long) (stationProductsIds.contains(productId)
-                ? Math.floor(productService.getById(productId).getPrice() * 0.5)
-                : Math.floor(productService.getById(productId).getPrice() * 0.7));
-    }
+        if (goodsOptional.isPresent()) {
+            Goods goods = goodsOptional.get();
 
-    private long calculatePurchasePrice(List<TransferProductsDto> products) {
-
-        return products.stream()
-                .map(product -> productService.getById(product.getProductId()).getPrice() * product.getProductAmount())
-                .mapToLong(Long::longValue)
-                .sum();
-    }
-
-    private List<Long> getStationGoodsIds(Station station) {
-
-        return station.getGoods()
-                .stream()
-                .map(goods -> goods.getProduct().getId())
-                .toList();
-    }
-
-    private boolean isProductsPriceActual(Station station, List<ShopDto> products) {
-        for (ShopDto dto : products) {
-            Goods goods = goodsService.getByOwnerAndProductId(station, dto.getProductId());
-            if (!dto.getPrice().equals(goods.getPrice())) {
-                return false;
-            }
+            return goods.getIsAvailableForBuy()
+                    ? goods.getBuyPrice()
+                    : -1;
         }
+        return productService.getById(productId).getPrice();
+    }
 
-        return true;
+    private long calculatePurchasePrice(List<TransferProductsDto> products, Station station) {
+
+        return products.stream()
+                .map(product -> goodsService.getByOwnerAndProductId(station, product.getProductId()).getSellPrice() * product.getProductAmount())
+                .mapToLong(Long::longValue)
+                .sum();
     }
 }

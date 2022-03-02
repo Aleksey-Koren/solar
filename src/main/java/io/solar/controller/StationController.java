@@ -1,8 +1,10 @@
 package io.solar.controller;
 
+import io.solar.dto.GoodsDto;
 import io.solar.dto.Option;
 import io.solar.dto.object.BasicObjectViewDto;
 import io.solar.dto.object.StationDto;
+import io.solar.entity.User;
 import io.solar.facade.StationFacade;
 import io.solar.service.StationService;
 import io.solar.service.UserService;
@@ -50,7 +52,7 @@ public class StationController {
         return stationFacade.save(dto);
     }
 
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('EDIT_STATION', 'PLAY_THE_GAME')")
     @Transactional
     public ResponseEntity<StationDto> get(@PathVariable("id") Long id) {
@@ -65,14 +67,23 @@ public class StationController {
         return stationFacade.findAll(pageable, stationFilter);
     }
 
-    @DeleteMapping("{id}")
+    @PatchMapping("/{stationId}")
+    @PreAuthorize("hasAnyAuthority('EDIT_STATION', 'PLAY_THE_GAME')")
+    @Transactional
+    public void updateGoods(@PathVariable Long stationId, @RequestBody List<GoodsDto> goods, Principal principal) {
+        User user = userService.findByLogin(principal.getName());
+
+        stationFacade.updateGoods(stationId, goods, user);
+    }
+
+    @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('EDIT_STATION')")
     @Transactional
     public void delete(@PathVariable("id") Long id) {
         stationService.deleteById(id);
     }
 
-    @GetMapping("utils/dropdown")
+    @GetMapping("/utils/dropdown")
     public List<Option> dropdown() {
         return stationService.findAll()
                 .stream()
@@ -91,13 +102,9 @@ public class StationController {
     @PatchMapping("/{id}/inventory/detachment")
     @PreAuthorize("hasAnyAuthority('PLAY_THE_GAME')")
     @Transactional
-    public void takeFromInventory(@PathVariable("id") Long stationId ,List<BasicObjectViewDto> dto, Principal principal) {
+    public void takeFromInventory(@PathVariable("id") Long stationId, List<BasicObjectViewDto> dto, Principal principal) {
 
         stationFacade.moveFromStationToOwner(stationId, dto, principal);
-    }
-
-    public void updateGoods() {
-        //TODO implement this methods;
     }
 
     @Scheduled(fixedDelayString = "#{@appProperties.getGoodsGenerationDelayMinutes()}",

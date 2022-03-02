@@ -2,7 +2,6 @@ package io.solar.service;
 
 import io.solar.entity.Goods;
 import io.solar.entity.Product;
-import io.solar.entity.User;
 import io.solar.entity.objects.BasicObject;
 import io.solar.repository.GoodsRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,9 +22,14 @@ public class GoodsService {
         return goodsRepository.findByOwnerAndProduct(owner, product);
     }
 
-    public Goods getByOwnerAndProductId(BasicObject owner, Long productId) {
+    public Optional<Goods> findByOwnerAndProductId(BasicObject owner, Long productId) {
 
         return goodsRepository.findByOwnerAndProductId(owner, productId);
+    }
+
+    public Goods getByOwnerAndProductId(BasicObject owner, Long productId) {
+
+        return goodsRepository.getByOwnerAndProductId(owner, productId);
     }
 
     public Goods getByOwnerAndProduct(BasicObject owner, Product product) {

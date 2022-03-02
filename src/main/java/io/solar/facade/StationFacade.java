@@ -1,11 +1,15 @@
 package io.solar.facade;
 
+import io.solar.dto.GoodsDto;
 import io.solar.dto.object.BasicObjectViewDto;
 import io.solar.dto.object.StationDto;
+import io.solar.entity.Goods;
 import io.solar.entity.User;
 import io.solar.entity.objects.BasicObject;
 import io.solar.entity.objects.Station;
 import io.solar.mapper.StationMapper;
+import io.solar.multithreading.StationMonitor;
+import io.solar.service.GoodsService;
 import io.solar.service.StationService;
 import io.solar.service.UserService;
 import io.solar.service.engine.interfaces.SpaceTechEngine;
@@ -22,6 +26,7 @@ import org.springframework.stereotype.Service;
 import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,9 +34,11 @@ import java.util.Optional;
 public class StationFacade {
 
     private final StationService stationService;
+    private final StationMonitor stationMonitor;
     private final StationMapper stationMapper;
     private final UserService userService;
     private final BasicObjectService basicObjectService;
+    private final GoodsService goodsService;
     private final SpaceTechEngine spaceTechEngine;
     private final InventoryEngine inventoryEngine;
 
@@ -49,7 +56,7 @@ public class StationFacade {
         return stationMapper.toDto(stationService.save(stationMapper.toEntity(dto)));
     }
 
-    public void moveFromOwnerToStation(Long stationId , List<BasicObjectViewDto> dto, Principal principal) {
+    public void moveFromOwnerToStation(Long stationId, List<BasicObjectViewDto> dto, Principal principal) {
         User user = userService.findByLogin(principal.getName());
         Station station = stationService.getById(stationId);
         List<BasicObject> items = dto.stream()
@@ -58,7 +65,7 @@ public class StationFacade {
         inventoryEngine.moveFromOwnerToStation(items, user, station);
     }
 
-    public void moveFromStationToOwner(Long stationId , List<BasicObjectViewDto> dto, Principal principal) {
+    public void moveFromStationToOwner(Long stationId, List<BasicObjectViewDto> dto, Principal principal) {
         User user = userService.findByLogin(principal.getName());
         Station station = stationService.getById(stationId);
         List<BasicObject> items = dto.stream()
@@ -66,4 +73,32 @@ public class StationFacade {
                 .toList();
         inventoryEngine.moveFromStationToOwner(items, user, station);
     }
+
+    public void updateGoods(Long stationId, List<GoodsDto> goodsDtoList, User user) {
+        Station station = stationService.getById(stationId);
+
+        if (spaceTechEngine.isUserAtStation(user, station) && spaceTechEngine.isUserOwnsThisSpaceTech(user, station)) {
+
+            synchronized (stationMonitor.getMonitor(stationId)) {
+                List<Goods> updatedGoods = goodsDtoList.stream()
+                        .map(this::updateGoodsByDto)
+                        .collect(Collectors.toList());
+
+                station.setGoods(updatedGoods);
+                stationService.save(station);
+            }
+        }
+    }
+
+    private Goods updateGoodsByDto(GoodsDto goodsDto) {
+        Goods goods = goodsService.getById(goodsDto.getId());
+
+        goods.setSellPrice(goodsDto.getSellPrice());
+        goods.setBuyPrice(goodsDto.getBuyPrice());
+        goods.setIsAvailableForSale(goodsDto.getIsAvailableForSale());
+        goods.setIsAvailableForBuy(goodsDto.getIsAvailableForBuy());
+
+        return goods;
+    }
+
 }
