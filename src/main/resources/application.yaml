@@ -14,9 +14,6 @@ spring:
             maximum-pool-size: 50
 
     flyway:
-        url: ${solar_db_url}
-        user: ${solar_db_user}
-        password: ${solar_db_pass}
         encoding: UTF-8
         out-of-order: true
         enabled: true

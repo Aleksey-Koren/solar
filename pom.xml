@@ -21,6 +21,7 @@
         <flyway.baselineOnMigrate>true</flyway.baselineOnMigrate>
         <flyway.baselineVersion>0</flyway.baselineVersion>
         <jUnit.version>5.8.2</jUnit.version>
+        <testcontainers-version>1.16.3</testcontainers-version>
     </properties>
 
     <parent>
@@ -181,12 +182,36 @@
             <artifactId>flyway-core</artifactId>
             <version>8.0.4</version>
         </dependency>
+
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>30.1.1-jre</version>
             <scope>compile</scope>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.testcontainers/mariadb -->
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>mariadb</artifactId>
+            <version>${testcontainers-version}</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.testcontainers/junit-jupiter -->
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${testcontainers-version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers</artifactId>
+            <version>${testcontainers-version}</version>
+            <scope>test</scope>
+        </dependency>
+
 
     </dependencies>
 </project>

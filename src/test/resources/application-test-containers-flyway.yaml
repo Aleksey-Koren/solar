@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    url: jdbc:tc:mariadb:10.6:////solar
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+    username: user
+    password: password
+
+  flyway:
+    encoding: UTF-8
+    out-of-order: true
+    enabled: true
+    baseline-on-migrate: true
+    baseline-version: 0
+
