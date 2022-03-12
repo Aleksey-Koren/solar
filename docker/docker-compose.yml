@@ -1,0 +1,28 @@
+version: "3.7"
+
+services:
+
+    database:
+        container_name: db
+        image: mariadb
+        restart: unless-stopped
+        environment:
+            MARIADB_ROOT_PASSWORD: root
+            MARIADB_DATABASE: solar
+            MARIADB_USER: root
+            MARIADB_PASSWORD: root
+            MARIADB_ROOT_HOST: jdbc:mariadb://localhost:3306/solar?useSSL=false&serverTimezone=UTC
+        ports:
+            - "33606:3306"
+
+    solar:
+        container_name: app
+        image: app
+        environment:
+            solar_db_user: root
+            solar_db_pass: root
+            solar_db_url: "jdbc:mariadb://db:3306/solar?useSSL=false&serverTimezone=UTC"
+            solar_token_secret: secrettoken
+        restart: unless-stopped
+        ports:
+            - "8081:8081"
