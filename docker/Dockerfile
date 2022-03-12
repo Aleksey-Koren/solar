@@ -1,3 +1,4 @@
-FROM maven:openjdk-17
-COPY solar-1.0-SNAPSHOT.jar /home/solar-1.0-SNAPSHOT.jar
-CMD ["java","-jar","/home/solar-1.0-SNAPSHOT.jar"]
+FROM maven:3.8.4-openjdk-17
+COPY . /home/solar/
+RUN cd /home/solar && mvn clean package -Dmaven.test.skip
+CMD ["java","-jar","/home/solar/target/solar-1.0-SNAPSHOT.jar"]
