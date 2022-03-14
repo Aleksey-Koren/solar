@@ -13,6 +13,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ExchangeMapper {
 
+
+
     private final ExchangeOfferMapper exchangeOfferMapper;
     private final UserMapper userMapper;
 
