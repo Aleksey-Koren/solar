@@ -24,7 +24,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
-@Service
+//@Service
 @RequiredArgsConstructor
 public class ObjectCoordinatesService {
     private final String POSITION_ITERATION_UTILITY_KEY = "position_iteration";
