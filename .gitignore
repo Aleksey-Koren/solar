@@ -2,6 +2,5 @@
 target/
 *.iml
 #src/main/java/io/solar/Test.java
-docker/
 src/main/resources/public/11.html
 #notes.txt
