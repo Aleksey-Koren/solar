@@ -26,7 +26,6 @@ import java.util.List;
 
 //@Service
 @RequiredArgsConstructor
-
 public class ObjectCoordinatesService {
     private final String POSITION_ITERATION_UTILITY_KEY = "position_iteration";
     private final String SCHEDULER_TIME_UTILITY_KEY = "scheduler_time";
