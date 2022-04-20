@@ -10,4 +10,5 @@ import lombok.Setter;
 public class TransferProductsDto {
     private Long productId;
     private Integer productAmount;
+    private Long price;
 }

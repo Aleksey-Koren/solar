@@ -137,7 +137,7 @@ public class UserService implements UserDetailsService {
     public void registerHackAttempt(User user) {
         user.setHackAttempts(user.getHackAttempts() + 1);
         if (user.getHackAttempts() > 4) {
-            user.setHackBlock(Instant.now().plusSeconds(HACK_BLOCK_TIME_MIN * 60));
+            user.setHackBlock(Instant.now().plusSeconds(/*HACK_BLOCK_TIME_MIN * 60*/ 20));
         }
         userRepository.save(user);
     }

@@ -12,35 +12,57 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class GoodsMapper {
+public class GoodsMapper implements EntityDtoMapper<Goods, GoodsDto> {
 
     private final BasicObjectService basicObjectService;
     private final ProductService productService;
     private final GoodsService goodsService;
 
-    public GoodsDto toDto(Goods goods) {
-        GoodsDto dto = new GoodsDto();
-        dto.setId(goods.getId());
-        dto.setStation(goods.getOwner() != null ? goods.getOwner().getId() : null);
-        dto.setProduct(goods.getProduct() != null ? goods.getProduct().getId() : null);
-        dto.setAmount(goods.getAmount());
-        dto.setPrice(goods.getPrice());
-        return dto;
+    @Override
+    public Goods toEntity(GoodsDto dto) {
+
+        return dto.getId() == null
+                ? createGoods(dto)
+                : updateGoods(dto);
     }
 
-    public Goods toEntity(GoodsDto dto) {
-        BasicObject owner = basicObjectService.getById(dto.getStation());
-        Product product = productService.getById(dto.getProduct());
-        Goods goods;
-        if(dto.getId() != null) {
-            goods = goodsService.getById(dto.getId());
-        }else{
-            goods = new Goods();
-            goods.setOwner(owner);
-            goods.setProduct(product);
-        }
-        goods.setAmount(dto.getAmount() != null ? dto.getAmount() : 0);
-        goods.setPrice(dto.getPrice() != null ? dto.getPrice() : 0);
+    @Override
+    public GoodsDto toDto(Goods goods) {
+
+        return GoodsDto.builder()
+                .id(goods.getId())
+                .station(goods.getOwner() != null ? goods.getOwner().getId() : null)
+                .product(goods.getProduct() != null ? goods.getProduct().getId() : null)
+                .amount(goods.getAmount())
+                .buyPrice(goods.getBuyPrice())
+                .sellPrice(goods.getSellPrice())
+                .isAvailableForBuy(goods.getIsAvailableForBuy())
+                .isAvailableForSale(goods.getIsAvailableForSale())
+                .build();
+    }
+
+    private Goods createGoods(GoodsDto dto) {
+
+        return Goods.builder()
+                .owner(basicObjectService.getById(dto.getStation()))
+                .product(productService.getById(dto.getProduct()))
+                .amount(dto.getAmount())
+                .buyPrice(dto.getBuyPrice())
+                .sellPrice(dto.getSellPrice())
+                .isAvailableForBuy(dto.getIsAvailableForBuy())
+                .isAvailableForSale(dto.getIsAvailableForSale())
+                .build();
+    }
+
+    private Goods updateGoods(GoodsDto dto) {
+        Goods goods = goodsService.getById(dto.getId());
+
+        goods.setAmount(dto.getAmount());
+        goods.setBuyPrice(dto.getBuyPrice());
+        goods.setSellPrice(dto.getSellPrice());
+        goods.setIsAvailableForBuy(dto.getIsAvailableForBuy());
+        goods.setIsAvailableForSale(dto.getIsAvailableForSale());
+
         return goods;
     }
 }

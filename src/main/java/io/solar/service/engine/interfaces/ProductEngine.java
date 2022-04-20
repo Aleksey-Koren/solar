@@ -6,6 +6,7 @@ import io.solar.entity.Goods;
 import io.solar.entity.Product;
 import io.solar.entity.interfaces.SpaceTech;
 import io.solar.entity.objects.StarShip;
+import io.solar.entity.objects.Station;
 
 import java.util.List;
 import java.util.Map;
@@ -17,4 +18,8 @@ public interface ProductEngine {
     Map<Long, Goods> createProductGoodsMap(SpaceTech spaceTech);
 
     void addProductToSpaceTech(StarShip starship, Product product, Long productAmount);
+
+    boolean isProductsAreBought(List<TransferProductsDto> products, Station station);
+
+    boolean isProductsPriceActual(List<TransferProductsDto> products, Station station);
 }

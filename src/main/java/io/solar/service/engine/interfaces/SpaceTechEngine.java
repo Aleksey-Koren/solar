@@ -14,9 +14,9 @@ public interface SpaceTechEngine {
 
     Integer calculateMass(SpaceTech spaceTech);
 
-    float calculateMaxThrust(SpaceTech spaceTech);
+    double calculateMaxThrust(SpaceTech spaceTech);
 
-    float calculateMaxAcceleration(SpaceTech spaceTech);
+    double calculateMaxAcceleration(SpaceTech spaceTech);
 
     float calculateTotalVolume(SpaceTech spaceTech);
 
@@ -36,5 +36,5 @@ public interface SpaceTechEngine {
 
     boolean isUserAtStation(User user, Station station);
 
-    public boolean isUserAtStation(User user);
+    boolean isUserAtStation(User user);
 }

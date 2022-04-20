@@ -11,5 +11,7 @@ public interface GoodsRepository extends JpaRepository<Goods, Long> {
 
     Optional<Goods> findByOwnerAndProduct(BasicObject ownew, Product product);
 
-    Goods findByOwnerAndProductId(BasicObject owner, Long productId);
+    Optional<Goods> findByOwnerAndProductId(BasicObject owner, Long productId);
+
+    Goods getByOwnerAndProductId(BasicObject owner, Long productId);
 }

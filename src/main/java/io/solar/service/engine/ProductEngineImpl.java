@@ -1,12 +1,12 @@
 package io.solar.service.engine;
 
-import io.solar.dto.shop.ShopDto;
 import io.solar.dto.transfer.TransferProductsDto;
 import io.solar.entity.Goods;
 import io.solar.entity.Product;
 import io.solar.entity.interfaces.SpaceTech;
 import io.solar.entity.objects.BasicObject;
 import io.solar.entity.objects.StarShip;
+import io.solar.entity.objects.Station;
 import io.solar.multithreading.StationMonitor;
 import io.solar.service.GoodsService;
 import io.solar.service.ProductService;
@@ -79,6 +79,24 @@ public class ProductEngineImpl implements ProductEngine {
         }
 
         goodsService.save(goods);
+    }
+
+    @Override
+    public boolean isProductsAreBought(List<TransferProductsDto> products, Station station) {
+        return products.stream()
+                .noneMatch(product -> goodsService.getByOwnerAndProductId(station, product.getProductId()).getIsAvailableForBuy());
+    }
+
+    @Override
+    public boolean isProductsPriceActual(List<TransferProductsDto> products, Station station) {
+        for (TransferProductsDto dto : products) {
+            Goods goods = goodsService.getByOwnerAndProductId(station, dto.getProductId());
+            if (!dto.getPrice().equals(goods.getSellPrice())) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     @Override

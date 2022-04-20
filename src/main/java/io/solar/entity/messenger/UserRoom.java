@@ -1,22 +1,23 @@
 package io.solar.entity.messenger;
 
 import io.solar.entity.User;
+import io.solar.listener.UserRoomListener;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.context.event.EventListener;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.IdClass;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import java.io.Serializable;
 import java.time.Instant;
 
 @Entity
@@ -25,6 +26,7 @@ import java.time.Instant;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@EntityListeners(UserRoomListener.class)
 public class UserRoom {
 
     @Id
@@ -48,7 +50,5 @@ public class UserRoom {
     public UserRoom(User user, Room room) {
         this.user = user;
         this.room = room;
-        this.subscribedAt = Instant.now();
-        this.lastSeenAt = Instant.now();
     }
 }

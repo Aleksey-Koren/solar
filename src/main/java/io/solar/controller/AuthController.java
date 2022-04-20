@@ -1,10 +1,9 @@
 package io.solar.controller;
 
 
-import io.solar.dto.BlockedToken;
 import io.solar.dto.ChangePasswordDto;
 import io.solar.dto.Register;
-import io.solar.dto.Token;
+import io.solar.dto.TokenDto;
 import io.solar.dto.UserDto;
 import io.solar.entity.User;
 import io.solar.mapper.UserMapper;
@@ -49,20 +48,20 @@ public class AuthController {
         }
 
         userFromClient = userService.registerNewUser(userFromClient, Role.USER);
-        Token token = createToken(userFromClient);
+        TokenDto token = createToken(userFromClient);
 
         return new Register(true, token.getData(), "");
     }
 
     @Transactional
     @PostMapping("/login")
-    public Token login(@RequestBody UserDto dto) {
+    public TokenDto login(@RequestBody UserDto dto) {
         User userFromClient = userMapper.toEntity(dto);
         User userFromDb = userService.findByLogin(userFromClient.getLogin());
         if (userFromDb != null) {
             Instant now = Instant.now();
             if (isHackBlocked(userFromDb, now)) {
-                return new BlockedToken(userFromDb.getHackBlock().toEpochMilli() - now.toEpochMilli());
+                return new TokenDto(userFromDb.getHackBlock().toEpochMilli() - now.toEpochMilli());
             }
             if (userService.matchPasswords(userFromClient, userFromDb)) {
                 if (userFromDb.getHackAttempts() != null && userFromDb.getHackAttempts() > 0) {
@@ -74,7 +73,7 @@ public class AuthController {
                 userService.registerHackAttempt(userFromDb);
             }
         }
-        return new Token();
+        return new TokenDto();
     }
 
     @PostMapping("/account/password")
@@ -93,7 +92,7 @@ public class AuthController {
 
     @PatchMapping("/account/password/change")
     @Transactional
-    public ResponseEntity<Token> changePassword(@RequestBody ChangePasswordDto changePasswordDto) {
+    public ResponseEntity<TokenDto> changePassword(@RequestBody ChangePasswordDto changePasswordDto) {
         User user = userService.changePassword(changePasswordDto);
 
         return ResponseEntity.ok(createToken(user));
@@ -101,10 +100,10 @@ public class AuthController {
 
     @GetMapping("/refresh")
     @Transactional
-    public Token refresh(@RequestHeader("auth_token") String token) {
+    public TokenDto refresh(@RequestHeader("auth_token") String token) {
         Optional<User> out = jwtProvider.verifyToken(token);
 
-        return out.map(this::createToken).orElseGet(Token::new);
+        return out.map(this::createToken).orElseGet(TokenDto::new);
     }
 
     private boolean isHackBlocked(User userFromDb, Instant now) {
@@ -112,10 +111,8 @@ public class AuthController {
         return userFromDb.getHackBlock() != null && now.isBefore(userFromDb.getHackBlock());
     }
 
-    private Token createToken(User user) {
-        Token out = new Token();
-        out.setData(jwtProvider.generateToken(user));
-        return out;
+    private TokenDto createToken(User user) {
+        return new TokenDto(jwtProvider.generateToken(user));
     }
 
     public static boolean hasPermissions(List<String> permissions) {

@@ -14,9 +14,6 @@ spring:
             maximum-pool-size: 50
 
     flyway:
-        url: ${solar_db_url}
-        user: ${solar_db_user}
-        password: ${solar_db_pass}
         encoding: UTF-8
         out-of-order: true
         enabled: true
@@ -26,7 +23,7 @@ spring:
     jpa:
         properties:
             hibernate:
-                show_sql: true
+                show_sql: false
                 format_sql: true
                 use_sql_comments: true
                 ddl-auto: validate
@@ -109,7 +106,7 @@ log4jdbc:
 logging:
     level:
         jdbc:
-            sqlonly: "INFO"
+            sqlonly: "OFF"
             sqltiming: "OFF"
             audit: "OFF"
             resultset: "OFF"

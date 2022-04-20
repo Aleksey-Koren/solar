@@ -3,26 +3,13 @@ TODO
 
     ** Create station monitor during creating station //todo need create
 
-    Для админа:
+    Questions to Roma:
+    1. applyModification(). Where should be placed? (witch controller?).
+    2. fields validation. Can we use Hibernate validator?
 
-    CRUD
-    1. io.solar.controller.modification.ModificationController with CRUD methods and 'EDIT_MODIFICATIONS' permission. Not for simple users.
-    5. applyModification()    "api/inventory-item/{id}/modification" PATCH...
-    6. Create ModificationTypeController and CRUD methods in it. With 'EDIT_MODIFICATIONS' permission. Not for simple users.
-    7. Create ModificationPriceController with CRUD and findAll(Pageable, Filter filter). +++
-
-    -----------------------------------------------------------------------------------
-                                   ++ 2. prices and price_products DDL
-                                   ++ 3. refactor calculateSellPrice in inventoryShopFacade(), StarShipShopFacade()
-                                   ++ 4. modification_types DDL  (id INT, title VARCHAR)
-                                   ++ 5. Create ModificationPrice DDL, entities, service and repo.
+    StarShip repair at station.
 
 
-
-    Item is in inventory,
-    user's starship is at station.
-    station can do this modification
-    user has enough credits and resources.
 
 
 

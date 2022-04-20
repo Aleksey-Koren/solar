@@ -35,15 +35,15 @@ public class CourseFacade {
     }
 
     private void checkAccelLimit(Course course, StarShip starship) {
-        float maxAccel = spaceTechEngine.calculateMaxAcceleration(starship);
-        float courseAccel = (float) calculateAcceleration(course.getAccelerationX(), course.getAccelerationY());
+        double maxAccel = spaceTechEngine.calculateMaxAcceleration(starship);
+        double courseAccel = calculateAcceleration(course.getAccelerationX(), course.getAccelerationY());
         if (courseAccel > maxAccel) {
-            float accelDelta = maxAccel/courseAccel;
+            double accelDelta = maxAccel/courseAccel;
             decreaseCourseAcceleration(course, accelDelta);
         }
     }
 
-    private void decreaseCourseAcceleration(Course course, float accelDelta) {
+    private void decreaseCourseAcceleration(Course course, double accelDelta) {
         course.setAccelerationX(course.getAccelerationX() * accelDelta);
         course.setAccelerationY(course.getAccelerationY() * accelDelta);
     }
