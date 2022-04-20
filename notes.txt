@@ -3,23 +3,13 @@ TODO
 
     ** Create station monitor during creating station //todo need create
 
-    +++ 1   Station owner should be able to manage station goods shop:
-         1.1 Should be able to change buy/sell price for goods at station.
-         1.2 Should be able to put up for sale/remove from sale goods
-
-   +++ 2   2.1 Add columns to goods table: buy_price Long default 0 ; available for sale boolean ; available for buy boolean
-        2.2 Alter column price to sell_price
-        2.3. Refactor goods mapper, entity and dto
-
-   +++ 3   StationController.updateGoods().
-
-   +++ 4   Refactor productShopFacade logic after above changes.
-
-    test jenkins
-
     Questions to Roma:
     1. applyModification(). Where should be placed? (witch controller?).
     2. fields validation. Can we use Hibernate validator?
+
+    StarShip repair at station.
+
+
 
 
 

@@ -83,11 +83,10 @@ public class User {
     @ToString.Exclude
     private List<ExchangeOffer> exchangeOffers;
 
-
     public static UserDetails retrieveUserDetails(User user) {
         return new org.springframework.security.core.userdetails.User(
-                user.getLogin(), user.getPassword(),
-                true, true, true, true,
+                user.getLogin(),
+                user.getPassword(),
                 user.getPermissions().stream()
                         .map(permission -> new SimpleGrantedAuthority(permission.getTitle()))
                         .collect(toSet())
