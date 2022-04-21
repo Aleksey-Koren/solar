@@ -298,7 +298,8 @@ UPDATE objects o
     SET o.durability = (SELECT otd.durability FROM object_type_description otd WHERE otd.id = o.hull_id);
 
     UPDATE objects o
-        SET o.title = (SELECT otd.title FROM object_type_description otd WHERE otd.id = o.hull_id);
+        SET o.title = (SELECT otd.title FROM object_type_description otd WHERE otd.id = o.hull_id)
+    WHERE o.hull_id != 84;
 
 UPDATE objects o
     SET status = 'ATTACHED_TO' WHERE o.attached_to_ship IS NOT NULL;
