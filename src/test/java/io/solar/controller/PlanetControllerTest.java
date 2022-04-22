@@ -57,12 +57,12 @@ public class PlanetControllerTest {
     @Spy
     private PlanetMapper planetMapper;
 
-    @BeforeEach
-    private void setup() {
-        this.mockMvc = MockMvcBuilders.standaloneSetup(new PlanetController(planetService, planetMapper))
-                                        .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
-                                        .build();
-    }
+//    @BeforeEach
+//    private void setup() {
+//        this.mockMvc = MockMvcBuilders.standaloneSetup(new PlanetController(planetService, planetMapper))
+//                                        .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
+//                                        .build();
+//    }
 
     @Test
     @WithMockUser(authorities = {"PLAY_THE_GAME", "EDIT_PLANET"})
@@ -70,7 +70,7 @@ public class PlanetControllerTest {
         long planetId = 500;
         Planet mockPlanet = new Planet();
         mockPlanet.setId(planetId);
-        when(planetService.findById(planetId)).thenReturn(mockPlanet);
+        when(planetService.getById(planetId)).thenReturn(mockPlanet);
 
         MvcResult mvcResult = mockMvc.perform(get("/api/planet/{id}", planetId).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk()).andReturn();

@@ -10,7 +10,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 public class PlanetFilter {
-
-    List<Long> ids;
-
+    private List<Long> ids;
+    private String[] types;
+    private Long parentId;
 }
