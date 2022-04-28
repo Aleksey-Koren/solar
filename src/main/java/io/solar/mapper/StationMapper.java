@@ -42,7 +42,7 @@ public class StationMapper {
 
         station.setId(dto.getId());
         station.setTitle(dto.getTitle());
-        station.setPlanet(dto.getPlanet() != null ? planetService.findById(dto.getPlanet()) : null);
+        station.setPlanet(dto.getPlanet() != null ? planetService.getById(dto.getPlanet()) : null);
         station.setPopulation(dto.getPopulation());
         station.setFraction(dto.getFraction());
         station.setX(dto.getX());

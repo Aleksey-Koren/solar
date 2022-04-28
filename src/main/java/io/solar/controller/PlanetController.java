@@ -1,6 +1,7 @@
 package io.solar.controller;
 
 import io.solar.dto.PlanetDto;
+import io.solar.facade.PlanetFacade;
 import io.solar.mapper.PlanetMapper;
 import io.solar.service.PlanetService;
 import io.solar.specification.filter.PlanetFilter;
@@ -24,31 +25,30 @@ import java.util.stream.Collectors;
 public class PlanetController {
 
     private final PlanetService planetService;
-    private final PlanetMapper planetMapper;
+    private final PlanetFacade planetFacade;
 
     @Transactional
     @PreAuthorize("hasAuthority('EDIT_PLANET')")
     @PostMapping
-    public PlanetDto save(@RequestBody PlanetDto dto) {
-        return planetMapper.toDto(planetService.save(planetMapper.toEntity(dto)));
+    public PlanetDto save(@RequestBody PlanetDto planetDto) {
+
+        return planetFacade.save(planetDto);
     }
 
     @Transactional
     @PreAuthorize("hasAnyAuthority('PLAY_THE_GAME', 'EDIT_PLANET')")
     @GetMapping("/{id}")
     public PlanetDto findById(@PathVariable("id") Long id) {
-        return planetMapper.toDto(planetService.findById(id));
+
+        return planetFacade.findById(id);
     }
 
     @Transactional
     @PreAuthorize("hasAnyAuthority('PLAY_THE_GAME', 'EDIT_PLANET')")
     @GetMapping
-    public Page<PlanetDto> findAll(@PageableDefault Pageable pageable, @RequestParam(value = "ids", required = false) List<Long> ids) {
-        if(ids == null || ids.size() == 0) {
-            return planetService.findAll(pageable).map(planetMapper::toDto);
-        }else {
-            return planetService.findAllFiltered(new PlanetFilter(ids), pageable).map(planetMapper::toDto);
-        }
+    public Page<PlanetDto> findAll(@PageableDefault Pageable pageable, PlanetFilter planetFilter) {
+
+        return planetFacade.findAll(planetFilter, pageable);
     }
 
     @Transactional

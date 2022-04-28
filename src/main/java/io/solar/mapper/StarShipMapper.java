@@ -3,10 +3,7 @@ package io.solar.mapper;
 import io.solar.dto.GoodsDto;
 import io.solar.dto.object.StarShipDto;
 import io.solar.entity.Goods;
-import io.solar.entity.inventory.InventorySocket;
-import io.solar.entity.objects.ObjectStatus;
 import io.solar.entity.objects.StarShip;
-import io.solar.service.GoodsService;
 import io.solar.service.PlanetService;
 import io.solar.service.StarShipService;
 import io.solar.service.UserService;
@@ -82,7 +79,7 @@ public class StarShipMapper implements EntityDtoMapper<StarShip, StarShipDto> {
                 ? dto.getGoods().stream().map(goodsMapper::toEntity).toList()
                 : null;
 
-        starShip.setPlanet(dto.getPlanet() != null ? planetService.findById(dto.getPlanet()) : null);
+        starShip.setPlanet(dto.getPlanet() != null ? planetService.getById(dto.getPlanet()) : null);
         starShip.setPopulation(dto.getPopulation());
         starShip.setFraction(dto.getFraction());
         starShip.setTitle(dto.getTitle());
