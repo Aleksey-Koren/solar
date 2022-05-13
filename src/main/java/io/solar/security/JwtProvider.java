@@ -5,6 +5,7 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import io.solar.entity.Permission;
 import io.solar.entity.User;
 import io.solar.repository.UserRepository;
 import io.solar.service.UserService;
@@ -13,8 +14,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtProvider {
@@ -44,6 +48,7 @@ public class JwtProvider {
                     .withIssuer("auth0")
                     .withExpiresAt(new Date(new Date(Instant.now().toEpochMilli()).getTime() + TOKEN_LIFETIME_MIN * 60 * 1000))
                     .withClaim("user_id", user.getId())
+                    .withClaim("roles",user.getPermissions().stream().map(Permission::getTitle).toList())
                     .sign(algorithm);
         } catch (IllegalArgumentException e) {
             throw new RuntimeException(e);
