@@ -25,6 +25,7 @@ public class StationMapper {
     private final StationRepository stationRepository;
     private final ObjectTypeDescriptionRepository objectTypeDescriptionRepository;
     private final PlanetService planetService;
+    private final UserService userService;
     private final BasicObjectRepository basicObjectRepository;
     private final BasicObjectViewMapper basicObjectViewMapper;
     private final ProductionMapper productionMapper;
@@ -42,6 +43,8 @@ public class StationMapper {
 
         station.setId(dto.getId());
         station.setTitle(dto.getTitle());
+        station.setMoney(dto.getMoney());
+        station.setUser(dto.getUserId() != null ? userService.getById(dto.getUserId()) : null);
         station.setPlanet(dto.getPlanet() != null ? planetService.getById(dto.getPlanet()) : null);
         station.setPopulation(dto.getPopulation());
         station.setFraction(dto.getFraction());
@@ -82,6 +85,8 @@ public class StationMapper {
         dto.setId(station.getId());
         dto.setTitle(station.getTitle());
         dto.setPlanet(station.getPlanet() != null ? station.getPlanet().getId() : null);
+        dto.setUserId(station.getUser() != null ? station.getUser().getId() : null);
+        dto.setMoney(station.getMoney());
         dto.setPopulation(station.getPopulation());
         dto.setFraction(dto.getFraction());
         dto.setX(station.getX());

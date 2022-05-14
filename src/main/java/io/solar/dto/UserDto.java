@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.Instant;
+import java.util.List;
 
 @Getter
 @Setter
@@ -22,9 +23,10 @@ public class UserDto {
     private String email;
     private String password;
     private Long money;
-    private BasicObjectViewDto location;
+    private Long locationId;
     private Instant hackBlock;
     private Integer hackAttempts;
     private String avatar;
     private Integer emailNotifications;
+    private List<PermissionDto> permissions;
 }

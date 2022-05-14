@@ -4,17 +4,21 @@ import io.solar.dto.UserDto;
 import io.solar.entity.User;
 import io.solar.mapper.object.BasicObjectViewMapper;
 import io.solar.repository.UserRepository;
+import io.solar.service.object.BasicObjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class UserMapper {
 
     private final UserRepository userRepository;
-    private final BasicObjectViewMapper basicObjectViewMapper;
+    private final BasicObjectService basicObjectService;
+    private final PermissionMapper permissionMapper;
 
     public User toEntity(UserDto dto) {
 
@@ -30,13 +34,14 @@ public class UserMapper {
         user.setLogin(dto.getLogin());
         user.setPassword(dto.getPassword());
         user.setMoney(dto.getMoney());
-        user.setLocation(dto.getLocation() == null ? null : basicObjectViewMapper.toEntity(dto.getLocation()));
+        user.setLocation(dto.getLocationId() == null ? null : basicObjectService.getById(dto.getLocationId()));
         user.setHackBlock(dto.getHackBlock());
         user.setHackAttempts(dto.getHackAttempts());
         user.setAvatar(dto.getAvatar());
         user.setEmailNotifications(dto.getEmailNotifications());
         user.setEmail(dto.getEmail());
-
+        user.setPermissions(dto.getPermissions() != null ? dto.getPermissions().stream().map(permissionMapper::toEntity).collect(Collectors.toSet()) : null);
+        
         return user;
     }
 
@@ -47,11 +52,12 @@ public class UserMapper {
                 .title(user.getTitle())
                 .email(user.getEmail())
                 .money(user.getMoney())
-                .location(user.getLocation() == null ? null : basicObjectViewMapper.toDto(user.getLocation()))
+                .locationId(user.getLocation() == null ? null : user.getLocation().getId())
                 .hackBlock(user.getHackBlock())
                 .hackAttempts(user.getHackAttempts())
                 .avatar(user.getAvatar())
                 .emailNotifications(user.getEmailNotifications())
+                .permissions(user.getPermissions().stream().map(permissionMapper::toDto).toList())
                 .build();
     }
 
