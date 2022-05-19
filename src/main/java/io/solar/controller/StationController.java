@@ -64,6 +64,7 @@ public class StationController {
     @PreAuthorize("hasAnyAuthority('EDIT_STATION', 'PLAY_THE_GAME')")
     @Transactional
     public Page<StationDto> getAll(Pageable pageable, StationFilter stationFilter) {
+        int i = 0;
         return stationFacade.findAll(pageable, stationFilter);
     }
 

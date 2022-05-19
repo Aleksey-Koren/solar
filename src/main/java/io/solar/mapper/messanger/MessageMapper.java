@@ -47,6 +47,7 @@ public class MessageMapper implements EntityDtoMapper<Message, MessageDto> {
         return MessageDto.builder()
                 .id(entity.getId())
                 .senderId(entity.getSender().getId())
+                .senderTitle(entity.getSender().getTitle())
                 .roomId(entity.getRoom().getId())
                 .title(entity.getTitle())
                 .message(entity.getMessage())

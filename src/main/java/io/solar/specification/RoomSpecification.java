@@ -31,10 +31,10 @@ public class RoomSpecification implements Specification<Room> {
         if (roomFilter.getRoomType() != null) {
             predicates.add(criteriaBuilder.equal(root.get(Room_.type), RoomType.valueOf(roomFilter.getRoomType())));
         }
+
         predicates.add(criteriaBuilder.equal(usersInRoom.get(User_.id), roomFilter.getUserId()));
 
-
-        predicates.add(criteriaBuilder.and(criteriaBuilder.like(usersInRoom2.get(User_.login), roomFilter.getTitle() + "%"),
+        predicates.add(criteriaBuilder.and(criteriaBuilder.like(usersInRoom2.get(User_.title), roomFilter.getTitle() + "%"),
                 criteriaBuilder.notEqual(usersInRoom2.get(User_.id), roomFilter.getUserId())));
 
         return criteriaBuilder.and(predicates.toArray(Predicate[]::new));

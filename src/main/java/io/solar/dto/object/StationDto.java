@@ -11,6 +11,9 @@ import java.util.List;
 @Data
 public class StationDto extends BasicObjectViewDto {
 
+    private Long userId;
+    private Long money;
+
     private List<ProductionDto> production;
     private List<GoodsDto> goods;
     private List<Inventory> inventory;
