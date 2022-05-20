@@ -1,9 +1,8 @@
 package io.solar.service.messenger;
 
 import io.solar.dto.messenger.CreateRoomDto;
-import io.solar.dto.messenger.NotificationDto;
+import io.solar.dto.messenger.notification.NotificationDto;
 import io.solar.dto.messenger.RoomDto;
-import io.solar.dto.messenger.RoomDtoImpl;
 import io.solar.entity.User;
 import io.solar.entity.messenger.Message;
 import io.solar.entity.messenger.MessageType;
@@ -15,7 +14,6 @@ import io.solar.mapper.messanger.RoomMapper;
 import io.solar.repository.UserRepository;
 import io.solar.repository.messenger.MessageRepository;
 import io.solar.repository.messenger.RoomRepository;
-import io.solar.repository.messenger.UserRoomRepository;
 import io.solar.service.exception.ServiceException;
 import io.solar.specification.RoomSpecification;
 import lombok.RequiredArgsConstructor;
@@ -205,6 +203,16 @@ public class RoomService {
                 .messageType(MessageType.SYSTEM)
                 .sender(user)
                 .room(getById(roomId))
+                .build();
+    }
+
+    public Message createKickUserFromRoomMessage(Room room, User user, String kickedUserTitle) {
+
+        return Message.builder()
+                .message(kickedUserTitle + " has been kicked")
+                .messageType(MessageType.SYSTEM)
+                .sender(user)
+                .room(room)
                 .build();
     }
 }

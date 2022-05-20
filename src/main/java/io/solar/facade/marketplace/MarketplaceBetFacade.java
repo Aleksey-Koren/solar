@@ -3,7 +3,7 @@ package io.solar.facade.marketplace;
 import io.solar.config.properties.MarketplaceProperties;
 import io.solar.config.properties.MessengerProperties;
 import io.solar.dto.marketplace.MarketplaceBetDto;
-import io.solar.dto.messenger.NotificationDto;
+import io.solar.dto.messenger.notification.NotificationDto;
 import io.solar.entity.User;
 import io.solar.entity.marketplace.MarketplaceBet;
 import io.solar.entity.marketplace.MarketplaceLot;

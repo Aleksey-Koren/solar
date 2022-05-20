@@ -4,10 +4,12 @@ import io.solar.config.properties.MessengerProperties;
 import io.solar.dto.UserDto;
 import io.solar.dto.exchange.ExchangeOfferDto;
 import io.solar.dto.marketplace.MarketplaceLotDto;
-import io.solar.dto.messenger.NotificationDto;
+import io.solar.dto.messenger.notification.KickUserNotificationPayload;
+import io.solar.dto.messenger.notification.NotificationDto;
 import io.solar.entity.User;
 import io.solar.entity.exchange.Exchange;
 import io.solar.entity.messenger.NotificationType;
+import io.solar.entity.messenger.Room;
 import io.solar.service.engine.interfaces.NotificationEngine;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -88,5 +90,14 @@ public class NotificationEngineImpl implements NotificationEngine {
         simpMessagingTemplate.convertAndSendToUser(userDestination.getLogin(),
                 messengerProperties.getNotificationDestination(),
                 new NotificationDto<>(NotificationType.CANNOT_ATTACH_TO_ORBIT.name()));
+    }
+
+    @Override
+    public void sendKickUserFromRoomNotification(Room room, KickUserNotificationPayload payload) {
+        room.getUsers().forEach(user -> {
+            simpMessagingTemplate.convertAndSendToUser(user.getLogin(),
+                    messengerProperties.getNotificationDestination(),
+                    new NotificationDto<>(NotificationType.KICK_USER_FROM_ROOM.name(), payload));
+        });
     }
 }

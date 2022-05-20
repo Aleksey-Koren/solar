@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -78,6 +79,15 @@ public class RoomController {
         User user = userService.findByLogin(principal.getName());
 
         roomFacade.leaveFromRoom(user, roomId);
+    }
+
+    @DeleteMapping("/{roomId}/participants/{kickedUserId}")
+    @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
+    @Transactional
+    public void kickUserFromRoom(@PathVariable Long roomId, @PathVariable Long kickedUserId, Principal principal) {
+        User user = userService.findByLogin(principal.getName());
+
+        roomFacade.kickUserFromRoom(roomId, kickedUserId, user);
     }
 
     @GetMapping("/{roomId}/participants")

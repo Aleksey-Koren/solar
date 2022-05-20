@@ -4,12 +4,13 @@ import io.solar.dto.UserDto;
 import io.solar.dto.messenger.CreateRoomDto;
 import io.solar.dto.messenger.RoomDtoImpl;
 import io.solar.dto.messenger.SearchRoomDto;
+import io.solar.dto.messenger.notification.KickUserNotificationPayload;
 import io.solar.entity.User;
 import io.solar.entity.messenger.Room;
 import io.solar.entity.messenger.UserRoom;
 import io.solar.mapper.UserMapper;
 import io.solar.mapper.messanger.RoomMapper;
-import io.solar.repository.messenger.RoomRepository;
+import io.solar.service.UserService;
 import io.solar.service.engine.interfaces.NotificationEngine;
 import io.solar.service.messenger.RoomService;
 import io.solar.service.messenger.UserRoomService;
@@ -32,6 +33,8 @@ public class RoomFacade {
     private final WebSocketFacade webSocketFacade;
     private final RoomService roomService;
     private final UserRoomService userRoomService;
+
+    private final UserService userService;
     private final NotificationEngine notificationEngine;
     private final RoomMapper roomMapper;
     private final UserMapper userMapper;
@@ -105,6 +108,23 @@ public class RoomFacade {
         }
     }
 
+    public void kickUserFromRoom(Long roomId, Long kickedUserId, User user) {
+        Room room = roomService.getById(roomId);
+
+        if (!room.getOwner().equals(user)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    String.format("User with id = %d cannot kick users out of room with id = %d", user.getId(), room.getId())
+            );
+        }
+        User kickedUser = userService.getById(kickedUserId);
+        roomService.removeUserFromRoom(room, kickedUser);
+        regenerateTitleIfNeeded(room);
+        roomService.save(room);
+
+        sendKickUserFromRoomNotification(kickedUser, room);
+        webSocketFacade.sendSystemMessage(roomService.createKickUserFromRoomMessage(room, user, kickedUser.getTitle()));
+    }
+
     private void regenerateTitleIfNeeded(Room room) {
         if (room.getDefaultTitle()) {
             List<String> usersTitles = room.getUsers().stream().map(User::getTitle).toList();
@@ -116,5 +136,15 @@ public class RoomFacade {
     private void sendLeaveRoomNotifications(List<User> roomParticipants, User departedUser) {
         roomParticipants.forEach(userInRoom ->
                 notificationEngine.sendLeaveRoomNotification(userInRoom, userMapper.toDtoWithIdAndTitle(departedUser)));
+    }
+
+    private void sendKickUserFromRoomNotification(User kickedUser, Room room) {
+        KickUserNotificationPayload payload = KickUserNotificationPayload.builder()
+                .kickedUserId(kickedUser.getId())
+                .roomId(room.getId())
+                .roomTitle(room.getTitle())
+                .build();
+
+        notificationEngine.sendKickUserFromRoomNotification(room, payload);
     }
 }

@@ -1,4 +1,4 @@
-package io.solar.dto.messenger;
+package io.solar.dto.messenger.notification;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
