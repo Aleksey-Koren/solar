@@ -11,4 +11,5 @@ public class UserFilter {
 
     private String login;
     private String title;
+    private Integer notInRoom;
 }

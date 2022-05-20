@@ -36,4 +36,6 @@ public class Message {
 
     @Enumerated(EnumType.STRING)
     private MessageType messageType;
+
+
 }

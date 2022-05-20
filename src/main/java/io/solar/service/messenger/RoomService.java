@@ -3,7 +3,6 @@ package io.solar.service.messenger;
 import io.solar.dto.messenger.CreateRoomDto;
 import io.solar.dto.messenger.NotificationDto;
 import io.solar.dto.messenger.RoomDto;
-import io.solar.dto.messenger.RoomDtoImpl;
 import io.solar.entity.User;
 import io.solar.entity.messenger.Message;
 import io.solar.entity.messenger.MessageType;
@@ -15,7 +14,7 @@ import io.solar.mapper.messanger.RoomMapper;
 import io.solar.repository.UserRepository;
 import io.solar.repository.messenger.MessageRepository;
 import io.solar.repository.messenger.RoomRepository;
-import io.solar.repository.messenger.UserRoomRepository;
+import io.solar.service.UserService;
 import io.solar.service.exception.ServiceException;
 import io.solar.specification.RoomSpecification;
 import lombok.RequiredArgsConstructor;
@@ -40,6 +39,7 @@ public class RoomService {
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final UserRoomService userRoomService;
     private final MessageRepository messageRepository;
+    private  final UserService userService;
 
     public Optional<Room> findById(Long id) {
         return roomRepository.findById(id);
@@ -63,9 +63,7 @@ public class RoomService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Such a private room already exists");
         }
 
-        User interlocutor = userRepository.findById(dto.getUserId()).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        String.format("There is no user with id = %d in database", dto.getUserId())));
+        User interlocutor = userService.getById(dto.getUserId());
 
         Room room = Room.builder()
                 .owner(owner)
