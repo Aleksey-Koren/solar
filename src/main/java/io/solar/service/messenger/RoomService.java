@@ -1,7 +1,7 @@
 package io.solar.service.messenger;
 
 import io.solar.dto.messenger.CreateRoomDto;
-import io.solar.dto.messenger.NotificationDto;
+import io.solar.dto.messenger.notification.NotificationDto;
 import io.solar.dto.messenger.RoomDto;
 import io.solar.entity.User;
 import io.solar.entity.messenger.Message;
@@ -203,6 +203,16 @@ public class RoomService {
                 .messageType(MessageType.SYSTEM)
                 .sender(user)
                 .room(getById(roomId))
+                .build();
+    }
+
+    public Message createKickUserFromRoomMessage(Room room, User user, String kickedUserTitle) {
+
+        return Message.builder()
+                .message(kickedUserTitle + " has been kicked")
+                .messageType(MessageType.SYSTEM)
+                .sender(user)
+                .room(room)
                 .build();
     }
 }
