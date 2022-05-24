@@ -1,8 +1,9 @@
 package io.solar.service.messenger;
 
 import io.solar.dto.messenger.CreateRoomDto;
-import io.solar.dto.messenger.notification.NotificationDto;
+import io.solar.dto.messenger.MessageDto;
 import io.solar.dto.messenger.RoomDto;
+import io.solar.dto.messenger.notification.NotificationDto;
 import io.solar.entity.User;
 import io.solar.entity.messenger.Message;
 import io.solar.entity.messenger.MessageType;
@@ -11,10 +12,10 @@ import io.solar.entity.messenger.Room;
 import io.solar.entity.messenger.RoomType;
 import io.solar.entity.messenger.UserRoom;
 import io.solar.mapper.messanger.RoomMapper;
-import io.solar.repository.UserRepository;
 import io.solar.repository.messenger.MessageRepository;
 import io.solar.repository.messenger.RoomRepository;
 import io.solar.service.UserService;
+import io.solar.service.engine.interfaces.NotificationEngine;
 import io.solar.service.exception.ServiceException;
 import io.solar.specification.RoomSpecification;
 import lombok.RequiredArgsConstructor;
@@ -35,11 +36,13 @@ public class RoomService {
 
     private final RoomRepository roomRepository;
     private final RoomMapper roomMapper;
-    private final UserRepository userRepository;
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final UserRoomService userRoomService;
     private final MessageRepository messageRepository;
-    private  final UserService userService;
+    private final UserService userService;
+    private final MessageService messageService;
+    private final WebSocketService webSocketService;
+    private final NotificationEngine notificationEngine;
 
     public Optional<Room> findById(Long id) {
         return roomRepository.findById(id);
@@ -100,15 +103,8 @@ public class RoomService {
 
     public void inviteToExistingRoom(User inviter, Long invitedId, Long roomId) {
 
-        Room room = roomRepository.findById(roomId).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        String.format("There is no room with id = %d in database", roomId)
-                ));
-
-        User invited = userRepository.findById(invitedId).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        String.format("There is no user with id = %d in database", invitedId)
-                ));
+        Room room = getById(roomId);
+        User invited = userService.getById(invitedId);
 
         if (RoomType.PRIVATE.equals(room.getType())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "It is impossible to invite somebody else to existing private room");
@@ -117,14 +113,13 @@ public class RoomService {
         boolean inviterIsInRoom = userRoomService.findByUserAndRoom(inviter, room).isPresent();
         boolean invitedIsAlreadyInRoom = userRoomService.findByUserAndRoom(invited, room).isPresent();
 
+        if (invitedIsAlreadyInRoom) {
+            return;
+        }
+
         if (!inviterIsInRoom) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     String.format("User id = %d is not in room id = %d. He can't invite anybody to this room", inviter.getId(), roomId));
-        }
-
-        if (invitedIsAlreadyInRoom) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    String.format("User id = %d is already in room id = %d. He can't be invited to this room twice", invited.getId(), roomId));
         }
 
         if (RoomType.SYSTEM.equals(room.getType())) {
@@ -133,6 +128,24 @@ public class RoomService {
         }
 
         addUserToRoom(invited, room);
+        Message systemMessage = Message.builder()
+                .message(String.format("%s was invited to room by %s", invited.getTitle(), inviter.getTitle()))
+                .messageType(MessageType.SYSTEM)
+                .sender(inviter)
+                .room(room)
+                .build();
+        messageService.processNonChatMessage(systemMessage);
+        webSocketService.sendSystemMessage(
+                MessageDto.builder()
+                        .message(systemMessage.getMessage())
+                        .messageType(systemMessage.getMessageType().name())
+                        .senderId(systemMessage.getSender().getId())
+                        .roomId(systemMessage.getRoom().getId())
+                        .build(),
+                systemMessage.getRoom().getId()
+        );
+
+        notificationEngine.sendRoomUpdated(room, roomMapper.toDto(room));
     }
 
     public String generatePublicTitle(List<String> usersTitles) {

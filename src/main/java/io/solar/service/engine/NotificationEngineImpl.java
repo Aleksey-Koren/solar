@@ -4,6 +4,8 @@ import io.solar.config.properties.MessengerProperties;
 import io.solar.dto.UserDto;
 import io.solar.dto.exchange.ExchangeOfferDto;
 import io.solar.dto.marketplace.MarketplaceLotDto;
+import io.solar.dto.messenger.RoomDto;
+import io.solar.dto.messenger.SearchRoomDto;
 import io.solar.dto.messenger.notification.KickUserNotificationPayload;
 import io.solar.dto.messenger.notification.NotificationDto;
 import io.solar.entity.User;
@@ -98,6 +100,15 @@ public class NotificationEngineImpl implements NotificationEngine {
             simpMessagingTemplate.convertAndSendToUser(user.getLogin(),
                     messengerProperties.getNotificationDestination(),
                     new NotificationDto<>(NotificationType.KICK_USER_FROM_ROOM.name(), payload));
+        });
+    }
+
+    @Override
+    public void sendRoomUpdated(Room room, RoomDto payload) {
+        room.getUsers().forEach(user -> {
+            simpMessagingTemplate.convertAndSendToUser(user.getLogin(),
+                    messengerProperties.getNotificationDestination(),
+                    new NotificationDto<>(NotificationType.ROOM_UPDATED.name(), payload));
         });
     }
 }

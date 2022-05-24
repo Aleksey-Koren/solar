@@ -2,6 +2,7 @@ package io.solar.controller.messenger;
 
 import io.solar.dto.UserDto;
 import io.solar.dto.messenger.CreateRoomDto;
+import io.solar.dto.messenger.InviteToRoomDto;
 import io.solar.dto.messenger.RoomDtoImpl;
 import io.solar.dto.messenger.SearchRoomDto;
 import io.solar.entity.User;
@@ -63,13 +64,13 @@ public class RoomController {
     @PatchMapping("/{roomId}/participants")
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
     @Transactional
-    public void inviteToRoom(@RequestBody Long invitedId,
+    public void inviteToRoom(@RequestBody InviteToRoomDto dto,
                              @PathVariable("roomId") Long roomId,
                              Principal principal) {
 
         User inviter = userService.findByLogin(principal.getName());
 
-        roomFacade.inviteToExistingRoom(inviter, invitedId, roomId);
+        roomFacade.inviteToExistingRoom(inviter, dto.getInvitedIds(), roomId);
     }
 
     @PatchMapping("/{roomId}/leave")

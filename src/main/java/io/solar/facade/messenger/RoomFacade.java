@@ -91,8 +91,8 @@ public class RoomFacade {
         return HttpStatus.OK;
     }
 
-    public void inviteToExistingRoom(User inviter, Long invitedId, Long roomId) {
-        roomService.inviteToExistingRoom(inviter, invitedId, roomId);
+    public void inviteToExistingRoom(User inviter, List<Long> invitedIds, Long roomId) {
+        invitedIds.forEach(s -> roomService.inviteToExistingRoom(inviter, s, roomId));
     }
 
     public void leaveFromRoom(User user, Long roomId) {

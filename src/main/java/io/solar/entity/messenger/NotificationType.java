@@ -4,6 +4,7 @@ public enum NotificationType {
     INVITED_TO_ROOM,
     EDITED_ROOM_TITLE,
     KICK_USER_FROM_ROOM,
+    ROOM_UPDATED,
     BET_OVERBID,
     INSTANT_PURCHASE,
     MONEY_UPDATED,
@@ -16,5 +17,5 @@ public enum NotificationType {
     LEAVE_EXCHANGE,
     OFFER_CREATED,
     OFFER_UPDATED,
-    CANNOT_ATTACH_TO_ORBIT
+    CANNOT_ATTACH_TO_ORBIT,
 }

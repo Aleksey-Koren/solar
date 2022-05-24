@@ -3,6 +3,7 @@ package io.solar.service.engine.interfaces;
 import io.solar.dto.UserDto;
 import io.solar.dto.exchange.ExchangeOfferDto;
 import io.solar.dto.marketplace.MarketplaceLotDto;
+import io.solar.dto.messenger.RoomDto;
 import io.solar.dto.messenger.notification.KickUserNotificationPayload;
 import io.solar.entity.User;
 import io.solar.entity.exchange.Exchange;
@@ -30,4 +31,6 @@ public interface NotificationEngine {
     void sendCannotAttachToOrbitNotification(User userDestination);
 
     void sendKickUserFromRoomNotification(Room room, KickUserNotificationPayload payload);
+
+    void sendRoomUpdated(Room room, RoomDto payload);
 }
