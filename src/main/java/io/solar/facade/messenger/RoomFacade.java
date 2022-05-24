@@ -4,9 +4,10 @@ import io.solar.dto.UserDto;
 import io.solar.dto.messenger.CreateRoomDto;
 import io.solar.dto.messenger.RoomDtoImpl;
 import io.solar.dto.messenger.SearchRoomDto;
-import io.solar.dto.messenger.notification.KickUserNotificationPayload;
+import io.solar.dto.messenger.notification.DepartedUserNotificationPayload;
 import io.solar.entity.User;
 import io.solar.entity.messenger.Room;
+import io.solar.entity.messenger.RoomType;
 import io.solar.entity.messenger.UserRoom;
 import io.solar.mapper.UserMapper;
 import io.solar.mapper.messanger.RoomMapper;
@@ -102,9 +103,12 @@ public class RoomFacade {
             roomService.removeUserFromRoom(room, user);
             regenerateTitleIfNeeded(room);
             roomService.save(room);
-            sendLeaveRoomNotifications(room.getUsers(), user);
+
+            sendKickOrLeaveUserFromRoomNotification(user, room);
+            webSocketFacade.sendSystemMessage(roomService.createLeaveUserFromRoomMessage(room, user));
         } else {
             roomService.deleteRoom(room);
+            notificationEngine.sendRoomDeletedNotification(room);
         }
     }
 
@@ -121,8 +125,27 @@ public class RoomFacade {
         regenerateTitleIfNeeded(room);
         roomService.save(room);
 
-        sendKickUserFromRoomNotification(kickedUser, room);
+        sendKickOrLeaveUserFromRoomNotification(kickedUser, room);
         webSocketFacade.sendSystemMessage(roomService.createKickUserFromRoomMessage(room, user, kickedUser.getTitle()));
+    }
+
+    public void deleteRoom(User user, Long roomId) {
+        Room room = roomService.getById(roomId);
+
+        if (!room.getUsers().contains(user)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    String.format("User with id = %d cannot delete room with id = %d", user.getId(), room.getId())
+            );
+        }
+
+        if (room.getType().equals(RoomType.PUBLIC) && !room.getOwner().equals(user)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    String.format("User with id = %d not an admin and cannot delete room with id = %d", user.getId(), room.getId())
+            );
+        }
+
+        roomService.deleteRoom(room);
+        notificationEngine.sendRoomDeletedNotification(room);
     }
 
     private void regenerateTitleIfNeeded(Room room) {
@@ -133,18 +156,13 @@ public class RoomFacade {
         }
     }
 
-    private void sendLeaveRoomNotifications(List<User> roomParticipants, User departedUser) {
-        roomParticipants.forEach(userInRoom ->
-                notificationEngine.sendLeaveRoomNotification(userInRoom, userMapper.toDtoWithIdAndTitle(departedUser)));
-    }
-
-    private void sendKickUserFromRoomNotification(User kickedUser, Room room) {
-        KickUserNotificationPayload payload = KickUserNotificationPayload.builder()
-                .kickedUserId(kickedUser.getId())
+    private void sendKickOrLeaveUserFromRoomNotification(User departedUser, Room room) {
+        DepartedUserNotificationPayload payload = DepartedUserNotificationPayload.builder()
+                .kickedUserId(departedUser.getId())
                 .roomId(room.getId())
                 .roomTitle(room.getTitle())
                 .build();
 
-        notificationEngine.sendKickUserFromRoomNotification(room, payload);
+        notificationEngine.sendKickOrLeaveUserFromRoomNotification(room, payload);
     }
 }

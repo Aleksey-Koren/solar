@@ -228,4 +228,14 @@ public class RoomService {
                 .room(room)
                 .build();
     }
+
+    public Message createLeaveUserFromRoomMessage(Room room, User user) {
+
+        return Message.builder()
+                .message(user.getTitle() + " left the room")
+                .messageType(MessageType.SYSTEM)
+                .sender(user)
+                .room(room)
+                .build();
+    }
 }

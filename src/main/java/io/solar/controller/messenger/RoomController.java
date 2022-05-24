@@ -82,6 +82,15 @@ public class RoomController {
         roomFacade.leaveFromRoom(user, roomId);
     }
 
+    @DeleteMapping("/{roomId}")
+    @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
+    @Transactional
+    public void deleteRoom(@PathVariable Long roomId, Principal principal) {
+        User user = userService.findByLogin(principal.getName());
+
+        roomFacade.deleteRoom(user, roomId);
+    }
+
     @DeleteMapping("/{roomId}/participants/{kickedUserId}")
     @PreAuthorize("hasAuthority('PLAY_THE_GAME')")
     @Transactional

@@ -1,10 +1,10 @@
 package io.solar.service.engine.interfaces;
 
-import io.solar.dto.UserDto;
 import io.solar.dto.exchange.ExchangeOfferDto;
 import io.solar.dto.marketplace.MarketplaceLotDto;
 import io.solar.dto.messenger.RoomDto;
 import io.solar.dto.messenger.notification.KickUserNotificationPayload;
+import io.solar.dto.messenger.notification.DepartedUserNotificationPayload;
 import io.solar.entity.User;
 import io.solar.entity.exchange.Exchange;
 import io.solar.entity.messenger.NotificationType;
@@ -17,8 +17,6 @@ public interface NotificationEngine {
     void notificationToUser(NotificationType type, String userName, Object payload);
 
     public <T> void sendToUser(NotificationType type, User destinationUser, T payload);
-
-    void sendLeaveRoomNotification(User userDestination, UserDto payload);
 
     void sendInstantPurchaseNotification(User lotOwner, MarketplaceLotDto lotDto);
 
@@ -33,4 +31,8 @@ public interface NotificationEngine {
     void sendKickUserFromRoomNotification(Room room, KickUserNotificationPayload payload);
 
     void sendRoomUpdated(Room room, RoomDto payload);
+
+    void sendKickOrLeaveUserFromRoomNotification(Room room, DepartedUserNotificationPayload payload);
+
+    void sendRoomDeletedNotification(Room deletedRoom);
 }

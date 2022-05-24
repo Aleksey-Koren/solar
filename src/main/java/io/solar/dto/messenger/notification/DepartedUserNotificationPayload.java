@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class KickUserNotificationPayload {
+public class DepartedUserNotificationPayload {
     private Long kickedUserId;
     private Long roomId;
     private String roomTitle;
