@@ -1,5 +1,6 @@
 package io.solar.dto.messenger;
 
+import io.solar.dto.messenger.enums.RoomDtoErrorStatus;
 import io.solar.entity.messenger.RoomType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,4 +20,10 @@ public class RoomDtoImpl implements RoomDto{
     private Long ownerId;
     private Long amount;
     private RoomType roomType;
+    private RoomDtoErrorStatus errorStatus;
+
+    public RoomDtoImpl(RoomDtoErrorStatus errorStatus) {
+        this.errorStatus = errorStatus;
+    }
+
 }
