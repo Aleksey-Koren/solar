@@ -1,10 +1,9 @@
 package io.solar.service.engine;
 
 import io.solar.config.properties.MessengerProperties;
-import io.solar.dto.UserDto;
 import io.solar.dto.exchange.ExchangeOfferDto;
 import io.solar.dto.marketplace.MarketplaceLotDto;
-import io.solar.dto.messenger.notification.KickUserNotificationPayload;
+import io.solar.dto.messenger.notification.DepartedUserNotificationPayload;
 import io.solar.dto.messenger.notification.NotificationDto;
 import io.solar.entity.User;
 import io.solar.entity.exchange.Exchange;
@@ -43,14 +42,6 @@ public class NotificationEngineImpl implements NotificationEngine {
         simpMessagingTemplate.convertAndSendToUser(destinationUser.getLogin(),
                 messengerProperties.getNotificationDestination(),
                 new NotificationDto<>(type.name(), payload));
-    }
-
-    @Override
-    public void sendLeaveRoomNotification(User userDestination, UserDto payload) {
-
-        simpMessagingTemplate.convertAndSendToUser(userDestination.getLogin(),
-                messengerProperties.getNotificationDestination(),
-                new NotificationDto<>(NotificationType.LEAVE_ROOM.name(), payload));
     }
 
     @Override
@@ -93,11 +84,20 @@ public class NotificationEngineImpl implements NotificationEngine {
     }
 
     @Override
-    public void sendKickUserFromRoomNotification(Room room, KickUserNotificationPayload payload) {
+    public void sendKickOrLeaveUserFromRoomNotification(Room room, DepartedUserNotificationPayload payload) {
         room.getUsers().forEach(user -> {
             simpMessagingTemplate.convertAndSendToUser(user.getLogin(),
                     messengerProperties.getNotificationDestination(),
-                    new NotificationDto<>(NotificationType.KICK_USER_FROM_ROOM.name(), payload));
+                    new NotificationDto<>(NotificationType.KICK_OR_LEAVE_USER_FROM_ROOM.name(), payload));
         });
+    }
+
+    @Override
+    public void sendRoomDeletedNotification(Room deletedRoom) {
+        deletedRoom.getUsers().forEach(user ->
+                simpMessagingTemplate.convertAndSendToUser(user.getLogin(),
+                        messengerProperties.getNotificationDestination(),
+                        new NotificationDto<>(NotificationType.ROOM_DELETED.name(), deletedRoom.getId()))
+        );
     }
 }

@@ -39,7 +39,7 @@ public class RoomService {
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final UserRoomService userRoomService;
     private final MessageRepository messageRepository;
-    private  final UserService userService;
+    private final UserService userService;
 
     public Optional<Room> findById(Long id) {
         return roomRepository.findById(id);
@@ -210,6 +210,16 @@ public class RoomService {
 
         return Message.builder()
                 .message(kickedUserTitle + " has been kicked")
+                .messageType(MessageType.SYSTEM)
+                .sender(user)
+                .room(room)
+                .build();
+    }
+
+    public Message createLeaveUserFromRoomMessage(Room room, User user) {
+
+        return Message.builder()
+                .message(user.getTitle() + " left the room")
                 .messageType(MessageType.SYSTEM)
                 .sender(user)
                 .room(room)
