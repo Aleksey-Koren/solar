@@ -19,6 +19,8 @@ import io.solar.service.engine.interfaces.NotificationEngine;
 import io.solar.service.exception.ServiceException;
 import io.solar.specification.RoomSpecification;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -32,6 +34,7 @@ import static java.util.stream.Collectors.joining;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class RoomService {
 
     private final RoomRepository roomRepository;
@@ -82,7 +85,13 @@ public class RoomService {
                 .defaultTitle(true)
                 .build();
 
-        roomRepository.save(room);
+        try {
+            roomRepository.save(room);
+        } catch (DataIntegrityViolationException e) {
+            log.warn(String.format("Room with title %s already exists in database", room.getTitle()));
+            throw new ResponseStatusException(HttpStatus.CONFLICT);
+        }
+
         inviteToRoom(room, owner);
 
         if(dto.getIsPrivate()) {
@@ -104,7 +113,13 @@ public class RoomService {
 
         room.setTitle(roomTitle);
         room.setDefaultTitle(false);
-        roomRepository.save(room);
+
+        try {
+            roomRepository.saveAndFlush(room);
+        } catch (DataIntegrityViolationException e) {
+            log.warn(String.format("Room with title %s already exists in database", room.getTitle()));
+            throw new ResponseStatusException(HttpStatus.CONFLICT);
+        }
 
         sendChangeRoomTitleNotification(room);
     }
