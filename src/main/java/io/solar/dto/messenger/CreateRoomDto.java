@@ -11,4 +11,5 @@ public class CreateRoomDto {
 
     private Long userId;
     private Boolean isPrivate;
+    private String title;
 }

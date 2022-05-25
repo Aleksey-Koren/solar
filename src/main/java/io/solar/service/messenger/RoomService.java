@@ -66,7 +66,11 @@ public class RoomService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Such a private room already exists");
         }
 
-        User interlocutor = userService.getById(dto.getUserId());
+        User interlocutor = null;
+
+        if(dto.getIsPrivate()) {
+            interlocutor = userService.getById(dto.getUserId());
+        }
 
         Room room = Room.builder()
                 .owner(owner)
@@ -74,13 +78,17 @@ public class RoomService {
                 .type(dto.getIsPrivate() ? RoomType.PRIVATE : RoomType.PUBLIC)
                 .title(dto.getIsPrivate()
                         ? generatePrivateTitle(owner, interlocutor)
-                        : generatePublicTitle(List.of(owner.getTitle(), interlocutor.getTitle())))
+                        : dto.getTitle())
                 .defaultTitle(true)
                 .build();
 
         roomRepository.save(room);
         inviteToRoom(room, owner);
-        inviteToRoom(room, interlocutor);
+
+        if(dto.getIsPrivate()) {
+            inviteToRoom(room, interlocutor);
+        }
+
         return room;
     }
 

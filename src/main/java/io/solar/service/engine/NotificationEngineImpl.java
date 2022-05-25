@@ -4,7 +4,6 @@ import io.solar.config.properties.MessengerProperties;
 import io.solar.dto.exchange.ExchangeOfferDto;
 import io.solar.dto.marketplace.MarketplaceLotDto;
 import io.solar.dto.messenger.RoomDto;
-import io.solar.dto.messenger.SearchRoomDto;
 import io.solar.dto.messenger.notification.DepartedUserNotificationPayload;
 import io.solar.dto.messenger.notification.NotificationDto;
 import io.solar.entity.User;
