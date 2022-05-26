@@ -32,4 +32,8 @@ public interface NotificationEngine {
     void sendKickOrLeaveUserFromRoomNotification(Room room, DepartedUserNotificationPayload payload);
 
     void sendRoomDeletedNotification(Room deletedRoom);
+
+    void sendInviteToRoomNotification(User user, RoomDto dto);
+
+    void sendChangeRoomTitleNotification(Room room, RoomDto dto);
 }

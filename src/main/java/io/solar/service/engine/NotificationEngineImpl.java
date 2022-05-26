@@ -110,4 +110,18 @@ public class NotificationEngineImpl implements NotificationEngine {
                         new NotificationDto<>(NotificationType.ROOM_DELETED.name(), deletedRoom.getId()))
         );
     }
+
+    @Override
+    public void sendInviteToRoomNotification(User user, RoomDto dto) {
+        simpMessagingTemplate.convertAndSendToUser(user.getLogin(),
+                "/notifications",
+                new NotificationDto<>(NotificationType.INVITED_TO_ROOM.name(), dto));
+    }
+
+    @Override
+    public void sendChangeRoomTitleNotification(Room room, RoomDto dto) {
+        room.getUsers().forEach(s -> simpMessagingTemplate.convertAndSendToUser(s.getLogin(),
+                "/notifications",
+                new NotificationDto<>(NotificationType.EDITED_ROOM_TITLE.name(), dto)));
+    }
 }

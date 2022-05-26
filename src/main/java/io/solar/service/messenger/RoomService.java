@@ -88,7 +88,7 @@ public class RoomService {
         try {
             roomRepository.save(room);
         } catch (DataIntegrityViolationException e) {
-            log.warn(String.format("Room with title %s already exists in database", room.getTitle()));
+            log.warn("Room with title {} already exists in database", room.getTitle());
             throw new ResponseStatusException(HttpStatus.CONFLICT);
         }
 
@@ -117,11 +117,11 @@ public class RoomService {
         try {
             roomRepository.saveAndFlush(room);
         } catch (DataIntegrityViolationException e) {
-            log.warn(String.format("Room with title %s already exists in database", room.getTitle()));
+            log.warn("Room with title {} already exists in database", room.getTitle());
             throw new ResponseStatusException(HttpStatus.CONFLICT);
         }
 
-        sendChangeRoomTitleNotification(room);
+        notificationEngine.sendChangeRoomTitleNotification(room, roomMapper.toDto(room));
     }
 
     public void inviteToExistingRoom(User inviter, Long invitedId, Long roomId) {
@@ -150,13 +150,9 @@ public class RoomService {
                     String.format("Room with id = %d is SYSTEM. It is impossible to invite somebody to this room", room.getId()));
         }
 
-        addUserToRoom(invited, room);
-        Message systemMessage = Message.builder()
-                .message(String.format("%s was invited to room by %s", invited.getTitle(), inviter.getTitle()))
-                .messageType(MessageType.SYSTEM)
-                .sender(inviter)
-                .room(room)
-                .build();
+        inviteToRoom(room, invited);
+        Message systemMessage = createInvitedToRoomMessage(invited, inviter, room);
+
         messageService.processNonChatMessage(systemMessage);
         webSocketService.sendSystemMessage(
                 MessageDto.builder()
@@ -209,18 +205,12 @@ public class RoomService {
 
     private void inviteToRoom(Room room, User user) {
         addUserToRoom(user, room);
-        sendInviteNotification(user, room);
+        notificationEngine.sendInviteToRoomNotification(user, roomMapper.toDto(room));
     }
 
     private void addUserToRoom(User user, Room room) {
         UserRoom userRoom = new UserRoom(user, room);
         userRoomService.save(userRoom);
-    }
-
-    private void sendInviteNotification(User user, Room room) {
-        simpMessagingTemplate.convertAndSendToUser(user.getLogin(),
-                "/notifications",
-                new NotificationDto<>(NotificationType.INVITED_TO_ROOM.name(), roomMapper.toDto(room)));
     }
 
     private void sendChangeRoomTitleNotification(Room room) {
@@ -258,6 +248,16 @@ public class RoomService {
                 .message(user.getTitle() + " left the room")
                 .messageType(MessageType.SYSTEM)
                 .sender(user)
+                .room(room)
+                .build();
+    }
+
+    public Message createInvitedToRoomMessage(User invited, User inviter, Room room) {
+
+        return Message.builder()
+                .message(String.format("%s was invited to room by %s", invited.getTitle(), inviter.getTitle()))
+                .messageType(MessageType.SYSTEM)
+                .sender(inviter)
                 .room(room)
                 .build();
     }
